@@ -20,4 +20,4 @@ Contribuições são bem-vindas! Por favor, abra uma issue ou envie um pull requ
 
 ## Licença
 
-[Adicione informações sobre a licença aqui]
+[Adicione informações sobre a licença aqui]# rpg-player
