@@ -487,6 +487,18 @@ async function checkAuthentication() {
     console.log('🔐 Verificando autenticação...')
     
     try {
+        // CORREÇÃO: Verificar se há token de confirmação na URL (vindo do email)
+        const hashParams = new URLSearchParams(window.location.hash.substring(1))
+        const accessToken = hashParams.get('access_token')
+        
+        if (accessToken) {
+            console.log('📧 Token de confirmação de email detectado na URL!')
+            console.log('⏳ Aguardando Supabase processar a sessão...')
+            
+            // Aguarda um pouco para o Supabase processar o token
+            await new Promise(resolve => setTimeout(resolve, 1500))
+        }
+        
         // Usa o checkAuth da nova autenticação
         const user = await checkAuth()
         
@@ -495,6 +507,15 @@ async function checkAuthentication() {
             // CORREÇÃO: Garantir que currentUserId está no localStorage
             localStorage.setItem('currentUserId', user.id)
             localStorage.setItem('isLoggedIn', 'true')
+            localStorage.setItem('userEmail', user.email || '')
+            localStorage.setItem('onboardingCompleted', 'false')
+            
+            // Limpa o hash da URL para evitar reprocessamento
+            if (accessToken) {
+                console.log('🧹 Limpando token da URL...')
+                window.history.replaceState(null, '', window.location.pathname)
+            }
+            
             return true
         } else {
             console.log('⚠️ Usuário não autenticado')
