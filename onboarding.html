@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RPG Player - Configure seu Perfil</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Cinzel+Decorative:wght@400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles/onboarding.css">
+</head>
+<body>
+    <div class="onboarding-container">
+        <!-- Header com Logo -->
+        <header class="onboarding-header">
+            <div class="logo">
+                <h1>⚔️ RPG Player</h1>
+            </div>
+            <div class="skip-btn-container">
+                <button onclick="debugUserState()" class="skip-btn" style="margin-right: 10px; background: rgba(0, 123, 255, 0.2); border: 1px solid #007bff; color: #007bff;">🔍 Debug</button>
+                <button id="logoutBtn" class="skip-btn" style="margin-right: 10px; background: rgba(220, 53, 69, 0.2); border: 1px solid #dc3545; color: #dc3545;">Sair</button>
+                <button id="skipBtn" class="skip-btn">Pular Configuração</button>
+            </div>
+        </header>
+
+        <!-- Progress Bar -->
+        <div class="progress-container">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+                <div class="progress-shimmer"></div>
+            </div>
+            <div class="progress-text">
+                <span id="currentStep">1</span> de <span id="totalSteps">5</span>
+            </div>
+        </div>
+
+        <!-- Onboarding Steps -->
+        <main class="onboarding-main">
+            <!-- Etapa 1: Avatar -->
+            <div class="onboarding-step active" id="step1">
+                <div class="step-content">
+                    <div class="step-header">
+                        <h2>📸 Escolha sua Imagem de Perfil</h2>
+                        <p>Como você gostaria de ser reconhecido em suas aventuras?</p>
+                    </div>
+
+                    <div class="avatar-section">
+                        <div class="avatar-upload">
+                            <div class="avatar-preview" id="avatarPreview">
+                                <img id="avatarImage" src="https://via.placeholder.com/120" alt="Avatar">
+                                <div class="upload-overlay">
+                                    <span>📷</span>
+                                    <small>Clique para enviar sua foto</small>
+                                </div>
+                            </div>
+                            <input type="file" id="avatarInput" accept="image/*" style="display: none;">
+                        </div>
+
+                        <div class="divider-or">ou escolha um avatar</div>
+
+                        <div class="preset-avatars">
+                            <div class="avatar-preset" data-avatar="🏠">🏠</div>
+                            <div class="avatar-preset" data-avatar="⚔️">⚔️</div>
+                            <div class="avatar-preset" data-avatar="🛡️">🛡️</div>
+                            <div class="avatar-preset" data-avatar="🏹">🏹</div>
+                            <div class="avatar-preset" data-avatar="🔮">🔮</div>
+                            <div class="avatar-preset" data-avatar="📿">📿</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Etapa 2: Nome -->
+            <div class="onboarding-step" id="step2">
+                <div class="step-content">
+                    <div class="step-header">
+                        <h2>⚡ Qual é o seu nome de aventureiro?</h2>
+                        <p>Este será o nome que outros jogadores verão</p>
+                    </div>
+
+                    <div class="name-section">
+                        <div class="input-group">
+                            <input type="text" id="playerName" placeholder="Digite seu nome..." maxlength="30">
+                            <div class="input-validation" id="nameValidation"></div>
+                        </div>
+                        <div class="name-suggestions">
+                            <p>Sugestões épicas:</p>
+                            <div class="suggestions-list">
+                                <button class="suggestion-btn" data-name="Kael Ventolâmina">Kael Ventolâmina</button>
+                                <button class="suggestion-btn" data-name="Lyra Forjaferro">Lyra Forjaferro</button>
+                                <button class="suggestion-btn" data-name="Zephyr Luaverde">Zephyr Luaverde</button>
+                                <button class="suggestion-btn" data-name="Aris Pedrasombra">Aris Pedrasombra</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Etapa 3: Idade -->
+            <div class="onboarding-step" id="step3">
+                <div class="step-content">
+                    <div class="step-header">
+                        <h2>🎂 Qual é a sua idade?</h2>
+                        <p>Isso nos ajuda a personalizar sua experiência</p>
+                    </div>
+
+                    <div class="age-section">
+                        <div class="age-slider-container">
+                            <div class="age-display">
+                                <span id="ageValue">18</span> anos
+                            </div>
+                            <input type="range" id="ageSlider" min="13" max="99" value="18" class="age-slider">
+                            <div class="age-range">
+                                <span>13</span>
+                                <span>99+</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Etapa 4: Experiência -->
+            <div class="onboarding-step" id="step4">
+                <div class="step-content">
+                    <div class="step-header">
+                        <h2>🎮 Qual é sua experiência com RPG?</h2>
+                        <p>Isso nos ajuda a recomendar o conteúdo ideal</p>
+                    </div>
+
+                    <div class="experience-section">
+                        <div class="experience-cards">
+                            <div class="experience-card" data-experience="iniciante">
+                                <div class="card-icon">🌱</div>
+                                <h3>Iniciante</h3>
+                                <p>Novo no mundo dos RPGs, pronto para descobrir aventuras épicas</p>
+                                <div class="card-features">
+                                    <span>• Tutoriais inclusos</span>
+                                    <span>• Suporte dedicado</span>
+                                    <span>• Mesas para iniciantes</span>
+                                </div>
+                            </div>
+                            <div class="experience-card" data-experience="intermediario">
+                                <div class="card-icon">⚔️</div>
+                                <h3>Intermediário</h3>
+                                <p>Já jogou alguns RPGs e conhece o básico das mecânicas</p>
+                                <div class="card-features">
+                                    <span>• Conteúdo balanceado</span>
+                                    <span>• Mesas variadas</span>
+                                    <span>• Ferramentas avançadas</span>
+                                </div>
+                            </div>
+                            <div class="experience-card" data-experience="avancado">
+                                <div class="card-icon">🏆</div>
+                                <h3>Avançado</h3>
+                                <p>Veterano experiente, conhece múltiplos sistemas e estratégias</p>
+                                <div class="card-features">
+                                    <span>• Todas as funcionalidades</span>
+                                    <span>• Mesas complexas</span>
+                                    <span>• Ferramentas de mestre</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Etapa 5: Função -->
+            <div class="onboarding-step" id="step5">
+                <div class="step-content">
+                    <div class="step-header">
+                        <h2>🎭 Como você pretende participar?</h2>
+                        <p>Defina seu papel principal nas aventuras</p>
+                    </div>
+
+                    <div class="role-section">
+                        <div class="role-cards">
+                            <div class="role-card" data-role="jogador">
+                                <div class="role-icon">🏃‍♂️</div>
+                                <h3>Jogador</h3>
+                                <p>Foco em criar personagens e participar de aventuras épicas</p>
+                                <div class="role-benefits">
+                                    <span>✨ Criador de personagens</span>
+                                    <span>🎲 Fichas detalhadas</span>
+                                    <span>📊 Acompanhamento de progresso</span>
+                                </div>
+                            </div>
+                            <div class="role-card" data-role="mestre">
+                                <div class="role-icon">👨‍🏫</div>
+                                <h3>Mestre</h3>
+                                <p>Especializado em criar e conduzir aventuras inesquecíveis</p>
+                                <div class="role-benefits">
+                                    <span>🎭 Ferramentas de narrativa</span>
+                                    <span>🗺️ Criador de mundos</span>
+                                    <span>👥 Gerenciamento de grupos</span>
+                                </div>
+                            </div>
+                            <div class="role-card" data-role="ambos">
+                                <div class="role-icon">⚖️</div>
+                                <h3>Ambos</h3>
+                                <p>Versatilidade total - ora jogador, ora mestre das aventuras</p>
+                                <div class="role-benefits">
+                                    <span>🔄 Experiência completa</span>
+                                    <span>🛠️ Todas as ferramentas</span>
+                                    <span>🌟 Máxima flexibilidade</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Navigation Buttons -->
+        <footer class="onboarding-footer">
+            <button id="prevBtn" class="nav-btn secondary" disabled>
+                ← Anterior
+            </button>
+            <div class="step-dots">
+                <span class="dot active" data-step="1"></span>
+                <span class="dot" data-step="2"></span>
+                <span class="dot" data-step="3"></span>
+                <span class="dot" data-step="4"></span>
+                <span class="dot" data-step="5"></span>
+            </div>
+            <button id="nextBtn" class="nav-btn primary">
+                Próximo →
+            </button>
+        </footer>
+
+        <!-- Messages -->
+        <div id="messages" class="messages"></div>
+    </div>
+
+    <script type="module" src="js/auth-supabase-only.js"></script>
+    <script type="module" src="js/database.js"></script>
+    <script src="js/debug.js"></script>
+    <script type="module" src="js/onboarding.js"></script>
+</body>
+</html>

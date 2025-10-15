@@ -1,55 +1,39 @@
 // =====================================
-// RPG PLAYER - SISTEMA DE AUTENTICAÇÃO
+// FIREBASE E SUPABASE CONFIG
 // =====================================
 
-// Importações Firebase v9+
+// Firebase v9+ imports
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.5.0/firebase-app.js'
 import { 
     getAuth, 
+    GoogleAuthProvider, 
     signInWithPopup, 
-    GoogleAuthProvider,
-    signInWithEmailAndPassword,
-    createUserWithEmailAndPassword,
-    sendPasswordResetEmail,
-    sendEmailVerification,
-    signOut,
-    onAuthStateChanged
+    signOut, 
+    onAuthStateChanged 
 } from 'https://www.gstatic.com/firebasejs/10.5.0/firebase-auth.js'
 
-// Importação Supabase
-import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm'
+// Supabase
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.38.0/+esm'
 
-// =====================================
-// CONFIGURAÇÃO
-// =====================================
-
+// Firebase config
 const firebaseConfig = {
-  apiKey: "AIzaSyDBQ7WocaMQ-f3NMEDZjUM0ro4seE0RyFk",
-  authDomain: "player-7a871.firebaseapp.com",
-  projectId: "player-7a871",
-  storageBucket: "player-7a871.firebasestorage.app",
-  messagingSenderId: "526885048287",
-  appId: "1:526885048287:web:229cd7035138439a60be6a",
-  measurementId: "G-T7P89TVQWK"
+    apiKey: "AIzaSyDBQ7WocaMQ-f3NMEDZjUM0ro4seE0RyFk",
+    authDomain: "player-7a871.firebaseapp.com",
+    projectId: "player-7a871",
+    storageBucket: "player-7a871.firebasestorage.app",
+    messagingSenderId: "526885048287",
+    appId: "1:526885048287:web:229cd7035138439a60be6a",
+    measurementId: "G-T7P89TVQWK"
 }
 
+// Supabase config
 const SUPABASE_URL = 'https://bifiatkpfmrrnfhvgrpb.supabase.co'
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpZmlhdGtwZm1ycm5maHZncnBiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA0ODM2NTMsImV4cCI6MjA3NjA1OTY1M30.g5S4aT-ml_cgGoJHWudB36EWz-3bonFZW3DEIWNOUAM'
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpZmlhdGtwZm1ycm5maHZncnBiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzA1Nzg4NjcsImV4cCI6MjA0NjE1NDg2N30.bthKbcYRJoE2sKYGjJu0q5ZjBMOL9oJXkGrPZYzVlXs'
 
-// =====================================
-// INICIALIZAÇÃO
-// =====================================
-
-// Firebase
+// Initialize
 const app = initializeApp(firebaseConfig)
 const auth = getAuth(app)
 const googleProvider = new GoogleAuthProvider()
-
-googleProvider.setCustomParameters({
-    'prompt': 'select_account'
-})
-
-// Supabase
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
 
 // =====================================
@@ -141,6 +125,9 @@ async function signInWithGoogle() {
             case 'auth/cancelled-popup-request':
                 errorMessage = 'Apenas um pop-up por vez.'
                 break
+            case 'auth/api-key-not-valid':
+                errorMessage = 'Configuração do Google temporariamente indisponível.'
+                break
             default:
                 errorMessage = error.message
         }
@@ -150,6 +137,16 @@ async function signInWithGoogle() {
 }
 
 function updateFirebaseDashboard(user) {
+    // Verificar se o usuário já tem perfil
+    const savedProfile = localStorage.getItem(`profile_firebase_${user.uid}`)
+    
+    if (!savedProfile) {
+        // Primeira vez - mostrar onboarding
+        showOnboarding()
+        return
+    }
+    
+    // Usuário já tem perfil - mostrar dashboard
     const userInfo = document.getElementById('userInfo')
     const emailStatus = document.getElementById('emailStatus')
     
@@ -242,7 +239,21 @@ async function resetPassword(email) {
     }
 }
 
-function updateSupabaseDashboard(user) {
+async function updateSupabaseDashboard(user) {
+    // Verificar se o usuário já tem perfil no Supabase
+    const { data: profile, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', user.id)
+        .single()
+    
+    if (error && error.code === 'PGRST116') {
+        // Perfil não existe - mostrar onboarding
+        showOnboarding()
+        return
+    }
+    
+    // Usuário já tem perfil - mostrar dashboard
     const userInfo = document.getElementById('userInfo')
     const emailStatus = document.getElementById('emailStatus')
     
@@ -290,6 +301,376 @@ async function handleLogout() {
         console.error('Erro no logout:', error)
         showMessage(`Erro no logout: ${error.message}`, 'error')
     }
+}
+
+// =====================================
+// SISTEMA DE ONBOARDING
+// =====================================
+
+let currentStep = 1
+let onboardingData = {
+    avatar: null,
+    avatarType: null,
+    name: '',
+    age: 18,
+    experience: '',
+    roles: []
+}
+
+// Elementos do onboarding
+const onboardingProgress = document.getElementById('onboardingProgress')
+const progressFill = document.getElementById('progressFill')
+const onboardingSteps = ['onboardingStep1', 'onboardingStep2', 'onboardingStep3', 'onboardingStep4', 'onboardingStep5']
+const onboardingComplete = document.getElementById('onboardingComplete')
+
+function showOnboarding() {
+    // Esconder todas as telas de auth
+    const authForms = [loginForm, registerForm, forgotPasswordForm, emailVerification, userDashboard]
+    authForms.forEach(form => form.classList.add('hidden'))
+    
+    // Mostrar onboarding
+    onboardingProgress.classList.remove('hidden')
+    showOnboardingStep(1)
+}
+
+function showOnboardingStep(step) {
+    // Esconder todas as etapas
+    onboardingSteps.forEach(stepId => {
+        document.getElementById(stepId).classList.add('hidden')
+    })
+    
+    // Mostrar etapa atual
+    document.getElementById(`onboardingStep${step}`).classList.remove('hidden')
+    
+    // Atualizar progresso
+    updateProgress(step)
+    currentStep = step
+}
+
+function updateProgress(step) {
+    const progressPercentage = (step / 5) * 100
+    progressFill.style.width = `${progressPercentage}%`
+    
+    // Atualizar steps visuais
+    document.querySelectorAll('.progress-step').forEach((stepEl, index) => {
+        stepEl.classList.remove('active', 'completed')
+        
+        if (index + 1 < step) {
+            stepEl.classList.add('completed')
+        } else if (index + 1 === step) {
+            stepEl.classList.add('active')
+        }
+    })
+}
+
+function nextStep() {
+    if (currentStep < 5) {
+        showOnboardingStep(currentStep + 1)
+    } else {
+        finishOnboarding()
+    }
+}
+
+function previousStep() {
+    if (currentStep > 1) {
+        showOnboardingStep(currentStep - 1)
+    }
+}
+
+// ===== ETAPA 1: FOTO DE PERFIL =====
+function initAvatarStep() {
+    const avatarInput = document.getElementById('avatarInput')
+    const avatarPreview = document.getElementById('avatarPreview')
+    const avatarOptions = document.querySelectorAll('.avatar-option')
+    const step1Next = document.getElementById('step1Next')
+    
+    // Upload de foto
+    avatarPreview.addEventListener('click', () => {
+        avatarInput.click()
+    })
+    
+    avatarInput.addEventListener('change', (e) => {
+        const file = e.target.files[0]
+        if (file) {
+            const reader = new FileReader()
+            reader.onload = (e) => {
+                avatarPreview.innerHTML = `<img src="${e.target.result}" alt="Avatar" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">`
+                onboardingData.avatar = e.target.result
+                onboardingData.avatarType = 'upload'
+                
+                // Desmarcar avatares preset
+                avatarOptions.forEach(opt => opt.classList.remove('selected'))
+                step1Next.disabled = false
+            }
+            reader.readAsDataURL(file)
+        }
+    })
+    
+    // Avatares preset
+    avatarOptions.forEach(option => {
+        option.addEventListener('click', () => {
+            // Desmarcar outros
+            avatarOptions.forEach(opt => opt.classList.remove('selected'))
+            option.classList.add('selected')
+            
+            // Atualizar preview
+            const avatarType = option.dataset.avatar
+            const emoji = option.textContent
+            avatarPreview.innerHTML = `<div style="font-size: 4em; display: flex; align-items: center; justify-content: center; height: 100%;">${emoji}</div>`
+            
+            onboardingData.avatar = emoji
+            onboardingData.avatarType = 'preset'
+            step1Next.disabled = false
+        })
+    })
+    
+    step1Next.addEventListener('click', () => {
+        if (onboardingData.avatar) {
+            nextStep()
+        }
+    })
+}
+
+// ===== ETAPA 2: NOME DE USUÁRIO =====
+function initNameStep() {
+    const userNameInput = document.getElementById('userName')
+    const nameValidation = document.getElementById('nameValidation')
+    const step2Next = document.getElementById('step2Next')
+    const step2Back = document.getElementById('step2Back')
+    
+    userNameInput.addEventListener('input', (e) => {
+        const name = e.target.value.trim()
+        
+        if (name.length < 2) {
+            nameValidation.textContent = 'Nome deve ter pelo menos 2 caracteres'
+            nameValidation.className = 'input-feedback invalid'
+            step2Next.disabled = true
+        } else if (name.length > 30) {
+            nameValidation.textContent = 'Nome muito longo (máximo 30 caracteres)'
+            nameValidation.className = 'input-feedback invalid'
+            step2Next.disabled = true
+        } else if (!/^[a-zA-ZÀ-ÿ\s]+$/.test(name)) {
+            nameValidation.textContent = 'Use apenas letras e espaços'
+            nameValidation.className = 'input-feedback invalid'
+            step2Next.disabled = true
+        } else {
+            nameValidation.textContent = `Perfeito! "${name}" é um ótimo nome de aventureiro!`
+            nameValidation.className = 'input-feedback valid'
+            step2Next.disabled = false
+            onboardingData.name = name
+        }
+    })
+    
+    step2Next.addEventListener('click', () => {
+        if (onboardingData.name) {
+            nextStep()
+        }
+    })
+    
+    step2Back.addEventListener('click', previousStep)
+}
+
+// ===== ETAPA 3: IDADE =====
+function initAgeStep() {
+    const ageSlider = document.getElementById('ageSlider')
+    const ageDisplay = document.getElementById('ageDisplay')
+    const step3Next = document.getElementById('step3Next')
+    const step3Back = document.getElementById('step3Back')
+    
+    ageSlider.addEventListener('input', (e) => {
+        const age = parseInt(e.target.value)
+        ageDisplay.textContent = age
+        onboardingData.age = age
+    })
+    
+    step3Next.addEventListener('click', nextStep)
+    step3Back.addEventListener('click', previousStep)
+}
+
+// ===== ETAPA 4: EXPERIÊNCIA =====
+function initExperienceStep() {
+    const experienceCards = document.querySelectorAll('.experience-card')
+    const step4Next = document.getElementById('step4Next')
+    const step4Back = document.getElementById('step4Back')
+    
+    experienceCards.forEach(card => {
+        card.addEventListener('click', () => {
+            // Desmarcar outros
+            experienceCards.forEach(c => c.classList.remove('selected'))
+            card.classList.add('selected')
+            
+            onboardingData.experience = card.dataset.experience
+            step4Next.disabled = false
+        })
+    })
+    
+    step4Next.addEventListener('click', () => {
+        if (onboardingData.experience) {
+            nextStep()
+        }
+    })
+    
+    step4Back.addEventListener('click', previousStep)
+}
+
+// ===== ETAPA 5: FUNÇÃO NO RPG =====
+function initRoleStep() {
+    const roleCards = document.querySelectorAll('.role-card')
+    const step5Next = document.getElementById('step5Next')
+    const step5Back = document.getElementById('step5Back')
+    
+    roleCards.forEach(card => {
+        const checkbox = card.querySelector('input[type="checkbox"]')
+        
+        card.addEventListener('click', (e) => {
+            if (e.target.type !== 'checkbox') {
+                checkbox.checked = !checkbox.checked
+            }
+            
+            updateRoleCard(card, checkbox.checked)
+            updateRoles()
+        })
+        
+        checkbox.addEventListener('change', (e) => {
+            updateRoleCard(card, e.target.checked)
+            updateRoles()
+        })
+    })
+    
+    function updateRoleCard(card, checked) {
+        if (checked) {
+            card.classList.add('selected')
+        } else {
+            card.classList.remove('selected')
+        }
+    }
+    
+    function updateRoles() {
+        const selectedRoles = []
+        roleCards.forEach(card => {
+            const checkbox = card.querySelector('input[type="checkbox"]')
+            if (checkbox.checked) {
+                selectedRoles.push(card.dataset.role)
+            }
+        })
+        
+        onboardingData.roles = selectedRoles
+        step5Next.disabled = selectedRoles.length === 0
+    }
+    
+    step5Next.addEventListener('click', () => {
+        if (onboardingData.roles.length > 0) {
+            finishOnboarding()
+        }
+    })
+    
+    step5Back.addEventListener('click', previousStep)
+}
+
+// ===== FINALIZAÇÃO =====
+async function finishOnboarding() {
+    // Esconder etapas e progresso
+    onboardingSteps.forEach(stepId => {
+        document.getElementById(stepId).classList.add('hidden')
+    })
+    onboardingProgress.classList.add('hidden')
+    
+    // Mostrar tela de conclusão
+    onboardingComplete.classList.remove('hidden')
+    
+    // Preencher resumo
+    document.getElementById('summaryAvatar').innerHTML = 
+        onboardingData.avatarType === 'upload' 
+            ? `<img src="${onboardingData.avatar}" alt="Avatar" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">`
+            : `<div style="font-size: 2.5em;">${onboardingData.avatar}</div>`
+    
+    document.getElementById('summaryName').textContent = onboardingData.name
+    
+    const experienceLabels = {
+        'beginner': 'Iniciante',
+        'intermediate': 'Pouco Tempo', 
+        'veteran': 'Muito Tempo'
+    }
+    
+    const roleLabels = {
+        'player': 'Jogador',
+        'dm': 'Mestre',
+        'both': 'Ambos'
+    }
+    
+    const rolesText = onboardingData.roles.map(role => roleLabels[role]).join(', ')
+    
+    document.getElementById('summaryDetails').innerHTML = `
+        <strong>Idade:</strong> ${onboardingData.age} anos<br>
+        <strong>Experiência:</strong> ${experienceLabels[onboardingData.experience]}<br>
+        <strong>Função:</strong> ${rolesText}
+    `
+    
+    // Salvar dados do perfil
+    try {
+        await saveUserProfile()
+        showMessage('Perfil criado com sucesso!', 'success')
+    } catch (error) {
+        console.error('Erro ao salvar perfil:', error)
+        showMessage('Erro ao salvar perfil, mas você pode continuar', 'error')
+    }
+}
+
+async function saveUserProfile() {
+    // Determinar qual sistema de auth está ativo
+    const firebaseUser = auth.currentUser
+    const { data: { session } } = await supabase.auth.getSession()
+    
+    const profileData = {
+        avatar: onboardingData.avatar,
+        avatar_type: onboardingData.avatarType,
+        name: onboardingData.name,
+        age: onboardingData.age,
+        experience: onboardingData.experience,
+        roles: onboardingData.roles,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+    }
+    
+    if (firebaseUser) {
+        // Salvar no Firebase (ou em local storage por enquanto)
+        localStorage.setItem(`profile_firebase_${firebaseUser.uid}`, JSON.stringify(profileData))
+        console.log('Perfil salvo no Firebase:', profileData)
+    } else if (session) {
+        // Salvar no Supabase
+        const { error } = await supabase
+            .from('profiles')
+            .upsert({
+                id: session.user.id,
+                ...profileData
+            })
+        
+        if (error) {
+            console.error('Erro ao salvar no Supabase:', error)
+        } else {
+            console.log('Perfil salvo no Supabase:', profileData)
+        }
+    }
+}
+
+function enterPlatform() {
+    // Esconder onboarding
+    onboardingComplete.classList.add('hidden')
+    
+    // Mostrar dashboard normal
+    showForm(userDashboard)
+}
+
+// ===== INICIALIZAÇÃO DO ONBOARDING =====
+function initOnboarding() {
+    initAvatarStep()
+    initNameStep()
+    initAgeStep()
+    initExperienceStep()
+    initRoleStep()
+    
+    // Botão final
+    document.getElementById('enterPlatform')?.addEventListener('click', enterPlatform)
 }
 
 // =====================================
@@ -404,5 +785,8 @@ async function checkInitialSession() {
 // =====================================
 // INICIALIZAÇÃO
 // =====================================
+
+// Inicializar onboarding
+initOnboarding()
 
 checkInitialSession()

@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Confirme seu Email - RPG Player</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Cinzel+Decorative:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f0f1e 0%, #1a1a2e 50%, #16213e 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        /* Animação de fundo */
+        body::before {
+            content: '';
+            position: absolute;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(233, 69, 96, 0.1) 0%, transparent 70%);
+            animation: pulse 8s ease-in-out infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1) translate(0, 0); }
+            50% { transform: scale(1.1) translate(-5%, -5%); }
+        }
+        
+        .container {
+            max-width: 700px;
+            width: 100%;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .card {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            border-radius: 30px;
+            padding: 50px 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5), 0 0 40px rgba(233, 69, 96, 0.2);
+            border: 2px solid rgba(241, 196, 15, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(241, 196, 15, 0.05) 0%, transparent 70%);
+            animation: rotate 20s linear infinite;
+        }
+        
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+        .content {
+            position: relative;
+            z-index: 1;
+        }
+        
+        /* Header */
+        .logo {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .logo h1 {
+            font-family: 'Cinzel Decorative', serif;
+            font-size: 2.5em;
+            color: #f1c40f;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5), 0 0 20px rgba(241, 196, 15, 0.3);
+            margin-bottom: 10px;
+        }
+        
+        .logo p {
+            color: #bbb;
+            font-size: 0.9em;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+        }
+        
+        /* Ícone Principal */
+        .icon-container {
+            text-align: center;
+            margin: 40px 0;
+            position: relative;
+        }
+        
+        .icon-circle {
+            width: 150px;
+            height: 150px;
+            margin: 0 auto;
+            background: linear-gradient(135deg, #e94560 0%, #c0392b 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 10px 30px rgba(233, 69, 96, 0.4);
+            position: relative;
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .icon-circle::before {
+            content: '';
+            position: absolute;
+            width: 170px;
+            height: 170px;
+            border: 3px dashed #f1c40f;
+            border-radius: 50%;
+            animation: spin 20s linear infinite;
+        }
+        
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+        .icon-circle span {
+            font-size: 70px;
+        }
+        
+        /* Título */
+        .title {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .title h2 {
+            color: #f1c40f;
+            font-size: 2em;
+            margin-bottom: 15px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+        }
+        
+        .title p {
+            color: #e0e0e0;
+            font-size: 1.2em;
+            line-height: 1.6;
+        }
+        
+        .title .highlight {
+            color: #e94560;
+            font-weight: bold;
+        }
+        
+        /* Email Info */
+        .email-info {
+            background: rgba(52, 152, 219, 0.1);
+            border-left: 4px solid #3498db;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 30px 0;
+        }
+        
+        .email-info p {
+            color: #e0e0e0;
+            font-size: 1em;
+            line-height: 1.6;
+            margin-bottom: 10px;
+        }
+        
+        .email-address {
+            background: #0a0a0a;
+            padding: 12px;
+            border-radius: 8px;
+            text-align: center;
+            margin-top: 15px;
+        }
+        
+        .email-address strong {
+            color: #3498db;
+            font-size: 1.1em;
+            word-break: break-all;
+        }
+        
+        /* Instruções */
+        .instructions {
+            background: rgba(241, 196, 15, 0.1);
+            border-left: 4px solid #f1c40f;
+            padding: 25px;
+            border-radius: 10px;
+            margin: 30px 0;
+        }
+        
+        .instructions h3 {
+            color: #f1c40f;
+            margin-bottom: 20px;
+            font-size: 1.3em;
+        }
+        
+        .step {
+            display: flex;
+            align-items: start;
+            margin: 15px 0;
+            padding: 15px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 8px;
+            transition: transform 0.3s;
+        }
+        
+        .step:hover {
+            transform: translateX(5px);
+        }
+        
+        .step-number {
+            width: 35px;
+            height: 35px;
+            background: linear-gradient(135deg, #e94560 0%, #c0392b 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            flex-shrink: 0;
+            margin-right: 15px;
+        }
+        
+        .step-content {
+            flex: 1;
+            color: #e0e0e0;
+            line-height: 1.6;
+        }
+        
+        /* Alertas */
+        .alert {
+            padding: 20px;
+            border-radius: 10px;
+            margin: 25px 0;
+            display: flex;
+            align-items: start;
+        }
+        
+        .alert.warning {
+            background: rgba(241, 196, 15, 0.15);
+            border: 1px solid #f1c40f;
+        }
+        
+        .alert.tip {
+            background: rgba(46, 204, 113, 0.15);
+            border: 1px solid #2ecc71;
+        }
+        
+        .alert-icon {
+            font-size: 30px;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+        
+        .alert-content {
+            color: #e0e0e0;
+            line-height: 1.6;
+        }
+        
+        .alert-content strong {
+            color: #f1c40f;
+        }
+        
+        /* Botões */
+        .actions {
+            margin-top: 40px;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            flex: 1;
+            min-width: 200px;
+            padding: 18px 30px;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+            color: white;
+            box-shadow: 0 5px 20px rgba(46, 204, 113, 0.3);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(46, 204, 113, 0.5);
+        }
+        
+        .btn-secondary {
+            background: rgba(255,255,255,0.1);
+            color: #3498db;
+            border: 2px solid #3498db;
+        }
+        
+        .btn-secondary:hover {
+            background: rgba(52, 152, 219, 0.2);
+        }
+        
+        /* Links */
+        .help-links {
+            margin-top: 40px;
+            padding-top: 30px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            text-align: center;
+        }
+        
+        .help-links p {
+            color: #999;
+            margin-bottom: 15px;
+        }
+        
+        .help-links a {
+            color: #3498db;
+            text-decoration: none;
+            margin: 0 15px;
+            transition: color 0.3s;
+        }
+        
+        .help-links a:hover {
+            color: #f1c40f;
+        }
+        
+        /* Animação de entrada */
+        .card {
+            animation: slideUp 0.6s ease-out;
+        }
+        
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* Responsivo */
+        @media (max-width: 768px) {
+            .card {
+                padding: 30px 25px;
+            }
+            
+            .logo h1 {
+                font-size: 2em;
+            }
+            
+            .title h2 {
+                font-size: 1.5em;
+            }
+            
+            .icon-circle {
+                width: 120px;
+                height: 120px;
+            }
+            
+            .icon-circle span {
+                font-size: 50px;
+            }
+            
+            .actions {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <div class="content">
+                <!-- Logo -->
+                <div class="logo">
+                    <h1>⚔️ RPG PLAYER ⚔️</h1>
+                    <p>Sua Jornada Começa Aqui</p>
+                </div>
+                
+                <!-- Ícone Principal -->
+                <div class="icon-container">
+                    <div class="icon-circle">
+                        <span>📧</span>
+                    </div>
+                </div>
+                
+                <!-- Título -->
+                <div class="title">
+                    <h2>📜 Missão: Confirme Seu Email</h2>
+                    <p>
+                        Bem-vindo, <span class="highlight">Aventureiro</span>!<br>
+                        Sua conta foi criada com sucesso!
+                    </p>
+                </div>
+                
+                <!-- Info do Email -->
+                <div class="email-info">
+                    <p>
+                        📬 Enviamos um <strong>email de confirmação</strong> para:
+                    </p>
+                    <div class="email-address">
+                        <strong id="userEmail">carregando...</strong>
+                    </div>
+                </div>
+                
+                <!-- Instruções -->
+                <div class="instructions">
+                    <h3>🗺️ O Que Fazer Agora:</h3>
+                    
+                    <div class="step">
+                        <div class="step-number">1</div>
+                        <div class="step-content">
+                            <strong>Abra seu email</strong><br>
+                            Acesse sua caixa de entrada (Gmail, Outlook, etc.)
+                        </div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-number">2</div>
+                        <div class="step-content">
+                            <strong>Procure por email da RPG Player</strong><br>
+                            Remetente: noreply@... ou RPG Player
+                        </div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-number">3</div>
+                        <div class="step-content">
+                            <strong>Clique no botão de confirmação</strong><br>
+                            O botão dirá: "✨ Confirmar Minha Conta ✨"
+                        </div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-number">4</div>
+                        <div class="step-content">
+                            <strong>Volte aqui automaticamente</strong><br>
+                            Você será redirecionado para continuar sua jornada!
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Alerta de Spam -->
+                <div class="alert warning">
+                    <div class="alert-icon">⚠️</div>
+                    <div class="alert-content">
+                        <strong>Não encontrou o email?</strong><br>
+                        Verifique sua pasta de <strong>SPAM/Lixo Eletrônico</strong>. 
+                        Às vezes os emails mágicos acabam lá por engano!
+                    </div>
+                </div>
+                
+                <!-- Dica -->
+                <div class="alert tip">
+                    <div class="alert-icon">💡</div>
+                    <div class="alert-content">
+                        <strong>Dica do Mestre:</strong><br>
+                        O email tem tema RPG medieval com gradientes escuros e dourados. 
+                        Se ver um pergaminho 📜, é o email certo!
+                    </div>
+                </div>
+                
+                <!-- Ações -->
+                <div class="actions">
+                    <button class="btn btn-primary" onclick="checkEmailConfirmed()">
+                        🔄 Já Confirmei - Continuar
+                    </button>
+                    <button class="btn btn-secondary" onclick="resendEmail()">
+                        📧 Reenviar Email
+                    </button>
+                </div>
+                
+                <!-- Links de Ajuda -->
+                <div class="help-links">
+                    <p>Precisa de ajuda?</p>
+                    <a href="help-email-confirmation.html">❓ Central de Ajuda</a>
+                    <a href="login.html">🔐 Voltar ao Login</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.38.0/+esm'
+        
+        const SUPABASE_URL = 'https://bifiatkpfmrrnfhvgrpb.supabase.co'
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpZmlhdGtwZm1ycm5maHZncnBiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA0ODM2NTMsImV4cCI6MjA3NjA1OTY1M30.g5S4aT-ml_cgGoJHWudB36EWz-3bonFZW3DEIWNOUAM'
+        
+        const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+        
+        // Pega email do localStorage ou URL
+        const urlParams = new URLSearchParams(window.location.search)
+        const email = urlParams.get('email') || localStorage.getItem('pendingUserEmail') || 'seu-email@exemplo.com'
+        
+        document.getElementById('userEmail').textContent = email
+        
+        // Função para verificar se email foi confirmado
+        window.checkEmailConfirmed = async function() {
+            console.log('🔍 Verificando confirmação...')
+            
+            const { data: { session }, error } = await supabase.auth.getSession()
+            
+            if (session && session.user) {
+                console.log('✅ Email confirmado! Redirecionando...')
+                
+                // Salva sessão
+                localStorage.setItem('isLoggedIn', 'true')
+                localStorage.setItem('currentUserId', session.user.id)
+                localStorage.setItem('onboardingCompleted', 'false')
+                
+                // Remove dados temporários
+                localStorage.removeItem('pendingUserId')
+                localStorage.removeItem('pendingUserEmail')
+                
+                alert('✅ Email confirmado com sucesso!\n\nRedirecionando para o onboarding...')
+                
+                setTimeout(() => {
+                    window.location.href = 'onboarding.html'
+                }, 1000)
+            } else {
+                alert('⚠️ Email ainda não foi confirmado!\n\nPor favor:\n1. Abra seu email\n2. Clique no link de confirmação\n3. Volte aqui e tente novamente')
+            }
+        }
+        
+        // Função para reenviar email
+        window.resendEmail = async function() {
+            console.log('📧 Reenviando email...')
+            
+            try {
+                const { data, error } = await supabase.auth.resend({
+                    type: 'signup',
+                    email: email
+                })
+                
+                if (error) throw error
+                
+                alert('📧 Email reenviado com sucesso!\n\nVerifique sua caixa de entrada (e spam).')
+            } catch (error) {
+                console.error('Erro ao reenviar:', error)
+                alert('❌ Erro ao reenviar email.\n\nTente fazer login novamente ou entre em contato com o suporte.')
+            }
+        }
+        
+        // Verifica automaticamente a cada 10 segundos
+        let checkInterval = setInterval(async () => {
+            const { data: { session } } = await supabase.auth.getSession()
+            
+            if (session && session.user) {
+                console.log('✅ Email confirmado automaticamente!')
+                clearInterval(checkInterval)
+                
+                localStorage.setItem('isLoggedIn', 'true')
+                localStorage.setItem('currentUserId', session.user.id)
+                localStorage.setItem('onboardingCompleted', 'false')
+                
+                localStorage.removeItem('pendingUserId')
+                localStorage.removeItem('pendingUserEmail')
+                
+                alert('🎉 Email confirmado!\n\nRedirecionando...')
+                
+                setTimeout(() => {
+                    window.location.href = 'onboarding.html'
+                }, 1500)
+            }
+        }, 10000) // Verifica a cada 10 segundos
+        
+        // Limpa intervalo ao sair da página
+        window.addEventListener('beforeunload', () => {
+            clearInterval(checkInterval)
+        })
+    </script>
+</body>
+</html>

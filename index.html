@@ -3,23 +3,61 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RPG Player - Sistema de Autenticação</title>
-    
-    <!-- Favicons -->
-    <link rel="apple-touch-icon" sizes="180x180" href="./img/apple-touch-icon.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="./img/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="./img/favicon-16x16.png">
-    <link rel="manifest" href="./img/site.webmanifest">
-    
-    <!-- Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Cinzel+Decorative:wght@400;700&display=swap" rel="stylesheet">
-    
-    <link rel="stylesheet" href="style.css">
+    <title>RPG Player - Redirecionando...</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            color: #e8dcc6;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+        .redirect-message {
+            background: rgba(212, 175, 55, 0.1);
+            border: 2px solid rgba(212, 175, 55, 0.3);
+            border-radius: 15px;
+            padding: 40px;
+            backdrop-filter: blur(10px);
+        }
+        .logo {
+            font-size: 2.5rem;
+            color: #d4af37;
+            margin-bottom: 20px;
+        }
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(212, 175, 55, 0.3);
+            border-top: 4px solid #d4af37;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
 </head>
 <body>
-    <div class="container">
+    <div class="redirect-message">
+        <div class="logo">⚔️ RPG Player</div>
+        <h2>Carregando nova experiência...</h2>
+        <div class="spinner"></div>
+        <p>Você será redirecionado automaticamente</p>
+    </div>
+    
+    <script>
+        // Redireciona para a nova estrutura após 2 segundos
+        setTimeout(() => {
+            window.location.href = 'login.html'
+        }, 2000)
+    </script>
+</body>
+</html>
         <div class="auth-container">
             <!-- Título Medieval Elaborado -->
             <div class="title-section">
@@ -38,7 +76,7 @@
                 </h1>
                 
                 <div class="title-subtitle">
-                    <span class="subtitle-text">Sistema de Autenticação Medieval</span>
+                    <span class="subtitle-text">Sistema de Fichas de D&D 5E</span>
                 </div>
                 
                 <div class="title-ornament bottom">
@@ -152,6 +190,257 @@
                 <div id="userInfo"></div>
                 <div id="emailStatus"></div>
                 <button id="logout">Sair</button>
+            </div>
+
+            <!-- === SISTEMA DE ONBOARDING === -->
+            <!-- Barra de Progresso Medieval -->
+            <div id="onboardingProgress" class="onboarding-progress hidden">
+                <div class="progress-ornament left">⚜</div>
+                <div class="progress-track">
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill"></div>
+                        <div class="progress-steps">
+                            <div class="progress-step active" data-step="1">
+                                <span class="step-icon">🖼️</span>
+                                <span class="step-label">Foto</span>
+                            </div>
+                            <div class="progress-step" data-step="2">
+                                <span class="step-icon">👤</span>
+                                <span class="step-label">Nome</span>
+                            </div>
+                            <div class="progress-step" data-step="3">
+                                <span class="step-icon">📅</span>
+                                <span class="step-label">Idade</span>
+                            </div>
+                            <div class="progress-step" data-step="4">
+                                <span class="step-icon">⚔️</span>
+                                <span class="step-label">Experiência</span>
+                            </div>
+                            <div class="progress-step" data-step="5">
+                                <span class="step-icon">👑</span>
+                                <span class="step-label">Função</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="progress-ornament right">⚜</div>
+            </div>
+
+            <!-- Etapa 1: Foto de Perfil -->
+            <div id="onboardingStep1" class="onboarding-step hidden">
+                <div class="step-header">
+                    <h2>Escolha sua Imagem de Perfil</h2>
+                    <p class="step-subtitle">Como você gostaria de ser reconhecido em suas aventuras?</p>
+                </div>
+                
+                <div class="avatar-section">
+                    <!-- Upload personalizado -->
+                    <div class="avatar-upload">
+                        <div class="avatar-preview" id="avatarPreview">
+                            <div class="avatar-placeholder">
+                                <span class="upload-icon">📸</span>
+                                <span class="upload-text">Clique para enviar sua foto</span>
+                            </div>
+                        </div>
+                        <input type="file" id="avatarInput" accept="image/*" class="hidden">
+                    </div>
+                    
+                    <!-- Ou avatares pré-definidos -->
+                    <div class="divider-section">
+                        <div class="divider">
+                            <span>ou escolha um avatar</span>
+                        </div>
+                    </div>
+                    
+                    <div class="preset-avatars">
+                        <div class="avatar-option" data-avatar="wizard">🧙‍♂️</div>
+                        <div class="avatar-option" data-avatar="warrior">⚔️</div>
+                        <div class="avatar-option" data-avatar="rogue">🗡️</div>
+                        <div class="avatar-option" data-avatar="cleric">⚡</div>
+                        <div class="avatar-option" data-avatar="ranger">🏹</div>
+                        <div class="avatar-option" data-avatar="bard">🎵</div>
+                    </div>
+                </div>
+                
+                <div class="step-navigation">
+                    <button class="btn-next" id="step1Next">
+                        <span>Seguir</span>
+                        <span class="btn-arrow">→</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Etapa 2: Nome de Usuário -->
+            <div id="onboardingStep2" class="onboarding-step hidden">
+                <div class="step-header">
+                    <h2>Como devemos te chamar?</h2>
+                    <p class="step-subtitle">Escolha um nome que represente sua identidade no mundo dos RPGs</p>
+                </div>
+                
+                <div class="input-section">
+                    <div class="input-group medieval">
+                        <label for="userName">Nome de Usuário</label>
+                        <input type="text" id="userName" placeholder="Insira seu nome de aventureiro..." maxlength="30">
+                        <div class="input-feedback" id="nameValidation"></div>
+                    </div>
+                </div>
+                
+                <div class="step-navigation">
+                    <button class="btn-back" id="step2Back">
+                        <span class="btn-arrow">←</span>
+                        <span>Voltar</span>
+                    </button>
+                    <button class="btn-next" id="step2Next" disabled>
+                        <span>Seguir</span>
+                        <span class="btn-arrow">→</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Etapa 3: Idade -->
+            <div id="onboardingStep3" class="onboarding-step hidden">
+                <div class="step-header">
+                    <h2>Qual é a sua idade?</h2>
+                    <p class="step-subtitle">Isso nos ajuda a personalizar sua experiência</p>
+                </div>
+                
+                <div class="age-section">
+                    <div class="age-input-group">
+                        <div class="age-display">
+                            <span class="age-number" id="ageDisplay">18</span>
+                            <span class="age-label">anos</span>
+                        </div>
+                        <div class="age-slider-container">
+                            <input type="range" id="ageSlider" min="13" max="99" value="18" class="age-slider">
+                            <div class="age-marks">
+                                <span>13</span>
+                                <span>25</span>
+                                <span>35</span>
+                                <span>50</span>
+                                <span>99</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="step-navigation">
+                    <button class="btn-back" id="step3Back">
+                        <span class="btn-arrow">←</span>
+                        <span>Voltar</span>
+                    </button>
+                    <button class="btn-next" id="step3Next">
+                        <span>Seguir</span>
+                        <span class="btn-arrow">→</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Etapa 4: Experiência RPG -->
+            <div id="onboardingStep4" class="onboarding-step hidden">
+                <div class="step-header">
+                    <h2>Qual sua experiência com RPG?</h2>
+                    <p class="step-subtitle">Isso nos ajuda a adaptar o conteúdo para você</p>
+                </div>
+                
+                <div class="experience-options">
+                    <div class="experience-card" data-experience="beginner">
+                        <div class="card-icon">🌱</div>
+                        <h3>Iniciante</h3>
+                        <p>Estou começando minha jornada no mundo dos RPGs</p>
+                    </div>
+                    <div class="experience-card" data-experience="intermediate">
+                        <div class="card-icon">⚔️</div>
+                        <h3>Pouco Tempo</h3>
+                        <p>Já tenho alguma experiência, mas ainda estou aprendendo</p>
+                    </div>
+                    <div class="experience-card" data-experience="veteran">
+                        <div class="card-icon">🏆</div>
+                        <h3>Muito Tempo</h3>
+                        <p>Sou um veterano das mesas de RPG</p>
+                    </div>
+                </div>
+                
+                <div class="step-navigation">
+                    <button class="btn-back" id="step4Back">
+                        <span class="btn-arrow">←</span>
+                        <span>Voltar</span>
+                    </button>
+                    <button class="btn-next" id="step4Next" disabled>
+                        <span>Seguir</span>
+                        <span class="btn-arrow">→</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Etapa 5: Função no RPG -->
+            <div id="onboardingStep5" class="onboarding-step hidden">
+                <div class="step-header">
+                    <h2>Qual sua função preferida?</h2>
+                    <p class="step-subtitle">Você pode escolher mais de uma opção</p>
+                </div>
+                
+                <div class="role-options">
+                    <div class="role-card" data-role="player">
+                        <div class="card-icon">🎭</div>
+                        <h3>Jogador</h3>
+                        <p>Gosto de interpretar personagens e viver aventuras</p>
+                        <div class="card-checkbox">
+                            <input type="checkbox" id="rolePlayer">
+                            <label for="rolePlayer"></label>
+                        </div>
+                    </div>
+                    <div class="role-card" data-role="dm">
+                        <div class="card-icon">👑</div>
+                        <h3>Mestre (DM)</h3>
+                        <p>Adoro narrar histórias e guiar outros jogadores</p>
+                        <div class="card-checkbox">
+                            <input type="checkbox" id="roleDM">
+                            <label for="roleDM"></label>
+                        </div>
+                    </div>
+                    <div class="role-card" data-role="both">
+                        <div class="card-icon">⚖️</div>
+                        <h3>Ambos</h3>
+                        <p>Gosto tanto de jogar quanto de mestrar</p>
+                        <div class="card-checkbox">
+                            <input type="checkbox" id="roleBoth">
+                            <label for="roleBoth"></label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="step-navigation">
+                    <button class="btn-back" id="step5Back">
+                        <span class="btn-arrow">←</span>
+                        <span>Voltar</span>
+                    </button>
+                    <button class="btn-next" id="step5Next" disabled>
+                        <span>Finalizar</span>
+                        <span class="btn-arrow">✓</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Conclusão do Onboarding -->
+            <div id="onboardingComplete" class="onboarding-step hidden">
+                <div class="completion-animation">
+                    <div class="success-icon">🎉</div>
+                    <h2>Bem-vindo ao RPG Player!</h2>
+                    <p>Seu perfil foi criado com sucesso. Você está pronto para começar suas aventuras!</p>
+                    
+                    <div class="profile-summary">
+                        <div class="summary-avatar" id="summaryAvatar"></div>
+                        <div class="summary-info">
+                            <h3 id="summaryName"></h3>
+                            <p id="summaryDetails"></p>
+                        </div>
+                    </div>
+                    
+                    <button class="btn-primary" id="enterPlatform">
+                        <span>Entrar na Plataforma</span>
+                        <span class="btn-arrow">→</span>
+                    </button>
+                </div>
             </div>
         </div>
         

@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste de Autenticação</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #1a1a2e;
+            color: #fff;
+        }
+        .section {
+            background: #16213e;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 10px;
+        }
+        button {
+            background: #0f3460;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin: 5px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        button:hover {
+            background: #16a085;
+        }
+        pre {
+            background: #0a0a0a;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+        .success { color: #2ecc71; }
+        .error { color: #e74c3c; }
+        .warning { color: #f39c12; }
+    </style>
+</head>
+<body>
+    <h1>🔐 Teste de Autenticação - RPG Player</h1>
+    
+    <div class="section">
+        <h2>1. Estado do LocalStorage</h2>
+        <pre id="localStorage-info"></pre>
+        <button onclick="checkLocalStorage()">🔄 Atualizar</button>
+    </div>
+    
+    <div class="section">
+        <h2>2. Sessão Supabase</h2>
+        <pre id="session-info"></pre>
+        <button onclick="checkSession()">🔄 Verificar Sessão</button>
+    </div>
+    
+    <div class="section">
+        <h2>3. Teste de Login</h2>
+        <input type="email" id="testEmail" placeholder="Email" style="padding: 10px; margin: 5px; width: 250px;">
+        <input type="password" id="testPassword" placeholder="Senha" style="padding: 10px; margin: 5px; width: 250px;">
+        <button onclick="testLogin()">🔑 Fazer Login</button>
+    </div>
+    
+    <div class="section">
+        <h2>4. Ações</h2>
+        <button onclick="goToOnboarding()">➡️ Ir para Onboarding</button>
+        <button onclick="goToDashboard()">➡️ Ir para Dashboard</button>
+        <button onclick="clearData()">🗑️ Limpar Dados</button>
+    </div>
+
+    <script type="module">
+        import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.38.0/+esm'
+        
+        const SUPABASE_URL = 'https://bifiatkpfmrrnfhvgrpb.supabase.co'
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpZmlhdGtwZm1ycm5maHZncnBiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA0ODM2NTMsImV4cCI6MjA3NjA1OTY1M30.g5S4aT-ml_cgGoJHWudB36EWz-3bonFZW3DEIWNOUAM'
+        
+        window.supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+        
+        window.checkLocalStorage = function() {
+            const info = document.getElementById('localStorage-info')
+            const data = {
+                isLoggedIn: localStorage.getItem('isLoggedIn'),
+                currentUserId: localStorage.getItem('currentUserId'),
+                onboardingCompleted: localStorage.getItem('onboardingCompleted'),
+                userName: localStorage.getItem('userName'),
+                userEmail: localStorage.getItem('userEmail')
+            }
+            
+            info.innerHTML = JSON.stringify(data, null, 2)
+        }
+        
+        window.checkSession = async function() {
+            const info = document.getElementById('session-info')
+            info.innerHTML = '⏳ Verificando...'
+            
+            try {
+                const { data: { session }, error } = await window.supabase.auth.getSession()
+                
+                if (error) throw error
+                
+                if (session) {
+                    info.innerHTML = `<span class="success">✅ SESSÃO ATIVA</span>\n\n` + 
+                                    JSON.stringify({
+                                        user_id: session.user.id,
+                                        email: session.user.email,
+                                        created_at: session.user.created_at
+                                    }, null, 2)
+                } else {
+                    info.innerHTML = '<span class="error">❌ Nenhuma sessão ativa</span>'
+                }
+            } catch (error) {
+                info.innerHTML = `<span class="error">❌ ERRO:</span>\n${error.message}`
+            }
+        }
+        
+        window.testLogin = async function() {
+            const email = document.getElementById('testEmail').value
+            const password = document.getElementById('testPassword').value
+            
+            if (!email || !password) {
+                alert('Preencha email e senha!')
+                return
+            }
+            
+            const info = document.getElementById('session-info')
+            info.innerHTML = '⏳ Fazendo login...'
+            
+            try {
+                const { data, error } = await window.supabase.auth.signInWithPassword({
+                    email: email,
+                    password: password
+                })
+                
+                if (error) throw error
+                
+                // Salva no localStorage
+                localStorage.setItem('isLoggedIn', 'true')
+                localStorage.setItem('currentUserId', data.user.id)
+                localStorage.setItem('userEmail', data.user.email)
+                
+                info.innerHTML = `<span class="success">✅ LOGIN REALIZADO!</span>\n\n` +
+                                JSON.stringify({
+                                    user_id: data.user.id,
+                                    email: data.user.email
+                                }, null, 2)
+                
+                checkLocalStorage()
+                
+                alert('Login realizado com sucesso! Verifique o localStorage.')
+                
+            } catch (error) {
+                info.innerHTML = `<span class="error">❌ ERRO NO LOGIN:</span>\n${error.message}`
+                alert('Erro no login: ' + error.message)
+            }
+        }
+        
+        window.goToOnboarding = function() {
+            window.location.href = 'onboarding.html'
+        }
+        
+        window.goToDashboard = function() {
+            window.location.href = 'dashboard.html'
+        }
+        
+        window.clearData = function() {
+            if (confirm('Tem certeza que deseja limpar todos os dados?')) {
+                localStorage.clear()
+                window.supabase.auth.signOut()
+                checkLocalStorage()
+                checkSession()
+                alert('Dados limpos!')
+            }
+        }
+        
+        // Auto-carrega informações ao abrir página
+        checkLocalStorage()
+        checkSession()
+    </script>
+</body>
+</html>

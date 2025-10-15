@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recuperação de Senha - RPG Player</title>
+</head>
+<body style="margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #0f0f1e;">
+    <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #0f0f1e; padding: 40px 20px;">
+        <tr>
+            <td align="center">
+                <table width="600" cellpadding="0" cellspacing="0" style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); border-radius: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); overflow: hidden;">
+                    
+                    <!-- Header -->
+                    <tr>
+                        <td style="background: linear-gradient(135deg, #8e44ad 0%, #9b59b6 100%); padding: 40px; text-align: center; border-bottom: 3px solid #f1c40f;">
+                            <h1 style="margin: 0; color: #f1c40f; font-size: 42px; text-shadow: 2px 2px 4px rgba(0,0,0,0.5);">
+                                🔮 RPG PLAYER 🔮
+                            </h1>
+                            <p style="margin: 10px 0 0 0; color: #bbb; font-size: 16px; letter-spacing: 2px;">
+                                Recuperação de Acesso
+                            </p>
+                        </td>
+                    </tr>
+                    
+                    <!-- Conteúdo -->
+                    <tr>
+                        <td style="padding: 50px 40px; color: #ffffff;">
+                            
+                            <!-- Ícone -->
+                            <table width="100%" cellpadding="0" cellspacing="0">
+                                <tr>
+                                    <td align="center" style="padding-bottom: 30px;">
+                                        <div style="width: 100px; height: 100px; background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%); border-radius: 50%; display: inline-flex; box-shadow: 0 5px 20px rgba(142, 68, 173, 0.3);">
+                                            <span style="font-size: 50px; margin: auto;">🗝️</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </table>
+                            
+                            <h2 style="color: #f1c40f; text-align: center; font-size: 28px; margin: 0 0 20px 0;">
+                                🛡️ Recuperação de Senha
+                            </h2>
+                            
+                            <p style="color: #e0e0e0; font-size: 18px; line-height: 1.8; text-align: center; margin: 20px 0;">
+                                Olá, <strong style="color: #f1c40f;">Aventureiro</strong>!
+                            </p>
+                            
+                            <p style="color: #e0e0e0; font-size: 16px; line-height: 1.8; text-align: left; margin: 20px 0; padding: 0 20px;">
+                                Recebemos uma solicitação para <strong>redefinir a senha</strong> da sua conta. Se foi você quem solicitou, clique no botão abaixo para criar uma nova senha mágica.
+                            </p>
+                            
+                            <!-- Alerta -->
+                            <table width="100%" cellpadding="0" cellspacing="0" style="margin: 30px 0;">
+                                <tr>
+                                    <td style="background: rgba(241, 196, 15, 0.15); border-left: 4px solid #f1c40f; padding: 20px; border-radius: 8px;">
+                                        <p style="margin: 0; color: #bbb; font-size: 14px; line-height: 1.6;">
+                                            ⏰ <strong style="color: #f1c40f;">ATENÇÃO:</strong> Este link expira em <strong>1 hora</strong>. Após esse tempo, será necessário solicitar uma nova recuperação.
+                                        </p>
+                                    </td>
+                                </tr>
+                            </table>
+                            
+                            <!-- Botão -->
+                            <table width="100%" cellpadding="0" cellspacing="0" style="margin: 40px 0;">
+                                <tr>
+                                    <td align="center">
+                                        <a href="{{ .ConfirmationURL }}" 
+                                           style="display: inline-block; 
+                                                  background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%); 
+                                                  color: #ffffff; 
+                                                  font-size: 20px; 
+                                                  font-weight: bold; 
+                                                  text-decoration: none; 
+                                                  padding: 18px 50px; 
+                                                  border-radius: 50px; 
+                                                  box-shadow: 0 8px 25px rgba(142, 68, 173, 0.4);
+                                                  text-transform: uppercase;
+                                                  letter-spacing: 1px;">
+                                            🔑 Redefinir Minha Senha
+                                        </a>
+                                    </td>
+                                </tr>
+                            </table>
+                            
+                            <table width="100%" cellpadding="0" cellspacing="0" style="margin: 30px 0;">
+                                <tr>
+                                    <td style="border-bottom: 2px dashed #444; padding: 10px 0;"></td>
+                                </tr>
+                            </table>
+                            
+                            <p style="color: #999; font-size: 14px; line-height: 1.6; text-align: center; margin: 20px 0;">
+                                Ou copie e cole este link no seu navegador:
+                            </p>
+                            
+                            <table width="100%" cellpadding="0" cellspacing="0">
+                                <tr>
+                                    <td style="background: #0a0a0a; padding: 15px; border-radius: 8px; text-align: center; word-break: break-all;">
+                                        <a href="{{ .ConfirmationURL }}" style="color: #9b59b6; text-decoration: none; font-size: 12px;">
+                                            {{ .ConfirmationURL }}
+                                        </a>
+                                    </td>
+                                </tr>
+                            </table>
+                            
+                        </td>
+                    </tr>
+                    
+                    <!-- Aviso de Segurança -->
+                    <tr>
+                        <td style="background: rgba(231, 76, 60, 0.1); padding: 25px 40px; border-top: 2px solid #e74c3c;">
+                            <table width="100%" cellpadding="0" cellspacing="0">
+                                <tr>
+                                    <td width="50" align="center" style="vertical-align: top;">
+                                        <span style="font-size: 32px;">⚠️</span>
+                                    </td>
+                                    <td style="padding-left: 15px;">
+                                        <h4 style="color: #e74c3c; margin: 0 0 10px 0; font-size: 16px;">
+                                            Não foi você?
+                                        </h4>
+                                        <p style="color: #bbb; font-size: 13px; line-height: 1.6; margin: 0;">
+                                            Se você <strong>NÃO</strong> solicitou a recuperação de senha, ignore este email. Sua conta permanecerá segura e nenhuma alteração será feita.
+                                        </p>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    
+                    <!-- Footer -->
+                    <tr>
+                        <td style="background: #0f0f1e; padding: 30px 40px; text-align: center; border-top: 3px solid #f1c40f;">
+                            <p style="color: #666; font-size: 12px; margin: 0 0 10px 0;">
+                                Este é um email automático da <strong style="color: #f1c40f;">Guilda RPG Player</strong>
+                            </p>
+                            <p style="color: #666; font-size: 12px; margin: 0 0 15px 0;">
+                                © 2025 RPG Player. Todos os direitos reservados.
+                            </p>
+                            <p style="margin: 20px 0 0 0; font-size: 20px; color: #444;">
+                                🔮 🗝️ 🛡️ ⚔️
+                            </p>
+                        </td>
+                    </tr>
+                    
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

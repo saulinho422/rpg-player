@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RPG Player - Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Cinzel+Decorative:wght@400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles/dashboard.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Header -->
+        <header class="dashboard-header">
+            <div class="header-content">
+                <div class="logo">
+                    <h1>⚔️ RPG Player</h1>
+                </div>
+                <div class="user-info">
+                    <div class="user-avatar">
+                        <img id="userAvatar" src="https://via.placeholder.com/40" alt="Avatar">
+                    </div>
+                    <div class="user-details">
+                        <span id="userName">Jogador</span>
+                        <small id="userLevel">Nível 1</small>
+                    </div>
+                    <button id="logoutBtn" class="logout-btn">Sair</button>
+                </div>
+            </div>
+        </header>
+
+        <div class="dashboard-main">
+            <!-- Sidebar (Desktop) -->
+            <nav class="sidebar">
+                <div class="nav-menu">
+                    <button class="nav-item active" data-tab="inicio">
+                        <span class="nav-icon">🏠</span>
+                        <span class="nav-text">Início</span>
+                    </button>
+                    <button class="nav-item" data-tab="personagens">
+                        <span class="nav-icon">👥</span>
+                        <span class="nav-text">Personagens</span>
+                    </button>
+                    <button class="nav-item" data-tab="mesas">
+                        <span class="nav-icon">🎲</span>
+                        <span class="nav-text">Mesas</span>
+                    </button>
+                </div>
+            </nav>
+
+            <!-- Content Area -->
+            <main class="dashboard-content">
+                <!-- Tab: Início -->
+                <div class="tab-content active" id="inicio-tab">
+                    <div class="content-header">
+                        <h2>🏠 Bem-vindo de volta!</h2>
+                        <p>Sua jornada épica continua...</p>
+                    </div>
+
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon">👥</div>
+                            <div class="stat-info">
+                                <div class="stat-number">3</div>
+                                <div class="stat-label">Personagens</div>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">🎲</div>
+                            <div class="stat-info">
+                                <div class="stat-number">2</div>
+                                <div class="stat-label">Mesas Ativas</div>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">⚔️</div>
+                            <div class="stat-info">
+                                <div class="stat-number">12</div>
+                                <div class="stat-label">Aventuras</div>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">🏆</div>
+                            <div class="stat-info">
+                                <div class="stat-number">Nível 5</div>
+                                <div class="stat-label">Experiência</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="recent-activity">
+                        <h3>📜 Atividade Recente</h3>
+                        <div class="activity-list">
+                            <div class="activity-item">
+                                <div class="activity-icon">⚔️</div>
+                                <div class="activity-content">
+                                    <div class="activity-title">Batalha Épica Concluída</div>
+                                    <div class="activity-time">Há 2 horas</div>
+                                </div>
+                            </div>
+                            <div class="activity-item">
+                                <div class="activity-icon">👤</div>
+                                <div class="activity-content">
+                                    <div class="activity-title">Novo personagem criado: Elara</div>
+                                    <div class="activity-time">Ontem</div>
+                                </div>
+                            </div>
+                            <div class="activity-item">
+                                <div class="activity-icon">🎲</div>
+                                <div class="activity-content">
+                                    <div class="activity-title">Entrou na mesa "Dragões Antigos"</div>
+                                    <div class="activity-time">2 dias atrás</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tab: Personagens -->
+                <div class="tab-content" id="personagens-tab">
+                    <div class="content-header">
+                        <h2>👥 Meus Personagens</h2>
+                        <button class="add-btn">+ Criar Personagem</button>
+                    </div>
+
+                    <div class="characters-grid">
+                        <div class="character-card">
+                            <div class="character-avatar">
+                                <img src="https://via.placeholder.com/80" alt="Personagem">
+                                <div class="character-level">Nível 5</div>
+                            </div>
+                            <div class="character-info">
+                                <h3>Kael Ventolâmina</h3>
+                                <div class="character-class">Ranger Élfico</div>
+                                <div class="character-stats">
+                                    <span>HP: 45/45</span>
+                                    <span>MP: 25/25</span>
+                                </div>
+                            </div>
+                            <div class="character-actions">
+                                <button class="btn-secondary">Editar</button>
+                                <button class="btn-primary">Jogar</button>
+                            </div>
+                        </div>
+
+                        <div class="character-card">
+                            <div class="character-avatar">
+                                <img src="https://via.placeholder.com/80" alt="Personagem">
+                                <div class="character-level">Nível 3</div>
+                            </div>
+                            <div class="character-info">
+                                <h3>Lyra Forjaferro</h3>
+                                <div class="character-class">Guerreira Anã</div>
+                                <div class="character-stats">
+                                    <span>HP: 60/60</span>
+                                    <span>MP: 10/10</span>
+                                </div>
+                            </div>
+                            <div class="character-actions">
+                                <button class="btn-secondary">Editar</button>
+                                <button class="btn-primary">Jogar</button>
+                            </div>
+                        </div>
+
+                        <div class="character-card">
+                            <div class="character-avatar">
+                                <img src="https://via.placeholder.com/80" alt="Personagem">
+                                <div class="character-level">Nível 7</div>
+                            </div>
+                            <div class="character-info">
+                                <h3>Zephyr Luaverde</h3>
+                                <div class="character-class">Mago Humano</div>
+                                <div class="character-stats">
+                                    <span>HP: 35/35</span>
+                                    <span>MP: 70/70</span>
+                                </div>
+                            </div>
+                            <div class="character-actions">
+                                <button class="btn-secondary">Editar</button>
+                                <button class="btn-primary">Jogar</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tab: Mesas -->
+                <div class="tab-content" id="mesas-tab">
+                    <div class="content-header">
+                        <h2>🎲 Minhas Mesas</h2>
+                        <button class="add-btn">+ Criar Mesa</button>
+                    </div>
+
+                    <div class="tables-grid">
+                        <div class="table-card active">
+                            <div class="table-header">
+                                <div class="table-status">🟢 Ativa</div>
+                                <div class="table-players">4/6 jogadores</div>
+                            </div>
+                            <div class="table-info">
+                                <h3>A Lenda dos Dragões Antigos</h3>
+                                <div class="table-system">D&D 5e</div>
+                                <div class="table-description">
+                                    Uma épica jornada através das terras místicas em busca dos últimos dragões ancestrais...
+                                </div>
+                            </div>
+                            <div class="table-actions">
+                                <button class="btn-secondary">Configurar</button>
+                                <button class="btn-primary">Entrar na Mesa</button>
+                            </div>
+                        </div>
+
+                        <div class="table-card">
+                            <div class="table-header">
+                                <div class="table-status">🟡 Aguardando</div>
+                                <div class="table-players">2/4 jogadores</div>
+                            </div>
+                            <div class="table-info">
+                                <h3>Mistérios de Ravenloft</h3>
+                                <div class="table-system">D&D 5e</div>
+                                <div class="table-description">
+                                    Horror gótico e mistérios sombrios aguardam os aventureiros corajosos...
+                                </div>
+                            </div>
+                            <div class="table-actions">
+                                <button class="btn-secondary">Configurar</button>
+                                <button class="btn-primary">Entrar na Mesa</button>
+                            </div>
+                        </div>
+
+                        <div class="table-card completed">
+                            <div class="table-header">
+                                <div class="table-status">✅ Concluída</div>
+                                <div class="table-players">5/5 jogadores</div>
+                            </div>
+                            <div class="table-info">
+                                <h3>A Queda do Rei Lich</h3>
+                                <div class="table-system">D&D 5e</div>
+                                <div class="table-description">
+                                    Uma campanha épica que resultou na derrota do temível Rei Lich...
+                                </div>
+                            </div>
+                            <div class="table-actions">
+                                <button class="btn-secondary">Ver Histórico</button>
+                                <button class="btn-secondary">Exportar</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+
+        <!-- Bottom Navigation (Mobile) -->
+        <nav class="bottom-nav">
+            <button class="nav-item active" data-tab="inicio">
+                <span class="nav-icon">🏠</span>
+                <span class="nav-text">Início</span>
+            </button>
+            <button class="nav-item" data-tab="personagens">
+                <span class="nav-icon">👥</span>
+                <span class="nav-text">Personagens</span>
+            </button>
+            <button class="nav-item" data-tab="mesas">
+                <span class="nav-icon">🎲</span>
+                <span class="nav-text">Mesas</span>
+            </button>
+        </nav>
+    </div>
+
+    <script type="module" src="js/auth-supabase-only.js"></script>
+    <script type="module" src="js/database.js"></script>
+    <script type="module" src="js/dashboard-real.js"></script>
+    <script type="module" src="js/dashboard.js"></script>
+</body>
+</html>

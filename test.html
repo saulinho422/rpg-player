@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RPG Player - Teste de Conexão</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a1a, #2c1810);
+            color: white;
+            padding: 40px;
+            min-height: 100vh;
+            margin: 0;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+        
+        h1 {
+            text-align: center;
+            color: #D2691E;
+            margin-bottom: 30px;
+        }
+        
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            border-left: 4px solid #8B4513;
+        }
+        
+        button {
+            background: linear-gradient(135deg, #8B4513, #D2691E);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            margin: 10px 5px;
+            transition: all 0.3s ease;
+        }
+        
+        button:hover {
+            background: linear-gradient(135deg, #A0522D, #F4A460);
+            transform: translateY(-2px);
+        }
+        
+        .console {
+            background: #000;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            height: 300px;
+            overflow-y: auto;
+            margin-top: 20px;
+            border: 1px solid #333;
+        }
+        
+        .success { color: #4CAF50; }
+        .error { color: #f44336; }
+        .warning { color: #ff9800; }
+        .info { color: #2196F3; }
+        
+        .back-link {
+            display: inline-block;
+            margin-top: 20px;
+            color: #D2691E;
+            text-decoration: none;
+            padding: 10px 20px;
+            border: 1px solid #D2691E;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+        }
+        
+        .back-link:hover {
+            background: #D2691E;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>⚔️ RPG Player - Teste do Sistema</h1>
+        
+        <div class="test-section">
+            <h3>🔍 Teste de Conexão com Banco de Dados</h3>
+            <p>Clique no botão abaixo para testar a conexão com o Supabase e verificar se as tabelas foram criadas corretamente.</p>
+            <button onclick="runDatabaseTest()">🧪 Testar Conexão</button>
+        </div>
+        
+        <div class="test-section">
+            <h3>👤 Teste do Sistema de Usuários</h3>
+            <p>Teste as funções básicas do sistema de usuários.</p>
+            <button onclick="testUserSystem()">👥 Testar Usuários</button>
+        </div>
+        
+        <div class="test-section">
+            <h3>⚔️ Teste do Sistema de Personagens</h3>
+            <p>Teste as funções de criação e listagem de personagens.</p>
+            <button onclick="testCharacterSystem()">🎭 Testar Personagens</button>
+        </div>
+        
+        <div class="test-section">
+            <h3>🎲 Teste do Sistema de Campanhas</h3>
+            <p>Teste as funções de campanhas e mesas.</p>
+            <button onclick="testCampaignSystem()">🏰 Testar Campanhas</button>
+        </div>
+        
+        <div class="console" id="console">
+            <div class="info">🚀 Sistema RPG Player - Console de Teste</div>
+            <div class="info">Clique nos botões acima para executar os testes...</div>
+        </div>
+        
+        <a href="login.html" class="back-link">← Voltar para o Login</a>
+    </div>
+
+    <script>
+        const consoleElement = document.getElementById('console')
+        
+        function log(message, type = 'info') {
+            const div = document.createElement('div')
+            div.className = type
+            div.textContent = `${new Date().toLocaleTimeString()} - ${message}`
+            consoleElement.appendChild(div)
+            consoleElement.scrollTop = consoleElement.scrollHeight
+        }
+        
+        function clearConsole() {
+            consoleElement.innerHTML = '<div class="info">🚀 Sistema RPG Player - Console de Teste</div>'
+        }
+        
+        async function runDatabaseTest() {
+            clearConsole()
+            log('🔍 Iniciando teste de conexão com Supabase...')
+            
+            try {
+                // Importa dinamicamente o módulo de teste
+                const testModule = await import('./js/test-connection.js')
+                log('✅ Módulo de teste carregado com sucesso')
+                
+            } catch (error) {
+                log(`❌ Erro ao carregar módulo de teste: ${error.message}`, 'error')
+            }
+        }
+        
+        async function testUserSystem() {
+            clearConsole()
+            log('👤 Testando sistema de usuários...')
+            
+            try {
+                const { UserService } = await import('./js/database.js')
+                log('✅ Serviço de usuários carregado')
+                
+                // Teste básico sem usuário logado
+                log('ℹ️ Para testes completos, faça login primeiro', 'warning')
+                
+            } catch (error) {
+                log(`❌ Erro no teste de usuários: ${error.message}`, 'error')
+            }
+        }
+        
+        async function testCharacterSystem() {
+            clearConsole()
+            log('⚔️ Testando sistema de personagens...')
+            
+            try {
+                const { CharacterService } = await import('./js/database.js')
+                log('✅ Serviço de personagens carregado')
+                
+                log('ℹ️ Para criar personagens, faça login primeiro', 'warning')
+                
+            } catch (error) {
+                log(`❌ Erro no teste de personagens: ${error.message}`, 'error')
+            }
+        }
+        
+        async function testCampaignSystem() {
+            clearConsole()
+            log('🎲 Testando sistema de campanhas...')
+            
+            try {
+                const { CampaignService } = await import('./js/database.js')
+                log('✅ Serviço de campanhas carregado')
+                
+                log('ℹ️ Para gerenciar campanhas, faça login primeiro', 'warning')
+                
+            } catch (error) {
+                log(`❌ Erro no teste de campanhas: ${error.message}`, 'error')
+            }
+        }
+        
+        // Auto-test na inicialização
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                log('🎯 Página de testes carregada')
+                log('💡 Execute os testes acima para verificar o sistema')
+            }, 1000)
+        })
+    </script>
+</body>
+</html>
