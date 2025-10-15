@@ -1,23 +1,74 @@
-# RPG Player
+# 🎮 RPG Player - Sistema de Autenticação
 
-Um projeto de jogador de RPG.
+Sistema completo de autenticação para jogadores de RPG com suporte a Google OAuth e login tradicional por email.
 
-## Descrição
+## ✨ Funcionalidades
 
-Este é um projeto para [adicione sua descrição aqui].
+- **🔐 Autenticação Google** - Login rápido e seguro via Firebase
+- **📧 Login por Email** - Sistema tradicional via Supabase  
+- **🔒 Verificação de Email** - Ativação de conta obrigatória
+- **🔑 Recuperação de Senha** - Reset seguro por email
+- **📱 Interface Responsiva** - Design moderno e mobile-friendly
+- **⚡ Arquitetura Híbrida** - Firebase + Supabase para máxima flexibilidade
 
-## Como usar
+## 🚀 Como executar
 
-[Adicione instruções de uso aqui]
+### Pré-requisitos
+- Node.js 18+
+- Conta Firebase (configurada)
+- Projeto Supabase (configurado)
 
-## Instalação
+### Instalação
+```bash
+# Clone o repositório
+git clone https://github.com/saulinho422/rpg-player.git
+cd rpg-player
 
-[Adicione instruções de instalação aqui]
+# Instale as dependências
+npm install
 
-## Contribuição
+# Execute o projeto
+npm run dev
+```
 
-Contribuições são bem-vindas! Por favor, abra uma issue ou envie um pull request.
+## 🏗️ Arquitetura
 
-## Licença
+- **Login Google** → Firebase Auth → Dashboard Firebase
+- **Login Email** → Supabase Auth → Dashboard Supabase
 
-[Adicione informações sobre a licença aqui]# rpg-player
+## 🛠️ Tecnologias
+
+- **Frontend:** HTML5, CSS3, JavaScript ES6+
+- **Build:** Vite
+- **Auth Google:** Firebase v9+
+- **Auth Email:** Supabase
+- **Styling:** CSS Moderno com Flexbox/Grid
+
+## 📂 Estrutura do Projeto
+
+```
+rpg-player/
+├── index.html          # Página principal
+├── app.js             # Lógica de autenticação
+├── style.css          # Estilos da aplicação
+├── package.json       # Dependências e scripts
+└── README.md          # Este arquivo
+```
+
+## 🔧 Configuração
+
+As credenciais Firebase e Supabase já estão configuradas no projeto. Para usar em produção, atualize as chaves em `app.js`.
+
+## 📝 Scripts Disponíveis
+
+- `npm run dev` - Inicia o servidor de desenvolvimento
+- `npm run build` - Gera build de produção
+- `npm run preview` - Visualiza o build de produção
+
+## 🤝 Contribuição
+
+Contribuições são bem-vindas! Sinta-se à vontade para abrir issues ou pull requests.
+
+## 📄 Licença
+
+Este projeto está sob a licença MIT. Veja o arquivo LICENSE para mais detalhes.

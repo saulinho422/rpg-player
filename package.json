@@ -4,10 +4,8 @@
   "description": "Um projeto de jogador de RPG com autenticação",
   "main": "index.js",
   "scripts": {
-    "dev": "vite",
-    "dev:firebase": "vite --open index-firebase.html",
-    "test:firebase": "vite --open test-firebase.html",
-    "final:integration": "vite --open final-integration.html",
+    "start": "vite",
+    "dev": "vite --open",
     "build": "vite build",
     "preview": "vite preview"
   },
