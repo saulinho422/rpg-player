@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RPG Player - Autenticação</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="auth-container">
+            <h1>RPG Player</h1>
+            
+            <!-- Formulário de Login -->
+            <div id="loginForm" class="form-container">
+                <h2>Entrar</h2>
+                <form id="login">
+                    <div class="input-group">
+                        <label for="loginEmail">Email:</label>
+                        <input type="email" id="loginEmail" required>
+                    </div>
+                    <div class="input-group">
+                        <label for="loginPassword">Senha:</label>
+                        <input type="password" id="loginPassword" required>
+                    </div>
+                    <button type="submit">Entrar</button>
+                </form>
+                <p>Não tem uma conta? <a href="#" id="showRegister">Cadastre-se</a></p>
+                <p><a href="#" id="showForgotPassword">Esqueceu a senha?</a></p>
+            </div>
+            
+            <!-- Formulário de Cadastro -->
+            <div id="registerForm" class="form-container hidden">
+                <h2>Cadastrar</h2>
+                <form id="register">
+                    <div class="input-group">
+                        <label for="registerName">Nome:</label>
+                        <input type="text" id="registerName" required>
+                    </div>
+                    <div class="input-group">
+                        <label for="registerEmail">Email:</label>
+                        <input type="email" id="registerEmail" required>
+                    </div>
+                    <div class="input-group">
+                        <label for="registerPassword">Senha:</label>
+                        <input type="password" id="registerPassword" required minlength="6">
+                    </div>
+                    <div class="input-group">
+                        <label for="confirmPassword">Confirmar Senha:</label>
+                        <input type="password" id="confirmPassword" required minlength="6">
+                    </div>
+                    <button type="submit">Cadastrar</button>
+                </form>
+                <p>Já tem uma conta? <a href="#" id="showLogin">Entrar</a></p>
+            </div>
+            
+            <!-- Formulário de Recuperação de Senha -->
+            <div id="forgotPasswordForm" class="form-container hidden">
+                <h2>Recuperar Senha</h2>
+                <form id="forgotPassword">
+                    <div class="input-group">
+                        <label for="resetEmail">Email:</label>
+                        <input type="email" id="resetEmail" required>
+                    </div>
+                    <button type="submit">Enviar Link de Recuperação</button>
+                </form>
+                <p><a href="#" id="backToLogin">Voltar ao Login</a></p>
+            </div>
+            
+            <!-- Verificação de Email -->
+            <div id="emailVerification" class="form-container hidden">
+                <h2>Verificação de Email</h2>
+                <p>Um email de verificação foi enviado para seu endereço. Por favor, verifique sua caixa de entrada e clique no link para ativar sua conta.</p>
+                <button id="resendVerification">Reenviar Email de Verificação</button>
+                <p><a href="#" id="backToLoginFromVerification">Voltar ao Login</a></p>
+            </div>
+            
+            <!-- Dashboard do Usuário -->
+            <div id="userDashboard" class="form-container hidden">
+                <h2>Bem-vindo!</h2>
+                <div id="userInfo"></div>
+                <div id="emailStatus"></div>
+                <button id="logout">Sair</button>
+            </div>
+        </div>
+        
+        <!-- Mensagens de Feedback -->
+        <div id="message" class="message hidden"></div>
+    </div>
+    
+    <script type="module" src="main.js"></script>
+</body>
+</html>

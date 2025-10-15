@@ -1,0 +1,192 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.container {
+    width: 100%;
+    max-width: 400px;
+    padding: 20px;
+}
+
+.auth-container {
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+.form-container {
+    padding: 40px;
+}
+
+.form-container h1 {
+    text-align: center;
+    color: #333;
+    margin-bottom: 10px;
+    font-size: 2.5em;
+    font-weight: 300;
+}
+
+.form-container h2 {
+    text-align: center;
+    color: #333;
+    margin-bottom: 30px;
+    font-weight: 400;
+}
+
+.input-group {
+    margin-bottom: 20px;
+}
+
+.input-group label {
+    display: block;
+    margin-bottom: 5px;
+    color: #555;
+    font-weight: 500;
+}
+
+.input-group input {
+    width: 100%;
+    padding: 12px 15px;
+    border: 2px solid #e1e1e1;
+    border-radius: 8px;
+    font-size: 16px;
+    transition: border-color 0.3s ease;
+}
+
+.input-group input:focus {
+    outline: none;
+    border-color: #667eea;
+}
+
+button {
+    width: 100%;
+    padding: 12px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+    margin-bottom: 15px;
+}
+
+button:hover {
+    transform: translateY(-2px);
+}
+
+button:active {
+    transform: translateY(0);
+}
+
+.form-container p {
+    text-align: center;
+    color: #666;
+    margin-bottom: 10px;
+}
+
+.form-container a {
+    color: #667eea;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.form-container a:hover {
+    text-decoration: underline;
+}
+
+.hidden {
+    display: none !important;
+}
+
+.message {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 15px 20px;
+    border-radius: 8px;
+    color: white;
+    font-weight: 600;
+    z-index: 1000;
+    min-width: 300px;
+    text-align: center;
+}
+
+.message.success {
+    background-color: #10b981;
+}
+
+.message.error {
+    background-color: #ef4444;
+}
+
+.message.info {
+    background-color: #3b82f6;
+}
+
+#userInfo {
+    background: #f8f9ff;
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
+
+#userInfo h3 {
+    color: #333;
+    margin-bottom: 10px;
+}
+
+#userInfo p {
+    color: #666;
+    margin-bottom: 5px;
+    text-align: left;
+}
+
+#emailStatus {
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    text-align: center;
+    font-weight: 600;
+}
+
+#emailStatus.verified {
+    background-color: #d1fae5;
+    color: #065f46;
+}
+
+#emailStatus.unverified {
+    background-color: #fef3c7;
+    color: #92400e;
+}
+
+@media (max-width: 480px) {
+    .container {
+        padding: 10px;
+    }
+    
+    .form-container {
+        padding: 30px 20px;
+    }
+    
+    .message {
+        position: relative;
+        top: auto;
+        right: auto;
+        margin-bottom: 20px;
+        min-width: auto;
+    }
+}

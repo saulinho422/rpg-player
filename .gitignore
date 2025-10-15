@@ -26,8 +26,9 @@ coverage/
 # Bower dependency directory
 bower_components
 
-# node_modules
+# Node modules
 node_modules/
+package-lock.json
 
 # IDE
 .vscode/
