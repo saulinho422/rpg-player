@@ -230,6 +230,9 @@ class OnboardingSystem {
         const newAvatarInput = avatarInput.cloneNode(true)
         avatarInput.parentNode.replaceChild(newAvatarInput, avatarInput)
         
+        // CORREÇÃO: Buscar avatarImage novamente após clonar (pois está dentro do preview)
+        const updatedAvatarImage = document.getElementById('avatarImage')
+        
         // Adiciona listener no novo preview
         newAvatarPreview.addEventListener('click', () => {
             console.log('👆 Avatar preview clicado!')
@@ -241,14 +244,25 @@ class OnboardingSystem {
             console.log('📁 Arquivo selecionado')
             const file = e.target.files[0]
             if (file) {
-                console.log('✅ Carregando arquivo:', file.name)
+                console.log('✅ Carregando arquivo:', file.name, 'Tamanho:', (file.size / 1024).toFixed(2), 'KB')
                 const reader = new FileReader()
                 reader.onload = (e) => {
-                    avatarImage.src = e.target.result
+                    console.log('📸 Imagem lida, atualizando preview...')
+                    // CORREÇÃO: Usar updatedAvatarImage em vez de avatarImage
+                    if (updatedAvatarImage) {
+                        updatedAvatarImage.src = e.target.result
+                        console.log('✅ Imagem atribuída ao elemento img!')
+                    } else {
+                        console.error('❌ avatarImage não encontrado após clone!')
+                    }
                     this.userData.avatar = e.target.result
                     this.userData.avatarType = 'upload'
-                    console.log('✅ Foto carregada!')
+                    console.log('✅ Foto carregada e salva em userData!')
                     this.showMessage('Foto carregada com sucesso!', 'success')
+                }
+                reader.onerror = (error) => {
+                    console.error('❌ Erro ao ler arquivo:', error)
+                    this.showMessage('Erro ao carregar foto. Tente novamente.', 'error')
                 }
                 reader.readAsDataURL(file)
             }
@@ -258,6 +272,9 @@ class OnboardingSystem {
         document.querySelectorAll('.avatar-preset').forEach(preset => {
             preset.addEventListener('click', () => {
                 console.log('👆 Avatar preset clicado:', preset.dataset.avatar)
+                
+                // CORREÇÃO: Buscar avatarImage novamente
+                const currentAvatarImage = document.getElementById('avatarImage')
                 
                 // Remove seleção anterior
                 document.querySelectorAll('.avatar-preset').forEach(p => p.classList.remove('selected'))
@@ -270,7 +287,12 @@ class OnboardingSystem {
                 this.userData.avatarType = 'preset'
                 
                 // Atualiza preview
-                avatarImage.src = `data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="120" height="120" viewBox="0 0 120 120"><text x="50%" y="50%" text-anchor="middle" dy=".3em" font-size="60">${avatarEmoji}</text></svg>`
+                if (currentAvatarImage) {
+                    currentAvatarImage.src = `data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="120" height="120" viewBox="0 0 120 120"><text x="50%" y="50%" text-anchor="middle" dy=".3em" font-size="60">${avatarEmoji}</text></svg>`
+                    console.log('✅ Avatar preset aplicado à imagem!')
+                } else {
+                    console.error('❌ Elemento avatarImage não encontrado!')
+                }
                 
                 console.log('✅ Avatar selecionado:', avatarEmoji)
                 this.showMessage('Avatar selecionado!', 'success')
@@ -370,38 +392,51 @@ class OnboardingSystem {
     // =====================================
     
     async completeOnboarding() {
+        console.log('🎯 completeOnboarding() INICIADO')
         this.showMessage('Salvando seu perfil...', 'info')
         
         try {
             const userId = localStorage.getItem('currentUserId')
-            console.log('🔍 Debug - userId:', userId)
-            console.log('🔍 Debug - userData:', this.userData)
+            console.log('🔍 Step 1 - userId:', userId)
+            console.log('🔍 Step 1 - userData:', JSON.stringify(this.userData, null, 2))
             
             if (!userId) {
                 throw new Error('Usuário não identificado. Faça login novamente.')
             }
             
+            console.log('✅ Step 1 - UserId OK')
+            
             // Valida dados obrigatórios
+            console.log('🔍 Step 2 - Validando dados obrigatórios...')
             if (!this.userData.name || !this.userData.age || !this.userData.experience || !this.userData.role) {
                 throw new Error('Dados incompletos. Verifique todos os campos.')
             }
             
+            console.log('✅ Step 2 - Validação OK')
+            
             // Salva no banco de dados real
-            console.log('💾 Tentando salvar no Supabase...')
+            console.log('💾 Step 3 - Chamando UserService.completeOnboarding...')
             const result = await UserService.completeOnboarding(userId, this.userData)
-            console.log('✅ Dados salvos:', result)
+            console.log('✅ Step 3 - Dados salvos no Supabase:', result)
             
             // Atualiza localStorage com dados salvos
+            console.log('💾 Step 4 - Salvando no localStorage...')
             this.saveUserData()
+            console.log('✅ Step 4 - localStorage atualizado')
             
             this.showMessage('Perfil configurado com sucesso! Redirecionando...', 'success')
             
+            console.log('🚀 Step 5 - Redirecionando para dashboard em 2 segundos...')
             setTimeout(() => {
+                console.log('🔄 Executando redirecionamento para dashboard.html')
                 window.location.href = 'dashboard.html'
             }, 2000)
             
         } catch (error) {
-            console.error('❌ Erro completo ao salvar onboarding:', error)
+            console.error('❌ ERRO COMPLETO em completeOnboarding:', error)
+            console.error('❌ Error stack:', error.stack)
+            console.error('❌ Error name:', error.name)
+            console.error('❌ Error message:', error.message)
             
             // Mostra erro mais específico
             let errorMessage = 'Erro desconhecido'
@@ -412,6 +447,13 @@ class OnboardingSystem {
             }
             
             this.showMessage(`Erro ao salvar perfil: ${errorMessage}`, 'error')
+            
+            // Mesmo com erro, tenta redirecionar (fallback)
+            console.log('⚠️ Tentando redirecionar mesmo com erro...')
+            setTimeout(() => {
+                console.log('🔄 Redirecionamento de fallback')
+                window.location.href = 'dashboard.html'
+            }, 3000)
         }
     }
     
