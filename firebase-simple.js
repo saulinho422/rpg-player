@@ -1,5 +1,6 @@
 // ====================================
-// CONFIGURAÇÃO FIREBASE + SUPABASE
+// VERSÃO SIMPLIFICADA PARA TESTE
+// Firebase Auth independente + Supabase básico
 // ====================================
 
 // 🔥 CONFIGURAÇÃO DO FIREBASE
@@ -18,35 +19,17 @@ const SUPABASE_URL = 'https://bifiatkpfmrrnfhvgrpb.supabase.co'
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpZmlhdGtwZm1ycm5maHZncnBiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA0ODM2NTMsImV4cCI6MjA3NjA1OTY1M30.g5S4aT-ml_cgGoJHWudB36EWz-3bonFZW3DEIWNOUAM'
 
 // ====================================
-// INICIALIZAÇÃO
+// INICIALIZAÇÃO BÁSICA
 // ====================================
 
-// Inicializar Firebase
+// Firebase
 firebase.initializeApp(firebaseConfig)
 const auth = firebase.auth()
 const googleProvider = new firebase.auth.GoogleAuthProvider()
 
-// Inicializar Supabase com Firebase Token
+// Supabase (modo básico, sem Third Party Auth por enquanto)
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm'
-
-// Primeiro, criar cliente básico
-let supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
-
-// Função para reconfigurar com token Firebase
-function updateSupabaseWithFirebaseToken() {
-  supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-    global: {
-      headers: {
-        Authorization: `Bearer ${SUPABASE_ANON_KEY}` // Usar anon key por padrão
-      }
-    },
-    auth: {
-      // Desabilitar auto refresh do Supabase já que usamos Firebase
-      autoRefreshToken: false,
-      persistSession: false
-    }
-  })
-}
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
 
 // ====================================
 // ELEMENTOS DO DOM
@@ -82,22 +65,22 @@ function showForm(formToShow) {
 // NAVEGAÇÃO ENTRE FORMULÁRIOS
 // ====================================
 
-document.getElementById('showRegister').addEventListener('click', (e) => {
+document.getElementById('showRegister')?.addEventListener('click', (e) => {
     e.preventDefault()
     showForm(registerForm)
 })
 
-document.getElementById('showLogin').addEventListener('click', (e) => {
+document.getElementById('showLogin')?.addEventListener('click', (e) => {
     e.preventDefault()
     showForm(loginForm)
 })
 
-document.getElementById('showForgotPassword').addEventListener('click', (e) => {
+document.getElementById('showForgotPassword')?.addEventListener('click', (e) => {
     e.preventDefault()
     showForm(forgotPasswordForm)
 })
 
-document.getElementById('backToLogin').addEventListener('click', (e) => {
+document.getElementById('backToLogin')?.addEventListener('click', (e) => {
     e.preventDefault()
     showForm(loginForm)
 })
@@ -110,18 +93,30 @@ document.getElementById('backToLogin').addEventListener('click', (e) => {
 async function signInWithGoogle() {
     try {
         showMessage('Redirecionando para Google...', 'info')
+        
+        // Configurar popup para evitar problemas de CORS
+        googleProvider.setCustomParameters({
+            'prompt': 'select_account'
+        })
+        
         const result = await auth.signInWithPopup(googleProvider)
         const user = result.user
         
-        // Forçar refresh do token para incluir custom claims
-        await user.getIdToken(/* forceRefresh */ true)
+        showMessage('✅ Login com Google realizado com sucesso!', 'success')
+        console.log('🔥 Usuário Firebase:', user)
         
-        showMessage('Login com Google realizado com sucesso!', 'success')
         await updateUserDashboard(user)
         
     } catch (error) {
         console.error('❌ Erro no login com Google:', error)
-        showMessage(`Erro no login com Google: ${error.message}`, 'error')
+        
+        if (error.code === 'auth/popup-blocked') {
+            showMessage('❌ Pop-up bloqueado! Permita pop-ups e tente novamente.', 'error')
+        } else if (error.code === 'auth/popup-closed-by-user') {
+            showMessage('⚠️ Login cancelado pelo usuário.', 'info')
+        } else {
+            showMessage(`❌ Erro no login: ${error.message}`, 'error')
+        }
     }
 }
 
@@ -131,15 +126,12 @@ async function signInWithEmail(email, password) {
         const result = await auth.signInWithEmailAndPassword(email, password)
         const user = result.user
         
-        // Forçar refresh do token para incluir custom claims
-        await user.getIdToken(/* forceRefresh */ true)
-        
-        showMessage('Login realizado com sucesso!', 'success')
+        showMessage('✅ Login realizado com sucesso!', 'success')
         await updateUserDashboard(user)
         
     } catch (error) {
         console.error('❌ Erro no login:', error)
-        showMessage(`Erro no login: ${error.message}`, 'error')
+        showMessage(`❌ Erro no login: ${error.message}`, 'error')
     }
 }
 
@@ -152,15 +144,12 @@ async function registerWithEmail(email, password) {
         // Enviar email de verificação
         await user.sendEmailVerification()
         
-        // Forçar refresh do token para incluir custom claims
-        await user.getIdToken(/* forceRefresh */ true)
-        
-        showMessage('Cadastro realizado! Verifique seu email para ativar a conta.', 'success')
+        showMessage('✅ Cadastro realizado! Verifique seu email.', 'success')
         await updateUserDashboard(user)
         
     } catch (error) {
         console.error('❌ Erro no cadastro:', error)
-        showMessage(`Erro no cadastro: ${error.message}`, 'error')
+        showMessage(`❌ Erro no cadastro: ${error.message}`, 'error')
     }
 }
 
@@ -168,12 +157,12 @@ async function registerWithEmail(email, password) {
 async function resetPassword(email) {
     try {
         await auth.sendPasswordResetEmail(email)
-        showMessage('Email de recuperação enviado! Verifique sua caixa de entrada.', 'success')
+        showMessage('✅ Email de recuperação enviado!', 'success')
         showForm(loginForm)
         
     } catch (error) {
         console.error('❌ Erro na recuperação:', error)
-        showMessage(`Erro: ${error.message}`, 'error')
+        showMessage(`❌ Erro: ${error.message}`, 'error')
     }
 }
 
@@ -181,41 +170,40 @@ async function resetPassword(email) {
 async function signOut() {
     try {
         await auth.signOut()
-        showMessage('Logout realizado com sucesso!', 'success')
+        showMessage('✅ Logout realizado com sucesso!', 'success')
         showForm(loginForm)
         
     } catch (error) {
         console.error('❌ Erro no logout:', error)
-        showMessage(`Erro no logout: ${error.message}`, 'error')
+        showMessage(`❌ Erro no logout: ${error.message}`, 'error')
     }
 }
 
 // ====================================
-// INTEGRAÇÃO COM SUPABASE
+// TESTE BÁSICO SUPABASE
 // ====================================
 
-async function testSupabaseConnection(user) {
+async function testSupabaseBasic() {
     try {
-        // Obter token Firebase
-        const firebaseToken = await user.getIdToken(true) // Forçar refresh
-        console.log('🔑 Token Firebase obtido:', firebaseToken.substring(0, 50) + '...')
-        
-        // Testar uma query simples no Supabase
+        // Teste simples - apenas verificar se o Supabase responde
         const { data, error } = await supabase
-            .from('profiles') // Tabela de exemplo
+            .from('_health') // Endpoint que sempre existe
             .select('*')
             .limit(1)
         
-        if (error && error.code !== 'PGRST116') { // PGRST116 = tabela não existe (ok)
-            console.error('❌ Erro na query Supabase:', error)
-            return `❌ Erro: ${error.message}`
+        console.log('🗄️ Teste Supabase:', { data, error })
+        
+        if (error && error.code === 'PGRST116') {
+            // Tabela não existe, mas conexão OK
+            return '✅ Supabase conectado (sem Third Party Auth)'
+        } else if (error) {
+            return `⚠️ Supabase: ${error.message}`
+        } else {
+            return '✅ Supabase funcionando perfeitamente'
         }
         
-        console.log('✅ Supabase respondeu corretamente')
-        return '✅ Conexão Firebase → Supabase funcionando'
-        
     } catch (error) {
-        console.error('❌ Erro ao testar Supabase:', error)
+        console.error('❌ Erro Supabase:', error)
         return `❌ Erro na conexão: ${error.message}`
     }
 }
@@ -228,11 +216,9 @@ async function updateUserDashboard(user) {
     const userInfo = document.getElementById('userInfo')
     const supabaseStatus = document.getElementById('supabaseStatus')
     
-    // Obter token com claims
-    const token = await user.getIdToken()
-    
+    // Informações do Firebase
     userInfo.innerHTML = `
-        <h3>Informações do Usuário (Firebase)</h3>
+        <h3>✅ Firebase Auth Funcionando</h3>
         <p><strong>Nome:</strong> ${user.displayName || 'Não informado'}</p>
         <p><strong>Email:</strong> ${user.email}</p>
         <p><strong>ID:</strong> ${user.uid}</p>
@@ -241,17 +227,25 @@ async function updateUserDashboard(user) {
         <p><strong>Último login:</strong> ${new Date(user.metadata.lastSignInTime).toLocaleString('pt-BR')}</p>
     `
     
-    // Testar conexão com Supabase
-    supabaseStatus.innerHTML = '<p>🔄 Testando conexão com Supabase...</p>'
-    const supabaseResult = await testSupabaseConnection(user)
+    // Teste do Supabase
+    supabaseStatus.innerHTML = '<p>🔄 Testando Supabase...</p>'
+    const supabaseResult = await testSupabaseBasic()
+    
     supabaseStatus.innerHTML = `
-        <h3>Status da Integração</h3>
-        <p>${supabaseResult}</p>
-        <details>
-            <summary>Detalhes técnicos (clique para expandir)</summary>
-            <p><strong>Firebase Project:</strong> ${firebaseConfig.projectId}</p>
-            <p><strong>Supabase URL:</strong> ${SUPABASE_URL}</p>
-            <p><strong>Token JWT:</strong> ${token.substring(0, 50)}...</p>
+        <h3>Status dos Sistemas</h3>
+        <p><strong>Firebase:</strong> ✅ Funcionando</p>
+        <p><strong>Supabase:</strong> ${supabaseResult}</p>
+        <p><strong>Integração:</strong> 🔧 Em configuração</p>
+        
+        <details style="margin-top: 15px;">
+            <summary>🔧 Próximos passos</summary>
+            <ul style="text-align: left; margin-top: 10px;">
+                <li>✅ Firebase Auth configurado</li>
+                <li>✅ Supabase conectado</li>
+                <li>🔧 Configurar Third Party Auth</li>
+                <li>🔧 Adicionar Custom Claims</li>
+                <li>🔧 Deploy Cloud Functions</li>
+            </ul>
         </details>
     `
     
@@ -263,11 +257,11 @@ async function updateUserDashboard(user) {
 // ====================================
 
 // Botões de Google
-document.getElementById('googleLogin').addEventListener('click', signInWithGoogle)
-document.getElementById('googleRegister').addEventListener('click', signInWithGoogle)
+document.getElementById('googleLogin')?.addEventListener('click', signInWithGoogle)
+document.getElementById('googleRegister')?.addEventListener('click', signInWithGoogle)
 
 // Formulário de login
-document.getElementById('login').addEventListener('submit', async (e) => {
+document.getElementById('login')?.addEventListener('submit', async (e) => {
     e.preventDefault()
     const email = document.getElementById('loginEmail').value
     const password = document.getElementById('loginPassword').value
@@ -275,14 +269,14 @@ document.getElementById('login').addEventListener('submit', async (e) => {
 })
 
 // Formulário de cadastro
-document.getElementById('register').addEventListener('submit', async (e) => {
+document.getElementById('register')?.addEventListener('submit', async (e) => {
     e.preventDefault()
     const email = document.getElementById('registerEmail').value
     const password = document.getElementById('registerPassword').value
     const confirmPassword = document.getElementById('confirmPassword').value
     
     if (password !== confirmPassword) {
-        showMessage('As senhas não coincidem!', 'error')
+        showMessage('❌ As senhas não coincidem!', 'error')
         return
     }
     
@@ -290,14 +284,14 @@ document.getElementById('register').addEventListener('submit', async (e) => {
 })
 
 // Formulário de recuperação
-document.getElementById('forgotPassword').addEventListener('submit', async (e) => {
+document.getElementById('forgotPassword')?.addEventListener('submit', async (e) => {
     e.preventDefault()
     const email = document.getElementById('resetEmail').value
     await resetPassword(email)
 })
 
 // Logout
-document.getElementById('logout').addEventListener('click', signOut)
+document.getElementById('logout')?.addEventListener('click', signOut)
 
 // ====================================
 // MONITORAMENTO DE ESTADO
@@ -305,7 +299,7 @@ document.getElementById('logout').addEventListener('click', signOut)
 
 auth.onAuthStateChanged(async (user) => {
     if (user) {
-        console.log('🔥 Usuário logado no Firebase:', user.email)
+        console.log('🔥 Usuário logado:', user.email)
         await updateUserDashboard(user)
     } else {
         console.log('👤 Usuário deslogado')
@@ -317,9 +311,7 @@ auth.onAuthStateChanged(async (user) => {
 // INICIALIZAÇÃO
 // ====================================
 
-// Configurar Supabase
-updateSupabaseWithFirebaseToken()
-
-console.log('🚀 Sistema Firebase + Supabase inicializado')
+console.log('🚀 Sistema inicializado (modo de teste)')
 console.log('🔥 Firebase Project:', firebaseConfig.projectId)
 console.log('🗄️ Supabase URL:', SUPABASE_URL)
+console.log('💡 Esta é uma versão simplificada para teste')

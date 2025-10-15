@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite",
     "dev:firebase": "vite --open index-firebase.html",
+    "test:firebase": "vite --open test-firebase.html",
     "build": "vite build",
     "preview": "vite preview"
   },

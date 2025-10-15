@@ -98,7 +98,7 @@ const firebaseConfig = {
 
 ### Política restritiva para Firebase + Supabase:
 ```sql
--- Função helper
+-- Função helper para seu projeto específico
 CREATE FUNCTION public.is_supabase_or_firebase_project_jwt()
 RETURNS BOOL
 LANGUAGE SQL
@@ -108,9 +108,9 @@ RETURN (
   (auth.jwt()->>'iss' = 'https://bifiatkpfmrrnfhvgrpb.supabase.co/auth/v1')
   OR
   (
-    auth.jwt()->>'iss' = 'https://securetoken.google.com/SEU_FIREBASE_PROJECT_ID'
+    auth.jwt()->>'iss' = 'https://securetoken.google.com/player-7a871'
     AND
-    auth.jwt()->>'aud' = 'SEU_FIREBASE_PROJECT_ID'
+    auth.jwt()->>'aud' = 'player-7a871'
   )
 );
 
