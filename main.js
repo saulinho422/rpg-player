@@ -60,6 +60,46 @@ document.getElementById('backToLoginFromVerification').addEventListener('click',
     showForm(loginForm)
 })
 
+// Função para login social
+async function handleSocialLogin(provider) {
+    try {
+        const { data, error } = await supabase.auth.signInWithOAuth({
+            provider: provider,
+            options: {
+                redirectTo: window.location.origin
+            }
+        })
+        
+        if (error) {
+            showMessage(`Erro no login com ${provider}: ${error.message}`, 'error')
+            return
+        }
+        
+        showMessage(`Redirecionando para ${provider}...`, 'info')
+        
+    } catch (error) {
+        showMessage(`Erro inesperado: ${error.message}`, 'error')
+    }
+}
+
+// Event listeners para login social - Login
+document.getElementById('googleLogin').addEventListener('click', () => {
+    handleSocialLogin('google')
+})
+
+document.getElementById('githubLogin').addEventListener('click', () => {
+    handleSocialLogin('github')
+})
+
+// Event listeners para login social - Cadastro
+document.getElementById('googleRegister').addEventListener('click', () => {
+    handleSocialLogin('google')
+})
+
+document.getElementById('githubRegister').addEventListener('click', () => {
+    handleSocialLogin('github')
+})
+
 // Função de cadastro
 document.getElementById('register').addEventListener('submit', async (e) => {
     e.preventDefault()
