@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "vite",
+    "dev:firebase": "vite --open index-firebase.html",
     "build": "vite build",
     "preview": "vite preview"
   },
