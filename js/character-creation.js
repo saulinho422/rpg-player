@@ -223,9 +223,13 @@ class CharacterCreation {
 
         // Step 4: Attributes - Method buttons with confirmation
         document.querySelectorAll('.method-btn[data-method]').forEach(btn => {
+            console.log('Adicionando listener para botão:', btn.dataset.method);
             btn.addEventListener('click', () => {
+                console.log('Botão clicado! Método:', btn.dataset.method, 'methodLocked:', this.methodLocked);
                 if (!this.methodLocked) {
                     this.showMethodConfirmation(btn.dataset.method);
+                } else {
+                    console.log('Método já está travado!');
                 }
             });
         });
@@ -406,9 +410,13 @@ class CharacterCreation {
     // ===== STEP 4: ATTRIBUTES =====
     
     showMethodConfirmation(method) {
+        console.log('showMethodConfirmation chamado com método:', method);
         this.pendingMethod = method;
         const modal = document.getElementById('methodConfirmModal');
         const methodDisplay = modal.querySelector('.method-display');
+        
+        console.log('Modal encontrado:', modal);
+        console.log('methodDisplay encontrado:', methodDisplay);
         
         if (method === '4d6') {
             methodDisplay.innerHTML = '<span class="method-icon">🎲</span> 4d6 (Drop Lowest)';
@@ -417,6 +425,7 @@ class CharacterCreation {
         }
         
         modal.classList.add('active');
+        console.log('Modal agora tem classe active');
     }
 
     cancelMethodConfirmation() {
@@ -463,7 +472,7 @@ class CharacterCreation {
         diceSection.classList.remove('hidden');
         resultsDisplay.innerHTML = '';
         
-        document.getElementById('rollsLeft').textContent = '6';
+        document.getElementById('rollsCompleted').textContent = '0';
         document.getElementById('rollDiceBtn').disabled = false;
         document.getElementById('rollDiceBtn').classList.remove('hidden');
     }
@@ -538,7 +547,7 @@ class CharacterCreation {
             this.rolledValues.push(sum);
             this.rollsCompleted++;
             
-            document.getElementById('rollsLeft').textContent = 6 - this.rollsCompleted;
+            document.getElementById('rollsCompleted').textContent = this.rollsCompleted;
             
             if (this.rollsCompleted >= 6) {
                 document.getElementById('rollDiceBtn').disabled = true;
