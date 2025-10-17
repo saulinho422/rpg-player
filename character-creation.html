@@ -422,8 +422,25 @@
         </div>
     </div>
 
-    <!-- Modal for Subraces -->
-    <div id="subraceModal" class="modal">
+    <!-- Modal for Subrace Selection -->
+    <div id="subraceSelectionModal" class="modal">
+        <div class="modal-content selection-modal">
+            <span class="close" onclick="characterCreation.backToRaceModal()">&times;</span>
+            <h2>✨ Selecione uma Sub-raça</h2>
+            
+            <!-- Race info display will be inserted here by JS -->
+            <!-- Subrace info display will be inserted here by JS -->
+            
+            <div class="selection-grid" id="subraceSelectionGrid">
+                <!-- Populated by JavaScript -->
+            </div>
+            
+            <!-- Action buttons will be inserted here by JS -->
+        </div>
+    </div>
+
+    <!-- OLD Modal for Subraces (deprecated) -->
+    <div id="subraceModal" class="modal" style="display: none;">
         <div class="modal-content">
             <span class="close">&times;</span>
             <h2 id="raceTitle">Raça Selecionada</h2>

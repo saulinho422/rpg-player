@@ -938,10 +938,24 @@ class CharacterCreation {
         
         if (type === 'race') {
             icon = this.getRaceIcon(item.nome);
+            
+            // Formatar aumentoatributos se for objeto
+            let atributos = '';
+            if (item.aumentoatributos) {
+                if (typeof item.aumentoatributos === 'string') {
+                    atributos = item.aumentoatributos;
+                } else if (typeof item.aumentoatributos === 'object') {
+                    atributos = Object.entries(item.aumentoatributos)
+                        .map(([attr, value]) => `${attr.toUpperCase()} +${value}`)
+                        .join(', ');
+                }
+            }
+            
             stats = `
-                ${item.aumentoatributos ? `<div class="selection-card-stat"><strong>Atributos:</strong> ${item.aumentoatributos}</div>` : ''}
-                ${item.deslocamento ? `<div class="selection-card-stat"><strong>Deslocamento:</strong> ${item.deslocamento}</div>` : ''}
+                ${atributos ? `<div class="selection-card-stat"><strong>Atributos:</strong> ${atributos}</div>` : ''}
+                ${item.deslocamento ? `<div class="selection-card-stat"><strong>Deslocamento:</strong> ${item.deslocamento} pés</div>` : ''}
                 ${item.idiomasextras ? `<div class="selection-card-stat"><strong>Idiomas:</strong> ${item.idiomasextras}</div>` : ''}
+                ${item.subracas && item.subracas.length > 0 ? `<div class="selection-card-stat"><strong>Sub-raças:</strong> ${item.subracas.length} disponíveis</div>` : ''}
             `;
         } else if (type === 'class') {
             icon = this.getClassIcon(item.nome);
@@ -986,20 +1000,28 @@ class CharacterCreation {
 
         // Update character data and UI
         if (type === 'race') {
-            this.character.race = item.nome;
-            document.getElementById('race').value = item.nome;
-            document.getElementById('selectedRaceLabel').textContent = item.nome;
-            document.getElementById('selectRaceBtn').classList.add('selected');
+            // Salva a raça selecionada temporariamente
+            this.tempSelectedRace = item;
             
-            // Check for subraces
+            // Mostra informações da raça no topo do modal
+            this.showRaceInfo(item);
+            
+            // Check for subraces - mostra botão de sub-raças
             if (item.subracas && item.subracas.length > 0) {
-                setTimeout(() => {
-                    this.closeModals();
-                    this.showSubraceModal(item);
-                }, 500);
+                this.showSubraceButton(item);
             } else {
-                setTimeout(() => this.closeModals(), 300);
+                this.hideSubraceButton();
             }
+            
+            // Habilita botão de confirmar
+            this.enableConfirmRaceButton();
+            
+        } else if (type === 'subrace') {
+            // Quando seleciona uma sub-raça
+            this.tempSelectedSubrace = item;
+            this.showSubraceInfo(item);
+            this.enableConfirmSubraceButton();
+            
         } else if (type === 'class') {
             this.character.class = item.nome;
             document.getElementById('class').value = item.nome;
@@ -1027,6 +1049,210 @@ class CharacterCreation {
         }
 
         this.saveProgress();
+    }
+
+    showRaceInfo(race) {
+        const modal = document.getElementById('raceSelectionModal');
+        let infoDiv = modal.querySelector('.race-info-display');
+        
+        if (!infoDiv) {
+            infoDiv = document.createElement('div');
+            infoDiv.className = 'race-info-display';
+            modal.querySelector('.modal-content').insertBefore(infoDiv, modal.querySelector('.selection-grid'));
+        }
+        
+        // Formatar atributos
+        let atributos = '';
+        if (race.aumentoatributos) {
+            if (typeof race.aumentoatributos === 'string') {
+                atributos = race.aumentoatributos;
+            } else if (typeof race.aumentoatributos === 'object') {
+                atributos = Object.entries(race.aumentoatributos)
+                    .map(([attr, value]) => `${attr.toUpperCase()} +${value}`)
+                    .join(', ');
+            }
+        }
+        
+        infoDiv.innerHTML = `
+            <h3>${this.getRaceIcon(race.nome)} ${race.nome}</h3>
+            <p>${race.descricao || ''}</p>
+            <div class="info-stats">
+                ${atributos ? `<span><strong>Atributos:</strong> ${atributos}</span>` : ''}
+                ${race.deslocamento ? `<span><strong>Deslocamento:</strong> ${race.deslocamento} pés</span>` : ''}
+                ${race.idiomasextras ? `<span><strong>Idiomas:</strong> ${race.idiomasextras}</span>` : ''}
+            </div>
+        `;
+        
+        infoDiv.style.display = 'block';
+    }
+
+    showSubraceButton(race) {
+        const modal = document.getElementById('raceSelectionModal');
+        let buttonDiv = modal.querySelector('.subrace-button-container');
+        
+        if (!buttonDiv) {
+            buttonDiv = document.createElement('div');
+            buttonDiv.className = 'subrace-button-container';
+            const grid = modal.querySelector('.selection-grid');
+            grid.parentNode.insertBefore(buttonDiv, grid.nextSibling);
+        }
+        
+        buttonDiv.innerHTML = `
+            <button type="button" class="btn-subrace" onclick="characterCreation.openSubraceModal()">
+                ✨ Ver Sub-raças (${race.subracas.length} disponíveis)
+            </button>
+        `;
+        buttonDiv.style.display = 'block';
+    }
+
+    hideSubraceButton() {
+        const modal = document.getElementById('raceSelectionModal');
+        const buttonDiv = modal.querySelector('.subrace-button-container');
+        if (buttonDiv) {
+            buttonDiv.style.display = 'none';
+        }
+    }
+
+    enableConfirmRaceButton() {
+        const modal = document.getElementById('raceSelectionModal');
+        let actionsDiv = modal.querySelector('.modal-actions-bottom');
+        
+        if (!actionsDiv) {
+            actionsDiv = document.createElement('div');
+            actionsDiv.className = 'modal-actions-bottom';
+            modal.querySelector('.modal-content').appendChild(actionsDiv);
+        }
+        
+        actionsDiv.innerHTML = `
+            <button type="button" class="btn-cancel" onclick="characterCreation.closeModals()">Cancelar</button>
+            <button type="button" class="btn-confirm" onclick="characterCreation.confirmRaceSelection()">Confirmar Raça</button>
+        `;
+        actionsDiv.style.display = 'flex';
+    }
+
+    confirmRaceSelection() {
+        if (this.tempSelectedRace) {
+            this.character.race = this.tempSelectedRace.nome;
+            document.getElementById('race').value = this.tempSelectedRace.nome;
+            document.getElementById('selectedRaceLabel').textContent = this.tempSelectedRace.nome;
+            document.getElementById('selectRaceBtn').classList.add('selected');
+            
+            if (this.tempSelectedSubrace) {
+                this.character.subrace = this.tempSelectedSubrace.nome;
+            }
+            
+            this.closeModals();
+            this.tempSelectedRace = null;
+            this.tempSelectedSubrace = null;
+        }
+    }
+
+    openSubraceModal() {
+        if (!this.tempSelectedRace) return;
+        
+        // Esconde o modal de raças
+        document.getElementById('raceSelectionModal').style.display = 'none';
+        
+        // Mostra modal de sub-raças
+        const modal = document.getElementById('subraceSelectionModal');
+        const grid = document.getElementById('subraceSelectionGrid');
+        
+        grid.innerHTML = '';
+        
+        this.tempSelectedRace.subracas.forEach(subrace => {
+            const card = this.createSelectionCard(subrace, 'subrace');
+            grid.appendChild(card);
+        });
+        
+        // Mostra info da raça no topo
+        this.showRaceInfoInSubraceModal(this.tempSelectedRace);
+        
+        // Adiciona botões
+        this.addSubraceModalActions();
+        
+        modal.style.display = 'block';
+    }
+
+    showRaceInfoInSubraceModal(race) {
+        const modal = document.getElementById('subraceSelectionModal');
+        let infoDiv = modal.querySelector('.race-info-display');
+        
+        if (!infoDiv) {
+            infoDiv = document.createElement('div');
+            infoDiv.className = 'race-info-display';
+            modal.querySelector('.modal-content').insertBefore(infoDiv, modal.querySelector('h2').nextSibling);
+        }
+        
+        infoDiv.innerHTML = `
+            <p class="parent-race-info">
+                <strong>Raça Base:</strong> ${this.getRaceIcon(race.nome)} ${race.nome}
+            </p>
+        `;
+        infoDiv.style.display = 'block';
+    }
+
+    showSubraceInfo(subrace) {
+        const modal = document.getElementById('subraceSelectionModal');
+        let infoDiv = modal.querySelector('.subrace-info-display');
+        
+        if (!infoDiv) {
+            infoDiv = document.createElement('div');
+            infoDiv.className = 'subrace-info-display';
+            const raceInfo = modal.querySelector('.race-info-display');
+            raceInfo.parentNode.insertBefore(infoDiv, raceInfo.nextSibling);
+        }
+        
+        infoDiv.innerHTML = `
+            <h4>✨ ${subrace.nome}</h4>
+            <p>${subrace.descricao || ''}</p>
+        `;
+        infoDiv.style.display = 'block';
+    }
+
+    addSubraceModalActions() {
+        const modal = document.getElementById('subraceSelectionModal');
+        let actionsDiv = modal.querySelector('.modal-actions-bottom');
+        
+        if (!actionsDiv) {
+            actionsDiv = document.createElement('div');
+            actionsDiv.className = 'modal-actions-bottom';
+            modal.querySelector('.modal-content').appendChild(actionsDiv);
+        }
+        
+        actionsDiv.innerHTML = `
+            <button type="button" class="btn-cancel" onclick="characterCreation.backToRaceModal()">← Voltar</button>
+            <button type="button" class="btn-confirm" onclick="characterCreation.confirmSubraceSelection()">Confirmar Sub-raça</button>
+        `;
+        actionsDiv.style.display = 'flex';
+    }
+
+    enableConfirmSubraceButton() {
+        // Botão já está criado, só precisa estar habilitado
+    }
+
+    backToRaceModal() {
+        document.getElementById('subraceSelectionModal').style.display = 'none';
+        document.getElementById('raceSelectionModal').style.display = 'block';
+    }
+
+    confirmSubraceSelection() {
+        if (this.tempSelectedRace) {
+            this.character.race = this.tempSelectedRace.nome;
+            document.getElementById('race').value = this.tempSelectedRace.nome;
+            
+            let labelText = this.tempSelectedRace.nome;
+            if (this.tempSelectedSubrace) {
+                this.character.subrace = this.tempSelectedSubrace.nome;
+                labelText += ` (${this.tempSelectedSubrace.nome})`;
+            }
+            
+            document.getElementById('selectedRaceLabel').textContent = labelText;
+            document.getElementById('selectRaceBtn').classList.add('selected');
+            
+            this.closeModals();
+            this.tempSelectedRace = null;
+            this.tempSelectedSubrace = null;
+        }
     }
 
     getRaceIcon(raceName) {
