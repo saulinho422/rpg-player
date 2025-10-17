@@ -890,8 +890,30 @@ class CharacterCreation {
     }
 
     openSubclassSelectionModal() {
-        const selectedClass = this.data.classes.find(c => c.nome === this.character.class);
-        if (!selectedClass || !selectedClass.subclasses || selectedClass.subclasses.length === 0) {
+        console.log('🎭 Abrindo modal de subclasses...');
+        console.log('   - Classe atual:', this.character.class);
+        console.log('   - Classes disponíveis:', this.data.classes);
+        
+        const selectedClass = this.data.classes.find(c => {
+            const className = c.nome || c.name;
+            return className === this.character.class;
+        });
+        
+        console.log('   - Classe encontrada:', selectedClass);
+        
+        if (!selectedClass) {
+            console.error('❌ Classe não encontrada!');
+            alert('Classe não encontrada. Por favor, selecione uma classe primeiro.');
+            return;
+        }
+        
+        // Suporta múltiplos formatos de subclasses
+        const subclassesField = selectedClass.subclasses || selectedClass.subclassesl || selectedClass.subclasss || [];
+        
+        console.log('   - Subclasses encontradas:', subclassesField);
+        
+        if (!subclassesField || subclassesField.length === 0) {
+            console.error('❌ Nenhuma subclasse disponível!');
             alert('Esta classe não possui subclasses disponíveis.');
             return;
         }
@@ -901,12 +923,14 @@ class CharacterCreation {
         
         grid.innerHTML = '';
         
-        selectedClass.subclasses.forEach(subclass => {
+        subclassesField.forEach(subclass => {
+            console.log('   - Criando card para subclasse:', subclass);
             const card = this.createSelectionCard(subclass, 'subclass');
             grid.appendChild(card);
         });
         
         modal.style.display = 'block';
+        console.log('✅ Modal de subclasses aberto');
     }
 
     openBackgroundSelectionModal() {
@@ -1050,10 +1074,22 @@ class CharacterCreation {
             document.getElementById('selectClassBtn').classList.add('selected');
             
             console.log('✅ Classe selecionada:', className);
+            console.log('🔍 Verificando subclasses...', item);
+            console.log('   - item.subclasses:', item.subclasses);
+            console.log('   - item.subclassesl:', item.subclassesl); 
+            console.log('   - Todas as chaves:', Object.keys(item));
+            
+            // Suporta múltiplos formatos de subclasses
+            const subclassesField = item.subclasses || item.subclassesl || item.subclasss || [];
+            
+            console.log('   - Subclasses encontradas:', subclassesField);
             
             // Show subclass option if available
-            if (item.subclasses && item.subclasses.length > 0) {
+            if (subclassesField && subclassesField.length > 0) {
+                console.log('✅ Mostrando opção de subclasse');
                 document.getElementById('subclassGroup').style.display = 'block';
+            } else {
+                console.log('❌ Nenhuma subclasse disponível para', className);
             }
             
             setTimeout(() => this.closeModals(), 300);
