@@ -1299,10 +1299,13 @@ class CharacterCreation {
     }
 
     showSubraceInfo(subrace) {
+        console.log('📋 Mostrando info da sub-raça:', subrace);
+        
         const modal = document.getElementById('subraceSelectionModal');
         let infoDiv = modal.querySelector('.subrace-info-display');
         
         if (!infoDiv) {
+            console.log('🆕 Criando div de info da sub-raça');
             infoDiv = document.createElement('div');
             infoDiv.className = 'subrace-info-display';
             const raceInfo = modal.querySelector('.race-info-display');
@@ -1320,6 +1323,8 @@ class CharacterCreation {
                     .join(', ');
             }
         }
+        
+        console.log('⚡ Atributos formatados:', atributos);
         
         // Habilidades da sub-raça (detalhadas)
         let habilidadesHTML = '';
@@ -1339,6 +1344,8 @@ class CharacterCreation {
             }).filter(h => h).join('');
         }
         
+        console.log('✨ Habilidades HTML:', habilidadesHTML);
+        
         // Proficiências da sub-raça
         let proficienciasHTML = '';
         if (subrace.proficiencias) {
@@ -1349,7 +1356,9 @@ class CharacterCreation {
             proficienciasHTML = profs.join('');
         }
         
-        infoDiv.innerHTML = `
+        console.log('🎯 Proficiências HTML:', proficienciasHTML);
+        
+        const finalHTML = `
             <div class="info-header subrace-header">
                 <h4>✨ ${subrace.nome}</h4>
                 ${subrace.descricao ? `<p class="info-description">${subrace.descricao}</p>` : ''}
@@ -1385,7 +1394,10 @@ class CharacterCreation {
             </div>
         `;
         
+        console.log('📄 HTML final da sub-raça:', finalHTML);
+        infoDiv.innerHTML = finalHTML;
         infoDiv.style.display = 'block';
+        console.log('✅ Info da sub-raça exibida');
     }
 
     addSubraceModalActions() {
