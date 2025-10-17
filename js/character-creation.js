@@ -1312,13 +1312,15 @@ class CharacterCreation {
             raceInfo.parentNode.insertBefore(infoDiv, raceInfo.nextSibling);
         }
         
-        // Formatar atributos adicionais
+        // Formatar atributos adicionais - SUPORTA MÚLTIPLOS FORMATOS
         let atributos = '';
-        if (subrace.aumentoatributos) {
-            if (typeof subrace.aumentoatributos === 'string') {
-                atributos = subrace.aumentoatributos;
-            } else if (typeof subrace.aumentoatributos === 'object') {
-                atributos = Object.entries(subrace.aumentoatributos)
+        const atributoField = subrace.aumentoatributos || subrace.aumentoAtributos || subrace.abilityScoreIncrease;
+        
+        if (atributoField) {
+            if (typeof atributoField === 'string') {
+                atributos = atributoField;
+            } else if (typeof atributoField === 'object') {
+                atributos = Object.entries(atributoField)
                     .map(([attr, value]) => `${attr.toUpperCase()} +${value}`)
                     .join(', ');
             }
@@ -1326,19 +1328,25 @@ class CharacterCreation {
         
         console.log('⚡ Atributos formatados:', atributos);
         
-        // Habilidades da sub-raça (detalhadas)
+        // Habilidades da sub-raça (detalhadas) - SUPORTA MÚLTIPLOS FORMATOS
         let habilidadesHTML = '';
-        if (subrace.habilidades && Array.isArray(subrace.habilidades)) {
-            habilidadesHTML = subrace.habilidades.map(h => {
+        const habilidadesField = subrace.habilidades || subrace.caracteristicas || subrace.traits;
+        
+        if (habilidadesField && Array.isArray(habilidadesField)) {
+            habilidadesHTML = habilidadesField.map(h => {
                 if (typeof h === 'string') {
                     return `<li><strong>${h}</strong></li>`;
-                } else if (typeof h === 'object' && h.nome) {
-                    return `
-                        <li>
-                            <strong>${h.nome}:</strong> 
-                            ${h.descricao || ''}
-                        </li>
-                    `;
+                } else if (typeof h === 'object') {
+                    const nome = h.nome || h.name || '';
+                    const desc = h.descricao || h.description || h.desc || '';
+                    if (nome) {
+                        return `
+                            <li>
+                                <strong>${nome}:</strong> 
+                                ${desc}
+                            </li>
+                        `;
+                    }
                 }
                 return '';
             }).filter(h => h).join('');
@@ -1358,10 +1366,13 @@ class CharacterCreation {
         
         console.log('🎯 Proficiências HTML:', proficienciasHTML);
         
+        const descricao = subrace.descricao || subrace.description || '';
+        const nome = subrace.nome || subrace.name || 'Sub-raça';
+        
         const finalHTML = `
             <div class="info-header subrace-header">
-                <h4>✨ ${subrace.nome}</h4>
-                ${subrace.descricao ? `<p class="info-description">${subrace.descricao}</p>` : ''}
+                <h4>✨ ${nome}</h4>
+                ${descricao ? `<p class="info-description">${descricao}</p>` : ''}
             </div>
             
             <div class="info-sections">
