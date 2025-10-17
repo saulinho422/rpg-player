@@ -1430,33 +1430,58 @@ body::before {
 
 .selection-card-description {
     color: #c5c5c5;
-    font-size: 14px;
-    line-height: 1.6;
-    margin-bottom: 15px;
-    text-align: center;
+    font-size: 13px;
+    line-height: 1.5;
+    margin: 12px 0;
+    text-align: left;
+    max-height: 80px;
+    overflow-y: auto;
+    padding-right: 5px;
+}
+
+.selection-card-description::-webkit-scrollbar {
+    width: 4px;
+}
+
+.selection-card-description::-webkit-scrollbar-track {
+    background: rgba(26, 26, 46, 0.3);
+    border-radius: 4px;
+}
+
+.selection-card-description::-webkit-scrollbar-thumb {
+    background: rgba(212, 175, 55, 0.5);
+    border-radius: 4px;
+}
+
+.selection-card-description::-webkit-scrollbar-thumb:hover {
+    background: rgba(212, 175, 55, 0.7);
 }
 
 .selection-card-stats {
-    margin-top: 18px;
-    padding-top: 15px;
+    margin-top: 15px;
+    padding-top: 12px;
     border-top: 1px solid rgba(212, 175, 55, 0.3);
 }
 
 .selection-card-stat {
     color: #b0b0b0;
-    font-size: 13px;
-    margin: 8px 0;
+    font-size: 12px;
+    margin: 6px 0;
     display: flex;
     align-items: flex-start;
-    gap: 8px;
+    gap: 6px;
+    line-height: 1.4;
 }
 
 .selection-card-stat::before {
-    content: '◆';
+    content: '';
+    display: none;
+}
+
+.selection-card-stat strong {
     color: #d4af37;
-    font-size: 10px;
-    margin-top: 3px;
-    flex-shrink: 0;
+    font-size: 12px;
+    white-space: nowrap;
 }
 
 .selection-card-stat strong {

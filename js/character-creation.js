@@ -951,24 +951,131 @@ class CharacterCreation {
                 }
             }
             
+            // Formatar idiomas
+            let idiomas = '';
+            if (item.idiomas && Array.isArray(item.idiomas)) {
+                idiomas = item.idiomas.join(', ');
+            }
+            
+            // Formatar habilidades raciais
+            let habilidades = '';
+            if (item.habilidades && Array.isArray(item.habilidades)) {
+                habilidades = item.habilidades.map(h => {
+                    if (typeof h === 'string') return h;
+                    if (h.nome) return h.nome;
+                    return '';
+                }).filter(h => h).join(', ');
+            }
+            
             stats = `
-                ${atributos ? `<div class="selection-card-stat"><strong>Atributos:</strong> ${atributos}</div>` : ''}
-                ${item.deslocamento ? `<div class="selection-card-stat"><strong>Deslocamento:</strong> ${item.deslocamento} pés</div>` : ''}
-                ${item.idiomasextras ? `<div class="selection-card-stat"><strong>Idiomas:</strong> ${item.idiomasextras}</div>` : ''}
-                ${item.subracas && item.subracas.length > 0 ? `<div class="selection-card-stat"><strong>Sub-raças:</strong> ${item.subracas.length} disponíveis</div>` : ''}
+                ${atributos ? `<div class="selection-card-stat"><strong>⚡ Atributos:</strong> ${atributos}</div>` : ''}
+                ${item.deslocamento ? `<div class="selection-card-stat"><strong>🏃 Deslocamento:</strong> ${item.deslocamento} pés</div>` : ''}
+                ${item.tamanho ? `<div class="selection-card-stat"><strong>📏 Tamanho:</strong> ${item.tamanho}</div>` : ''}
+                ${idiomas ? `<div class="selection-card-stat"><strong>🗣️ Idiomas:</strong> ${idiomas}</div>` : ''}
+                ${item.idiomasextras ? `<div class="selection-card-stat"><strong>📚 Idiomas Extras:</strong> +${item.idiomasextras} à escolha</div>` : ''}
+                ${habilidades ? `<div class="selection-card-stat"><strong>✨ Habilidades:</strong> ${habilidades}</div>` : ''}
+                ${item.visaonoescuro ? `<div class="selection-card-stat"><strong>👁️ Visão no Escuro:</strong> ${item.visaonoescuro} pés</div>` : ''}
+                ${item.subracas && item.subracas.length > 0 ? `<div class="selection-card-stat"><strong>🎭 Sub-raças:</strong> ${item.subracas.length} disponíveis</div>` : ''}
+            `;
+        } else if (type === 'subrace') {
+            icon = '✨';
+            
+            // Formatar aumentoatributos da sub-raça
+            let atributos = '';
+            if (item.aumentoatributos) {
+                if (typeof item.aumentoatributos === 'string') {
+                    atributos = item.aumentoatributos;
+                } else if (typeof item.aumentoatributos === 'object') {
+                    atributos = Object.entries(item.aumentoatributos)
+                        .map(([attr, value]) => `${attr.toUpperCase()} +${value}`)
+                        .join(', ');
+                }
+            }
+            
+            // Habilidades da sub-raça
+            let habilidades = '';
+            if (item.habilidades && Array.isArray(item.habilidades)) {
+                habilidades = item.habilidades.map(h => {
+                    if (typeof h === 'string') return h;
+                    if (h.nome) return h.nome;
+                    return '';
+                }).filter(h => h).join(', ');
+            }
+            
+            stats = `
+                ${atributos ? `<div class="selection-card-stat"><strong>⚡ Atributos Adicionais:</strong> ${atributos}</div>` : ''}
+                ${habilidades ? `<div class="selection-card-stat"><strong>✨ Habilidades:</strong> ${habilidades}</div>` : ''}
+                ${item.proficiencias ? `<div class="selection-card-stat"><strong>🎯 Proficiências:</strong> ${item.proficiencias}</div>` : ''}
             `;
         } else if (type === 'class') {
             icon = this.getClassIcon(item.nome);
+            
+            // Formatar proficiências
+            let proficiencias = '';
+            if (item.proficiencias) {
+                const profs = [];
+                if (item.proficiencias.armaduras) profs.push(`Armaduras: ${item.proficiencias.armaduras.join(', ')}`);
+                if (item.proficiencias.armas) profs.push(`Armas: ${item.proficiencias.armas.join(', ')}`);
+                if (item.proficiencias.ferramentas) profs.push(`Ferramentas: ${item.proficiencias.ferramentas.join(', ')}`);
+                proficiencias = profs.join(' | ');
+            }
+            
+            // Formatar perícias
+            let pericias = '';
+            if (item.proficiencias && item.proficiencias.pericias) {
+                pericias = `Escolha ${item.proficiencias.escolha || 2} entre: ${item.proficiencias.pericias.join(', ')}`;
+            }
+            
+            // Equipamento inicial
+            let equipamento = '';
+            if (item.equipamentoinicial && Array.isArray(item.equipamentoinicial)) {
+                equipamento = item.equipamentoinicial.slice(0, 3).join(', ');
+                if (item.equipamentoinicial.length > 3) equipamento += '...';
+            }
+            
             stats = `
-                ${item.hitdice ? `<div class="selection-card-stat"><strong>Dado de Vida:</strong> ${item.hitdice}</div>` : ''}
-                ${item.armaduras ? `<div class="selection-card-stat"><strong>Armaduras:</strong> ${item.armaduras}</div>` : ''}
-                ${item.armas ? `<div class="selection-card-stat"><strong>Armas:</strong> ${item.armas}</div>` : ''}
+                ${item.hitdice ? `<div class="selection-card-stat"><strong>❤️ Dado de Vida:</strong> ${item.hitdice}</div>` : ''}
+                ${item.atributoprincipal ? `<div class="selection-card-stat"><strong>⭐ Atributo Principal:</strong> ${item.atributoprincipal}</div>` : ''}
+                ${proficiencias ? `<div class="selection-card-stat"><strong>🛡️ Proficiências:</strong> ${proficiencias}</div>` : ''}
+                ${pericias ? `<div class="selection-card-stat"><strong>🎯 Perícias:</strong> ${pericias}</div>` : ''}
+                ${item.resistencias ? `<div class="selection-card-stat"><strong>🛡️ Resistências:</strong> ${item.resistencias.join(', ')}</div>` : ''}
+                ${equipamento ? `<div class="selection-card-stat"><strong>🎒 Equipamento:</strong> ${equipamento}</div>` : ''}
             `;
         } else if (type === 'background') {
             icon = this.getBackgroundIcon(item.nome);
+            
+            // Formatar proficiências do background
+            let proficiencias = '';
+            if (item.proficiencias) {
+                const profs = [];
+                if (item.proficiencias.pericias) profs.push(`Perícias: ${item.proficiencias.pericias.join(', ')}`);
+                if (item.proficiencias.ferramentas) profs.push(`Ferramentas: ${item.proficiencias.ferramentas.join(', ')}`);
+                if (item.proficiencias.idiomas) {
+                    profs.push(`Idiomas: ${item.proficiencias.idiomas.quantidade || 0} à escolha`);
+                }
+                proficiencias = profs.join(' | ');
+            }
+            
+            // Equipamento do background
+            let equipamento = '';
+            if (item.equipamento && Array.isArray(item.equipamento)) {
+                equipamento = item.equipamento.slice(0, 3).join(', ');
+                if (item.equipamento.length > 3) equipamento += '...';
+            }
+            
+            // Características
+            let caracteristica = '';
+            if (item.caracteristica) {
+                caracteristica = typeof item.caracteristica === 'string' 
+                    ? item.caracteristica 
+                    : item.caracteristica.nome || '';
+            }
+            
             stats = `
-                ${item.pericias ? `<div class="selection-card-stat"><strong>Perícias:</strong> ${item.pericias}</div>` : ''}
-                ${item.idiomas ? `<div class="selection-card-stat"><strong>Idiomas:</strong> ${item.idiomas || 'Nenhum'}</div>` : ''}
+                ${proficiencias ? `<div class="selection-card-stat"><strong>🎯 Proficiências:</strong> ${proficiencias}</div>` : ''}
+                ${equipamento ? `<div class="selection-card-stat"><strong>🎒 Equipamento:</strong> ${equipamento}</div>` : ''}
+                ${caracteristica ? `<div class="selection-card-stat"><strong>✨ Característica:</strong> ${caracteristica}</div>` : ''}
+                ${item.ouro ? `<div class="selection-card-stat"><strong>💰 Ouro:</strong> ${item.ouro} po</div>` : ''}
             `;
         } else if (type === 'subclass') {
             icon = '✨';
@@ -1394,6 +1501,7 @@ class CharacterCreation {
 }
 
 // Initialize on page load
+let characterCreation; // Variável global para acesso aos métodos
 document.addEventListener('DOMContentLoaded', () => {
-    new CharacterCreation();
+    characterCreation = new CharacterCreation();
 });
