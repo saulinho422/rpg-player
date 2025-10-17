@@ -1,0 +1,833 @@
+{
+  "classes": [
+    {
+      "id": "artificer",
+      "name": "Artífice",
+      "source": "Caldeirão de Tasha para Tudo",
+      "hitDice": "1d8",
+      "proficiencies": {
+        "armor": ["Leves", "Médias", "Escudos"],
+        "weapons": ["Simples"],
+        "tools": ["Ferramentas de ladrão", "Ferramentas de funileiro", "Um tipo de ferramenta de artesão à sua escolha"],
+        "savingThrows": ["Constituição", "Inteligência"],
+        "skills": {
+          "choose": 2,
+          "from": ["Arcanismo", "História", "Investigação", "Medicina", "Natureza", "Percepção", "Prestidigitação"]
+        }
+      },
+      "equipment": [
+        "(a) duas armas simples à sua escolha",
+        "Uma besta leve e 20 virotes",
+        "(a) armadura de couro batido ou (b) cota de malha",
+        "Ferramentas de ladrão e um pacote de aventureiro"
+      ],
+      "subclasses": [
+        {
+          "id": "alchemist",
+          "name": "Alquimista"
+        },
+        {
+          "id": "armorer",
+          "name": "Armeiro"
+        },
+        {
+          "id": "artillerist",
+          "name": "Artilheiro"
+        },
+        {
+          "id": "battle_smith",
+          "name": "Batalhador"
+        }
+      ]
+    },
+    {
+      "id": "barbarian",
+      "name": "Bárbaro",
+      "hitDice": "1d12",
+      "proficiencies": {
+        "armor": ["Leves", "Médias", "Escudos"],
+        "weapons": ["Simples", "Marciais"],
+        "tools": ["Nenhuma"],
+        "savingThrows": ["Força", "Constituição"],
+        "skills": {
+          "choose": 2,
+          "from": ["Adestrar Animais", "Atletismo", "Intimidação", "Natureza", "Percepção", "Sobrevivência"]
+        }
+      },
+      "equipment": [
+        "(a) um machado grande ou (b) qualquer arma marcial corpo a corpo",
+        "(a) duas machadinhas ou (b) qualquer arma simples",
+        "Um pacote de explorador e quatro azagaias"
+      ],
+      "subclasses": [
+        {
+          "id": "berserker",
+          "name": "Caminho do Furioso",
+          "source": "Livro do Jogador"
+        },
+        {
+          "id": "totem_warrior",
+          "name": "Caminho do Guerreiro Totêmico",
+          "source": "Livro do Jogador"
+        },
+        {
+          "id": "battlerager",
+          "name": "Furioso da Batalha",
+          "source": "Guia do Aventureiro da Costa da Espada"
+        },
+        {
+          "id": "ancestral_guardian",
+          "name": "Caminho do Guardião Ancestral",
+          "source": "Guia de Xanathar para Todas as Coisas"
+        },
+        {
+          "id": "storm_herald",
+          "name": "Caminho da Tempestade",
+          "source": "Guia de Xanathar para Todas as Coisas"
+        },
+        {
+          "id": "zealot",
+          "name": "Caminho do Zelote",
+          "source": "Guia de Xanathar para Todas as Coisas"
+        },
+        {
+          "id": "beast",
+          "name": "Caminho da Besta",
+          "source": "Caldeirão de Tasha para Tudo"
+        },
+        {
+          "id": "wild_magic",
+          "name": "Caminho da Magia Selvagem",
+          "source": "Caldeirão de Tasha para Tudo"
+        }
+      ]
+    },
+    {
+      "id": "bard",
+      "name": "Bardo",
+      "hitDice": "1d8",
+      "proficiencies": {
+        "armor": ["Leves"],
+        "weapons": ["Simples", "Bestas de mão", "Espadas longas", "Rapieiras", "Espadas curtas"],
+        "tools": ["Três instrumentos musicais à sua escolha"],
+        "savingThrows": ["Destreza", "Carisma"],
+        "skills": {
+          "choose": 3,
+          "from": ["Todas"]
+        }
+      },
+      "equipment": [
+        "(a) uma rapieira, (b) uma espada longa ou (c) qualquer arma simples",
+        "(a) um pacote de diplomata ou (b) um pacote de artista",
+        "(a) um alaúde ou (b) qualquer outro instrumento musical",
+        "Armadura de couro e uma adaga"
+      ],
+      "subclasses": [
+        {
+          "id": "lore",
+          "name": "Colégio do Conhecimento",
+          "source": "Livro do Jogador"
+        },
+        {
+          "id": "valor",
+          "name": "Colégio da Bravura",
+          "source": "Livro do Jogador"
+        },
+        {
+          "id": "glamour",
+          "name": "Colégio do Glamour",
+          "source": "Guia de Xanathar para Todas as Coisas"
+        },
+        {
+          "id": "swords",
+          "name": "Colégio das Espadas",
+          "source": "Guia de Xanathar para Todas as Coisas"
+        },
+        {
+          "id": "whispers",
+          "name": "Colégio dos Sussurros",
+          "source": "Guia de Xanathar para Todas as Coisas"
+        },
+        {
+          "id": "creation",
+          "name": "Colégio da Criação",
+          "source": "Caldeirão de Tasha para Tudo"
+        },
+        {
+          "id": "eloquence",
+          "name": "Colégio da Eloquência",
+          "source": "Caldeirão de Tasha para Tudo"
+        }
+      ]
+    },
+    {
+      "id": "warlock",
+      "name": "Bruxo",
+      "hitDice": "1d8",
+      "proficiencies": {
+        "armor": ["Leves"],
+        "weapons": ["Simples"],
+        "tools": ["Nenhuma"],
+        "savingThrows": ["Sabedoria", "Carisma"],
+        "skills": {
+          "choose": 2,
+          "from": ["Arcanismo", "Enganação", "História", "Intimidação", "Investigação", "Natureza", "Religião"]
+        }
+      },
+      "equipment": [
+        "(a) uma besta leve e 20 virotes ou (b) qualquer arma simples",
+        "(a) uma bolsa de componentes ou (b) um foco arcano",
+        "(a) um pacote de estudioso ou (b) um pacote de masmorreiro",
+        "Armadura de couro, qualquer arma simples e duas adagas"
+      ],
+      "subclasses": [
+        {
+          "id": "archfey",
+          "name": "A Arquifada",
+          "source": "Livro do Jogador"
+        },
+        {
+          "id": "fiend",
+          "name": "O Corruptor",
+          "source": "Livro do Jogador"
+        },
+        {
+          "id": "great_old_one",
+          "name": "O Grande Antigo",
+          "source": "Livro do Jogador"
+        },
+        {
+          "id": "undying",
+          "name": "O Imortal",
+          "source": "Guia do Aventureiro da Costa da Espada"
+        },
+        {
+          "id": "celestial",
+          "name": "O Celestial",
+          "source": "Guia de Xanathar para Todas as Coisas"
+        },
+        {
+          "id": "hexblade",
+          "name": "A Lâmina Maldita",
+          "source": "Guia de Xanathar para Todas as Coisas"
+        },
+        {
+          "id": "fathomless",
+          "name": "O Insondável",
+          "source": "Caldeirão de Tasha para Tudo"
+        },
+        {
+          "id": "genie",
+          "name": "O Gênio",
+          "source": "Caldeirão de Tasha para Tudo"
+        }
+      ]
+    },
+    {
+      "id": "cleric",
+      "name": "Clérigo",
+      "hitDice": "1d8",
+      "proficiencies": {
+        "armor": ["Leves", "Médias", "Escudos"],
+        "weapons": ["Simples"],
+        "tools": ["Nenhuma"],
+        "savingThrows": ["Sabedoria", "Carisma"],
+        "skills": {
+          "choose": 2,
+          "from": ["História", "Intuição", "Medicina", "Persuasão", "Religião"]
+        }
+      },
+      "equipment": [
+        "(a) uma maça ou (b) um martelo de guerra (se for proficiente)",
+        "(a) cota de malha, (b) armadura de couro ou (c) brunea (se for proficiente)",
+        "(a) uma besta leve e 20 virotes ou (b) qualquer arma simples",
+        "(a) um pacote de sacerdote ou (b) um pacote de explorador",
+        "Um escudo e um símbolo sagrado"
+      ],
+      "subclasses": [
+        {
+          "id": "knowledge",
+          "name": "Domínio do Conhecimento",
+          "source": "Livro do Jogador"
+        },
+        {
+          "id": "life",
+          "name": "Domínio da Vida",
+          "source": "Livro do Jogador"
+        },
+        {
+          "id": "light",
+          "name": "Domínio da Luz",
+          "source": "Livro do Jogador"
+        },
+        {
+          "id": "nature",
+          "name": "Domínio da Natureza",
+          "source": "Livro do Jogador"
+        },
+        {
+          "id": "tempest",
+          "name": "Domínio da Tempestade",
+          "source": "Livro do Jogador"
+        },
+        {
+          "id": "trickery",
+          "name": "Domínio da Enganação",
+          "source": "Livro do Jogador"
+        },
+        {
+          "id": "war",
+          "name": "Domínio da Guerra",
+          "source": "Livro do Jogador"
+        },
+        {
+          "id": "arcana",
+          "name": "Domínio do Arcano",
+          "source": "Guia do Aventureiro da Costa da Espada"
+        },
+        {
+          "id": "forge",
+          "name": "Domínio da Forja",
+          "source": "Guia de Xanathar para Todas as Coisas"
+        },
+        {
+          "id": "grave",
+          "name": "Domínio da Morte",
+          "source": "Guia de Xanathar para Todas as Coisas"
+        },
+        {
+          "id": "order",
+          "name": "Domínio da Ordem",
+          "source": "Caldeirão de Tasha para Tudo"
+        },
+        {
+          "id": "peace",
+          "name": "Domínio da Paz",
+          "source": "Caldeirão de Tasha para Tudo"
+        },
+        {
+          "id": "twilight",
+          "name": "Domínio do Crepúsculo",
+          "source": "Caldeirão de Tasha para Tudo"
+        }
+      ]
+    },
+    {
+      "id": "druid",
+      "name": "Druida",
+      "hitDice": "1d8",
+      "proficiencies": {
+        "armor": ["Leves", "Médias", "Escudos (druidas não usarão armaduras ou escudos de metal)"],
+        "weapons": ["Clavas", "Adagas", "Dardos", "Azagaias", "Maças", "Bordões", "Cimitarras", "Foices", "Fundas", "Lanças"],
+        "tools": ["Kit de herbalismo"],
+        "savingThrows": ["Inteligência", "Sabedoria"],
+        "skills": {
+          "choose": 2,
+          "from": ["Arcanismo", "Adestrar Animais", "Intuição", "Medicina", "Natureza", "Percepção", "Religião", "Sobrevivência"]
+        }
+      },
+      "equipment": [
+        "(a) um escudo de madeira ou (b) qualquer arma simples",
+        "(a) uma cimitara ou (b) qualquer arma simples corpo a corpo",
+        "Armadura de couro, um pacote de explorador e um foco druídico"
+      ],
+      "subclasses": [
+        {
+          "id": "land",
+          "name": "Círculo da Terra",
+          "source": "Livro do Jogador"
+        },
+        {
+          "id": "moon",
+          "name": "Círculo da Lua",
+          "source": "Livro do Jogador"
+        },
+        {
+          "id": "dreams",
+          "name": "Círculo dos Sonhos",
+          "source": "Guia de Xanathar para Todas as Coisas"
+        },
+        {
+          "id": "shepherd",
+          "name": "Círculo do Pastor",
+          "source": "Guia de Xanathar para Todas as Coisas"
+        },
+        {
+          "id": "spores",
+          "name": "Círculo dos Esporos",
+          "source": "Caldeirão de Tasha para Tudo"
+        },
+        {
+          "id": "stars",
+          "name": "Círculo das Estrelas",
+          "source": "Caldeirão de Tasha para Tudo"
+        },
+        {
+          "id": "wildfire",
+          "name": "Círculo do Fogo Selvagem",
+          "source": "Caldeirão de Tasha para Tudo"
+        }
+      ]
+    },
+    {
+      "id": "sorcerer",
+      "name": "Feiticeiro",
+      "hitDice": "1d6",
+      "proficiencies": {
+        "armor": ["Nenhuma"],
+        "weapons": ["Adagas", "Dardos", "Fundas", "Bordões", "Bestas leves"],
+        "tools": ["Nenhuma"],
+        "savingThrows": ["Constituição", "Carisma"],
+        "skills": {
+          "choose": 2,
+          "from": ["Arcanismo", "Enganação", "Intuição", "Intimidação", "Persuasão", "Religião"]
+        }
+      },
+      "equipment": [
+        "(a) uma besta leve e 20 virotes ou (b) qualquer arma simples",
+        "(a) uma bolsa de componentes ou (b) um foco arcano",
+        "(a) um pacote de masmorreiro ou (b) um pacote de explorador",
+        "Duas adagas"
+      ],
+      "subclasses": [
+        {
+          "id": "draconic_bloodline",
+          "name": "Linhagem Dracônica",
+          "source": "Livro do Jogador"
+        },
+        {
+          "id": "wild_magic",
+          "name": "Magia Selvagem",
+          "source": "Livro do Jogador"
+        },
+        {
+          "id": "divine_soul",
+          "name": "Alma Divina",
+          "source": "Guia de Xanathar para Todas as Coisas"
+        },
+        {
+          "id": "shadow_magic",
+          "name": "Magia das Sombras",
+          "source": "Guia de Xanathar para Todas as Coisas"
+        },
+        {
+          "id": "storm_sorcery",
+          "name": "Feitiçaria da Tempestade",
+          "source": "Guia de Xanathar para Todas as Coisas / Guia do Aventureiro da Costa da Espada"
+        },
+        {
+          "id": "aberrant_mind",
+          "name": "Mente Aberrante",
+          "source": "Caldeirão de Tasha para Tudo"
+        },
+        {
+          "id": "clockwork_soul",
+          "name": "Alma Mecânica",
+          "source": "Caldeirão de Tasha para Tudo"
+        }
+      ]
+    },
+    {
+      "id": "fighter",
+      "name": "Guerreiro",
+      "hitDice": "1d10",
+      "proficiencies": {
+        "armor": ["Todas as armaduras", "Escudos"],
+        "weapons": ["Simples", "Marciais"],
+        "tools": ["Nenhuma"],
+        "savingThrows": ["Força", "Constituição"],
+        "skills": {
+          "choose": 2,
+          "from": ["Acrobacia", "Adestrar Animais", "Atletismo", "História", "Intuição", "Intimidação", "Percepção", "Sobrevivência"]
+        }
+      },
+      "equipment": [
+        "(a) cota de malha ou (b) armadura de couro, arco longo e 20 flechas",
+        "(a) uma arma marcial e um escudo ou (b) duas armas marciais",
+        "(a) uma besta leve e 20 virotes ou (b) duas machadinhas",
+        "(a) um pacote de masmorreiro ou (b) um pacote de explorador"
+      ],
+      "subclasses": [
+        {
+          "id": "champion",
+          "name": "Campeão",
+          "source": "Livro do Jogador"
+        },
+        {
+          "id": "battle_master",
+          "name": "Mestre de Batalha",
+          "source": "Livro do Jogador"
+        },
+        {
+          "id": "eldritch_knight",
+          "name": "Cavaleiro Arcano",
+          "source": "Livro do Jogador"
+        },
+        {
+          "id": "banneret",
+          "name": "Porta-Estandarte (Cavaleiro do Dragão Púrpura)",
+          "source": "Guia do Aventureiro da Costa da Espada"
+        },
+        {
+          "id": "arcane_archer",
+          "name": "Arqueiro Arcano",
+          "source": "Guia de Xanathar para Todas as Coisas"
+        },
+        {
+          "id": "cavalier",
+          "name": "Cavaleiro",
+          "source": "Guia de Xanathar para Todas as Coisas"
+        },
+        {
+          "id": "samurai",
+          "name": "Samurai",
+          "source": "Guia de Xanathar para Todas as Coisas"
+        },
+        {
+          "id": "psi_warrior",
+          "name": "Guerreiro Psíquico",
+          "source": "Caldeirão de Tasha para Tudo"
+        },
+        {
+          "id": "rune_knight",
+          "name": "Cavaleiro Rúnico",
+          "source": "Caldeirão de Tasha para Tudo"
+        }
+      ]
+    },
+    {
+      "id": "rogue",
+      "name": "Ladino",
+      "hitDice": "1d8",
+      "proficiencies": {
+        "armor": ["Leves"],
+        "weapons": ["Simples", "Bestas de mão", "Espadas longas", "Rapieiras", "Espadas curtas"],
+        "tools": ["Ferramentas de ladrão"],
+        "savingThrows": ["Destreza", "Inteligência"],
+        "skills": {
+          "choose": 4,
+          "from": ["Acrobacia", "Atletismo", "Enganação", "Intuição", "Intimidação", "Investigação", "Percepção", "Atuação", "Persuasão", "Prestidigitação", "Furtividade"]
+        }
+      },
+      "equipment": [
+        "(a) uma rapieira ou (b) uma espada curta",
+        "(a) um arco curto e aljava com 20 flechas ou (b) uma espada curta",
+        "(a) um pacote de assaltante, (b) um pacote de masmorreiro ou (c) um pacote de explorador",
+        "Armadura de couro, duas adagas e ferramentas de ladrão"
+      ],
+      "subclasses": [
+        {
+          "id": "thief",
+          "name": "Ladrão",
+          "source": "Livro do Jogador"
+        },
+        {
+          "id": "assassin",
+          "name": "Assassino",
+          "source": "Livro do Jogador"
+        },
+        {
+          "id": "arcane_trickster",
+          "name": "Trapaceiro Arcano",
+          "source": "Livro do Jogador"
+        },
+        {
+          "id": "inquisitive",
+          "name": "Inquisitivo",
+          "source": "Guia de Xanathar para Todas as Coisas"
+        },
+        {
+          "id": "mastermind",
+          "name": "Mentor",
+          "source": "Guia de Xanathar para Todas as Coisas"
+        },
+        {
+          "id": "scout",
+          "name": "Batedor",
+          "source": "Guia de Xanathar para Todas as Coisas"
+        },
+        {
+          "id": "swashbuckler",
+          "name": "Espadachim",
+          "source": "Guia de Xanathar para Todas as Coisas / Guia do Aventureiro da Costa da Espada"
+        },
+        {
+          "id": "phantom",
+          "name": "Fantasma",
+          "source": "Caldeirão de Tasha para Tudo"
+        },
+        {
+          "id": "soulknife",
+          "name": "Lâmina da Alma",
+          "source": "Caldeirão de Tasha para Tudo"
+        }
+      ]
+    },
+    {
+      "id": "wizard",
+      "name": "Mago",
+      "hitDice": "1d6",
+      "proficiencies": {
+        "armor": ["Nenhuma"],
+        "weapons": ["Adagas", "Dardos", "Fundas", "Bordões", "Bestas leves"],
+        "tools": ["Nenhuma"],
+        "savingThrows": ["Inteligência", "Sabedoria"],
+        "skills": {
+          "choose": 2,
+          "from": ["Arcanismo", "História", "Intuição", "Investigação", "Medicina", "Religião"]
+        }
+      },
+      "equipment": [
+        "(a) um bordão ou (b) uma adaga",
+        "(a) uma bolsa de componentes ou (b) um foco arcano",
+        "(a) um pacote de estudioso ou (b) um pacote de explorador",
+        "Um grimório"
+      ],
+      "subclasses": [
+        {
+          "id": "abjuration",
+          "name": "Escola de Abjuração",
+          "source": "Livro do Jogador"
+        },
+        {
+          "id": "conjuration",
+          "name": "Escola de Conjuração",
+          "source": "Livro do Jogador"
+        },
+        {
+          "id": "divination",
+          "name": "Escola de Adivinhação",
+          "source": "Livro do Jogador"
+        },
+        {
+          "id": "enchantment",
+          "name": "Escola de Encantamento",
+          "source": "Livro do Jogador"
+        },
+        {
+          "id": "evocation",
+          "name": "Escola de Evocação",
+          "source": "Livro do Jogador"
+        },
+        {
+          "id": "illusion",
+          "name": "Escola de Ilusão",
+          "source": "Livro do Jogador"
+        },
+        {
+          "id": "necromancy",
+          "name": "Escola de Necromancia",
+          "source": "Livro do Jogador"
+        },
+        {
+          "id": "transmutation",
+          "name": "Escola de Transmutação",
+          "source": "Livro do Jogador"
+        },
+        {
+          "id": "bladesinging",
+          "name": "Lâmina Cantante",
+          "source": "Guia do Aventureiro da Costa da Espada / Caldeirão de Tasha para Tudo"
+        },
+        {
+          "id": "war_magic",
+          "name": "Magia de Guerra",
+          "source": "Guia de Xanathar para Todas as Coisas"
+        },
+        {
+          "id": "order_of_scribes",
+          "name": "Ordem dos Escribas",
+          "source": "Caldeirão de Tasha para Tudo"
+        }
+      ]
+    },
+    {
+      "id": "monk",
+      "name": "Monge",
+      "hitDice": "1d8",
+      "proficiencies": {
+        "armor": ["Nenhuma"],
+        "weapons": ["Simples", "Espadas curtas"],
+        "tools": ["Um tipo de ferramenta de artesão ou um instrumento musical"],
+        "savingThrows": ["Força", "Destreza"],
+        "skills": {
+          "choose": 2,
+          "from": ["Acrobacia", "Atletismo", "História", "Intuição", "Religião", "Furtividade"]
+        }
+      },
+      "equipment": [
+        "(a) uma espada curta ou (b) qualquer arma simples",
+        "(a) um pacote de masmorreiro ou (b) um pacote de explorador",
+        "10 dardos"
+      ],
+      "subclasses": [
+        {
+          "id": "open_hand",
+          "name": "Caminho da Mão Aberta",
+          "source": "Livro do Jogador"
+        },
+        {
+          "id": "shadow",
+          "name": "Caminho da Sombra",
+          "source": "Livro do Jogador"
+        },
+        {
+          "id": "four_elements",
+          "name": "Caminho dos Quatro Elementos",
+          "source": "Livro do Jogador"
+        },
+        {
+          "id": "long_death",
+          "name": "Caminho da Morte Longa",
+          "source": "Guia do Aventureiro da Costa da Espada"
+        },
+        {
+          "id": "drunken_master",
+          "name": "Caminho do Mestre Bêbado",
+          "source": "Guia de Xanathar para Todas as Coisas"
+        },
+        {
+          "id": "kensei",
+          "name": "Caminho do Kensei",
+          "source": "Guia de Xanathar para Todas as Coisas"
+        },
+        {
+          "id": "sun_soul",
+          "name": "Caminho da Alma do Sol",
+          "source": "Guia de Xanathar para Todas as Coisas / Guia do Aventureiro da Costa da Espada"
+        },
+        {
+          "id": "mercy",
+          "name": "Caminho da Misericórdia",
+          "source": "Caldeirão de Tasha para Tudo"
+        },
+        {
+          "id": "astral_self",
+          "name": "Caminho do Eu Astral",
+          "source": "Caldeirão de Tasha para Tudo"
+        }
+      ]
+    },
+    {
+      "id": "paladin",
+      "name": "Paladino",
+      "hitDice": "1d10",
+      "proficiencies": {
+        "armor": ["Todas as armaduras", "Escudos"],
+        "weapons": ["Simples", "Marciais"],
+        "tools": ["Nenhuma"],
+        "savingThrows": ["Sabedoria", "Carisma"],
+        "skills": {
+          "choose": 2,
+          "from": ["Atletismo", "Intuição", "Intimidação", "Medicina", "Persuasão", "Religião"]
+        }
+      },
+      "equipment": [
+        "(a) uma arma marcial e um escudo ou (b) duas armas marciais",
+        "(a) cinco azagaias ou (b) qualquer arma simples corpo a corpo",
+        "(a) um pacote de sacerdote ou (b) um pacote de explorador",
+        "Cota de malha e um símbolo sagrado"
+      ],
+      "subclasses": [
+        {
+          "id": "devotion",
+          "name": "Juramento de Devoção",
+          "source": "Livro do Jogador"
+        },
+        {
+          "id": "ancients",
+          "name": "Juramento dos Anciões",
+          "source": "Livro do Jogador"
+        },
+        {
+          "id": "vengeance",
+          "name": "Juramento de Vingança",
+          "source": "Livro do Jogador"
+        },
+        {
+          "id": "crown",
+          "name": "Juramento da Coroa",
+          "source": "Guia do Aventureiro da Costa da Espada"
+        },
+        {
+          "id": "conquest",
+          "name": "Juramento da Conquista",
+          "source": "Guia de Xanathar para Todas as Coisas"
+        },
+        {
+          "id": "redemption",
+          "name": "Juramento da Redenção",
+          "source": "Guia de Xanathar para Todas as Coisas"
+        },
+        {
+          "id": "glory",
+          "name": "Juramento da Glória",
+          "source": "Caldeirão de Tasha para Tudo"
+        },
+        {
+          "id": "watchers",
+          "name": "Juramento dos Vigilantes",
+          "source": "Caldeirão de Tasha para Tudo"
+        }
+      ]
+    },
+    {
+      "id": "ranger",
+      "name": "Patrulheiro",
+      "hitDice": "1d10",
+      "proficiencies": {
+        "armor": ["Leves", "Médias", "Escudos"],
+        "weapons": ["Simples", "Marciais"],
+        "tools": ["Nenhuma"],
+        "savingThrows": ["Força", "Destreza"],
+        "skills": {
+          "choose": 3,
+          "from": ["Adestrar Animais", "Atletismo", "Intuição", "Investigação", "Natureza", "Percepção", "Furtividade", "Sobrevivência"]
+        }
+      },
+      "equipment": [
+        "(a) cota de malha ou (b) armadura de couro",
+        "(a) duas espadas curtas ou (b) duas armas simples corpo a corpo",
+        "(a) um pacote de masmorreiro ou (b) um pacote de explorador",
+        "Um arco longo e uma aljava com 20 flechas"
+      ],
+      "subclasses": [
+        {
+          "id": "hunter",
+          "name": "Caçador",
+          "source": "Livro do Jogador"
+        },
+        {
+          "id": "beast_master",
+          "name": "Mestre das Bestas",
+          "source": "Livro do Jogador"
+        },
+        {
+          "id": "gloom_stalker",
+          "name": "Espreitador das Trevas",
+          "source": "Guia de Xanathar para Todas as Coisas"
+        },
+        {
+          "id": "horizon_walker",
+          "name": "Andarilho do Horizonte",
+          "source": "Guia de Xanathar para Todas as Coisas"
+        },
+        {
+          "id": "monster_slayer",
+          "name": "Matador de Monstros",
+          "source": "Guia de Xanathar para Todas as Coisas"
+        },
+        {
+          "id": "fey_wanderer",
+          "name": "Andarilho das Fadas",
+          "source": "Caldeirão de Tasha para Tudo"
+        },
+        {
+          "id": "swarmkeeper",
+          "name": "Guardião do Enxame",
+          "source": "Caldeirão de Tasha para Tudo"
+        }
+      ]
+    }
+  ]
+}

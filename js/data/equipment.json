@@ -1,0 +1,533 @@
+{
+  "equipamentos": {
+    "pacotes": [
+      {
+        "id": "pacote-artista",
+        "nome": "Pacote de Artista",
+        "custo": {
+          "quantidade": 40,
+          "moeda": "po"
+        },
+        "peso": 0,
+        "descricao": "Inclui uma mochila, um saco de dormir, 2 fantasias, 5 velas, 5 dias de rações, um cantil e um kit de disfarce.",
+        "conteudo": [
+          "Mochila",
+          "Saco de dormir",
+          "Fantasias (2)",
+          "Velas (5)",
+          "Rações (5 dias)",
+          "Cantil",
+          "Kit de disfarce"
+        ]
+      },
+      {
+        "id": "pacote-assaltante",
+        "nome": "Pacote de Assaltante",
+        "custo": {
+          "quantidade": 16,
+          "moeda": "po"
+        },
+        "peso": 0,
+        "descricao": "Inclui uma mochila, um saco com 1.000 esferas de metal, 3 metros de fio, um sino, 5 velas, um pé de cabra, um martelo, 10 pítons, um capuz com lanterna, 2 frascos de óleo, 5 dias de rações, uma caixa de fogo e um cantil.",
+        "conteudo": [
+          "Mochila",
+          "Saco com 1.000 esferas de metal",
+          "Fio (3 metros)",
+          "Sino",
+          "Velas (5)",
+          "Pé de cabra",
+          "Martelo",
+          "Pítons (10)",
+          "Capuz com lanterna",
+          "Frascos de óleo (2)",
+          "Rações (5 dias)",
+          "Caixa de fogo",
+          "Cantil"
+        ]
+      },
+      {
+        "id": "pacote-diplomata",
+        "nome": "Pacote de Diplomata",
+        "custo": {
+          "quantidade": 39,
+          "moeda": "po"
+        },
+        "peso": 0,
+        "descricao": "Inclui um baú, 2 estojos para mapas ou pergaminhos, um conjunto de roupas finas, um frasco de tinta, uma caneta, uma lâmpada, 2 frascos de óleo, 5 folhas de papel, um frasco de perfume, cera para lacre e sabão.",
+        "conteudo": [
+          "Baú",
+          "Estojos para mapas ou pergaminhos (2)",
+          "Conjunto de roupas finas",
+          "Frasco de tinta",
+          "Caneta",
+          "Lâmpada",
+          "Frascos de óleo (2)",
+          "Folhas de papel (5)",
+          "Frasco de perfume",
+          "Cera para lacre",
+          "Sabão"
+        ]
+      },
+      {
+        "id": "pacote-aventureiro",
+        "nome": "Pacote de Aventureiro",
+        "custo": {
+          "quantidade": 10,
+          "moeda": "po"
+        },
+        "peso": 0,
+        "descricao": "Inclui uma mochila, um pé de cabra, um martelo, 10 pítons, 10 tochas, uma caixa de fogo, 10 dias de rações, um cantil e 15 metros de corda de cânhamo.",
+        "conteudo": [
+          "Mochila",
+          "Pé de cabra",
+          "Martelo",
+          "Pítons (10)",
+          "Tochas (10)",
+          "Caixa de fogo",
+          "Rações (10 dias)",
+          "Cantil",
+          "Corda de cânhamo (15 metros)"
+        ]
+      },
+      {
+        "id": "pacote-explorador",
+        "nome": "Pacote de Explorador",
+        "custo": {
+          "quantidade": 10,
+          "moeda": "po"
+        },
+        "peso": 0,
+        "descricao": "Inclui uma mochila, um saco de dormir, um kit de refeição, uma caixa de fogo, 10 tochas, 10 dias de rações, um cantil e 15 metros de corda de cânhamo.",
+        "conteudo": [
+          "Mochila",
+          "Saco de dormir",
+          "Kit de refeição",
+          "Caixa de fogo",
+          "Tochas (10)",
+          "Rações (10 dias)",
+          "Cantil",
+          "Corda de cânhamo (15 metros)"
+        ]
+      },
+      {
+        "id": "pacote-padre",
+        "nome": "Pacote de Padre",
+        "custo": {
+          "quantidade": 19,
+          "moeda": "po"
+        },
+        "peso": 0,
+        "descricao": "Inclui uma mochila, um cobertor, 10 velas, uma caixa de fogo, uma caixa de esmolas, 2 blocos de incenso, um incensário, vestimentas, 2 dias de rações e um cantil.",
+        "conteudo": [
+          "Mochila",
+          "Cobertor",
+          "Velas (10)",
+          "Caixa de fogo",
+          "Caixa de esmolas",
+          "Blocos de incenso (2)",
+          "Incensário",
+          "Vestimentas",
+          "Rações (2 dias)",
+          "Cantil"
+        ]
+      },
+      {
+        "id": "pacote-sabio",
+        "nome": "Pacote de Sábio",
+        "custo": {
+          "quantidade": 40,
+          "moeda": "po"
+        },
+        "peso": 0,
+        "descricao": "Inclui uma mochila, um livro de conhecimento, um frasco de tinta, uma caneta, 10 folhas de pergaminho, um saquinho de areia e uma faca pequena.",
+        "conteudo": [
+          "Mochila",
+          "Livro de conhecimento",
+          "Frasco de tinta",
+          "Caneta",
+          "Folhas de pergaminho (10)",
+          "Saquinho de areia",
+          "Faca pequena"
+        ]
+      }
+    ],
+    "ferramentasArtesao": [
+      {
+        "id": "ferramentas-carpinteiro",
+        "nome": "Ferramentas de Carpinteiro",
+        "categoria": "Ferramentas de Artesão",
+        "custo": {
+          "quantidade": 8,
+          "moeda": "po"
+        },
+        "peso": 3
+      },
+      {
+        "id": "ferramentas-cartografo",
+        "nome": "Ferramentas de Cartógrafo",
+        "categoria": "Ferramentas de Artesão",
+        "custo": {
+          "quantidade": 15,
+          "moeda": "po"
+        },
+        "peso": 3
+      },
+      {
+        "id": "ferramentas-coureiro",
+        "nome": "Ferramentas de Coureiro",
+        "categoria": "Ferramentas de Artesão",
+        "custo": {
+          "quantidade": 5,
+          "moeda": "po"
+        },
+        "peso": 2.5
+      },
+      {
+        "id": "ferramentas-entalhador",
+        "nome": "Ferramentas de Entalhador",
+        "categoria": "Ferramentas de Artesão",
+        "custo": {
+          "quantidade": 1,
+          "moeda": "po"
+        },
+        "peso": 2.5
+      },
+      {
+        "id": "ferramentas-ferreiro",
+        "nome": "Ferramentas de Ferreiro",
+        "categoria": "Ferramentas de Artesão",
+        "custo": {
+          "quantidade": 20,
+          "moeda": "po"
+        },
+        "peso": 4
+      },
+      {
+        "id": "ferramentas-funileiro",
+        "nome": "Ferramentas de Funileiro",
+        "categoria": "Ferramentas de Artesão",
+        "custo": {
+          "quantidade": 50,
+          "moeda": "po"
+        },
+        "peso": 5
+      },
+      {
+        "id": "ferramentas-joalheiro",
+        "nome": "Ferramentas de Joalheiro",
+        "categoria": "Ferramentas de Artesão",
+        "custo": {
+          "quantidade": 25,
+          "moeda": "po"
+        },
+        "peso": 1
+      },
+      {
+        "id": "ferramentas-oleiro",
+        "nome": "Ferramentas de Oleiro",
+        "categoria": "Ferramentas de Artesão",
+        "custo": {
+          "quantidade": 10,
+          "moeda": "po"
+        },
+        "peso": 1.5
+      },
+      {
+        "id": "ferramentas-pedreiro",
+        "nome": "Ferramentas de Pedreiro",
+        "categoria": "Ferramentas de Artesão",
+        "custo": {
+          "quantidade": 10,
+          "moeda": "po"
+        },
+        "peso": 4
+      },
+      {
+        "id": "ferramentas-pintor",
+        "nome": "Ferramentas de Pintor",
+        "categoria": "Ferramentas de Artesão",
+        "custo": {
+          "quantidade": 10,
+          "moeda": "po"
+        },
+        "peso": 2.5
+      },
+      {
+        "id": "ferramentas-soprador-vidro",
+        "nome": "Ferramentas de Soprador de Vidro",
+        "categoria": "Ferramentas de Artesão",
+        "custo": {
+          "quantidade": 30,
+          "moeda": "po"
+        },
+        "peso": 2.5
+      },
+      {
+        "id": "ferramentas-tecelao",
+        "nome": "Ferramentas de Tecelão",
+        "categoria": "Ferramentas de Artesão",
+        "custo": {
+          "quantidade": 1,
+          "moeda": "po"
+        },
+        "peso": 2.5
+      },
+      {
+        "id": "suprimentos-alquimista",
+        "nome": "Suprimentos de Alquimista",
+        "categoria": "Ferramentas de Artesão",
+        "custo": {
+          "quantidade": 50,
+          "moeda": "po"
+        },
+        "peso": 4
+      },
+      {
+        "id": "suprimentos-cervejeiro",
+        "nome": "Suprimentos de Cervejeiro",
+        "categoria": "Ferramentas de Artesão",
+        "custo": {
+          "quantidade": 20,
+          "moeda": "po"
+        },
+        "peso": 4.5
+      },
+      {
+        "id": "suprimentos-cozinheiro",
+        "nome": "Suprimentos de Cozinheiro",
+        "categoria": "Ferramentas de Artesão",
+        "custo": {
+          "quantidade": 1,
+          "moeda": "po"
+        },
+        "peso": 4
+      }
+    ],
+    "kits": [
+      {
+        "id": "kit-disfarce",
+        "nome": "Kit de Disfarce",
+        "categoria": "Kits Especializados",
+        "custo": {
+          "quantidade": 25,
+          "moeda": "po"
+        },
+        "peso": 1.5
+      },
+      {
+        "id": "kit-falsificacao",
+        "nome": "Kit de Falsificação",
+        "categoria": "Kits Especializados",
+        "custo": {
+          "quantidade": 15,
+          "moeda": "po"
+        },
+        "peso": 2.5
+      },
+      {
+        "id": "kit-herbalismo",
+        "nome": "Kit de Herbalismo",
+        "categoria": "Kits Especializados",
+        "custo": {
+          "quantidade": 5,
+          "moeda": "po"
+        },
+        "peso": 1.5
+      },
+      {
+        "id": "kit-venenos",
+        "nome": "Kit de Venenos",
+        "categoria": "Kits Especializados",
+        "custo": {
+          "quantidade": 50,
+          "moeda": "po"
+        },
+        "peso": 1
+      }
+    ],
+    "kitsJogo": [
+      {
+        "id": "baralho-cartas",
+        "nome": "Baralho de Cartas",
+        "categoria": "Kit de Jogo",
+        "custo": {
+          "quantidade": 5,
+          "moeda": "pp"
+        },
+        "peso": 0
+      },
+      {
+        "id": "conjunto-dados",
+        "nome": "Conjunto de Dados",
+        "categoria": "Kit de Jogo",
+        "custo": {
+          "quantidade": 1,
+          "moeda": "pp"
+        },
+        "peso": 0
+      },
+      {
+        "id": "xadrez-dragao",
+        "nome": "Xadrez de Dragão",
+        "categoria": "Kit de Jogo",
+        "custo": {
+          "quantidade": 1,
+          "moeda": "po"
+        },
+        "peso": 0.25
+      }
+    ],
+    "instrumentosMusicais": [
+      {
+        "id": "alaude",
+        "nome": "Alaúde",
+        "categoria": "Instrumento Musical",
+        "custo": {
+          "quantidade": 35,
+          "moeda": "po"
+        },
+        "peso": 1
+      },
+      {
+        "id": "charamela",
+        "nome": "Charamela",
+        "categoria": "Instrumento Musical",
+        "custo": {
+          "quantidade": 2,
+          "moeda": "po"
+        },
+        "peso": 0.5
+      },
+      {
+        "id": "corneta",
+        "nome": "Corneta",
+        "categoria": "Instrumento Musical",
+        "custo": {
+          "quantidade": 3,
+          "moeda": "po"
+        },
+        "peso": 1
+      },
+      {
+        "id": "flauta",
+        "nome": "Flauta",
+        "categoria": "Instrumento Musical",
+        "custo": {
+          "quantidade": 2,
+          "moeda": "po"
+        },
+        "peso": 0.5
+      },
+      {
+        "id": "flauta-pa",
+        "nome": "Flauta de Pã",
+        "categoria": "Instrumento Musical",
+        "custo": {
+          "quantidade": 12,
+          "moeda": "po"
+        },
+        "peso": 1
+      },
+      {
+        "id": "lira",
+        "nome": "Lira",
+        "categoria": "Instrumento Musical",
+        "custo": {
+          "quantidade": 30,
+          "moeda": "po"
+        },
+        "peso": 1
+      },
+      {
+        "id": "tambor",
+        "nome": "Tambor",
+        "categoria": "Instrumento Musical",
+        "custo": {
+          "quantidade": 6,
+          "moeda": "po"
+        },
+        "peso": 1.5
+      },
+      {
+        "id": "viola",
+        "nome": "Viola",
+        "categoria": "Instrumento Musical",
+        "custo": {
+          "quantidade": 30,
+          "moeda": "po"
+        },
+        "peso": 0.5
+      },
+      {
+        "id": "xilofone",
+        "nome": "Xilofone",
+        "categoria": "Instrumento Musical",
+        "custo": {
+          "quantidade": 25,
+          "moeda": "po"
+        },
+        "peso": 5
+      }
+    ],
+    "ferramentasEspeciais": [
+      {
+        "id": "ferramentas-navegador",
+        "nome": "Ferramentas de Navegador",
+        "categoria": "Ferramentas Especiais",
+        "custo": {
+          "quantidade": 25,
+          "moeda": "po"
+        },
+        "peso": 1
+      },
+      {
+        "id": "ferramentas-ladrao",
+        "nome": "Ferramentas de Ladrão",
+        "categoria": "Ferramentas Especiais",
+        "custo": {
+          "quantidade": 25,
+          "moeda": "po"
+        },
+        "peso": 0.5
+      }
+    ]
+  },
+  "categorias": [
+    {
+      "id": "pacotes",
+      "nome": "Pacotes de Equipamento",
+      "descricao": "Pacotes pré-montados de equipamentos para diferentes estilos de aventureiros. Cada pacote oferece uma economia em comparação com comprar os itens individualmente."
+    },
+    {
+      "id": "ferramentas-artesao",
+      "nome": "Ferramentas de Artesão",
+      "descricao": "Ferramentas especializadas usadas para criar, reparar ou trabalhar com materiais específicos. Proficiência com ferramentas de artesão permite adicionar seu bônus de proficiência em testes de atributo ao usar essas ferramentas."
+    },
+    {
+      "id": "kits-especializados",
+      "nome": "Kits Especializados",
+      "descricao": "Conjuntos de ferramentas e materiais para tarefas específicas como disfarce, falsificação, herbalismo e preparo de venenos."
+    },
+    {
+      "id": "kits-jogo",
+      "nome": "Kits de Jogo",
+      "descricao": "Jogos de entretenimento que podem ser usados para passar o tempo ou ganhar dinheiro. Proficiência com um kit de jogo permite adicionar seu bônus de proficiência em testes de atributo ao jogar."
+    },
+    {
+      "id": "instrumentos-musicais",
+      "nome": "Instrumentos Musicais",
+      "descricao": "Instrumentos usados para criar música. Proficiência com um instrumento musical permite adicionar seu bônus de proficiência em testes de atributo ao tocar música."
+    },
+    {
+      "id": "ferramentas-especiais",
+      "nome": "Ferramentas Especiais",
+      "descricao": "Ferramentas especializadas para navegação, infiltração e outras tarefas específicas de aventureiros."
+    }
+  ],
+  "observacoes": {
+    "peso": "Todos os pesos estão em quilogramas (kg). Itens com peso 0 são negligenciáveis.",
+    "custo": "Os valores são em peças de ouro (po) ou peças de prata (pp).",
+    "proficiencia": "Proficiência com ferramentas permite adicionar seu bônus de proficiência aos testes de atributo feitos usando essas ferramentas. Você pode ganhar proficiência através de sua raça, classe, antecedente ou talentos.",
+    "pacotes": "Pacotes de equipamento oferecem economia em comparação com comprar itens individuais. Algumas classes iniciam com pacotes específicos."
+  }
+}

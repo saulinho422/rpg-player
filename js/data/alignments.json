@@ -1,0 +1,252 @@
+{
+  "alinhamentos": [
+    {
+      "id": "leal-bom",
+      "nome": "Leal e Bom",
+      "abreviacao": "LB",
+      "eixoLegalidade": "Leal",
+      "eixoMoralidade": "Bom",
+      "descricao": "Criaturas leais e boas podem ser contadas para fazer a coisa certa como esperado pela sociedade. Dragões de ouro, paladinos e a maioria dos anões são leais e bons.",
+      "descricaoDetalhada": "Um personagem leal e bom age como se espera ou é exigido por uma pessoa boa. Ele combina um compromisso de se opor ao mal com a disciplina de lutar implacavelmente contra o mal. Ele diz a verdade, mantém sua palavra, ajuda aqueles em necessidade e fala contra a injustiça. Um personagem leal e bom odeia ver os culpados ficarem impunes.",
+      "exemplos": [
+        "Paladinos devotos",
+        "Cavaleiros honrados",
+        "Clérigos de divindades benignas",
+        "Dragões de ouro",
+        "Anões nobres"
+      ],
+      "caracteristicas": [
+        "Honra e compaixão",
+        "Respeito pela lei e ordem",
+        "Proteção dos inocentes",
+        "Combate ao mal de forma organizada",
+        "Senso de dever e responsabilidade"
+      ]
+    },
+    {
+      "id": "neutro-bom",
+      "nome": "Neutro e Bom",
+      "abreviacao": "NB",
+      "eixoLegalidade": "Neutro",
+      "eixoMoralidade": "Bom",
+      "descricao": "Pessoas neutras e boas fazem o melhor que podem para ajudar os outros de acordo com suas necessidades. Muitos celestiais, alguns gigantes de nuvem e a maioria dos gnomos são neutros e bons.",
+      "descricaoDetalhada": "Um personagem neutro e bom faz o melhor que pode fazer pelas pessoas sem preconceitos ou compulsão. Ele se sente obrigado a ajudar os outros, mas não se sente obrigado a trabalhar dentro de um sistema específico. Ele é bondoso e benevolente em seus relacionamentos.",
+      "exemplos": [
+        "Druidas benevolentes",
+        "Clérigos independentes",
+        "Celestiais compassivos",
+        "Gnomos gentis",
+        "Aventureiros heroicos pragmáticos"
+      ],
+      "caracteristicas": [
+        "Bondade sem dogmatismo",
+        "Ajuda aos necessitados",
+        "Pragmatismo compassivo",
+        "Flexibilidade moral positiva",
+        "Foco no bem maior"
+      ]
+    },
+    {
+      "id": "caotico-bom",
+      "nome": "Caótico e Bom",
+      "abreviacao": "CB",
+      "eixoLegalidade": "Caótico",
+      "eixoMoralidade": "Bom",
+      "descricao": "Criaturas caóticas e boas agem de acordo com sua consciência, com pouca consideração pelo que os outros esperam. Dragões de cobre, muitos elfos e unicórnios são caóticos e bons.",
+      "descricaoDetalhada": "Um personagem caótico e bom age de acordo com sua consciência sem considerar o que os outros esperam dele. Ele faz o que é bom e certo, mas tem pouco uso para leis e regulamentos. Ele odeia quando as pessoas tentam intimidar outros e dizer-lhes o que fazer. Ele segue seus próprios padrões morais, que, embora bons, podem não concordar com os da sociedade.",
+      "exemplos": [
+        "Robin Hood e bandidos honrados",
+        "Elfos livres e rebeldes",
+        "Dragões de cobre",
+        "Unicórnios",
+        "Heróis independentes e desafiadores"
+      ],
+      "caracteristicas": [
+        "Liberdade individual e bondade",
+        "Desprezo por autoridade injusta",
+        "Seguir a própria consciência",
+        "Rebeldia benevolente",
+        "Justiça acima da lei"
+      ]
+    },
+    {
+      "id": "leal-neutro",
+      "nome": "Leal e Neutro",
+      "abreviacao": "LN",
+      "eixoLegalidade": "Leal",
+      "eixoMoralidade": "Neutro",
+      "descricao": "Indivíduos leais e neutros agem de acordo com a lei, tradição ou códigos pessoais. Muitos monges e alguns magos são leais e neutros.",
+      "descricaoDetalhada": "Um personagem leal e neutro age como a lei, tradição ou código pessoal o direciona. Ordem e organização são fundamentais para ele. Ele pode acreditar em ordem pessoal e viver de acordo com um código ou padrão, ou pode acreditar em ordem para todos e favorecer um governo forte e organizado. Um personagem leal e neutro é confiável e honrado, mas não é um fanático.",
+      "exemplos": [
+        "Monges disciplinados",
+        "Juízes imparciais",
+        "Soldados leais",
+        "Burocratas dedicados",
+        "Guardiões da ordem"
+      ],
+      "caracteristicas": [
+        "Respeito pela lei e ordem",
+        "Neutralidade moral",
+        "Confiabilidade e honra",
+        "Disciplina pessoal",
+        "Foco na estrutura"
+      ]
+    },
+    {
+      "id": "neutro",
+      "nome": "Neutro",
+      "abreviacao": "N",
+      "eixoLegalidade": "Neutro",
+      "eixoMoralidade": "Neutro",
+      "descricao": "O alinhamento neutro é para aqueles que preferem evitar questões morais e não tomam partido, fazendo o que parece melhor no momento. Lagartos, a maioria dos druidas e muitos humanos são neutros.",
+      "descricaoDetalhada": "Um personagem neutro faz o que parece ser uma boa ideia. Ele não se sente fortemente de uma maneira ou de outra quando se trata do bem versus o mal ou lei versus caos. A maioria das pessoas neutras exibe uma falta de convicção ou preconceito, em vez de um compromisso com a neutralidade. Alguns neutros, no entanto, são filosoficamente comprometidos com a neutralidade. Eles veem o bem, o mal, a lei e o caos como preconceitos e abstrações perigosas.",
+      "exemplos": [
+        "Druidas devotados ao equilíbrio",
+        "Lagartos e criaturas animais",
+        "Camponeses pragmáticos",
+        "Mercadores oportunistas",
+        "Pessoas comuns sem forte convicção"
+      ],
+      "caracteristicas": [
+        "Pragmatismo absoluto",
+        "Falta de compromisso ideológico",
+        "Busca pelo equilíbrio",
+        "Autopreservação",
+        "Flexibilidade moral e ética"
+      ]
+    },
+    {
+      "id": "caotico-neutro",
+      "nome": "Caótico e Neutro",
+      "abreviacao": "CN",
+      "eixoLegalidade": "Caótico",
+      "eixoMoralidade": "Neutro",
+      "descricao": "Criaturas caóticas e neutras seguem seus caprichos, mantendo sua liberdade pessoal acima de tudo. Muitos bárbaros e ladinos, e alguns bardos, são caóticos e neutros.",
+      "descricaoDetalhada": "Um personagem caótico e neutro segue seus caprichos. Ele é um espírito livre, individualista em primeiro lugar e acima de tudo. Ele valoriza sua própria liberdade, mas não se esforça para proteger a liberdade dos outros. Ele evita a autoridade, ressente restrições e desafia tradições. Um personagem caótico e neutro não intencionalmente perturba organizações como parte de uma campanha de anarquia. Para fazer isso, ele teria que ser motivado por bem (e um desejo de libertar outros) ou mal (e um desejo de fazer os outros sofrerem).",
+      "exemplos": [
+        "Bárbaros selvagens",
+        "Ladinos independentes",
+        "Bardos livres",
+        "Piratas aventureiros",
+        "Errantes sem rumo"
+      ],
+      "caracteristicas": [
+        "Liberdade individual extrema",
+        "Imprevisibilidade",
+        "Desprezo por autoridade",
+        "Seguir impulsos e desejos",
+        "Independência acima de tudo"
+      ]
+    },
+    {
+      "id": "leal-mau",
+      "nome": "Leal e Mau",
+      "abreviacao": "LM",
+      "eixoLegalidade": "Leal",
+      "eixoMoralidade": "Mau",
+      "descricao": "Criaturas leais e más pegam metodicamente o que querem, dentro dos limites de um código de tradição, lealdade ou ordem. Diabos, dragões azuis e hobgoblins são leais e maus.",
+      "descricaoDetalhada": "Um personagem leal e mau pega metodicamente o que quer dentro dos limites de seu código de conduta sem consideração por quem machuca. Ele se preocupa com tradição, lealdade e ordem, mas não com liberdade, dignidade ou vida. Ele joga pelas regras, mas sem misericórdia ou compaixão. Ele se sente confortável em uma hierarquia e gostaria de governar, mas está disposto a servir. Ele condena os outros não de acordo com suas ações, mas de acordo com raça, religião, terra natal ou classe social.",
+      "exemplos": [
+        "Tiranos e ditadores",
+        "Diabos organizados",
+        "Dragões azuis",
+        "Hobgoblins disciplinados",
+        "Juízes corruptos mas metódicos"
+      ],
+      "caracteristicas": [
+        "Ordem maligna",
+        "Lealdade a hierarquia do mal",
+        "Metodologia cruel",
+        "Respeito por tradições malignas",
+        "Ambição dentro da estrutura"
+      ]
+    },
+    {
+      "id": "neutro-mau",
+      "nome": "Neutro e Mau",
+      "abreviacao": "NM",
+      "eixoLegalidade": "Neutro",
+      "eixoMoralidade": "Mau",
+      "descricao": "O alinhamento neutro e mau é para aqueles que fazem o que quer que possam fazer sem compaixão ou escrúpulos. Muitos drow, alguns gigantes de nuvem e yugoloths são neutros e maus.",
+      "descricaoDetalhada": "Um personagem neutro e mau faz o que quer que possa escapar. Ele está interessado apenas em si mesmo. Ele não tem remorso sobre aqueles que mata, seja por lucro, esporte ou conveniência. Ele não tem amor pela ordem e não mantém nenhuma ilusão de que seguir leis, tradições ou códigos o tornaria melhor ou mais nobre. Por outro lado, ele não tem a natureza inquieta ou o amor pelo conflito que um personagem caótico e mau tem.",
+      "exemplos": [
+        "Drow egoístas",
+        "Yugoloths mercenários",
+        "Criminosos pragmáticos",
+        "Mercenários sem escrúpulos",
+        "Vilões oportunistas"
+      ],
+      "caracteristicas": [
+        "Egoísmo puro",
+        "Ausência de compaixão",
+        "Pragmatismo maligno",
+        "Oportunismo sem limites",
+        "Indiferença ao sofrimento alheio"
+      ]
+    },
+    {
+      "id": "caotico-mau",
+      "nome": "Caótico e Mau",
+      "abreviacao": "CM",
+      "eixoLegalidade": "Caótico",
+      "eixoMoralidade": "Mau",
+      "descricao": "Criaturas caóticas e más agem com violência arbitrária, impelidas por sua ganância, ódio ou sede de sangue. Demônios, dragões vermelhos e orcs são caóticos e maus.",
+      "descricaoDetalhada": "Um personagem caótico e mau faz o que sua ganância, ódio e desejo de destruição o levam a fazer. Ele é impetuosamente violento, vicioso e imprevisível. Se ele está simplesmente atrás do que quer, ele é cruel e brutal. Se ele é dedicado à disseminação do mal e do caos, ele é pior ainda. Felizmente, seus planos são confusos, e quaisquer grupos que ele forme ou dos quais participe tendem a ser mal organizados. Normalmente, personagens caóticos e maus só trabalham juntos quando forçados por alguém mais poderoso.",
+      "exemplos": [
+        "Demônios destrutivos",
+        "Dragões vermelhos furiosos",
+        "Orcs saqueadores",
+        "Assassinos sádicos",
+        "Vilões insanos e caóticos"
+      ],
+      "caracteristicas": [
+        "Violência arbitrária",
+        "Caos destrutivo",
+        "Crueldade e sadismo",
+        "Imprevisibilidade maligna",
+        "Ganância e ódio sem controle"
+      ]
+    }
+  ],
+  "eixos": {
+    "legalidade": [
+      {
+        "id": "leal",
+        "nome": "Leal",
+        "descricao": "Indivíduos leais podem ser contados para fazer o que é certo conforme esperado pela sociedade. Eles valorizam ordem, tradição e códigos pessoais."
+      },
+      {
+        "id": "neutro-lei",
+        "nome": "Neutro (Lei)",
+        "descricao": "Indivíduos neutros quanto à lei não têm forte inclinação para ordem ou caos. Eles agem de acordo com a situação e suas próprias necessidades."
+      },
+      {
+        "id": "caotico",
+        "nome": "Caótico",
+        "descricao": "Indivíduos caóticos agem de acordo com seus próprios caprichos e valorizam liberdade pessoal acima de tudo. Eles tendem a desafiar autoridade e tradição."
+      }
+    ],
+    "moralidade": [
+      {
+        "id": "bom",
+        "nome": "Bom",
+        "descricao": "Criaturas boas protegem vidas inocentes e se opõem ativamente ao mal. Elas valorizam compaixão, altruísmo e ajudar os outros."
+      },
+      {
+        "id": "neutro-moral",
+        "nome": "Neutro (Moral)",
+        "descricao": "Criaturas neutras moralmente não têm forte inclinação para o bem ou mal. Elas agem por pragmatismo ou autopreservação."
+      },
+      {
+        "id": "mau",
+        "nome": "Mau",
+        "descricao": "Criaturas más prejudicam, oprimem e matam outros por esporte ou ganho. Elas não têm compaixão e agem por egoísmo ou crueldade."
+      }
+    ]
+  },
+  "observacoes": {
+    "personagensJogadores": "A maioria das pessoas e criaturas no mundo são neutras no que diz respeito ao bem e ao mal. Poucas pessoas escolhem o mal deliberadamente. Alinhamento é uma ferramenta essencial para desenvolver a identidade de seu personagem—não é uma camisa de força para restringir seu jogo.",
+    "mudancaAlinhamento": "O alinhamento pode mudar ao longo do tempo com base nas ações e decisões do personagem. Mudanças dramáticas na personalidade ou filosofia do personagem podem resultar em mudança de alinhamento.",
+    "semAlinhamento": "Algumas criaturas, especialmente bestas e constructos, não têm alinhamento. Elas são 'sem alinhamento' e agem puramente por instinto ou programação."
+  }
+}

@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste Supabase</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 40px;
+            background: #1a1a2e;
+            color: #e8dcc6;
+        }
+        h1 {
+            color: #d4af37;
+        }
+        button {
+            background: #d4af37;
+            color: #1a1a2e;
+            border: none;
+            padding: 15px 30px;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 10px;
+            border-radius: 8px;
+        }
+        button:hover {
+            background: #f0d772;
+        }
+        pre {
+            background: #0f3460;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            white-space: pre-wrap;
+        }
+        .success {
+            color: #28a745;
+        }
+        .error {
+            color: #dc3545;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧪 Teste de Conexão Supabase</h1>
+    
+    <button onclick="testConnection()">Testar Conexão</button>
+    <button onclick="testRaces()">Buscar Raças</button>
+    <button onclick="testClasses()">Buscar Classes</button>
+    <button onclick="testBackgrounds()">Buscar Antecedentes</button>
+    <button onclick="testAuth()">Verificar Autenticação</button>
+    
+    <h2>Resultado:</h2>
+    <div id="result"></div>
+
+    <script type="module">
+        import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.38.0/+esm';
+
+        const SUPABASE_URL = 'https://bifiatkpfmrrnfhvgrpb.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpZmlhdGtwZm1ycm5maHZncnBiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA0ODM2NTMsImV4cCI6MjA3NjA1OTY1M30.g5S4aT-ml_cgGoJHWudB36EWz-3bonFZW3DEIWNOUAM';
+
+        window.supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        const resultDiv = document.getElementById('result');
+
+        function showResult(title, data, isError = false) {
+            const className = isError ? 'error' : 'success';
+            resultDiv.innerHTML = `
+                <h3 class="${className}">${title}</h3>
+                <pre>${JSON.stringify(data, null, 2)}</pre>
+            `;
+        }
+
+        window.testConnection = async () => {
+            try {
+                console.log('Testando conexão...');
+                const { data, error } = await supabase.from('game_races').select('count');
+                
+                if (error) {
+                    showResult('❌ Erro de Conexão', error, true);
+                } else {
+                    showResult('✅ Conexão OK', { message: 'Supabase conectado com sucesso!', data });
+                }
+            } catch (err) {
+                showResult('❌ Erro Crítico', err, true);
+            }
+        };
+
+        window.testRaces = async () => {
+            try {
+                console.log('Buscando raças...');
+                const { data, error } = await supabase.from('game_races').select('*');
+                
+                if (error) {
+                    showResult('❌ Erro ao buscar raças', error, true);
+                } else {
+                    showResult(`✅ ${data.length} Raças Encontradas`, data);
+                }
+            } catch (err) {
+                showResult('❌ Erro Crítico', err, true);
+            }
+        };
+
+        window.testClasses = async () => {
+            try {
+                console.log('Buscando classes...');
+                const { data, error } = await supabase.from('game_classes').select('*');
+                
+                if (error) {
+                    showResult('❌ Erro ao buscar classes', error, true);
+                } else {
+                    showResult(`✅ ${data.length} Classes Encontradas`, data);
+                }
+            } catch (err) {
+                showResult('❌ Erro Crítico', err, true);
+            }
+        };
+
+        window.testBackgrounds = async () => {
+            try {
+                console.log('Buscando antecedentes...');
+                const { data, error } = await supabase.from('game_backgrounds').select('*');
+                
+                if (error) {
+                    showResult('❌ Erro ao buscar antecedentes', error, true);
+                } else {
+                    showResult(`✅ ${data.length} Antecedentes Encontrados`, data);
+                }
+            } catch (err) {
+                showResult('❌ Erro Crítico', err, true);
+            }
+        };
+
+        window.testAuth = async () => {
+            try {
+                console.log('Verificando autenticação...');
+                const { data: { user }, error } = await supabase.auth.getUser();
+                
+                if (error) {
+                    showResult('❌ Erro de Autenticação', error, true);
+                } else if (!user) {
+                    showResult('⚠️ Não Autenticado', { message: 'Nenhum usuário logado' }, true);
+                } else {
+                    showResult('✅ Usuário Autenticado', user);
+                }
+            } catch (err) {
+                showResult('❌ Erro Crítico', err, true);
+            }
+        };
+
+        // Auto-test ao carregar
+        console.log('🔌 Página de teste carregada');
+        console.log('🌐 Supabase URL:', SUPABASE_URL);
+        console.log('🔑 Key configurada:', SUPABASE_ANON_KEY ? 'Sim' : 'Não');
+    </script>
+</body>
+</html>

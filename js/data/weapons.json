@@ -1,0 +1,736 @@
+{
+  "armas": [
+    {
+      "id": "adaga",
+      "nome": "Adaga",
+      "categoria": "Armas Corpo a Corpo Simples",
+      "tipo": "Corpo a Corpo",
+      "proficiencia": "Simples",
+      "custo": {
+        "quantidade": 2,
+        "moeda": "po"
+      },
+      "dano": "1d4",
+      "tipoDano": "perfurante",
+      "peso": 0.5,
+      "propriedades": [
+        "Acuidade",
+        "Leve",
+        "Arremesso (distância 6/18)"
+      ]
+    },
+    {
+      "id": "ataque-desarmado",
+      "nome": "Ataque Desarmado",
+      "categoria": "Armas Corpo a Corpo Simples",
+      "tipo": "Corpo a Corpo",
+      "proficiencia": "Simples",
+      "custo": {
+        "quantidade": 0,
+        "moeda": "—"
+      },
+      "dano": "1",
+      "tipoDano": "concussão",
+      "peso": 0,
+      "propriedades": []
+    },
+    {
+      "id": "azagaia",
+      "nome": "Azagaia",
+      "categoria": "Armas Corpo a Corpo Simples",
+      "tipo": "Corpo a Corpo",
+      "proficiencia": "Simples",
+      "custo": {
+        "quantidade": 5,
+        "moeda": "pp"
+      },
+      "dano": "1d6",
+      "tipoDano": "perfurante",
+      "peso": 1,
+      "propriedades": [
+        "Arremesso (distância 9/36)"
+      ]
+    },
+    {
+      "id": "bordao",
+      "nome": "Bordão",
+      "categoria": "Armas Corpo a Corpo Simples",
+      "tipo": "Corpo a Corpo",
+      "proficiencia": "Simples",
+      "custo": {
+        "quantidade": 2,
+        "moeda": "pp"
+      },
+      "dano": "1d6",
+      "tipoDano": "concussão",
+      "peso": 2,
+      "propriedades": [
+        "Versátil (1d8)"
+      ]
+    },
+    {
+      "id": "clava",
+      "nome": "Clava",
+      "categoria": "Armas Corpo a Corpo Simples",
+      "tipo": "Corpo a Corpo",
+      "proficiencia": "Simples",
+      "custo": {
+        "quantidade": 1,
+        "moeda": "pp"
+      },
+      "dano": "1d4",
+      "tipoDano": "concussão",
+      "peso": 1,
+      "propriedades": [
+        "Leve"
+      ]
+    },
+    {
+      "id": "foice-curta",
+      "nome": "Foice Curta",
+      "categoria": "Armas Corpo a Corpo Simples",
+      "tipo": "Corpo a Corpo",
+      "proficiencia": "Simples",
+      "custo": {
+        "quantidade": 1,
+        "moeda": "po"
+      },
+      "dano": "1d4",
+      "tipoDano": "cortante",
+      "peso": 1,
+      "propriedades": [
+        "Leve"
+      ]
+    },
+    {
+      "id": "lanca",
+      "nome": "Lança",
+      "categoria": "Armas Corpo a Corpo Simples",
+      "tipo": "Corpo a Corpo",
+      "proficiencia": "Simples",
+      "custo": {
+        "quantidade": 1,
+        "moeda": "po"
+      },
+      "dano": "1d6",
+      "tipoDano": "perfurante",
+      "peso": 1.5,
+      "propriedades": [
+        "Arremesso (distância 6/18)",
+        "Versátil (1d8)"
+      ]
+    },
+    {
+      "id": "maca",
+      "nome": "Maça",
+      "categoria": "Armas Corpo a Corpo Simples",
+      "tipo": "Corpo a Corpo",
+      "proficiencia": "Simples",
+      "custo": {
+        "quantidade": 5,
+        "moeda": "po"
+      },
+      "dano": "1d6",
+      "tipoDano": "concussão",
+      "peso": 2,
+      "propriedades": []
+    },
+    {
+      "id": "machadinha",
+      "nome": "Machadinha",
+      "categoria": "Armas Corpo a Corpo Simples",
+      "tipo": "Corpo a Corpo",
+      "proficiencia": "Simples",
+      "custo": {
+        "quantidade": 5,
+        "moeda": "po"
+      },
+      "dano": "1d6",
+      "tipoDano": "cortante",
+      "peso": 1,
+      "propriedades": [
+        "Leve",
+        "Arremesso (distância 6/18)"
+      ]
+    },
+    {
+      "id": "martelo-leve",
+      "nome": "Martelo Leve",
+      "categoria": "Armas Corpo a Corpo Simples",
+      "tipo": "Corpo a Corpo",
+      "proficiencia": "Simples",
+      "custo": {
+        "quantidade": 2,
+        "moeda": "po"
+      },
+      "dano": "1d4",
+      "tipoDano": "concussão",
+      "peso": 1,
+      "propriedades": [
+        "Leve",
+        "Arremesso (distância 6/18)"
+      ]
+    },
+    {
+      "id": "arco-curto",
+      "nome": "Arco Curto",
+      "categoria": "Armas à Distância Simples",
+      "tipo": "Distância",
+      "proficiencia": "Simples",
+      "custo": {
+        "quantidade": 25,
+        "moeda": "po"
+      },
+      "dano": "1d6",
+      "tipoDano": "perfurante",
+      "peso": 1,
+      "propriedades": [
+        "Munição (distância 24/96)",
+        "Duas mãos"
+      ]
+    },
+    {
+      "id": "besta-leve",
+      "nome": "Besta Leve",
+      "categoria": "Armas à Distância Simples",
+      "tipo": "Distância",
+      "proficiencia": "Simples",
+      "custo": {
+        "quantidade": 25,
+        "moeda": "po"
+      },
+      "dano": "1d8",
+      "tipoDano": "perfurante",
+      "peso": 2.5,
+      "propriedades": [
+        "Munição (distância 24/96)",
+        "Recarga",
+        "Duas mãos"
+      ]
+    },
+    {
+      "id": "dardo",
+      "nome": "Dardo",
+      "categoria": "Armas à Distância Simples",
+      "tipo": "Distância",
+      "proficiencia": "Simples",
+      "custo": {
+        "quantidade": 5,
+        "moeda": "pc"
+      },
+      "dano": "1d4",
+      "tipoDano": "perfurante",
+      "peso": 0.125,
+      "propriedades": [
+        "Acuidade",
+        "Arremesso (distância 6/18)"
+      ]
+    },
+    {
+      "id": "funda",
+      "nome": "Funda",
+      "categoria": "Armas à Distância Simples",
+      "tipo": "Distância",
+      "proficiencia": "Simples",
+      "custo": {
+        "quantidade": 1,
+        "moeda": "pp"
+      },
+      "dano": "1d4",
+      "tipoDano": "concussão",
+      "peso": 0,
+      "propriedades": [
+        "Munição (distância 9/36)"
+      ]
+    },
+    {
+      "id": "alabarda",
+      "nome": "Alabarda",
+      "categoria": "Armas Corpo a Corpo Marciais",
+      "tipo": "Corpo a Corpo",
+      "proficiencia": "Marcial",
+      "custo": {
+        "quantidade": 20,
+        "moeda": "po"
+      },
+      "dano": "1d10",
+      "tipoDano": "cortante",
+      "peso": 3,
+      "propriedades": [
+        "Pesada",
+        "Alcance",
+        "Duas mãos"
+      ]
+    },
+    {
+      "id": "chicote",
+      "nome": "Chicote",
+      "categoria": "Armas Corpo a Corpo Marciais",
+      "tipo": "Corpo a Corpo",
+      "proficiencia": "Marcial",
+      "custo": {
+        "quantidade": 2,
+        "moeda": "po"
+      },
+      "dano": "1d4",
+      "tipoDano": "cortante",
+      "peso": 1.5,
+      "propriedades": [
+        "Acuidade",
+        "Alcance"
+      ]
+    },
+    {
+      "id": "cimitarra",
+      "nome": "Cimitarra",
+      "categoria": "Armas Corpo a Corpo Marciais",
+      "tipo": "Corpo a Corpo",
+      "proficiencia": "Marcial",
+      "custo": {
+        "quantidade": 25,
+        "moeda": "po"
+      },
+      "dano": "1d6",
+      "tipoDano": "cortante",
+      "peso": 1.5,
+      "propriedades": [
+        "Acuidade",
+        "Leve"
+      ]
+    },
+    {
+      "id": "espada-curta",
+      "nome": "Espada Curta",
+      "categoria": "Armas Corpo a Corpo Marciais",
+      "tipo": "Corpo a Corpo",
+      "proficiencia": "Marcial",
+      "custo": {
+        "quantidade": 10,
+        "moeda": "po"
+      },
+      "dano": "1d6",
+      "tipoDano": "perfurante",
+      "peso": 1,
+      "propriedades": [
+        "Acuidade",
+        "Leve"
+      ]
+    },
+    {
+      "id": "espada-grande",
+      "nome": "Espada Grande",
+      "categoria": "Armas Corpo a Corpo Marciais",
+      "tipo": "Corpo a Corpo",
+      "proficiencia": "Marcial",
+      "custo": {
+        "quantidade": 50,
+        "moeda": "po"
+      },
+      "dano": "2d6",
+      "tipoDano": "cortante",
+      "peso": 3,
+      "propriedades": [
+        "Pesada",
+        "Duas mãos"
+      ]
+    },
+    {
+      "id": "espada-longa",
+      "nome": "Espada Longa",
+      "categoria": "Armas Corpo a Corpo Marciais",
+      "tipo": "Corpo a Corpo",
+      "proficiencia": "Marcial",
+      "custo": {
+        "quantidade": 15,
+        "moeda": "po"
+      },
+      "dano": "1d8",
+      "tipoDano": "cortante",
+      "peso": 1.5,
+      "propriedades": [
+        "Versátil (1d10)"
+      ]
+    },
+    {
+      "id": "glaive",
+      "nome": "Glaive",
+      "categoria": "Armas Corpo a Corpo Marciais",
+      "tipo": "Corpo a Corpo",
+      "proficiencia": "Marcial",
+      "custo": {
+        "quantidade": 20,
+        "moeda": "po"
+      },
+      "dano": "1d10",
+      "tipoDano": "cortante",
+      "peso": 3,
+      "propriedades": [
+        "Pesada",
+        "Alcance",
+        "Duas mãos"
+      ]
+    },
+    {
+      "id": "lanca-montaria",
+      "nome": "Lança de Montaria",
+      "categoria": "Armas Corpo a Corpo Marciais",
+      "tipo": "Corpo a Corpo",
+      "proficiencia": "Marcial",
+      "custo": {
+        "quantidade": 10,
+        "moeda": "po"
+      },
+      "dano": "1d12",
+      "tipoDano": "perfurante",
+      "peso": 3,
+      "propriedades": [
+        "Alcance",
+        "Especial"
+      ]
+    },
+    {
+      "id": "machado-batalha",
+      "nome": "Machado de Batalha",
+      "categoria": "Armas Corpo a Corpo Marciais",
+      "tipo": "Corpo a Corpo",
+      "proficiencia": "Marcial",
+      "custo": {
+        "quantidade": 10,
+        "moeda": "po"
+      },
+      "dano": "1d8",
+      "tipoDano": "cortante",
+      "peso": 2,
+      "propriedades": [
+        "Versátil (1d10)"
+      ]
+    },
+    {
+      "id": "machado-grande",
+      "nome": "Machado Grande",
+      "categoria": "Armas Corpo a Corpo Marciais",
+      "tipo": "Corpo a Corpo",
+      "proficiencia": "Marcial",
+      "custo": {
+        "quantidade": 30,
+        "moeda": "po"
+      },
+      "dano": "1d12",
+      "tipoDano": "cortante",
+      "peso": 3.5,
+      "propriedades": [
+        "Pesada",
+        "Duas mãos"
+      ]
+    },
+    {
+      "id": "malho",
+      "nome": "Malho",
+      "categoria": "Armas Corpo a Corpo Marciais",
+      "tipo": "Corpo a Corpo",
+      "proficiencia": "Marcial",
+      "custo": {
+        "quantidade": 10,
+        "moeda": "po"
+      },
+      "dano": "2d6",
+      "tipoDano": "concussão",
+      "peso": 5,
+      "propriedades": [
+        "Pesada",
+        "Duas mãos"
+      ]
+    },
+    {
+      "id": "mangual",
+      "nome": "Mangual",
+      "categoria": "Armas Corpo a Corpo Marciais",
+      "tipo": "Corpo a Corpo",
+      "proficiencia": "Marcial",
+      "custo": {
+        "quantidade": 10,
+        "moeda": "po"
+      },
+      "dano": "1d8",
+      "tipoDano": "concussão",
+      "peso": 1,
+      "propriedades": []
+    },
+    {
+      "id": "martelo-guerra",
+      "nome": "Martelo de Guerra",
+      "categoria": "Armas Corpo a Corpo Marciais",
+      "tipo": "Corpo a Corpo",
+      "proficiencia": "Marcial",
+      "custo": {
+        "quantidade": 15,
+        "moeda": "po"
+      },
+      "dano": "1d8",
+      "tipoDano": "concussão",
+      "peso": 1,
+      "propriedades": [
+        "Versátil (1d10)"
+      ]
+    },
+    {
+      "id": "picareta-guerra",
+      "nome": "Picareta de Guerra",
+      "categoria": "Armas Corpo a Corpo Marciais",
+      "tipo": "Corpo a Corpo",
+      "proficiencia": "Marcial",
+      "custo": {
+        "quantidade": 5,
+        "moeda": "po"
+      },
+      "dano": "1d8",
+      "tipoDano": "perfurante",
+      "peso": 1,
+      "propriedades": []
+    },
+    {
+      "id": "rapieira",
+      "nome": "Rapieira",
+      "categoria": "Armas Corpo a Corpo Marciais",
+      "tipo": "Corpo a Corpo",
+      "proficiencia": "Marcial",
+      "custo": {
+        "quantidade": 25,
+        "moeda": "po"
+      },
+      "dano": "1d8",
+      "tipoDano": "perfurante",
+      "peso": 1,
+      "propriedades": [
+        "Acuidade"
+      ]
+    },
+    {
+      "id": "tridente",
+      "nome": "Tridente",
+      "categoria": "Armas Corpo a Corpo Marciais",
+      "tipo": "Corpo a Corpo",
+      "proficiencia": "Marcial",
+      "custo": {
+        "quantidade": 5,
+        "moeda": "po"
+      },
+      "dano": "1d6",
+      "tipoDano": "perfurante",
+      "peso": 2,
+      "propriedades": [
+        "Arremesso (distância 6/18)",
+        "Versátil (1d8)"
+      ]
+    },
+    {
+      "id": "arco-longo",
+      "nome": "Arco Longo",
+      "categoria": "Armas à Distância Marciais",
+      "tipo": "Distância",
+      "proficiencia": "Marcial",
+      "custo": {
+        "quantidade": 50,
+        "moeda": "po"
+      },
+      "dano": "1d8",
+      "tipoDano": "perfurante",
+      "peso": 1,
+      "propriedades": [
+        "Munição (distância 45/180)",
+        "Pesada",
+        "Duas mãos"
+      ]
+    },
+    {
+      "id": "besta-mao",
+      "nome": "Besta de Mão",
+      "categoria": "Armas à Distância Marciais",
+      "tipo": "Distância",
+      "proficiencia": "Marcial",
+      "custo": {
+        "quantidade": 75,
+        "moeda": "po"
+      },
+      "dano": "1d6",
+      "tipoDano": "perfurante",
+      "peso": 1.5,
+      "propriedades": [
+        "Munição (distância 9/36)",
+        "Leve",
+        "Recarga"
+      ]
+    },
+    {
+      "id": "besta-pesada",
+      "nome": "Besta Pesada",
+      "categoria": "Armas à Distância Marciais",
+      "tipo": "Distância",
+      "proficiencia": "Marcial",
+      "custo": {
+        "quantidade": 50,
+        "moeda": "po"
+      },
+      "dano": "1d10",
+      "tipoDano": "perfurante",
+      "peso": 9,
+      "propriedades": [
+        "Munição (distância 30/120)",
+        "Pesada",
+        "Recarga",
+        "Duas mãos"
+      ]
+    },
+    {
+      "id": "rede",
+      "nome": "Rede",
+      "categoria": "Armas à Distância Marciais",
+      "tipo": "Distância",
+      "proficiencia": "Marcial",
+      "custo": {
+        "quantidade": 1,
+        "moeda": "po"
+      },
+      "dano": "—",
+      "tipoDano": "—",
+      "peso": 1.5,
+      "propriedades": [
+        "Arremesso (distância 1,5/4,5)",
+        "Especial"
+      ]
+    },
+    {
+      "id": "zarabatana",
+      "nome": "Zarabatana",
+      "categoria": "Armas à Distância Marciais",
+      "tipo": "Distância",
+      "proficiencia": "Marcial",
+      "custo": {
+        "quantidade": 10,
+        "moeda": "po"
+      },
+      "dano": "1",
+      "tipoDano": "perfurante",
+      "peso": 0.5,
+      "propriedades": [
+        "Munição (distância 7,5/30)",
+        "Recarga"
+      ]
+    }
+  ],
+  "propriedades": {
+    "acuidade": {
+      "nome": "Acuidade",
+      "descricao": "Ao realizar um ataque com uma arma com acuidade, você usa o modificador de Força ou Destreza para as jogadas de ataque e dano. Você deve usar o mesmo modificador para ambas as jogadas."
+    },
+    "alcance": {
+      "nome": "Alcance",
+      "descricao": "Esta arma adiciona 1,5 metro ao seu alcance quando você ataca com ela, assim como quando você determina seu alcance para ataques de oportunidade com ela."
+    },
+    "arremesso": {
+      "nome": "Arremesso",
+      "descricao": "Se uma arma tem a propriedade arremesso, você pode arremessar a arma para realizar um ataque à distância. Se a arma é uma arma corpo a corpo, você usa o mesmo modificador de atributo para aquela jogada de ataque e jogada de dano que você usaria para um ataque corpo a corpo com a arma. Por exemplo, se você arremessar uma machadinha, você usa sua Força, mas se você arremessar uma adaga, você pode usar sua Força ou Destreza, já que a adaga tem a propriedade acuidade."
+    },
+    "duas-maos": {
+      "nome": "Duas Mãos",
+      "descricao": "Esta arma requer duas mãos quando você ataca com ela."
+    },
+    "especial": {
+      "nome": "Especial",
+      "descricao": "Uma arma com a propriedade especial tem regras incomuns que governam seu uso, explicadas na descrição da arma."
+    },
+    "leve": {
+      "nome": "Leve",
+      "descricao": "Uma arma leve é pequena e fácil de manusear, tornando-a ideal para uso ao lutar com duas armas."
+    },
+    "municao": {
+      "nome": "Munição",
+      "descricao": "Você pode usar uma arma que tem a propriedade munição para realizar um ataque à distância somente se você tiver munição para disparar da arma. Cada vez que você ataca com a arma, você gasta uma peça de munição. Sacar a munição de uma aljava, caixa ou outro recipiente é parte do ataque (você precisa de uma mão livre para carregar uma arma de uma mão). No final da batalha, você pode recuperar metade de sua munição gasta ao gastar um minuto procurando pelo campo de batalha."
+    },
+    "pesada": {
+      "nome": "Pesada",
+      "descricao": "Criaturas pequenas têm desvantagem nas jogadas de ataque com armas pesadas. O tamanho e volume de uma arma pesada a torna grande demais para uma criatura Pequena usar efetivamente."
+    },
+    "recarga": {
+      "nome": "Recarga",
+      "descricao": "Devido ao tempo requerido para carregar esta arma, você pode disparar somente uma munição dela quando você usa uma ação, ação bônus ou reação para dispará-la, independentemente do número de ataques que você normalmente pode fazer."
+    },
+    "versatil": {
+      "nome": "Versátil",
+      "descricao": "Esta arma pode ser usada com uma ou duas mãos. Um valor de dano em parênteses aparece com a propriedade—o dano quando a arma é usada com duas mãos para realizar um ataque corpo a corpo."
+    }
+  },
+  "categorias": [
+    {
+      "id": "corpo-corpo-simples",
+      "nome": "Armas Corpo a Corpo Simples",
+      "tipo": "Corpo a Corpo",
+      "proficiencia": "Simples",
+      "descricao": "Armas simples de combate próximo que não requerem treinamento especial para serem usadas efetivamente."
+    },
+    {
+      "id": "distancia-simples",
+      "nome": "Armas à Distância Simples",
+      "tipo": "Distância",
+      "proficiencia": "Simples",
+      "descricao": "Armas de ataque à distância que não requerem treinamento especial para serem usadas efetivamente."
+    },
+    {
+      "id": "corpo-corpo-marciais",
+      "nome": "Armas Corpo a Corpo Marciais",
+      "tipo": "Corpo a Corpo",
+      "proficiencia": "Marcial",
+      "descricao": "Armas de combate próximo mais especializadas que requerem treinamento marcial para serem usadas com proficiência."
+    },
+    {
+      "id": "distancia-marciais",
+      "nome": "Armas à Distância Marciais",
+      "tipo": "Distância",
+      "proficiencia": "Marcial",
+      "descricao": "Armas de ataque à distância mais especializadas que requerem treinamento marcial para serem usadas com proficiência."
+    }
+  ],
+  "tiposDano": [
+    {
+      "id": "perfurante",
+      "nome": "Perfurante",
+      "descricao": "Dano causado por objetos pontiagudos, como flechas, espadas e dentes."
+    },
+    {
+      "id": "concussao",
+      "nome": "Concussão",
+      "descricao": "Dano causado por força contundente, como martelos, queda e compressão."
+    },
+    {
+      "id": "cortante",
+      "nome": "Cortante",
+      "descricao": "Dano causado por ataques com espadas, machados e garras de monstros."
+    }
+  ],
+  "moedas": {
+    "pc": {
+      "nome": "Peças de Cobre",
+      "abreviacao": "pc",
+      "valorEmPO": 0.01
+    },
+    "pp": {
+      "nome": "Peças de Prata",
+      "abreviacao": "pp",
+      "valorEmPO": 0.1
+    },
+    "po": {
+      "nome": "Peças de Ouro",
+      "abreviacao": "po",
+      "valorEmPO": 1
+    },
+    "pl": {
+      "nome": "Peças de Platina",
+      "abreviacao": "pl",
+      "valorEmPO": 10
+    }
+  },
+  "observacoes": {
+    "proficiencia": "Sua raça, classe e talentos podem dar proficiência com certas armas ou categorias de armas. As duas categorias são simples e marcial. A maioria das pessoas pode usar armas simples com proficiência. Essas armas incluem clavas, maças e outras armas frequentemente encontradas nas mãos de plebeus. Armas marciais, incluindo espadas, machados e armas de haste, requerem treinamento mais especializado para usar efetivamente. A maioria dos guerreiros usa armas marciais porque essas armas colocam seus estilos de luta e treinamento em melhor uso.",
+    "pesoDistancias": "Todos os pesos estão em quilogramas (kg). Todas as distâncias de arremesso e munição estão em metros."
+  }
+}

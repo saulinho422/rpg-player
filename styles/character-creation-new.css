@@ -1,0 +1,605 @@
+/* =====================================
+   CHARACTER CREATION - RPG ÉPICO REVOLUCIONÁRIO
+   Design inspirado em Dungeons & Dragons
+   Paleta: Azul escuro + Dourado + Verde mágico
+   ===================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Cinzel+Decorative:wght@400;700;900&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Cinzel', serif;
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+    color: #e8dcc6;
+    min-height: 100vh;
+    overflow-x: hidden;
+    position: relative;
+}
+
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: 
+        repeating-linear-gradient(90deg, transparent, transparent 2px, rgba(212, 175, 55, 0.02) 2px, rgba(212, 175, 55, 0.02) 4px),
+        repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(212, 175, 55, 0.02) 2px, rgba(212, 175, 55, 0.02) 4px);
+    pointer-events: none;
+    z-index: 0;
+}
+
+.creation-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    position: relative;
+    z-index: 1;
+}
+
+/* =====================================
+   PROGRESS BAR ÉPICA
+   ===================================== */
+
+.progress-bar {
+    display: flex;
+    background: linear-gradient(135deg, rgba(26, 26, 46, 0.95), rgba(22, 33, 62, 0.95));
+    padding: 35px 25px;
+    overflow-x: auto;
+    backdrop-filter: blur(15px);
+    border-bottom: 3px solid rgba(212, 175, 55, 0.4);
+    box-shadow: inset 0 -5px 15px rgba(0, 0, 0, 0.4);
+    position: relative;
+}
+
+.progress-bar::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, #d4af37, transparent);
+}
+
+.progress-step {
+    flex: 1;
+    min-width: 140px;
+    text-align: center;
+    position: relative;
+    padding: 0 25px;
+}
+
+.progress-step:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    top: 25px;
+    right: -50%;
+    width: 100%;
+    height: 5px;
+    background: linear-gradient(90deg, rgba(212, 175, 55, 0.15), transparent);
+    z-index: 0;
+    border-radius: 10px;
+    transition: all 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+.progress-step.completed:not(:last-child)::after {
+    background: linear-gradient(90deg, #d4af37 0%, rgba(212, 175, 55, 0.6) 100%);
+    box-shadow: 0 0 20px rgba(212, 175, 55, 0.7);
+    animation: shimmerLine 2s infinite;
+}
+
+@keyframes shimmerLine {
+    0%, 100% { opacity: 0.8; }
+    50% { opacity: 1; box-shadow: 0 0 30px rgba(212, 175, 55, 0.9); }
+}
+
+.step-number {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: rgba(212, 175, 55, 0.08);
+    border: 3px solid rgba(212, 175, 55, 0.25);
+    color: rgba(232, 220, 198, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 14px;
+    font-weight: 900;
+    font-size: 20px;
+    position: relative;
+    z-index: 1;
+    transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.3);
+}
+
+.progress-step.active .step-number {
+    background: linear-gradient(135deg, #d4af37 0%, #f0d772 50%, #d4af37 100%);
+    color: #1a1a2e;
+    transform: scale(1.35) rotate(5deg);
+    box-shadow: 
+        0 0 35px rgba(212, 175, 55, 1),
+        inset 0 0 15px rgba(255, 255, 255, 0.4),
+        0 5px 20px rgba(212, 175, 55, 0.5);
+    border-color: #fff;
+    animation: pulseGlowEpic 2.5s infinite, rotateGem 4s infinite;
+}
+
+.progress-step.completed .step-number {
+    background: linear-gradient(135deg, #28a745 0%, #20c997 50%, #28a745 100%);
+    color: #fff;
+    border-color: #20c997;
+    box-shadow: 0 0 20px rgba(40, 167, 69, 0.7), inset 0 0 10px rgba(255, 255, 255, 0.2);
+    transform: scale(1.1);
+}
+
+.progress-step.completed .step-number::after {
+    content: '✓';
+    position: absolute;
+    font-size: 24px;
+    animation: checkmark 0.5s ease-in-out;
+}
+
+@keyframes checkmark {
+    0% { transform: scale(0) rotate(-180deg); opacity: 0; }
+    50% { transform: scale(1.3) rotate(0deg); }
+    100% { transform: scale(1) rotate(0deg); opacity: 1; }
+}
+
+@keyframes pulseGlowEpic {
+    0%, 100% { 
+        box-shadow: 
+            0 0 25px rgba(212, 175, 55, 0.8),
+            inset 0 0 12px rgba(255, 255, 255, 0.3),
+            0 5px 15px rgba(212, 175, 55, 0.4);
+    }
+    50% { 
+        box-shadow: 
+            0 0 50px rgba(212, 175, 55, 1),
+            inset 0 0 20px rgba(255, 255, 255, 0.6),
+            0 8px 30px rgba(212, 175, 55, 0.7);
+    }
+}
+
+@keyframes rotateGem {
+    0% { transform: scale(1.35) rotate(5deg); }
+    25% { transform: scale(1.4) rotate(-3deg); }
+    50% { transform: scale(1.35) rotate(5deg); }
+    75% { transform: scale(1.4) rotate(-3deg); }
+    100% { transform: scale(1.35) rotate(5deg); }
+}
+
+.step-label {
+    color: rgba(201, 176, 55, 0.5);
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    transition: all 0.4s ease;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.progress-step.active .step-label {
+    color: #d4af37;
+    font-size: 13px;
+    text-shadow: 0 0 15px rgba(212, 175, 55, 0.9), 0 0 25px rgba(212, 175, 55, 0.6);
+    transform: scale(1.05);
+}
+
+.progress-step.completed .step-label {
+    color: rgba(40, 167, 69, 0.95);
+    text-shadow: 0 0 10px rgba(40, 167, 69, 0.6);
+}
+
+/* =====================================
+   FORM STEPS - CONTAINER MÁGICO
+   ===================================== */
+
+.character-form {
+    padding: 70px 60px;
+    background: rgba(0, 0, 0, 0.25);
+    backdrop-filter: blur(12px);
+    flex: 1;
+    position: relative;
+}
+
+.character-form::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80%;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, #d4af37, transparent);
+    opacity: 0.5;
+}
+
+.form-step {
+    display: none;
+    animation: fadeInMagic 0.6s ease-out;
+}
+
+.form-step.active {
+    display: block;
+}
+
+@keyframes fadeInMagic {
+    0% {
+        opacity: 0;
+        transform: translateY(30px) scale(0.95);
+        filter: blur(5px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+        filter: blur(0);
+    }
+}
+
+.step-title {
+    font-family: 'Cinzel Decorative', serif;
+    color: #d4af37;
+    font-size: 2.8rem;
+    font-weight: 900;
+    text-align: center;
+    margin-bottom: 15px;
+    text-shadow: 
+        0 0 20px rgba(212, 175, 55, 0.6),
+        0 0 40px rgba(212, 175, 55, 0.3),
+        2px 2px 4px rgba(0, 0, 0, 0.8);
+    letter-spacing: 2px;
+}
+
+.step-description {
+    text-align: center;
+    color: #c9b037;
+    font-size: 1.3rem;
+    font-style: italic;
+    margin-bottom: 50px;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.6);
+}
+
+/* =====================================
+   FORM GROUPS - INPUTS ÉPICOS
+   ===================================== */
+
+.form-group {
+    margin-bottom: 35px;
+}
+
+.form-group label {
+    display: block;
+    color: #d4af37;
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.form-group select,
+.form-group input[type="text"],
+.form-group input[type="number"] {
+    width: 100%;
+    padding: 18px 22px;
+    font-size: 1.15rem;
+    font-family: 'Cinzel', serif;
+    background: rgba(212, 175, 55, 0.08);
+    border: 2px solid rgba(212, 175, 55, 0.3);
+    border-radius: 12px;
+    color: #e8dcc6;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.form-group select:focus,
+.form-group input:focus {
+    outline: none;
+    border-color: #d4af37;
+    background: rgba(212, 175, 55, 0.12);
+    box-shadow: 
+        0 0 25px rgba(212, 175, 55, 0.4),
+        inset 0 2px 8px rgba(0, 0, 0, 0.4);
+    transform: translateY(-2px);
+}
+
+.form-group select:hover,
+.form-group input:hover {
+    border-color: rgba(212, 175, 55, 0.5);
+    background: rgba(212, 175, 55, 0.1);
+}
+
+/* =====================================
+   SELECTION CARDS - CARDS MÁGICOS
+   ===================================== */
+
+.race-grid,
+.class-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 30px;
+    margin-top: 40px;
+}
+
+.race-card,
+.class-card {
+    background: linear-gradient(135deg, rgba(212, 175, 55, 0.05), rgba(212, 175, 55, 0.1));
+    border: 3px solid rgba(212, 175, 55, 0.25);
+    border-radius: 16px;
+    padding: 30px;
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+    backdrop-filter: blur(10px);
+    box-shadow: 
+        0 4px 15px rgba(0, 0, 0, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.race-card::before,
+.class-card::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(
+        45deg,
+        transparent,
+        rgba(212, 175, 55, 0.1),
+        transparent
+    );
+    transform: rotate(45deg);
+    transition: all 0.6s;
+}
+
+.race-card:hover,
+.class-card:hover {
+    transform: translateY(-8px) scale(1.02);
+    border-color: #d4af37;
+    box-shadow: 
+        0 12px 35px rgba(212, 175, 55, 0.3),
+        0 0 40px rgba(212, 175, 55, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    background: linear-gradient(135deg, rgba(212, 175, 55, 0.12), rgba(212, 175, 55, 0.18));
+}
+
+.race-card:hover::before,
+.class-card:hover::before {
+    left: 100%;
+}
+
+.race-card.selected,
+.class-card.selected {
+    border-color: #d4af37;
+    background: linear-gradient(135deg, rgba(212, 175, 55, 0.2), rgba(212, 175, 55, 0.3));
+    box-shadow: 
+        0 0 40px rgba(212, 175, 55, 0.6),
+        0 8px 30px rgba(212, 175, 55, 0.4),
+        inset 0 0 30px rgba(212, 175, 55, 0.1);
+    transform: scale(1.05);
+}
+
+.card-icon {
+    font-size: 4rem;
+    text-align: center;
+    margin-bottom: 20px;
+    filter: drop-shadow(0 0 15px rgba(212, 175, 55, 0.6));
+    animation: floatIcon 3s ease-in-out infinite;
+}
+
+@keyframes floatIcon {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+}
+
+.card-title {
+    font-family: 'Cinzel Decorative', serif;
+    color: #d4af37;
+    font-size: 1.8rem;
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 15px;
+    text-shadow: 0 0 10px rgba(212, 175, 55, 0.4);
+}
+
+.card-description {
+    color: #c9b037;
+    text-align: center;
+    line-height: 1.7;
+    font-size: 1.05rem;
+    margin-bottom: 20px;
+}
+
+.card-stats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+}
+
+.stat-badge {
+    background: rgba(212, 175, 55, 0.15);
+    border: 1px solid rgba(212, 175, 55, 0.3);
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #e8dcc6;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+/* =====================================
+   NAVIGATION BUTTONS - BOTÕES ÉPICOS
+   ===================================== */
+
+.form-navigation {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 35px 60px;
+    background: rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(10px);
+    border-top: 3px solid rgba(212, 175, 55, 0.4);
+}
+
+.nav-button {
+    padding: 16px 40px;
+    font-size: 1.15rem;
+    font-family: 'Cinzel', serif;
+    font-weight: 700;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    position: relative;
+    overflow: hidden;
+}
+
+.nav-button::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+}
+
+.nav-button:hover::before {
+    width: 300px;
+    height: 300px;
+}
+
+#prevBtn {
+    background: transparent;
+    border: 2px solid rgba(212, 175, 55, 0.5);
+    color: #d4af37;
+}
+
+#prevBtn:hover:not(:disabled) {
+    background: rgba(212, 175, 55, 0.1);
+    border-color: #d4af37;
+    box-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
+    transform: translateX(-5px);
+}
+
+#nextBtn,
+#submitBtn {
+    background: linear-gradient(135deg, #d4af37 0%, #f0d772 50%, #d4af37 100%);
+    color: #1a1a2e;
+    border: 2px solid #f0d772;
+    box-shadow: 0 4px 15px rgba(212, 175, 55, 0.4);
+}
+
+#nextBtn:hover,
+#submitBtn:hover {
+    box-shadow: 0 8px 30px rgba(212, 175, 55, 0.6), 0 0 40px rgba(212, 175, 55, 0.4);
+    transform: translateY(-3px) scale(1.05);
+}
+
+.nav-button:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    transform: none !important;
+}
+
+/* =====================================
+   RESPONSIVE
+   ===================================== */
+
+@media (max-width: 768px) {
+    .progress-bar {
+        padding: 25px 15px;
+    }
+    
+    .progress-step {
+        min-width: 100px;
+        padding: 0 10px;
+    }
+    
+    .step-number {
+        width: 40px;
+        height: 40px;
+        font-size: 16px;
+    }
+    
+    .step-label {
+        font-size: 10px;
+    }
+    
+    .character-form {
+        padding: 40px 25px;
+    }
+    
+    .step-title {
+        font-size: 2rem;
+    }
+    
+    .step-description {
+        font-size: 1.1rem;
+    }
+    
+    .race-grid,
+    .class-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+    
+    .form-navigation {
+        padding: 25px 25px;
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    .nav-button {
+        width: 100%;
+    }
+}
+
+/* =====================================
+   LOADING & ANIMATIONS
+   ===================================== */
+
+.loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(26, 26, 46, 0.95);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+}
+
+.loading-spinner {
+    width: 80px;
+    height: 80px;
+    border: 6px solid rgba(212, 175, 55, 0.2);
+    border-top-color: #d4af37;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}

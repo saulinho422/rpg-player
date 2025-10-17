@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Criação de Personagem - RPG Player</title>
+    <link rel="stylesheet" href="styles/character-creation.css">
+</head>
+<body>
+    <div class="creation-container">
+        <!-- Progress Bar -->
+        <div class="progress-bar">
+            <div class="progress-step active" data-step="1">
+                <div class="step-number">1</div>
+                <div class="step-label">Raça & Classe</div>
+            </div>
+            <div class="progress-step" data-step="2">
+                <div class="step-number">2</div>
+                <div class="step-label">Tendência</div>
+            </div>
+            <div class="progress-step" data-step="3">
+                <div class="step-number">3</div>
+                <div class="step-label">Detalhes</div>
+            </div>
+            <div class="progress-step" data-step="4">
+                <div class="step-number">4</div>
+                <div class="step-label">Atributos</div>
+            </div>
+            <div class="progress-step" data-step="5">
+                <div class="step-number">5</div>
+                <div class="step-label">Perícias</div>
+            </div>
+            <div class="progress-step" data-step="6">
+                <div class="step-number">6</div>
+                <div class="step-label">Pontos de Vida</div>
+            </div>
+            <div class="progress-step" data-step="7">
+                <div class="step-number">7</div>
+                <div class="step-label">Idiomas</div>
+            </div>
+            <div class="progress-step" data-step="8">
+                <div class="step-number">8</div>
+                <div class="step-label">Personalidade</div>
+            </div>
+        </div>
+
+        <!-- Form Steps -->
+        <form id="characterForm" class="character-form">
+            
+            <!-- Step 1: Raça, Classe, Subclasse, Nível -->
+            <div class="form-step active" data-step="1">
+                <h2 class="step-title">⚔️ Escolha sua Raça & Classe</h2>
+                <p class="step-description">Defina a essência do seu herói</p>
+                
+                <div class="form-group">
+                    <label>🏰 Raça</label>
+                    <button type="button" class="selection-btn" id="selectRaceBtn">
+                        <span class="selection-label" id="selectedRaceLabel">Selecione uma raça...</span>
+                        <span class="selection-icon">▼</span>
+                    </button>
+                    <input type="hidden" id="race" name="race" required>
+                </div>
+
+                <div class="form-group">
+                    <label>⚔️ Classe</label>
+                    <button type="button" class="selection-btn" id="selectClassBtn">
+                        <span class="selection-label" id="selectedClassLabel">Selecione uma classe...</span>
+                        <span class="selection-icon">▼</span>
+                    </button>
+                    <input type="hidden" id="class" name="class" required>
+                </div>
+
+                <div class="form-group" id="subclassGroup" style="display: none;">
+                    <label>✨ Subclasse</label>
+                    <button type="button" class="selection-btn" id="selectSubclassBtn">
+                        <span class="selection-label" id="selectedSubclassLabel">Selecione uma subclasse...</span>
+                        <span class="selection-icon">▼</span>
+                    </button>
+                    <input type="hidden" id="subclass" name="subclass">
+                </div>
+
+                <div class="form-group">
+                    <label for="level">📊 Nível</label>
+                    <select id="level" name="level" required>
+                        <option value="">Selecione o nível...</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Step 2: Tendência e Antecedente -->
+            <div class="form-step" data-step="2">
+                <h2 class="step-title">⚖️ Tendência & Antecedente</h2>
+                <p class="step-description">Defina sua moralidade e passado</p>
+                
+                <div class="form-group">
+                    <label for="alignment">⚖️ Tendência</label>
+                    <select id="alignment" name="alignment" required>
+                        <option value="">Selecione uma tendência...</option>
+                        <option value="leal-bom">Leal e Bom</option>
+                        <option value="neutro-bom">Neutro e Bom</option>
+                        <option value="caotico-bom">Caótico e Bom</option>
+                        <option value="leal-neutro">Leal e Neutro</option>
+                        <option value="neutro">Neutro</option>
+                        <option value="caotico-neutro">Caótico e Neutro</option>
+                        <option value="leal-mau">Leal e Mau</option>
+                        <option value="neutro-mau">Neutro e Mau</option>
+                        <option value="caotico-mau">Caótico e Mau</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>📜 Antecedente</label>
+                    <button type="button" class="selection-btn" id="selectBackgroundBtn">
+                        <span class="selection-label" id="selectedBackgroundLabel">Selecione um antecedente...</span>
+                        <span class="selection-icon">▼</span>
+                    </button>
+                    <input type="hidden" id="background" name="background" required>
+                </div>
+            </div>
+
+            <!-- Step 3: Detalhes do Personagem -->
+            <div class="form-step" data-step="3">
+                <h2 class="step-title">🎭 Detalhes do Personagem</h2>
+                <p class="step-description">Dê vida à aparência do seu herói</p>
+                
+                <div class="form-group">
+                    <label for="characterName">Nome do Personagem</label>
+                    <input type="text" id="characterName" name="characterName" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="characterImage">Imagem do Personagem</label>
+                    <input type="file" id="characterImage" name="characterImage" accept="image/*">
+                    <div id="imagePreview" class="image-preview"></div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="eyes">Olhos</label>
+                        <input type="text" id="eyes" name="eyes">
+                    </div>
+                    <div class="form-group">
+                        <label for="skin">Pele</label>
+                        <input type="text" id="skin" name="skin">
+                    </div>
+                    <div class="form-group">
+                        <label for="hair">Cabelo</label>
+                        <input type="text" id="hair" name="hair">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="weight">Peso</label>
+                        <input type="text" id="weight" name="weight" placeholder="ex: 70 kg">
+                    </div>
+                    <div class="form-group">
+                        <label for="height">Altura</label>
+                        <input type="text" id="height" name="height" placeholder="ex: 1,75 m">
+                    </div>
+                    <div class="form-group">
+                        <label for="age">Idade</label>
+                        <input type="number" id="age" name="age" min="1">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 4: Atributos -->
+            <div class="form-step" data-step="4">
+                <h2 class="step-title">💪 Atributos</h2>
+                <p class="step-description">Determine as capacidades fundamentais do seu herói</p>
+                
+                <div class="method-selection">
+                    <h3 class="subsection-title">Escolha o método de geração:</h3>
+                    <div class="method-buttons">
+                        <button type="button" class="method-btn" data-method="4d6">
+                            <strong>4d6</strong>
+                            <span>Role 4 dados e descarte o menor</span>
+                        </button>
+                        <button type="button" class="method-btn" data-method="standard">
+                            <strong>Valores Padrão</strong>
+                            <span>Use: 15, 14, 13, 12, 10, 8</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div id="diceRolling" class="dice-rolling hidden">
+                    <div class="rolls-remaining">
+                        Rolagens restantes: <span id="rollsLeft">6</span>
+                    </div>
+                    
+                    <div class="dice-container">
+                        <div class="die" id="die1">?</div>
+                        <div class="die" id="die2">?</div>
+                        <div class="die" id="die3">?</div>
+                        <div class="die" id="die4">?</div>
+                    </div>
+                    
+                    <button type="button" id="rollDiceBtn" class="roll-btn">Rolar Dados</button>
+                    
+                    <div class="rolled-values">
+                        <h4>Valores Rolados:</h4>
+                        <div id="rolledValuesList"></div>
+                    </div>
+                </div>
+
+                <div id="attributeAssignment" class="attribute-assignment hidden">
+                    <h3>Distribua os valores nos atributos:</h3>
+                    <div class="attributes-grid">
+                        <div class="attribute-item">
+                            <label>Força</label>
+                            <select name="str" required>
+                                <option value="">-</option>
+                            </select>
+                            <span class="modifier">+0</span>
+                        </div>
+                        <div class="attribute-item">
+                            <label>Destreza</label>
+                            <select name="dex" required>
+                                <option value="">-</option>
+                            </select>
+                            <span class="modifier">+0</span>
+                        </div>
+                        <div class="attribute-item">
+                            <label>Constituição</label>
+                            <select name="con" required>
+                                <option value="">-</option>
+                            </select>
+                            <span class="modifier">+0</span>
+                        </div>
+                        <div class="attribute-item">
+                            <label>Inteligência</label>
+                            <select name="int" required>
+                                <option value="">-</option>
+                            </select>
+                            <span class="modifier">+0</span>
+                        </div>
+                        <div class="attribute-item">
+                            <label>Sabedoria</label>
+                            <select name="wis" required>
+                                <option value="">-</option>
+                            </select>
+                            <span class="modifier">+0</span>
+                        </div>
+                        <div class="attribute-item">
+                            <label>Carisma</label>
+                            <select name="cha" required>
+                                <option value="">-</option>
+                            </select>
+                            <span class="modifier">+0</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 5: Perícias -->
+            <div class="form-step" data-step="5">
+                <h2 class="step-title">🎯 Perícias</h2>
+                <p class="step-description">Escolha as especialidades do seu personagem</p>
+                
+                <div class="skills-info">
+                    <p>Escolha <strong><span id="skillsToChoose">2</span></strong> perícia(s)</p>
+                    <div class="legend">
+                        <span class="legend-item"><span class="box checked"></span> Do antecedente</span>
+                        <span class="legend-item"><span class="box available"></span> Disponível</span>
+                        <span class="legend-item"><span class="box disabled"></span> Não disponível</span>
+                    </div>
+                </div>
+
+                <div class="skills-grid" id="skillsGrid">
+                    <!-- Skills will be populated by JavaScript -->
+                </div>
+            </div>
+
+            <!-- Step 6: Pontos de Vida -->
+            <div class="form-step" data-step="6">
+                <h2 class="step-title">❤️ Pontos de Vida</h2>
+                <p class="step-description">Determine a resistência vital do seu herói</p>
+                
+                <div class="hp-method-selection">
+                    <h3 class="subsection-title">Como deseja calcular seus pontos de vida?</h3>
+                    <div class="method-buttons">
+                        <button type="button" class="method-btn" data-hp-method="average">
+                            <strong>Média</strong>
+                            <span>Valor fixo por nível</span>
+                        </button>
+                        <button type="button" class="method-btn" data-hp-method="roll">
+                            <strong>Rolagem</strong>
+                            <span>Role o dado de vida</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div id="hpCalculation" class="hp-calculation hidden">
+                    <div class="hp-summary">
+                        <h3>Seus Pontos de Vida:</h3>
+                        <div class="hp-display">
+                            <div class="hp-value">
+                                <span id="totalHP">0</span>
+                                <label>Total</label>
+                            </div>
+                        </div>
+                        <div class="hp-breakdown" id="hpBreakdown"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 7: Idiomas e Proficiências -->
+            <div class="form-step" data-step="7">
+                <h2 class="step-title">🗣️ Idiomas e Proficiências</h2>
+                <p class="step-description">Amplie as capacidades do seu personagem</p>
+                
+                <div id="extraChoices" class="extra-choices">
+                    <div class="extra-section" id="languageSection">
+                        <h3>Idiomas Adicionais</h3>
+                        <p>Escolha <strong><span id="languagesToChoose">0</span></strong> idioma(s)</p>
+                        <div class="choices-grid" id="languagesGrid"></div>
+                    </div>
+
+                    <div class="extra-section" id="proficiencySection">
+                        <h3>Proficiências Adicionais</h3>
+                        <p>Escolha <strong><span id="proficienciesToChoose">0</span></strong> proficiência(s)</p>
+                        <div class="choices-grid" id="proficienciesGrid"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 8: Traços de Personalidade -->
+            <div class="form-step" data-step="8">
+                <h2 class="step-title">🎭 Personalidade</h2>
+                <p class="step-description">Defina a essência emocional e moral do seu herói</p>
+                
+                <div class="personality-section">
+                    <div class="personality-category">
+                        <h3>Traços de Personalidade</h3>
+                        <div class="personality-controls">
+                            <button type="button" class="random-btn" data-category="traits">🎲 Sortear</button>
+                            <button type="button" class="choose-btn" data-category="traits">📋 Escolher</button>
+                        </div>
+                        <textarea id="traits" name="traits" rows="3" placeholder="Digite ou sorteie um traço..."></textarea>
+                    </div>
+
+                    <div class="personality-category">
+                        <h3>Ideais</h3>
+                        <div class="personality-controls">
+                            <button type="button" class="random-btn" data-category="ideals">🎲 Sortear</button>
+                            <button type="button" class="choose-btn" data-category="ideals">📋 Escolher</button>
+                        </div>
+                        <textarea id="ideals" name="ideals" rows="3" placeholder="Digite ou sorteie um ideal..."></textarea>
+                    </div>
+
+                    <div class="personality-category">
+                        <h3>Vínculos</h3>
+                        <div class="personality-controls">
+                            <button type="button" class="random-btn" data-category="bonds">🎲 Sortear</button>
+                            <button type="button" class="choose-btn" data-category="bonds">📋 Escolher</button>
+                        </div>
+                        <textarea id="bonds" name="bonds" rows="3" placeholder="Digite ou sorteie um vínculo..."></textarea>
+                    </div>
+
+                    <div class="personality-category">
+                        <h3>Defeitos</h3>
+                        <div class="personality-controls">
+                            <button type="button" class="random-btn" data-category="flaws">🎲 Sortear</button>
+                            <button type="button" class="choose-btn" data-category="flaws">📋 Escolher</button>
+                        </div>
+                        <textarea id="flaws" name="flaws" rows="3" placeholder="Digite ou sorteie um defeito..."></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Navigation Buttons -->
+            <div class="form-navigation">
+                <button type="button" id="prevBtn" class="nav-btn prev-btn" disabled>← Anterior</button>
+                <button type="button" id="nextBtn" class="nav-btn next-btn">Próximo →</button>
+                <button type="submit" id="submitBtn" class="nav-btn submit-btn hidden">Criar Personagem ✓</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Modal de Seleção de Raça -->
+    <div id="raceSelectionModal" class="modal">
+        <div class="modal-content selection-modal">
+            <span class="close">&times;</span>
+            <h2>🏰 Escolha sua Raça</h2>
+            <div class="selection-grid" id="raceSelectionGrid">
+                <!-- Populated by JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Seleção de Classe -->
+    <div id="classSelectionModal" class="modal">
+        <div class="modal-content selection-modal">
+            <span class="close">&times;</span>
+            <h2>⚔️ Escolha sua Classe</h2>
+            <div class="selection-grid" id="classSelectionGrid">
+                <!-- Populated by JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Seleção de Subclasse -->
+    <div id="subclassSelectionModal" class="modal">
+        <div class="modal-content selection-modal">
+            <span class="close">&times;</span>
+            <h2>✨ Escolha sua Subclasse</h2>
+            <div class="selection-grid" id="subclassSelectionGrid">
+                <!-- Populated by JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Seleção de Antecedente -->
+    <div id="backgroundSelectionModal" class="modal">
+        <div class="modal-content selection-modal">
+            <span class="close">&times;</span>
+            <h2>📜 Escolha seu Antecedente</h2>
+            <div class="selection-grid" id="backgroundSelectionGrid">
+                <!-- Populated by JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for Subraces -->
+    <div id="subraceModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2 id="raceTitle">Raça Selecionada</h2>
+            
+            <div class="race-info" id="raceInfo">
+                <!-- Race benefits will be displayed here -->
+            </div>
+
+            <div class="subraces-container" id="subracesContainer">
+                <h3>Sub-raças Disponíveis:</h3>
+                <div id="subracesList"></div>
+            </div>
+
+            <div class="modal-actions">
+                <button type="button" id="keepRaceBtn" class="btn-secondary">Permanecer com a Raça</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for Choosing Personality Traits -->
+    <div id="personalityModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2 id="personalityTitle">Escolher Traço</h2>
+            
+            <div class="personality-list" id="personalityList">
+                <!-- Personality options will be displayed here -->
+            </div>
+        </div>
+    </div>
+
+    <script src="js/character-creation.js"></script>
+</body>
+</html>
