@@ -872,6 +872,7 @@ class CharacterCreation {
         grid.innerHTML = '';
         
         console.log('📋 Classes disponíveis:', this.data.classes);
+        console.log('🔍 Primeira classe (exemplo):', this.data.classes[0]);
         
         if (!this.data.classes || this.data.classes.length === 0) {
             grid.innerHTML = '<p style="color: #d4af37; text-align: center; padding: 40px;">Nenhuma classe disponível. Execute a migração de dados.</p>';
@@ -880,6 +881,7 @@ class CharacterCreation {
         }
         
         this.data.classes.forEach(classData => {
+            console.log('🎴 Criando card para classe:', classData.nome || classData.name, classData);
             const card = this.createSelectionCard(classData, 'class');
             grid.appendChild(card);
         });
@@ -936,9 +938,12 @@ class CharacterCreation {
         let icon = '⚡';
         let stats = '';
         
+        // Suporta múltiplos formatos de nome
+        const itemName = item.nome || item.name || 'Indefinido';
+        
         // CARDS = INFORMAÇÕES SIMPLES E RESUMIDAS
         if (type === 'race') {
-            icon = this.getRaceIcon(item.nome);
+            icon = this.getRaceIcon(itemName);
             
             // Apenas o essencial no card
             let atributos = '';
@@ -975,14 +980,14 @@ class CharacterCreation {
                 ${atributos ? `<div class="selection-card-stat">+${atributos}</div>` : ''}
             `;
         } else if (type === 'class') {
-            icon = this.getClassIcon(item.nome);
+            icon = this.getClassIcon(itemName);
             
             stats = `
                 ${item.hitdice ? `<div class="selection-card-stat">Dado de Vida: ${item.hitdice}</div>` : ''}
                 ${item.atributoprincipal ? `<div class="selection-card-stat">Principal: ${item.atributoprincipal}</div>` : ''}
             `;
         } else if (type === 'background') {
-            icon = this.getBackgroundIcon(item.nome);
+            icon = this.getBackgroundIcon(itemName);
             
             const skills = item.proficiencias?.pericias?.join(', ') || '';
             stats = skills ? `<div class="selection-card-stat">${skills}</div>` : '';
@@ -993,7 +998,7 @@ class CharacterCreation {
 
         card.innerHTML = `
             <div class="selection-card-icon">${icon}</div>
-            <div class="selection-card-title">${item.nome}</div>
+            <div class="selection-card-title">${itemName}</div>
             ${stats ? `<div class="selection-card-stats">${stats}</div>` : ''}
         `;
 
