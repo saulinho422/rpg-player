@@ -69,6 +69,14 @@ class CharacterCreation {
                 flaws: ''
             }
         };
+        
+        // Attribute method system
+        this.attributeMethod = null; // 4d6 or standard
+        this.methodLocked = false; // Cannot change after confirmation
+        this.rolledValues = [];
+        this.standardValues = [15, 14, 13, 12, 10, 8];
+        this.availableValues = [];
+        this.rollsCompleted = 0;
     }
 
     async init() {
@@ -213,10 +221,16 @@ class CharacterCreation {
             });
         });
 
-        // Step 4: Attributes
+        // Step 4: Attributes - Method buttons with confirmation
         document.querySelectorAll('.method-btn[data-method]').forEach(btn => {
-            btn.addEventListener('click', (e) => this.selectAttributeMethod(e.target.closest('.method-btn')));
+            btn.addEventListener('click', () => {
+                if (!this.methodLocked) {
+                    this.showMethodConfirmation(btn.dataset.method);
+                }
+            });
         });
+        document.getElementById('cancelMethodBtn')?.addEventListener('click', () => this.cancelMethodConfirmation());
+        document.getElementById('confirmMethodBtn')?.addEventListener('click', () => this.confirmMethodSelection());
         document.getElementById('rollDiceBtn')?.addEventListener('click', () => this.rollDice());
 
         // Step 5: Skills
@@ -250,22 +264,49 @@ class CharacterCreation {
         document.getElementById('selectClassBtn')?.addEventListener('click', () => this.openClassSelectionModal());
         document.getElementById('selectSubclassBtn')?.addEventListener('click', () => this.openSubclassSelectionModal());
         document.getElementById('selectBackgroundBtn')?.addEventListener('click', () => this.openBackgroundSelectionModal());
+        document.getElementById('selectAlignmentBtn')?.addEventListener('click', () => this.openAlignmentSelectionModal());
     }
 
     // ===== STEP 1: RACE, CLASS, LEVEL =====
     
     populateStep1() {
-        // Populate levels (1-20)
-        const levelSelect = document.getElementById('level');
-        levelSelect.innerHTML = '<option value="">Selecione o nível...</option>';
+        // Populate levels (1-20) as visual grid
+        const levelGrid = document.getElementById('levelSelectionGrid');
+        levelGrid.innerHTML = '';
+        
         for (let i = 1; i <= 20; i++) {
-            const option = document.createElement('option');
-            option.value = i;
-            option.textContent = `Nível ${i}`;
-            levelSelect.appendChild(option);
+            const levelCard = document.createElement('div');
+            levelCard.className = 'level-card';
+            levelCard.dataset.level = i;
+            
+            const levelNumber = document.createElement('div');
+            levelNumber.className = 'level-number';
+            levelNumber.textContent = i;
+            
+            levelCard.appendChild(levelNumber);
+            
+            levelCard.addEventListener('click', () => this.selectLevel(i, levelCard));
+            
+            levelGrid.appendChild(levelCard);
         }
         
         console.log('✅ Step 1 inicializado. Raças:', this.data.races.length, 'Classes:', this.data.classes.length);
+    }
+    
+    selectLevel(level, card) {
+        // Remove previous selection
+        document.querySelectorAll('.level-card').forEach(c => c.classList.remove('selected'));
+        
+        // Add selection to clicked card
+        card.classList.add('selected');
+        
+        // Update hidden input and character data
+        document.getElementById('level').value = level;
+        this.character.level = level;
+        
+        this.saveProgress();
+        
+        console.log('✅ Nível selecionado:', level);
     }
 
     handleRaceChange(e) {
@@ -997,6 +1038,55 @@ class CharacterCreation {
         
         this.data.backgrounds.forEach(background => {
             const card = this.createSelectionCard(background, 'background');
+            grid.appendChild(card);
+        });
+        
+        modal.style.display = 'block';
+    }
+    
+    openAlignmentSelectionModal() {
+        const modal = document.getElementById('alignmentSelectionModal');
+        const grid = document.getElementById('alignmentSelectionGrid');
+        
+        grid.innerHTML = '';
+        
+        // Define as 9 tendências
+        const alignments = [
+            { id: 'leal-bom', name: 'Leal e Bom', icon: '⚖️✨', description: 'Honrado, compassivo e justo', category: 'good' },
+            { id: 'neutro-bom', name: 'Neutro e Bom', icon: '🕊️', description: 'Bondoso, mas pragmático', category: 'good' },
+            { id: 'caotico-bom', name: 'Caótico e Bom', icon: '🦋✨', description: 'Livre, bondoso e rebelde', category: 'good' },
+            
+            { id: 'leal-neutro', name: 'Leal e Neutro', icon: '⚖️', description: 'Seguidor de leis e ordem', category: 'neutral' },
+            { id: 'neutro', name: 'Neutro', icon: '⚖️➖', description: 'Equilibrado e imparcial', category: 'neutral' },
+            { id: 'caotico-neutro', name: 'Caótico e Neutro', icon: '🎲', description: 'Imprevisível e independente', category: 'neutral' },
+            
+            { id: 'leal-mau', name: 'Leal e Mau', icon: '👑🔥', description: 'Tir\u00e2nico e meticuloso', category: 'evil' },
+            { id: 'neutro-mau', name: 'Neutro e Mau', icon: '💀', description: 'Ego\u00edsta e cruel', category: 'evil' },
+            { id: 'caotico-mau', name: 'Caótico e Mau', icon: '😈', description: 'Destrutivo e malicioso', category: 'evil' }
+        ];
+        
+        alignments.forEach(alignment => {
+            const card = document.createElement('div');
+            card.className = `alignment-card ${alignment.category}`;
+            
+            card.innerHTML = `
+                <div class="alignment-icon">${alignment.icon}</div>
+                <div class="alignment-name">${alignment.name}</div>
+                <div class="alignment-description">${alignment.description}</div>
+            `;
+            
+            card.addEventListener('click', () => {
+                // Update selection
+                document.getElementById('alignment').value = alignment.id;
+                document.getElementById('selectedAlignmentLabel').textContent = alignment.name;
+                this.character.alignment = alignment.id;
+                
+                this.saveProgress();
+                this.closeModals();
+                
+                console.log('✅ Tendência selecionada:', alignment.name);
+            });
+            
             grid.appendChild(card);
         });
         
