@@ -1043,10 +1043,13 @@ class CharacterCreation {
             this.enableConfirmSubraceButton();
             
         } else if (type === 'class') {
-            this.character.class = item.nome;
-            document.getElementById('class').value = item.nome;
-            document.getElementById('selectedClassLabel').textContent = item.nome;
+            const className = item.nome || item.name || 'Classe';
+            this.character.class = className;
+            document.getElementById('class').value = className;
+            document.getElementById('selectedClassLabel').textContent = className;
             document.getElementById('selectClassBtn').classList.add('selected');
+            
+            console.log('✅ Classe selecionada:', className);
             
             // Show subclass option if available
             if (item.subclasses && item.subclasses.length > 0) {
@@ -1055,16 +1058,24 @@ class CharacterCreation {
             
             setTimeout(() => this.closeModals(), 300);
         } else if (type === 'subclass') {
-            this.character.subclass = item.nome;
-            document.getElementById('subclass').value = item.nome;
-            document.getElementById('selectedSubclassLabel').textContent = item.nome;
+            const subclassName = item.nome || item.name || 'Subclasse';
+            this.character.subclass = subclassName;
+            document.getElementById('subclass').value = subclassName;
+            document.getElementById('selectedSubclassLabel').textContent = subclassName;
             document.getElementById('selectSubclassBtn').classList.add('selected');
+            
+            console.log('✅ Subclasse selecionada:', subclassName);
+            
             setTimeout(() => this.closeModals(), 300);
         } else if (type === 'background') {
-            this.character.background = item.nome;
-            document.getElementById('background').value = item.nome;
-            document.getElementById('selectedBackgroundLabel').textContent = item.nome;
+            const backgroundName = item.nome || item.name || 'Antecedente';
+            this.character.background = backgroundName;
+            document.getElementById('background').value = backgroundName;
+            document.getElementById('selectedBackgroundLabel').textContent = backgroundName;
             document.getElementById('selectBackgroundBtn').classList.add('selected');
+            
+            console.log('✅ Antecedente selecionado:', backgroundName);
+            
             setTimeout(() => this.closeModals(), 300);
         }
 
@@ -1235,13 +1246,18 @@ class CharacterCreation {
 
     confirmRaceSelection() {
         if (this.tempSelectedRace) {
-            this.character.race = this.tempSelectedRace.nome;
-            document.getElementById('race').value = this.tempSelectedRace.nome;
-            document.getElementById('selectedRaceLabel').textContent = this.tempSelectedRace.nome;
+            const raceName = this.tempSelectedRace.nome || this.tempSelectedRace.name || 'Raça';
+            this.character.race = raceName;
+            document.getElementById('race').value = raceName;
+            document.getElementById('selectedRaceLabel').textContent = raceName;
             document.getElementById('selectRaceBtn').classList.add('selected');
             
+            console.log('✅ Raça confirmada:', raceName);
+            
             if (this.tempSelectedSubrace) {
-                this.character.subrace = this.tempSelectedSubrace.nome;
+                const subraceName = this.tempSelectedSubrace.nome || this.tempSelectedSubrace.name || 'Sub-raça';
+                this.character.subrace = subraceName;
+                console.log('✅ Sub-raça confirmada:', subraceName);
             }
             
             this.closeModals();
@@ -1444,17 +1460,22 @@ class CharacterCreation {
 
     confirmSubraceSelection() {
         if (this.tempSelectedRace) {
-            this.character.race = this.tempSelectedRace.nome;
-            document.getElementById('race').value = this.tempSelectedRace.nome;
+            const raceName = this.tempSelectedRace.nome || this.tempSelectedRace.name || 'Raça';
+            this.character.race = raceName;
+            document.getElementById('race').value = raceName;
             
-            let labelText = this.tempSelectedRace.nome;
+            let labelText = raceName;
             if (this.tempSelectedSubrace) {
-                this.character.subrace = this.tempSelectedSubrace.nome;
-                labelText += ` (${this.tempSelectedSubrace.nome})`;
+                const subraceName = this.tempSelectedSubrace.nome || this.tempSelectedSubrace.name || 'Sub-raça';
+                this.character.subrace = subraceName;
+                labelText += ` (${subraceName})`;
+                console.log('✅ Sub-raça confirmada:', subraceName);
             }
             
             document.getElementById('selectedRaceLabel').textContent = labelText;
             document.getElementById('selectRaceBtn').classList.add('selected');
+            
+            console.log('✅ Raça + Sub-raça confirmadas:', labelText);
             
             this.closeModals();
             this.tempSelectedRace = null;
