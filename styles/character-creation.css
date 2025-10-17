@@ -1076,6 +1076,96 @@ body::before {
     transform: translateY(-3px);
 }
 
+/* =====================================
+   METHOD SELECTION BUTTONS - STEP 4 & 6
+   ===================================== */
+
+.method-selection,
+.hp-method-selection {
+    margin: 30px 0;
+}
+
+.method-buttons {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 25px;
+    margin-top: 20px;
+}
+
+.method-btn {
+    background: linear-gradient(135deg, rgba(15, 52, 96, 0.6) 0%, rgba(22, 33, 62, 0.6) 100%);
+    border: 2px solid rgba(212, 175, 55, 0.4);
+    border-radius: 16px;
+    padding: 30px 25px;
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.method-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.15), transparent);
+    transition: left 0.6s ease;
+}
+
+.method-btn:hover::before {
+    left: 100%;
+}
+
+.method-btn:hover {
+    border-color: #d4af37;
+    background: linear-gradient(135deg, rgba(15, 52, 96, 0.8) 0%, rgba(22, 33, 62, 0.8) 100%);
+    box-shadow: 
+        0 12px 40px rgba(212, 175, 55, 0.4),
+        inset 0 0 30px rgba(212, 175, 55, 0.1);
+    transform: translateY(-5px);
+}
+
+.method-btn.selected {
+    border-color: #d4af37;
+    background: linear-gradient(135deg, rgba(212, 175, 55, 0.25) 0%, rgba(201, 176, 55, 0.25) 100%);
+    box-shadow: 
+        0 0 40px rgba(212, 175, 55, 0.6),
+        inset 0 0 40px rgba(212, 175, 55, 0.2);
+}
+
+.method-icon {
+    font-size: 64px;
+    margin-bottom: 15px;
+    filter: drop-shadow(0 0 15px rgba(212, 175, 55, 0.5));
+    animation: floatIcon 3s ease-in-out infinite;
+}
+
+.method-name {
+    color: #d4af37;
+    font-family: 'Cinzel', serif;
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 10px;
+    text-shadow: 0 0 15px rgba(212, 175, 55, 0.6);
+    letter-spacing: 1px;
+}
+
+.method-description {
+    color: rgba(232, 220, 198, 0.8);
+    font-family: 'Cinzel', serif;
+    font-size: 14px;
+    line-height: 1.6;
+    font-style: italic;
+}
+
 /* Responsive refinements */
 @media (max-width: 768px) {
     .step-title {
