@@ -169,7 +169,7 @@ export class DashboardService {
                     <div class="no-data-icon">👤</div>
                     <h3>Nenhum personagem ainda</h3>
                     <p>Crie seu primeiro personagem para começar suas aventuras!</p>
-                    <button class="btn-primary" onclick="createNewCharacter()">+ Criar Personagem</button>
+                    <button class="btn-primary" onclick="window.location.href='character-creation.html'">+ Criar Personagem</button>
                 </div>
             `
             return
@@ -384,7 +384,7 @@ export class DashboardService {
 // =====================================
 
 window.createNewCharacter = function() {
-    alert('Funcionalidade de criar personagem será implementada em breve!')
+    window.location.href = 'character-creation.html'
 }
 
 window.editCharacter = function(characterId) {
