@@ -1026,7 +1026,26 @@ body::before {
     padding: 10px;
 }
 
-/* Personality controls refinement */
+/* Personality section styles */
+.personality-category {
+    margin-bottom: 30px;
+}
+
+.personality-category h3 {
+    color: #d4af37;
+    font-size: 20px;
+    margin-bottom: 8px;
+    text-shadow: 0 0 15px rgba(212, 175, 55, 0.5);
+}
+
+.category-hint {
+    color: rgba(232, 220, 198, 0.7);
+    font-size: 14px;
+    font-style: italic;
+    margin-bottom: 12px;
+    line-height: 1.5;
+}
+
 .personality-controls {
     display: flex;
     gap: 12px;

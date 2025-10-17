@@ -132,8 +132,8 @@
                 <p class="step-description">Dê vida à aparência do seu herói</p>
                 
                 <div class="form-group">
-                    <label for="characterName">Nome do Personagem</label>
-                    <input type="text" id="characterName" name="characterName" required>
+                    <label for="characterName">✨ Nome do Personagem</label>
+                    <input type="text" id="characterName" name="characterName" required placeholder="Digite o nome do seu herói...">
                 </div>
 
                 <div class="form-group">
@@ -158,31 +158,31 @@
 
                 <div class="form-row">
                     <div class="form-group">
-                        <label for="eyes">Olhos</label>
-                        <input type="text" id="eyes" name="eyes">
+                        <label for="eyes">👁️ Olhos</label>
+                        <input type="text" id="eyes" name="eyes" placeholder="ex: Azuis profundos">
                     </div>
                     <div class="form-group">
-                        <label for="skin">Pele</label>
-                        <input type="text" id="skin" name="skin">
+                        <label for="skin">🎨 Pele</label>
+                        <input type="text" id="skin" name="skin" placeholder="ex: Morena clara">
                     </div>
                     <div class="form-group">
-                        <label for="hair">Cabelo</label>
-                        <input type="text" id="hair" name="hair">
+                        <label for="hair">💇 Cabelo</label>
+                        <input type="text" id="hair" name="hair" placeholder="ex: Castanho longo">
                     </div>
                 </div>
 
                 <div class="form-row">
                     <div class="form-group">
-                        <label for="weight">Peso</label>
+                        <label for="weight">⚖️ Peso</label>
                         <input type="text" id="weight" name="weight" placeholder="ex: 70 kg">
                     </div>
                     <div class="form-group">
-                        <label for="height">Altura</label>
+                        <label for="height">📏 Altura</label>
                         <input type="text" id="height" name="height" placeholder="ex: 1,75 m">
                     </div>
                     <div class="form-group">
-                        <label for="age">Idade</label>
-                        <input type="number" id="age" name="age" min="1">
+                        <label for="age">🎂 Idade</label>
+                        <input type="number" id="age" name="age" min="1" placeholder="ex: 25">
                     </div>
                 </div>
             </div>
@@ -193,15 +193,17 @@
                 <p class="step-description">Determine as capacidades fundamentais do seu herói</p>
                 
                 <div class="method-selection">
-                    <h3 class="subsection-title">Escolha o método de geração:</h3>
+                    <h3 class="subsection-title">⚡ Escolha o método de geração:</h3>
                     <div class="method-buttons">
                         <button type="button" class="method-btn" data-method="4d6">
-                            <strong>4d6</strong>
-                            <span>Role 4 dados e descarte o menor</span>
+                            <div class="method-icon">🎲</div>
+                            <div class="method-name">4d6 - Drop Lowest</div>
+                            <div class="method-description">Role 4 dados e descarte o menor resultado</div>
                         </button>
                         <button type="button" class="method-btn" data-method="standard">
-                            <strong>Valores Padrão</strong>
-                            <span>Use: 15, 14, 13, 12, 10, 8</span>
+                            <div class="method-icon">📊</div>
+                            <div class="method-name">Valores Padrão</div>
+                            <div class="method-description">Use: 15, 14, 13, 12, 10, 8</div>
                         </button>
                     </div>
                 </div>
@@ -227,45 +229,45 @@
                 </div>
 
                 <div id="attributeAssignment" class="attribute-assignment hidden">
-                    <h3>Distribua os valores nos atributos:</h3>
+                    <h3>⚔️ Distribua os valores nos atributos:</h3>
                     <div class="attributes-grid">
                         <div class="attribute-item">
-                            <label>Força</label>
+                            <label>💪 Força</label>
                             <select name="str" required>
                                 <option value="">-</option>
                             </select>
                             <span class="modifier">+0</span>
                         </div>
                         <div class="attribute-item">
-                            <label>Destreza</label>
+                            <label>🏹 Destreza</label>
                             <select name="dex" required>
                                 <option value="">-</option>
                             </select>
                             <span class="modifier">+0</span>
                         </div>
                         <div class="attribute-item">
-                            <label>Constituição</label>
+                            <label>❤️ Constituição</label>
                             <select name="con" required>
                                 <option value="">-</option>
                             </select>
                             <span class="modifier">+0</span>
                         </div>
                         <div class="attribute-item">
-                            <label>Inteligência</label>
+                            <label>🧠 Inteligência</label>
                             <select name="int" required>
                                 <option value="">-</option>
                             </select>
                             <span class="modifier">+0</span>
                         </div>
                         <div class="attribute-item">
-                            <label>Sabedoria</label>
+                            <label>🦉 Sabedoria</label>
                             <select name="wis" required>
                                 <option value="">-</option>
                             </select>
                             <span class="modifier">+0</span>
                         </div>
                         <div class="attribute-item">
-                            <label>Carisma</label>
+                            <label>✨ Carisma</label>
                             <select name="cha" required>
                                 <option value="">-</option>
                             </select>
@@ -300,15 +302,17 @@
                 <p class="step-description">Determine a resistência vital do seu herói</p>
                 
                 <div class="hp-method-selection">
-                    <h3 class="subsection-title">Como deseja calcular seus pontos de vida?</h3>
+                    <h3 class="subsection-title">⚡ Como deseja calcular seus pontos de vida?</h3>
                     <div class="method-buttons">
                         <button type="button" class="method-btn" data-hp-method="average">
-                            <strong>Média</strong>
-                            <span>Valor fixo por nível</span>
+                            <div class="method-icon">📊</div>
+                            <div class="method-name">Valor Médio</div>
+                            <div class="method-description">Valor fixo e consistente por nível</div>
                         </button>
                         <button type="button" class="method-btn" data-hp-method="roll">
-                            <strong>Rolagem</strong>
-                            <span>Role o dado de vida</span>
+                            <div class="method-icon">🎲</div>
+                            <div class="method-name">Rolagem de Dados</div>
+                            <div class="method-description">Role o dado de vida para cada nível</div>
                         </button>
                     </div>
                 </div>
@@ -334,14 +338,14 @@
                 
                 <div id="extraChoices" class="extra-choices">
                     <div class="extra-section" id="languageSection">
-                        <h3>Idiomas Adicionais</h3>
-                        <p>Escolha <strong><span id="languagesToChoose">0</span></strong> idioma(s)</p>
+                        <h3>🌍 Idiomas Adicionais</h3>
+                        <p>Escolha <strong><span id="languagesToChoose">0</span></strong> idioma(s) adicional(is)</p>
                         <div class="choices-grid" id="languagesGrid"></div>
                     </div>
 
                     <div class="extra-section" id="proficiencySection">
-                        <h3>Proficiências Adicionais</h3>
-                        <p>Escolha <strong><span id="proficienciesToChoose">0</span></strong> proficiência(s)</p>
+                        <h3>🛠️ Proficiências Adicionais</h3>
+                        <p>Escolha <strong><span id="proficienciesToChoose">0</span></strong> proficiência(s) adicional(is)</p>
                         <div class="choices-grid" id="proficienciesGrid"></div>
                     </div>
                 </div>
@@ -354,37 +358,41 @@
                 
                 <div class="personality-section">
                     <div class="personality-category">
-                        <h3>Traços de Personalidade</h3>
+                        <h3>✨ Traços de Personalidade</h3>
+                        <p class="category-hint">Características marcantes que definem o comportamento do seu personagem</p>
                         <div class="personality-controls">
                             <button type="button" class="random-btn" data-category="traits">🎲 Sortear</button>
-                            <button type="button" class="choose-btn" data-category="traits">📋 Escolher</button>
+                            <button type="button" class="choose-btn" data-category="traits">📋 Escolher da Lista</button>
                         </div>
-                        <textarea id="traits" name="traits" rows="3" placeholder="Digite ou sorteie um traço..."></textarea>
+                        <textarea id="traits" name="traits" rows="3" placeholder="Digite ou sorteie traços de personalidade..."></textarea>
                     </div>
 
                     <div class="personality-category">
-                        <h3>Ideais</h3>
+                        <h3>⚖️ Ideais</h3>
+                        <p class="category-hint">Os valores e princípios que guiam suas ações e decisões</p>
                         <div class="personality-controls">
                             <button type="button" class="random-btn" data-category="ideals">🎲 Sortear</button>
-                            <button type="button" class="choose-btn" data-category="ideals">📋 Escolher</button>
+                            <button type="button" class="choose-btn" data-category="ideals">📋 Escolher da Lista</button>
                         </div>
                         <textarea id="ideals" name="ideals" rows="3" placeholder="Digite ou sorteie um ideal..."></textarea>
                     </div>
 
                     <div class="personality-category">
-                        <h3>Vínculos</h3>
+                        <h3>🔗 Vínculos</h3>
+                        <p class="category-hint">Conexões pessoais, pessoas, lugares ou eventos importantes</p>
                         <div class="personality-controls">
                             <button type="button" class="random-btn" data-category="bonds">🎲 Sortear</button>
-                            <button type="button" class="choose-btn" data-category="bonds">📋 Escolher</button>
+                            <button type="button" class="choose-btn" data-category="bonds">📋 Escolher da Lista</button>
                         </div>
                         <textarea id="bonds" name="bonds" rows="3" placeholder="Digite ou sorteie um vínculo..."></textarea>
                     </div>
 
                     <div class="personality-category">
-                        <h3>Defeitos</h3>
+                        <h3>⚠️ Defeitos</h3>
+                        <p class="category-hint">Fraquezas, medos ou falhas que tornam seu personagem humano</p>
                         <div class="personality-controls">
                             <button type="button" class="random-btn" data-category="flaws">🎲 Sortear</button>
-                            <button type="button" class="choose-btn" data-category="flaws">📋 Escolher</button>
+                            <button type="button" class="choose-btn" data-category="flaws">📋 Escolher da Lista</button>
                         </div>
                         <textarea id="flaws" name="flaws" rows="3" placeholder="Digite ou sorteie um defeito..."></textarea>
                     </div>
