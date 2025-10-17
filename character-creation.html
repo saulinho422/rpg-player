@@ -88,10 +88,11 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="level">📊 Nível</label>
-                    <select id="level" name="level" required>
-                        <option value="">Selecione o nível...</option>
-                    </select>
+                    <label>📊 Nível</label>
+                    <div class="level-selection-grid" id="levelSelectionGrid">
+                        <!-- Levels 1-20 will be populated by JavaScript -->
+                    </div>
+                    <input type="hidden" id="level" name="level" required>
                 </div>
             </div>
 
@@ -101,19 +102,12 @@
                 <p class="step-description">Defina sua moralidade e passado</p>
                 
                 <div class="form-group">
-                    <label for="alignment">⚖️ Tendência</label>
-                    <select id="alignment" name="alignment" required>
-                        <option value="">Selecione uma tendência...</option>
-                        <option value="leal-bom">Leal e Bom</option>
-                        <option value="neutro-bom">Neutro e Bom</option>
-                        <option value="caotico-bom">Caótico e Bom</option>
-                        <option value="leal-neutro">Leal e Neutro</option>
-                        <option value="neutro">Neutro</option>
-                        <option value="caotico-neutro">Caótico e Neutro</option>
-                        <option value="leal-mau">Leal e Mau</option>
-                        <option value="neutro-mau">Neutro e Mau</option>
-                        <option value="caotico-mau">Caótico e Mau</option>
-                    </select>
+                    <label>⚖️ Tendência</label>
+                    <button type="button" class="selection-btn" id="selectAlignmentBtn">
+                        <span class="selection-label" id="selectedAlignmentLabel">Selecione uma tendência...</span>
+                        <span class="selection-icon">▼</span>
+                    </button>
+                    <input type="hidden" id="alignment" name="alignment" required>
                 </div>
 
                 <div class="form-group">
@@ -209,69 +203,161 @@
                 </div>
 
                 <div id="diceRolling" class="dice-rolling hidden">
-                    <div class="rolls-remaining">
-                        Rolagens restantes: <span id="rollsLeft">6</span>
+                    <div class="dice-roll-header">
+                        <h3>🎲 Rolagem de Dados</h3>
+                        <div class="rolls-counter">
+                            <span class="counter-label">Rolagens:</span>
+                            <span class="counter-value"><span id="rollsCompleted">0</span> / 6</span>
+                        </div>
                     </div>
                     
-                    <div class="dice-container">
-                        <div class="die" id="die1">?</div>
-                        <div class="die" id="die2">?</div>
-                        <div class="die" id="die3">?</div>
-                        <div class="die" id="die4">?</div>
+                    <div class="dice-animation-container">
+                        <div class="dice-3d-container">
+                            <div class="dice-3d" id="dice3d-1">
+                                <div class="dice-face dice-front">1</div>
+                                <div class="dice-face dice-back">6</div>
+                                <div class="dice-face dice-right">3</div>
+                                <div class="dice-face dice-left">4</div>
+                                <div class="dice-face dice-top">5</div>
+                                <div class="dice-face dice-bottom">2</div>
+                            </div>
+                            <div class="dice-3d" id="dice3d-2">
+                                <div class="dice-face dice-front">1</div>
+                                <div class="dice-face dice-back">6</div>
+                                <div class="dice-face dice-right">3</div>
+                                <div class="dice-face dice-left">4</div>
+                                <div class="dice-face dice-top">5</div>
+                                <div class="dice-face dice-bottom">2</div>
+                            </div>
+                            <div class="dice-3d" id="dice3d-3">
+                                <div class="dice-face dice-front">1</div>
+                                <div class="dice-face dice-back">6</div>
+                                <div class="dice-face dice-right">3</div>
+                                <div class="dice-face dice-left">4</div>
+                                <div class="dice-face dice-top">5</div>
+                                <div class="dice-face dice-bottom">2</div>
+                            </div>
+                            <div class="dice-3d" id="dice3d-4">
+                                <div class="dice-face dice-front">1</div>
+                                <div class="dice-face dice-back">6</div>
+                                <div class="dice-face dice-right">3</div>
+                                <div class="dice-face dice-left">4</div>
+                                <div class="dice-face dice-top">5</div>
+                                <div class="dice-face dice-bottom">2</div>
+                            </div>
+                        </div>
+                        
+                        <div class="dice-results-display hidden" id="diceResultsDisplay">
+                            <div class="result-values">
+                                <div class="result-value" id="result-1">?</div>
+                                <div class="result-value" id="result-2">?</div>
+                                <div class="result-value" id="result-3">?</div>
+                                <div class="result-value lowest" id="result-4">?</div>
+                            </div>
+                            <div class="result-summary">
+                                <span class="summary-label">Total (sem o menor):</span>
+                                <span class="summary-value" id="rollTotal">0</span>
+                            </div>
+                        </div>
                     </div>
                     
-                    <button type="button" id="rollDiceBtn" class="roll-btn">Rolar Dados</button>
+                    <button type="button" id="rollDiceBtn" class="roll-btn">
+                        <span class="btn-icon">🎲</span>
+                        <span class="btn-text">Rolar Dados</span>
+                    </button>
                     
-                    <div class="rolled-values">
-                        <h4>Valores Rolados:</h4>
-                        <div id="rolledValuesList"></div>
+                    <div class="rolled-values-pool">
+                        <h4>📊 Valores Disponíveis:</h4>
+                        <div class="values-pool" id="valuesPool">
+                            <!-- Rolled values will appear here as draggable items -->
+                        </div>
+                    </div>
+                </div>
+
+                <div id="standardArray" class="standard-array hidden">
+                    <div class="standard-header">
+                        <h3>📊 Valores Padrão</h3>
+                        <p>Arraste os valores para os atributos correspondentes</p>
+                    </div>
+                    <div class="values-pool" id="standardValuesPool">
+                        <!-- Standard array values: 15, 14, 13, 12, 10, 8 -->
                     </div>
                 </div>
 
                 <div id="attributeAssignment" class="attribute-assignment hidden">
                     <h3>⚔️ Distribua os valores nos atributos:</h3>
-                    <div class="attributes-grid">
-                        <div class="attribute-item">
-                            <label>💪 Força</label>
-                            <select name="str" required>
-                                <option value="">-</option>
-                            </select>
-                            <span class="modifier">+0</span>
+                    <p class="drag-instruction">Arraste os valores da pool acima para cada atributo</p>
+                    <div class="attributes-drag-grid">
+                        <div class="attribute-drop-zone" data-attribute="str">
+                            <div class="attribute-label">
+                                <span class="attr-icon">💪</span>
+                                <span class="attr-name">Força</span>
+                            </div>
+                            <div class="attribute-value-slot" id="slot-str">
+                                <span class="slot-placeholder">Arraste aqui</span>
+                                <span class="slot-value hidden"></span>
+                            </div>
+                            <div class="attribute-modifier" id="mod-str">+0</div>
                         </div>
-                        <div class="attribute-item">
-                            <label>🏹 Destreza</label>
-                            <select name="dex" required>
-                                <option value="">-</option>
-                            </select>
-                            <span class="modifier">+0</span>
+                        
+                        <div class="attribute-drop-zone" data-attribute="dex">
+                            <div class="attribute-label">
+                                <span class="attr-icon">🏹</span>
+                                <span class="attr-name">Destreza</span>
+                            </div>
+                            <div class="attribute-value-slot" id="slot-dex">
+                                <span class="slot-placeholder">Arraste aqui</span>
+                                <span class="slot-value hidden"></span>
+                            </div>
+                            <div class="attribute-modifier" id="mod-dex">+0</div>
                         </div>
-                        <div class="attribute-item">
-                            <label>❤️ Constituição</label>
-                            <select name="con" required>
-                                <option value="">-</option>
-                            </select>
-                            <span class="modifier">+0</span>
+                        
+                        <div class="attribute-drop-zone" data-attribute="con">
+                            <div class="attribute-label">
+                                <span class="attr-icon">❤️</span>
+                                <span class="attr-name">Constituição</span>
+                            </div>
+                            <div class="attribute-value-slot" id="slot-con">
+                                <span class="slot-placeholder">Arraste aqui</span>
+                                <span class="slot-value hidden"></span>
+                            </div>
+                            <div class="attribute-modifier" id="mod-con">+0</div>
                         </div>
-                        <div class="attribute-item">
-                            <label>🧠 Inteligência</label>
-                            <select name="int" required>
-                                <option value="">-</option>
-                            </select>
-                            <span class="modifier">+0</span>
+                        
+                        <div class="attribute-drop-zone" data-attribute="int">
+                            <div class="attribute-label">
+                                <span class="attr-icon">🧠</span>
+                                <span class="attr-name">Inteligência</span>
+                            </div>
+                            <div class="attribute-value-slot" id="slot-int">
+                                <span class="slot-placeholder">Arraste aqui</span>
+                                <span class="slot-value hidden"></span>
+                            </div>
+                            <div class="attribute-modifier" id="mod-int">+0</div>
                         </div>
-                        <div class="attribute-item">
-                            <label>🦉 Sabedoria</label>
-                            <select name="wis" required>
-                                <option value="">-</option>
-                            </select>
-                            <span class="modifier">+0</span>
+                        
+                        <div class="attribute-drop-zone" data-attribute="wis">
+                            <div class="attribute-label">
+                                <span class="attr-icon">🦉</span>
+                                <span class="attr-name">Sabedoria</span>
+                            </div>
+                            <div class="attribute-value-slot" id="slot-wis">
+                                <span class="slot-placeholder">Arraste aqui</span>
+                                <span class="slot-value hidden"></span>
+                            </div>
+                            <div class="attribute-modifier" id="mod-wis">+0</div>
                         </div>
-                        <div class="attribute-item">
-                            <label>✨ Carisma</label>
-                            <select name="cha" required>
-                                <option value="">-</option>
-                            </select>
-                            <span class="modifier">+0</span>
+                        
+                        <div class="attribute-drop-zone" data-attribute="cha">
+                            <div class="attribute-label">
+                                <span class="attr-icon">✨</span>
+                                <span class="attr-name">Carisma</span>
+                            </div>
+                            <div class="attribute-value-slot" id="slot-cha">
+                                <span class="slot-placeholder">Arraste aqui</span>
+                                <span class="slot-value hidden"></span>
+                            </div>
+                            <div class="attribute-modifier" id="mod-cha">+0</div>
                         </div>
                     </div>
                 </div>
@@ -448,6 +534,34 @@
             <h2>📜 Escolha seu Antecedente</h2>
             <div class="selection-grid" id="backgroundSelectionGrid">
                 <!-- Populated by JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Seleção de Tendência -->
+    <div id="alignmentSelectionModal" class="modal">
+        <div class="modal-content selection-modal alignment-modal">
+            <span class="close">&times;</span>
+            <h2>⚖️ Escolha sua Tendência</h2>
+            <p class="modal-subtitle">Defina o alinhamento moral e ético do seu personagem</p>
+            <div class="alignment-grid" id="alignmentSelectionGrid">
+                <!-- Populated by JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Confirmação de Método -->
+    <div id="methodConfirmModal" class="modal">
+        <div class="modal-content confirm-modal">
+            <h2>⚠️ Confirmação de Método</h2>
+            <div class="confirm-message">
+                <p>Você tem certeza que deseja usar o método:</p>
+                <div class="method-display" id="selectedMethodDisplay"></div>
+                <p class="warning-text">⚠️ Após confirmar, você NÃO poderá mudar de método!</p>
+            </div>
+            <div class="confirm-actions">
+                <button type="button" class="btn-cancel-confirm" id="cancelMethodBtn">❌ Cancelar</button>
+                <button type="button" class="btn-confirm-method" id="confirmMethodBtn">✅ Confirmar</button>
             </div>
         </div>
     </div>
