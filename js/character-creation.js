@@ -1246,7 +1246,13 @@ class CharacterCreation {
     }
 
     openSubraceModal() {
-        if (!this.tempSelectedRace) return;
+        console.log('🎭 Abrindo modal de sub-raças...');
+        console.log('Raça temporária:', this.tempSelectedRace);
+        
+        if (!this.tempSelectedRace) {
+            console.error('❌ Nenhuma raça selecionada!');
+            return;
+        }
         
         // Esconde o modal de raças
         document.getElementById('raceSelectionModal').style.display = 'none';
@@ -1256,6 +1262,8 @@ class CharacterCreation {
         const grid = document.getElementById('subraceSelectionGrid');
         
         grid.innerHTML = '';
+        
+        console.log('Sub-raças disponíveis:', this.tempSelectedRace.subracas);
         
         this.tempSelectedRace.subracas.forEach(subrace => {
             const card = this.createSelectionCard(subrace, 'subrace');
@@ -1269,6 +1277,7 @@ class CharacterCreation {
         this.addSubraceModalActions();
         
         modal.style.display = 'block';
+        console.log('✅ Modal de sub-raças aberto');
     }
 
     showRaceInfoInSubraceModal(race) {
@@ -1567,4 +1576,6 @@ class CharacterCreation {
 let characterCreation; // Variável global para acesso aos métodos
 document.addEventListener('DOMContentLoaded', () => {
     characterCreation = new CharacterCreation();
+    window.characterCreation = characterCreation; // Garante acesso global
+    console.log('✅ CharacterCreation inicializado', characterCreation);
 });
