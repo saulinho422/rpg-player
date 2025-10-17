@@ -320,6 +320,147 @@ body::before {
 }
 
 /* =====================================
+   IMAGE UPLOAD - PREVIEW ÉPICO
+   ===================================== */
+
+.image-upload-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    align-items: center;
+}
+
+.image-preview-wrapper {
+    width: 280px;
+    height: 280px;
+    border-radius: 20px;
+    border: 3px solid rgba(212, 175, 55, 0.4);
+    background: linear-gradient(135deg, rgba(15, 52, 96, 0.4) 0%, rgba(22, 33, 62, 0.4) 100%);
+    position: relative;
+    overflow: hidden;
+    backdrop-filter: blur(10px);
+    box-shadow: 
+        0 8px 32px rgba(0, 0, 0, 0.4),
+        inset 0 0 40px rgba(212, 175, 55, 0.1);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.image-preview-wrapper:hover {
+    border-color: #d4af37;
+    box-shadow: 
+        0 12px 48px rgba(212, 175, 55, 0.3),
+        inset 0 0 60px rgba(212, 175, 55, 0.15);
+    transform: translateY(-4px);
+}
+
+.image-preview-wrapper::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(212, 175, 55, 0.1) 0%, transparent 70%);
+    animation: rotateGlow 8s linear infinite;
+    pointer-events: none;
+}
+
+@keyframes rotateGlow {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.image-placeholder {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    color: rgba(212, 175, 55, 0.6);
+    pointer-events: none;
+}
+
+.placeholder-icon {
+    font-size: 80px;
+    display: block;
+    margin-bottom: 15px;
+    filter: drop-shadow(0 0 20px rgba(212, 175, 55, 0.4));
+    animation: floatIcon 3s ease-in-out infinite;
+}
+
+@keyframes floatIcon {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+}
+
+.placeholder-text {
+    font-size: 14px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.character-image-preview {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 17px;
+}
+
+.btn-remove-image {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: rgba(220, 38, 38, 0.9);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    color: white;
+    font-size: 20px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(10px);
+    z-index: 10;
+}
+
+.btn-remove-image:hover {
+    background: rgba(220, 38, 38, 1);
+    transform: scale(1.1);
+    box-shadow: 0 0 20px rgba(220, 38, 38, 0.6);
+}
+
+.btn-upload-image {
+    padding: 15px 35px;
+    background: linear-gradient(135deg, #d4af37 0%, #f4d03f 100%);
+    border: none;
+    border-radius: 12px;
+    color: #1a1a2e;
+    font-family: 'Cinzel', serif;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    box-shadow: 0 6px 20px rgba(212, 175, 55, 0.4);
+}
+
+.btn-upload-image:hover {
+    background: linear-gradient(135deg, #f4d03f 0%, #d4af37 100%);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 30px rgba(212, 175, 55, 0.6);
+}
+
+.btn-upload-image:active {
+    transform: translateY(-1px);
+}
+
+/* =====================================
    SELECTION BUTTONS (replaces dropdowns)
    ===================================== */
 
@@ -1869,5 +2010,443 @@ body::before {
         0 6px 20px rgba(212, 175, 55, 0.5),
         inset 0 1px 0 rgba(255, 255, 255, 0.3);
 }
+
+/* =====================================
+   RESPONSIVIDADE MÓVEL COMPLETA
+   Layout reorganizado para telas pequenas
+   ===================================== */
+
+@media (max-width: 768px) {
+    /* Container principal */
+    .creation-container {
+        padding: 0;
+    }
+    
+    /* Progress Bar - Versão compacta */
+    .progress-bar {
+        padding: 20px 10px;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    .progress-step {
+        min-width: 90px;
+        padding: 0 8px;
+    }
+    
+    .progress-icon {
+        width: 45px;
+        height: 45px;
+        font-size: 20px;
+    }
+    
+    .progress-label {
+        font-size: 10px;
+        margin-top: 8px;
+    }
+    
+    .progress-step:not(:last-child)::after {
+        display: none; /* Remove connecting lines on mobile */
+    }
+    
+    /* Form Container */
+    .form-container {
+        padding: 20px 15px;
+    }
+    
+    .form-card {
+        padding: 25px 20px;
+        border-radius: 15px;
+    }
+    
+    /* Step titles */
+    .step-title {
+        font-size: 24px;
+        margin-bottom: 10px;
+    }
+    
+    .step-description {
+        font-size: 14px;
+        margin-bottom: 25px;
+    }
+    
+    /* Form groups */
+    .form-group {
+        margin-bottom: 25px;
+    }
+    
+    .form-group label {
+        font-size: 15px;
+        margin-bottom: 10px;
+    }
+    
+    .form-group select,
+    .form-group input[type="text"],
+    .form-group input[type="number"],
+    .form-group textarea {
+        padding: 14px 16px;
+        font-size: 16px; /* Prevent zoom on iOS */
+    }
+    
+    /* Form rows - Stack vertically on mobile */
+    .form-row {
+        flex-direction: column;
+        gap: 0;
+    }
+    
+    .form-row .form-group {
+        width: 100%;
+    }
+    
+    /* Selection buttons */
+    .selection-btn {
+        padding: 14px 18px;
+        font-size: 15px;
+    }
+    
+    .selection-label {
+        font-size: 15px;
+    }
+    
+    /* Image upload - Smaller on mobile */
+    .image-preview-wrapper {
+        width: 220px;
+        height: 220px;
+    }
+    
+    .placeholder-icon {
+        font-size: 60px;
+        margin-bottom: 10px;
+    }
+    
+    .placeholder-text {
+        font-size: 12px;
+    }
+    
+    .btn-upload-image {
+        padding: 12px 28px;
+        font-size: 14px;
+    }
+    
+    .btn-remove-image {
+        width: 35px;
+        height: 35px;
+        font-size: 18px;
+    }
+    
+    /* Navigation buttons - Fixed at bottom */
+    .form-navigation {
+        position: sticky;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: linear-gradient(135deg, rgba(26, 26, 46, 0.98), rgba(22, 33, 62, 0.98));
+        padding: 15px;
+        margin: 0 -15px -20px -15px;
+        border-top: 2px solid rgba(212, 175, 55, 0.3);
+        box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.5);
+        z-index: 100;
+    }
+    
+    .btn-nav,
+    .btn-submit {
+        padding: 14px 25px;
+        font-size: 15px;
+        min-height: 48px; /* Touch-friendly size */
+    }
+    
+    /* Modals - Fullscreen on mobile */
+    .selection-modal,
+    .modal {
+        width: 100% !important;
+        max-width: 100% !important;
+        height: 100vh !important;
+        max-height: 100vh !important;
+        margin: 0 !important;
+        border-radius: 0 !important;
+        top: 0 !important;
+        left: 0 !important;
+        transform: none !important;
+    }
+    
+    .modal-header {
+        padding: 20px 15px;
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        background: linear-gradient(135deg, rgba(26, 26, 46, 0.98), rgba(22, 33, 62, 0.98));
+        backdrop-filter: blur(15px);
+    }
+    
+    .modal-title {
+        font-size: 22px;
+    }
+    
+    .close-modal {
+        width: 40px;
+        height: 40px;
+        font-size: 28px;
+    }
+    
+    .modal-body {
+        padding: 15px;
+        max-height: calc(100vh - 200px);
+    }
+    
+    /* Selection grid - 1 column on mobile */
+    .selection-grid {
+        grid-template-columns: 1fr !important;
+        gap: 15px;
+        padding: 15px;
+    }
+    
+    .selection-card {
+        padding: 18px;
+    }
+    
+    .selection-card-icon {
+        font-size: 36px;
+        margin-bottom: 10px;
+    }
+    
+    .selection-card-title {
+        font-size: 18px;
+        margin-bottom: 8px;
+    }
+    
+    .card-info {
+        font-size: 13px;
+    }
+    
+    .card-info-item {
+        font-size: 12px;
+    }
+    
+    /* Race/Class info display */
+    .race-info-display,
+    .subrace-info-display {
+        padding: 18px;
+        margin-bottom: 20px;
+        max-height: calc(100vh - 400px);
+    }
+    
+    .info-header h3 {
+        font-size: 22px;
+    }
+    
+    .info-header h4 {
+        font-size: 18px;
+    }
+    
+    .info-description {
+        font-size: 13px;
+    }
+    
+    .info-section {
+        padding: 12px;
+    }
+    
+    .info-section h4 {
+        font-size: 15px;
+    }
+    
+    .info-value {
+        font-size: 14px;
+    }
+    
+    .info-list li {
+        font-size: 13px;
+    }
+    
+    /* Modal actions - Stack on mobile if needed */
+    .modal-actions-bottom {
+        position: sticky;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        padding: 15px;
+        margin: 0 -15px -15px -15px;
+        background: linear-gradient(135deg, rgba(26, 26, 46, 0.98), rgba(22, 33, 62, 0.98));
+        border-top: 2px solid rgba(212, 175, 55, 0.3);
+        box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.5);
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+    
+    .btn-cancel,
+    .btn-confirm,
+    .btn-subrace {
+        padding: 12px 24px;
+        font-size: 14px;
+        min-height: 48px; /* Touch-friendly */
+        flex: 1;
+        min-width: 140px;
+    }
+    
+    /* Attribute allocation */
+    .method-selection {
+        gap: 15px;
+    }
+    
+    .method-btn {
+        padding: 20px 15px;
+    }
+    
+    .method-icon {
+        font-size: 36px;
+        margin-bottom: 10px;
+    }
+    
+    .method-name {
+        font-size: 16px;
+    }
+    
+    .method-description {
+        font-size: 12px;
+    }
+    
+    /* Dice rolling section */
+    .dice-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+    }
+    
+    .dice-result {
+        padding: 12px;
+        font-size: 16px;
+    }
+    
+    /* Attribute fields */
+    .attributes-grid {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+    
+    .attribute-field {
+        padding: 15px;
+    }
+    
+    .attribute-label {
+        font-size: 16px;
+    }
+    
+    .attribute-input {
+        font-size: 20px;
+        padding: 10px;
+    }
+    
+    /* Skills section */
+    .skills-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+    
+    .skill-checkbox {
+        padding: 12px 15px;
+    }
+    
+    /* HP section */
+    .hp-display {
+        padding: 20px;
+    }
+    
+    .hp-value {
+        font-size: 36px;
+    }
+    
+    /* Character summary */
+    .summary-section {
+        padding: 18px;
+    }
+    
+    .summary-item {
+        padding: 12px;
+    }
+    
+    .summary-label {
+        font-size: 13px;
+    }
+    
+    .summary-value {
+        font-size: 15px;
+    }
+}
+
+/* Landscape mode on phones */
+@media (max-width: 768px) and (orientation: landscape) {
+    .progress-bar {
+        padding: 15px 10px;
+    }
+    
+    .progress-icon {
+        width: 40px;
+        height: 40px;
+        font-size: 18px;
+    }
+    
+    .progress-label {
+        font-size: 9px;
+    }
+    
+    .form-container {
+        padding: 15px;
+    }
+    
+    .modal-body {
+        max-height: calc(100vh - 150px);
+    }
+}
+
+/* Very small screens (iPhone SE, etc) */
+@media (max-width: 380px) {
+    .step-title {
+        font-size: 20px;
+    }
+    
+    .step-description {
+        font-size: 13px;
+    }
+    
+    .form-group label {
+        font-size: 14px;
+    }
+    
+    .form-group select,
+    .form-group input,
+    .form-group textarea {
+        padding: 12px 14px;
+        font-size: 15px;
+    }
+    
+    .image-preview-wrapper {
+        width: 180px;
+        height: 180px;
+    }
+    
+    .placeholder-icon {
+        font-size: 50px;
+    }
+    
+    .btn-upload-image {
+        padding: 10px 24px;
+        font-size: 13px;
+    }
+    
+    .selection-card-title {
+        font-size: 16px;
+    }
+    
+    .modal-title {
+        font-size: 19px;
+    }
+    
+    .btn-cancel,
+    .btn-confirm,
+    .btn-subrace {
+        padding: 10px 20px;
+        font-size: 13px;
+    }
+}
+
 
 

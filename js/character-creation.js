@@ -198,7 +198,13 @@ class CharacterCreation {
             this.character.name = e.target.value;
             this.saveProgress();
         });
+        
+        // Image upload handlers
+        document.getElementById('uploadImageBtn').addEventListener('click', () => {
+            document.getElementById('characterImage').click();
+        });
         document.getElementById('characterImage').addEventListener('change', (e) => this.handleImageUpload(e));
+        document.getElementById('removeImageBtn').addEventListener('click', () => this.removeCharacterImage());
         
         ['eyes', 'skin', 'hair', 'weight', 'height', 'age'].forEach(field => {
             document.getElementById(field).addEventListener('input', (e) => {
@@ -828,15 +834,57 @@ class CharacterCreation {
     handleImageUpload(e) {
         const file = e.target.files[0];
         if (file) {
+            // Validate file type
+            if (!file.type.startsWith('image/')) {
+                alert('Por favor, selecione um arquivo de imagem válido.');
+                return;
+            }
+            
+            // Validate file size (max 5MB)
+            if (file.size > 5 * 1024 * 1024) {
+                alert('A imagem é muito grande. Por favor, selecione uma imagem menor que 5MB.');
+                return;
+            }
+            
             const reader = new FileReader();
             reader.onload = (event) => {
                 this.character.image = event.target.result;
+                
+                // Show image preview
                 const preview = document.getElementById('imagePreview');
-                preview.innerHTML = `<img src="${event.target.result}" alt="Character">`;
+                const placeholder = document.getElementById('imagePlaceholder');
+                const removeBtn = document.getElementById('removeImageBtn');
+                
+                preview.src = event.target.result;
+                preview.style.display = 'block';
+                placeholder.style.display = 'none';
+                removeBtn.style.display = 'flex';
+                
                 this.saveProgress();
+                
+                console.log('✅ Imagem do personagem carregada com sucesso');
             };
             reader.readAsDataURL(file);
         }
+    }
+    
+    removeCharacterImage() {
+        this.character.image = null;
+        
+        const preview = document.getElementById('imagePreview');
+        const placeholder = document.getElementById('imagePlaceholder');
+        const removeBtn = document.getElementById('removeImageBtn');
+        const fileInput = document.getElementById('characterImage');
+        
+        preview.src = '';
+        preview.style.display = 'none';
+        placeholder.style.display = 'block';
+        removeBtn.style.display = 'none';
+        fileInput.value = '';
+        
+        this.saveProgress();
+        
+        console.log('🗑️ Imagem do personagem removida');
     }
 
     // ===================================

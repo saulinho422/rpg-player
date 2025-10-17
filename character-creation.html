@@ -137,9 +137,23 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="characterImage">Imagem do Personagem</label>
-                    <input type="file" id="characterImage" name="characterImage" accept="image/*">
-                    <div id="imagePreview" class="image-preview"></div>
+                    <label for="characterImage">🖼️ Imagem do Personagem</label>
+                    <div class="image-upload-container">
+                        <div class="image-preview-wrapper" id="imagePreviewWrapper">
+                            <div class="image-placeholder" id="imagePlaceholder">
+                                <span class="placeholder-icon">🎭</span>
+                                <span class="placeholder-text">Clique para adicionar imagem</span>
+                            </div>
+                            <img id="imagePreview" class="character-image-preview" style="display: none;">
+                            <button type="button" class="btn-remove-image" id="removeImageBtn" style="display: none;">
+                                <span>✕</span>
+                            </button>
+                        </div>
+                        <input type="file" id="characterImage" name="characterImage" accept="image/*" style="display: none;">
+                        <button type="button" class="btn-upload-image" id="uploadImageBtn">
+                            📤 Escolher Imagem
+                        </button>
+                    </div>
                 </div>
 
                 <div class="form-row">
