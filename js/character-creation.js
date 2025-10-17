@@ -405,136 +405,331 @@ class CharacterCreation {
 
     // ===== STEP 4: ATTRIBUTES =====
     
-    selectAttributeMethod(btn) {
-        const method = btn.dataset.method;
-        document.querySelectorAll('.method-btn[data-method]').forEach(b => b.classList.remove('selected'));
-        btn.classList.add('selected');
-
+    showMethodConfirmation(method) {
+        this.pendingMethod = method;
+        const modal = document.getElementById('methodConfirmModal');
+        const methodDisplay = modal.querySelector('.method-display');
+        
         if (method === '4d6') {
-            document.getElementById('diceRolling').classList.remove('hidden');
-            document.getElementById('attributeAssignment').classList.add('hidden');
+            methodDisplay.innerHTML = '<span class="method-icon">🎲</span> 4d6 (Drop Lowest)';
+        } else {
+            methodDisplay.innerHTML = '<span class="method-icon">📊</span> Standard Array';
+        }
+        
+        modal.classList.add('active');
+    }
+
+    cancelMethodConfirmation() {
+        const modal = document.getElementById('methodConfirmModal');
+        modal.classList.remove('active');
+        this.pendingMethod = null;
+    }
+
+    confirmMethodSelection() {
+        if (!this.pendingMethod) return;
+        
+        this.attributeMethod = this.pendingMethod;
+        this.methodLocked = true;
+        
+        // Lock method buttons
+        document.querySelectorAll('.method-btn[data-method]').forEach(btn => {
+            if (btn.dataset.method !== this.attributeMethod) {
+                btn.classList.add('locked');
+                btn.style.opacity = '0.5';
+                btn.style.pointerEvents = 'none';
+            } else {
+                btn.classList.add('selected');
+            }
+        });
+        
+        // Close modal
+        this.cancelMethodConfirmation();
+        
+        // Initialize selected method
+        if (this.attributeMethod === '4d6') {
             this.setupDiceRolling();
         } else {
-            document.getElementById('diceRolling').classList.add('hidden');
             this.setupStandardArray();
         }
     }
 
     setupDiceRolling() {
         this.rolledValues = [];
+        this.rollsCompleted = 0;
+        
+        const diceSection = document.getElementById('diceRolling');
+        const resultsDisplay = document.querySelector('.dice-results-display');
+        
+        diceSection.classList.remove('hidden');
+        resultsDisplay.innerHTML = '';
+        
         document.getElementById('rollsLeft').textContent = '6';
-        document.getElementById('rolledValuesList').innerHTML = '';
         document.getElementById('rollDiceBtn').disabled = false;
+        document.getElementById('rollDiceBtn').classList.remove('hidden');
     }
 
     rollDice() {
-        if (this.rolledValues.length >= 6) return;
-
+        if (this.rollsCompleted >= 6) return;
+        
+        const diceContainer = document.querySelector('.dice-3d-container');
         const diceElements = [
-            document.getElementById('die1'),
-            document.getElementById('die2'),
-            document.getElementById('die3'),
-            document.getElementById('die4')
+            document.getElementById('dice3d-1'),
+            document.getElementById('dice3d-2'),
+            document.getElementById('dice3d-3'),
+            document.getElementById('dice3d-4')
         ];
-
-        // Animate dice
-        let rollCount = 0;
-        const rollInterval = setInterval(() => {
-            diceElements.forEach(die => {
-                die.textContent = Math.floor(Math.random() * 6) + 1;
-                die.classList.add('rolling');
-            });
-            rollCount++;
-            if (rollCount > 10) {
-                clearInterval(rollInterval);
-                this.finalizeDiceRoll(diceElements);
-            }
-        }, 100);
+        
+        // Show dice container
+        diceContainer.classList.remove('hidden');
+        
+        // Add rolling animation
+        diceElements.forEach(die => {
+            die.classList.add('rolling');
+        });
+        
+        // Generate random values
+        setTimeout(() => {
+            const rolls = [
+                Math.floor(Math.random() * 6) + 1,
+                Math.floor(Math.random() * 6) + 1,
+                Math.floor(Math.random() * 6) + 1,
+                Math.floor(Math.random() * 6) + 1
+            ];
+            
+            this.finalizeDiceRoll(rolls, diceElements);
+        }, 1000);
     }
 
-    finalizeDiceRoll(diceElements) {
-        const rolls = diceElements.map(() => Math.floor(Math.random() * 6) + 1);
-        rolls.sort((a, b) => a - b);
-        const lowest = rolls[0];
-        const sum = rolls.slice(1).reduce((a, b) => a + b, 0);
-
-        diceElements.forEach((die, i) => {
-            die.textContent = rolls[i];
+    finalizeDiceRoll(rolls, diceElements) {
+        // Remove rolling animation
+        diceElements.forEach((die, index) => {
             die.classList.remove('rolling');
-            if (rolls[i] === lowest && rolls.filter(r => r === lowest).length === 1) {
-                die.classList.add('dropped');
-            }
+            // Update dice face display
+            const value = rolls[index];
+            die.querySelectorAll('.dice-face').forEach(face => {
+                face.style.opacity = '0.3';
+            });
+            // Highlight the rolled number
+            const faces = ['front', 'back', 'right', 'left', 'top', 'bottom'];
+            const targetFace = die.querySelector(`.dice-${faces[value - 1]}`);
+            if (targetFace) targetFace.style.opacity = '1';
         });
-
-        this.rolledValues.push(sum);
         
-        const valuesList = document.getElementById('rolledValuesList');
-        const valueSpan = document.createElement('span');
-        valueSpan.className = 'rolled-value';
-        valueSpan.textContent = sum;
-        valuesList.appendChild(valueSpan);
-
-        const rollsLeft = 6 - this.rolledValues.length;
-        document.getElementById('rollsLeft').textContent = rollsLeft;
-
-        if (rollsLeft === 0) {
-            document.getElementById('rollDiceBtn').disabled = true;
-            this.populateAttributeSelects(this.rolledValues);
-        }
+        // Find lowest value
+        const sortedRolls = [...rolls].sort((a, b) => a - b);
+        const lowestValue = sortedRolls[0];
+        const lowestIndex = rolls.indexOf(lowestValue);
+        
+        // Calculate sum (drop lowest)
+        const sum = rolls.reduce((a, b) => a + b, 0) - lowestValue;
+        
+        // Display results
+        const resultsDisplay = document.querySelector('.dice-results-display');
+        const resultHTML = rolls.map((value, index) => {
+            const isLowest = index === lowestIndex;
+            return `<div class="result-value ${isLowest ? 'lowest' : ''}">${value}</div>`;
+        }).join('');
+        
+        resultsDisplay.innerHTML = resultHTML;
+        resultsDisplay.classList.remove('hidden');
+        
+        // After animation, add value to pool
+        setTimeout(() => {
+            this.rolledValues.push(sum);
+            this.rollsCompleted++;
+            
+            document.getElementById('rollsLeft').textContent = 6 - this.rollsCompleted;
+            
+            if (this.rollsCompleted >= 6) {
+                document.getElementById('rollDiceBtn').disabled = true;
+                document.getElementById('rollDiceBtn').textContent = 'Todas as rolagens completas!';
+                setTimeout(() => {
+                    this.showValuesPool();
+                }, 500);
+            } else {
+                // Clear for next roll
+                setTimeout(() => {
+                    resultsDisplay.classList.add('hidden');
+                    diceElements.forEach(die => {
+                        die.querySelectorAll('.dice-face').forEach(face => {
+                            face.style.opacity = '1';
+                        });
+                    });
+                }, 2500);
+            }
+        }, 2500);
     }
 
     setupStandardArray() {
-        const standardValues = [15, 14, 13, 12, 10, 8];
-        this.populateAttributeSelects(standardValues);
+        this.availableValues = [...this.standardValues];
+        this.showValuesPool();
     }
 
-    populateAttributeSelects(values) {
-        const assignment = document.getElementById('attributeAssignment');
-        assignment.classList.remove('hidden');
+    showValuesPool() {
+        const values = this.attributeMethod === '4d6' ? this.rolledValues : this.availableValues;
+        
+        // Hide dice section
+        document.getElementById('diceRolling').classList.add('hidden');
+        
+        // Show values pool
+        const valuesPool = document.querySelector('.values-pool');
+        const poolContainer = valuesPool.querySelector('.pool-container');
+        
+        poolContainer.innerHTML = '';
+        
+        values.forEach((value, index) => {
+            const valueDiv = document.createElement('div');
+            valueDiv.className = 'draggable-value';
+            valueDiv.draggable = true;
+            valueDiv.dataset.value = value;
+            valueDiv.dataset.index = index;
+            valueDiv.innerHTML = `<span class="value-number">${value}</span>`;
+            
+            // Drag events
+            valueDiv.addEventListener('dragstart', (e) => this.handleDragStart(e));
+            valueDiv.addEventListener('dragend', (e) => this.handleDragEnd(e));
+            
+            poolContainer.appendChild(valueDiv);
+        });
+        
+        valuesPool.classList.remove('hidden');
+        
+        // Setup drop zones
+        this.setupDropZones();
+    }
 
-        const selects = assignment.querySelectorAll('select');
-        selects.forEach(select => {
-            select.innerHTML = '<option value="">-</option>';
-            values.forEach(val => {
-                const option = document.createElement('option');
-                option.value = val;
-                option.textContent = val;
-                select.appendChild(option);
-            });
-
-            select.addEventListener('change', (e) => {
-                const attr = e.target.name;
-                this.character.attributes[attr] = parseInt(e.target.value) || 10;
-                this.updateModifier(e.target);
-                this.validateAttributeSelection();
-                this.saveProgress();
-            });
+    setupDropZones() {
+        const dropZones = document.querySelectorAll('.attribute-drop-zone');
+        
+        dropZones.forEach(zone => {
+            zone.addEventListener('dragover', (e) => this.handleDragOver(e));
+            zone.addEventListener('dragleave', (e) => this.handleDragLeave(e));
+            zone.addEventListener('drop', (e) => this.handleDrop(e));
         });
     }
 
-    updateModifier(select) {
-        const value = parseInt(select.value) || 10;
-        const modifier = Math.floor((value - 10) / 2);
-        const modifierSpan = select.closest('.attribute-item').querySelector('.modifier');
-        modifierSpan.textContent = modifier >= 0 ? `+${modifier}` : modifier;
+    handleDragStart(e) {
+        const draggableValue = e.target.closest('.draggable-value');
+        if (draggableValue.classList.contains('used')) {
+            e.preventDefault();
+            return;
+        }
+        
+        draggableValue.classList.add('dragging');
+        e.dataTransfer.effectAllowed = 'move';
+        e.dataTransfer.setData('text/plain', draggableValue.dataset.value);
+        e.dataTransfer.setData('index', draggableValue.dataset.index);
     }
 
-    validateAttributeSelection() {
-        const selects = document.querySelectorAll('#attributeAssignment select');
-        const values = Array.from(selects).map(s => s.value).filter(v => v);
+    handleDragEnd(e) {
+        const draggableValue = e.target.closest('.draggable-value');
+        draggableValue.classList.remove('dragging');
+    }
+
+    handleDragOver(e) {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
         
-        // Check for duplicates
-        const hasDuplicates = values.length !== new Set(values).size;
+        const dropZone = e.currentTarget;
+        dropZone.classList.add('drag-over');
+    }
+
+    handleDragLeave(e) {
+        const dropZone = e.currentTarget;
+        dropZone.classList.remove('drag-over');
+    }
+
+    handleDrop(e) {
+        e.preventDefault();
         
-        selects.forEach(select => {
-            if (select.value && values.filter(v => v === select.value).length > 1) {
-                select.style.borderColor = '#ff4444';
-            } else {
-                select.style.borderColor = '';
+        const dropZone = e.currentTarget;
+        dropZone.classList.remove('drag-over');
+        
+        const value = e.dataTransfer.getData('text/plain');
+        const index = e.dataTransfer.getData('index');
+        
+        // Check if already filled
+        if (dropZone.classList.contains('filled')) {
+            // Remove previous value
+            const oldValue = dropZone.dataset.assignedValue;
+            const oldIndex = dropZone.dataset.assignedIndex;
+            if (oldValue) {
+                const oldDraggable = document.querySelector(`.draggable-value[data-index="${oldIndex}"]`);
+                if (oldDraggable) {
+                    oldDraggable.classList.remove('used');
+                }
             }
-        });
+        }
+        
+        // Fill slot
+        const slot = dropZone.querySelector('.attribute-value-slot');
+        const placeholder = slot.querySelector('.slot-placeholder');
+        const valueDisplay = slot.querySelector('.slot-value');
+        const modifierDisplay = slot.querySelector('.slot-modifier');
+        
+        placeholder.classList.add('hidden');
+        valueDisplay.textContent = value;
+        valueDisplay.classList.remove('hidden');
+        
+        // Calculate modifier
+        const modifier = Math.floor((parseInt(value) - 10) / 2);
+        modifierDisplay.textContent = modifier >= 0 ? `+${modifier}` : modifier;
+        modifierDisplay.classList.remove('hidden');
+        
+        dropZone.classList.add('filled');
+        dropZone.dataset.assignedValue = value;
+        dropZone.dataset.assignedIndex = index;
+        
+        // Mark draggable as used
+        const draggable = document.querySelector(`.draggable-value[data-index="${index}"]`);
+        if (draggable) {
+            draggable.classList.add('used');
+        }
+        
+        // Save to character
+        const attribute = dropZone.dataset.attribute;
+        this.character.attributes[attribute] = parseInt(value);
+        
+        // Check if all filled
+        this.validateAttributes();
+        this.saveProgress();
+    }
 
-        return !hasDuplicates && values.length === 6;
+    validateAttributes() {
+        const dropZones = document.querySelectorAll('.attribute-drop-zone');
+        const filledCount = Array.from(dropZones).filter(zone => zone.classList.contains('filled')).length;
+        
+        if (filledCount === 6) {
+            // All attributes assigned!
+            const successMessage = document.createElement('div');
+            successMessage.className = 'success-message';
+            successMessage.innerHTML = '✓ Todos os atributos foram atribuídos!';
+            successMessage.style.cssText = `
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+                color: white;
+                padding: 20px 40px;
+                border-radius: 12px;
+                font-size: 18px;
+                font-weight: bold;
+                box-shadow: 0 10px 40px rgba(16, 185, 129, 0.3);
+                z-index: 10000;
+                animation: slideIn 0.5s ease-out;
+            `;
+            
+            document.body.appendChild(successMessage);
+            
+            setTimeout(() => {
+                successMessage.remove();
+            }, 3000);
+            
+            return true;
+        }
+        
+        return false;
     }
 
     // ===== STEP 5: SKILLS =====
