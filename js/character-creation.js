@@ -171,6 +171,7 @@ class CharacterCreation {
     }
 
     setupEventListeners() {
+        console.log('🔧 setupEventListeners() INICIADO');
         // Navigation buttons
         document.getElementById('prevBtn').addEventListener('click', () => this.previousStep());
         document.getElementById('nextBtn').addEventListener('click', () => this.nextStep());
@@ -223,19 +224,25 @@ class CharacterCreation {
 
         // Step 4: Attributes - Method buttons with confirmation
         const methodButtons = document.querySelectorAll('.method-btn[data-method]');
-        console.log('Botões de método encontrados:', methodButtons.length);
+        console.log('🎲 Botões de método encontrados:', methodButtons.length, methodButtons);
+        if (methodButtons.length === 0) {
+            console.error('❌ NENHUM BOTÃO ENCONTRADO! Verificar HTML.');
+        }
         methodButtons.forEach((btn, index) => {
-            console.log(`Botão ${index + 1}:`, btn, 'data-method:', btn.dataset.method);
+            console.log(`  📌 Registrando listener no botão ${index + 1}:`, btn.dataset.method);
             btn.addEventListener('click', (e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                console.log('Clique detectado!', e.currentTarget, 'methodLocked:', this.methodLocked);
+                console.log('🖱️ CLIQUE DETECTADO!', 'Método:', e.currentTarget.dataset.method, 'Locked:', this.methodLocked);
                 if (!this.methodLocked) {
                     const method = e.currentTarget.dataset.method;
                     this.showMethodConfirmation(method);
+                } else {
+                    console.warn('⚠️ Método já está travado!');
                 }
             });
         });
+        console.log('✅ Event listeners de Step 4 registrados');
         document.getElementById('cancelMethodBtn')?.addEventListener('click', () => this.cancelMethodConfirmation());
         document.getElementById('confirmMethodBtn')?.addEventListener('click', () => this.confirmMethodSelection());
         document.getElementById('rollDiceBtn')?.addEventListener('click', () => this.rollDice());
