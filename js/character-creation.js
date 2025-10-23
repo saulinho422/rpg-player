@@ -228,15 +228,37 @@ class CharacterCreation {
         if (methodButtons.length === 0) {
             console.error('❌ NENHUM BOTÃO ENCONTRADO! Verificar HTML.');
         }
+        
+        let isProcessingClick = false; // Flag para evitar múltiplos cliques
+        
         methodButtons.forEach((btn, index) => {
             console.log(`  📌 Registrando listener no botão ${index + 1}:`, btn.dataset.method);
-            btn.addEventListener('click', (e) => {
+            
+            // Remover listeners anteriores (se existirem)
+            const newBtn = btn.cloneNode(true);
+            btn.parentNode.replaceChild(newBtn, btn);
+            
+            newBtn.addEventListener('click', (e) => {
                 e.preventDefault();
                 e.stopPropagation();
+                e.stopImmediatePropagation();
+                
+                if (isProcessingClick) {
+                    console.log('⏭️ Clique ignorado (já processando)');
+                    return;
+                }
+                
                 console.log('🖱️ CLIQUE DETECTADO!', 'Método:', e.currentTarget.dataset.method, 'Locked:', this.methodLocked);
+                
                 if (!this.methodLocked) {
+                    isProcessingClick = true;
                     const method = e.currentTarget.dataset.method;
                     this.showMethodConfirmation(method);
+                    
+                    // Reset flag após um pequeno delay
+                    setTimeout(() => {
+                        isProcessingClick = false;
+                    }, 300);
                 } else {
                     console.warn('⚠️ Método já está travado!');
                 }
