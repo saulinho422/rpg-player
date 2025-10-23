@@ -171,7 +171,6 @@ class CharacterCreation {
     }
 
     setupEventListeners() {
-        console.log('🔧 setupEventListeners() INICIADO');
         // Navigation buttons
         document.getElementById('prevBtn').addEventListener('click', () => this.previousStep());
         document.getElementById('nextBtn').addEventListener('click', () => this.nextStep());
@@ -223,51 +222,32 @@ class CharacterCreation {
         });
 
         // Step 4: Attributes - Method buttons with confirmation
-        const methodButtons = document.querySelectorAll('.method-btn[data-method]');
-        console.log('🎲 Botões de método encontrados:', methodButtons.length, methodButtons);
-        if (methodButtons.length === 0) {
-            console.error('❌ NENHUM BOTÃO ENCONTRADO! Verificar HTML.');
+        const btn4d6 = document.querySelector('.method-btn[data-method="4d6"]');
+        const btnStandard = document.querySelector('.method-btn[data-method="standard"]');
+        
+        if (btn4d6) {
+            btn4d6.onclick = () => {
+                if (!this.methodLocked) {
+                    this.showMethodConfirmation('4d6');
+                }
+            };
         }
         
-        let isProcessingClick = false; // Flag para evitar múltiplos cliques
-        
-        methodButtons.forEach((btn, index) => {
-            console.log(`  📌 Registrando listener no botão ${index + 1}:`, btn.dataset.method);
-            
-            // Remover listeners anteriores (se existirem)
-            const newBtn = btn.cloneNode(true);
-            btn.parentNode.replaceChild(newBtn, btn);
-            
-            newBtn.addEventListener('click', (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                e.stopImmediatePropagation();
-                
-                if (isProcessingClick) {
-                    console.log('⏭️ Clique ignorado (já processando)');
-                    return;
-                }
-                
-                console.log('🖱️ CLIQUE DETECTADO!', 'Método:', e.currentTarget.dataset.method, 'Locked:', this.methodLocked);
-                
+        if (btnStandard) {
+            btnStandard.onclick = () => {
                 if (!this.methodLocked) {
-                    isProcessingClick = true;
-                    const method = e.currentTarget.dataset.method;
-                    this.showMethodConfirmation(method);
-                    
-                    // Reset flag após um pequeno delay
-                    setTimeout(() => {
-                        isProcessingClick = false;
-                    }, 300);
-                } else {
-                    console.warn('⚠️ Método já está travado!');
+                    this.showMethodConfirmation('standard');
                 }
-            });
-        });
-        console.log('✅ Event listeners de Step 4 registrados');
-        document.getElementById('cancelMethodBtn')?.addEventListener('click', () => this.cancelMethodConfirmation());
-        document.getElementById('confirmMethodBtn')?.addEventListener('click', () => this.confirmMethodSelection());
-        document.getElementById('rollDiceBtn')?.addEventListener('click', () => this.rollDice());
+            };
+        }
+        
+        const cancelBtn = document.getElementById('cancelMethodBtn');
+        const confirmBtn = document.getElementById('confirmMethodBtn');
+        const rollBtn = document.getElementById('rollDiceBtn');
+        
+        if (cancelBtn) cancelBtn.onclick = () => this.cancelMethodConfirmation();
+        if (confirmBtn) confirmBtn.onclick = () => this.confirmMethodSelection();
+        if (rollBtn) rollBtn.onclick = () => this.rollDice();
 
         // Step 5: Skills
         // Will be setup when skills are populated
