@@ -27,6 +27,14 @@ class CharacterCreation {
             feats: []
         };
         
+        // Attribute method system variables
+        this.attributeMethod = null; // 4d6 or standard
+        this.methodLocked = false; // Cannot change after confirmation
+        this.rolledValues = [];
+        this.standardValues = [15, 14, 13, 12, 10, 8];
+        this.availableValues = [];
+        this.rollsCompleted = 0;
+        
         this.init();
     }
 
@@ -69,14 +77,6 @@ class CharacterCreation {
                 flaws: ''
             }
         };
-        
-        // Attribute method system
-        this.attributeMethod = null; // 4d6 or standard
-        this.methodLocked = false; // Cannot change after confirmation
-        this.rolledValues = [];
-        this.standardValues = [15, 14, 13, 12, 10, 8];
-        this.availableValues = [];
-        this.rollsCompleted = 0;
     }
 
     async init() {
@@ -227,9 +227,12 @@ class CharacterCreation {
         methodButtons.forEach((btn, index) => {
             console.log(`Botão ${index + 1}:`, btn, 'data-method:', btn.dataset.method);
             btn.addEventListener('click', (e) => {
-                console.log('Clique detectado!', e.target, 'methodLocked:', this.methodLocked);
+                e.preventDefault();
+                e.stopPropagation();
+                console.log('Clique detectado!', e.currentTarget, 'methodLocked:', this.methodLocked);
                 if (!this.methodLocked) {
-                    this.showMethodConfirmation(btn.dataset.method);
+                    const method = e.currentTarget.dataset.method;
+                    this.showMethodConfirmation(method);
                 }
             });
         });
