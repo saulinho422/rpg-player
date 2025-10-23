@@ -1146,6 +1146,7 @@ body::before {
     margin-bottom: 15px;
     filter: drop-shadow(0 0 15px rgba(212, 175, 55, 0.5));
     animation: floatIcon 3s ease-in-out infinite;
+    pointer-events: none;
 }
 
 .method-name {
@@ -1156,6 +1157,7 @@ body::before {
     margin-bottom: 10px;
     text-shadow: 0 0 15px rgba(212, 175, 55, 0.6);
     letter-spacing: 1px;
+    pointer-events: none;
 }
 
 .method-description {
@@ -1164,6 +1166,7 @@ body::before {
     font-size: 14px;
     line-height: 1.6;
     font-style: italic;
+    pointer-events: none;
 }
 
 /* Responsive refinements */

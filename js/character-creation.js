@@ -222,8 +222,12 @@ class CharacterCreation {
         });
 
         // Step 4: Attributes - Method buttons with confirmation
-        document.querySelectorAll('.method-btn[data-method]').forEach(btn => {
-            btn.addEventListener('click', () => {
+        const methodButtons = document.querySelectorAll('.method-btn[data-method]');
+        console.log('Botões de método encontrados:', methodButtons.length);
+        methodButtons.forEach((btn, index) => {
+            console.log(`Botão ${index + 1}:`, btn, 'data-method:', btn.dataset.method);
+            btn.addEventListener('click', (e) => {
+                console.log('Clique detectado!', e.target, 'methodLocked:', this.methodLocked);
                 if (!this.methodLocked) {
                     this.showMethodConfirmation(btn.dataset.method);
                 }
