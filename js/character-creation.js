@@ -222,32 +222,29 @@ class CharacterCreation {
         });
 
         // Step 4: Attributes - Method buttons with confirmation
-        const btn4d6 = document.querySelector('.method-btn[data-method="4d6"]');
-        const btnStandard = document.querySelector('.method-btn[data-method="standard"]');
+        document.getElementById('method4d6Btn')?.addEventListener('click', () => {
+            if (!this.methodLocked) {
+                this.showMethodConfirmation('4d6');
+            }
+        });
         
-        if (btn4d6) {
-            btn4d6.onclick = () => {
-                if (!this.methodLocked) {
-                    this.showMethodConfirmation('4d6');
-                }
-            };
-        }
+        document.getElementById('methodStandardBtn')?.addEventListener('click', () => {
+            if (!this.methodLocked) {
+                this.showMethodConfirmation('standard');
+            }
+        });
         
-        if (btnStandard) {
-            btnStandard.onclick = () => {
-                if (!this.methodLocked) {
-                    this.showMethodConfirmation('standard');
-                }
-            };
-        }
+        document.getElementById('cancelMethodBtn')?.addEventListener('click', () => {
+            this.cancelMethodConfirmation();
+        });
         
-        const cancelBtn = document.getElementById('cancelMethodBtn');
-        const confirmBtn = document.getElementById('confirmMethodBtn');
-        const rollBtn = document.getElementById('rollDiceBtn');
+        document.getElementById('confirmMethodBtn')?.addEventListener('click', () => {
+            this.confirmMethodSelection();
+        });
         
-        if (cancelBtn) cancelBtn.onclick = () => this.cancelMethodConfirmation();
-        if (confirmBtn) confirmBtn.onclick = () => this.confirmMethodSelection();
-        if (rollBtn) rollBtn.onclick = () => this.rollDice();
+        document.getElementById('rollDiceBtn')?.addEventListener('click', () => {
+            this.rollDice();
+        });
 
         // Step 5: Skills
         // Will be setup when skills are populated
