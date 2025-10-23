@@ -1,9 +1,17 @@
 {
-  "rewrites": [
+  "redirects": [
+    {
+      "source": "/character-creation.html",
+      "destination": "/character-sheet.html",
+      "permanent": true
+    },
     {
       "source": "/character-creation",
-      "destination": "/character-creation.html"
-    },
+      "destination": "/character-sheet.html",
+      "permanent": true
+    }
+  ],
+  "rewrites": [
     {
       "source": "/dashboard",
       "destination": "/dashboard.html"
@@ -32,6 +40,10 @@
         {
           "key": "X-XSS-Protection",
           "value": "1; mode=block"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=0, must-revalidate"
         }
       ]
     }
