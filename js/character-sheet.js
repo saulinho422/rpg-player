@@ -148,26 +148,49 @@ class CharacterSheet {
         
         grid.innerHTML = '';
         
+        if (!this.races || this.races.length === 0) {
+            grid.innerHTML = '<p style="color: white; text-align: center; padding: 2rem;">Nenhuma raça disponível. Verifique o banco de dados.</p>';
+            modal.classList.add('active');
+            return;
+        }
+        
         this.races.forEach(race => {
             const card = document.createElement('div');
             card.className = 'modal-card';
             if (this.character.race?.id === race.id) card.classList.add('selected');
             
+            // Aceita tanto 'name' quanto 'nome'
+            const raceName = race.name || race.nome || 'Sem Nome';
+            const raceDesc = race.description || race.descricao || '';
+            const raceIcon = race.icon || race.icone || '🧙';
+            
             // Mostrar bônus de atributos se existir
             let bonusText = '';
-            if (race.ability_bonuses) {
-                const bonuses = Object.entries(race.ability_bonuses)
+            const bonuses = race.ability_bonuses || race.aumentoAtributos;
+            if (bonuses) {
+                const bonusArray = Object.entries(bonuses)
                     .filter(([key, val]) => val > 0)
-                    .map(([key, val]) => `${key.toUpperCase()} +${val}`)
+                    .map(([key, val]) => {
+                        // Mapear nomes de atributos em português para inglês
+                        const attrMap = {
+                            'for': 'FOR', 'des': 'DES', 'con': 'CON',
+                            'int': 'INT', 'sab': 'SAB', 'car': 'CAR',
+                            'str': 'FOR', 'dex': 'DES', 'wis': 'SAB', 'cha': 'CAR'
+                        };
+                        const attrName = attrMap[key.toLowerCase()] || key.toUpperCase();
+                        return `${attrName} +${val}`;
+                    })
                     .join(', ');
-                bonusText = `<p><strong>${bonuses}</strong></p>`;
+                if (bonusArray) {
+                    bonusText = `<p><strong>${bonusArray}</strong></p>`;
+                }
             }
             
             card.innerHTML = `
-                <div class="card-icon">${race.icon || '🧙'}</div>
-                <h3>${race.name}</h3>
+                <div class="card-icon">${raceIcon}</div>
+                <h3>${raceName}</h3>
                 ${bonusText}
-                <p>${race.description?.substring(0, 100)}...</p>
+                <p>${raceDesc.substring(0, 100)}${raceDesc.length > 100 ? '...' : ''}</p>
             `;
             
             card.addEventListener('click', () => this.selectRace(race));
@@ -183,17 +206,33 @@ class CharacterSheet {
         
         grid.innerHTML = '';
         
+        if (!this.classes || this.classes.length === 0) {
+            grid.innerHTML = '<p style="color: white; text-align: center; padding: 2rem;">Nenhuma classe disponível. Verifique o banco de dados.</p>';
+            modal.classList.add('active');
+            return;
+        }
+        
         this.classes.forEach(cls => {
             const card = document.createElement('div');
             card.className = 'modal-card';
             if (this.character.class?.id === cls.id) card.classList.add('selected');
             
+            // Aceita tanto campos em inglês quanto em português
+            const className = cls.name || cls.nome || 'Sem Nome';
+            const classDesc = cls.description || cls.descricao || '';
+            const classIcon = cls.icon || cls.icone || '⚔️';
+            const hitDie = cls.hit_die || cls.hitDice || cls.dado_vida || '?';
+            const primaryAbility = cls.primary_ability || cls.habilidade_primaria || 'Variável';
+            
+            // Extrair apenas o número do dado de vida (ex: "1d8" -> "8")
+            const dieNumber = hitDie.toString().replace(/\D/g, '');
+            
             card.innerHTML = `
-                <div class="card-icon">${cls.icon || '⚔️'}</div>
-                <h3>${cls.name}</h3>
-                <p><strong>Dado de Vida:</strong> d${cls.hit_die}</p>
-                <p><strong>Habilidade:</strong> ${cls.primary_ability || 'Variável'}</p>
-                <p>${cls.description?.substring(0, 80)}...</p>
+                <div class="card-icon">${classIcon}</div>
+                <h3>${className}</h3>
+                <p><strong>Dado de Vida:</strong> d${dieNumber}</p>
+                <p><strong>Habilidade:</strong> ${primaryAbility}</p>
+                <p>${classDesc.substring(0, 80)}${classDesc.length > 80 ? '...' : ''}</p>
             `;
             
             card.addEventListener('click', () => this.selectClass(cls));
@@ -209,15 +248,26 @@ class CharacterSheet {
         
         grid.innerHTML = '';
         
+        if (!this.backgrounds || this.backgrounds.length === 0) {
+            grid.innerHTML = '<p style="color: white; text-align: center; padding: 2rem;">Nenhum antecedente disponível. Verifique o banco de dados.</p>';
+            modal.classList.add('active');
+            return;
+        }
+        
         this.backgrounds.forEach(bg => {
             const card = document.createElement('div');
             card.className = 'modal-card';
             if (this.character.background?.id === bg.id) card.classList.add('selected');
             
+            // Aceita tanto campos em inglês quanto em português
+            const bgName = bg.name || bg.nome || 'Sem Nome';
+            const bgDesc = bg.description || bg.descricao || '';
+            const bgIcon = bg.icon || bg.icone || '📜';
+            
             card.innerHTML = `
-                <div class="card-icon">${bg.icon || '📜'}</div>
-                <h3>${bg.name}</h3>
-                <p>${bg.description?.substring(0, 120)}...</p>
+                <div class="card-icon">${bgIcon}</div>
+                <h3>${bgName}</h3>
+                <p>${bgDesc.substring(0, 120)}${bgDesc.length > 120 ? '...' : ''}</p>
             `;
             
             card.addEventListener('click', () => this.selectBackground(bg));
@@ -253,21 +303,24 @@ class CharacterSheet {
 
     selectRace(race) {
         this.character.race = race;
-        document.getElementById('charRaceDisplay').textContent = race.name;
+        const raceName = race.name || race.nome || 'Raça Selecionada';
+        document.getElementById('charRaceDisplay').textContent = raceName;
         document.getElementById('raceModal').classList.remove('active');
         this.saveCreationProgress();
     }
 
     selectClass(cls) {
         this.character.class = cls;
-        document.getElementById('charClassDisplay').textContent = `${cls.name} - Nível ${this.character.level}`;
+        const className = cls.name || cls.nome || 'Classe Selecionada';
+        document.getElementById('charClassDisplay').textContent = `${className} - Nível ${this.character.level}`;
         document.getElementById('classModal').classList.remove('active');
         this.saveCreationProgress();
     }
 
     selectBackground(bg) {
         this.character.background = bg;
-        document.getElementById('charBackgroundDisplay').textContent = bg.name;
+        const bgName = bg.name || bg.nome || 'Antecedente Selecionado';
+        document.getElementById('charBackgroundDisplay').textContent = bgName;
         document.getElementById('backgroundModal').classList.remove('active');
         this.saveCreationProgress();
     }
@@ -563,7 +616,14 @@ class CharacterSheet {
 
     // Helper methods to get class/race/background names
     getClassName() {
-        // In a real implementation, would load from classes.json
+        if (!this.character.class) return 'Classe não definida';
+        
+        // Se for objeto, retorna o nome
+        if (typeof this.character.class === 'object') {
+            return this.character.class.name || this.character.class.nome || 'Classe não definida';
+        }
+        
+        // Se for string, usa o mapeamento
         const classMap = {
             'barbaro': 'Bárbaro',
             'bardo': 'Bardo',
@@ -583,7 +643,14 @@ class CharacterSheet {
     }
 
     getBackgroundName() {
-        // In a real implementation, would load from backgrounds.json
+        if (!this.character.background) return 'Antecedente não definido';
+        
+        // Se for objeto, retorna o nome
+        if (typeof this.character.background === 'object') {
+            return this.character.background.name || this.character.background.nome || 'Antecedente não definido';
+        }
+        
+        // Se for string, usa o mapeamento
         const bgMap = {
             'acolito': 'Acólito',
             'artesao-guilda': 'Artesão de Guilda',
@@ -603,7 +670,18 @@ class CharacterSheet {
     }
 
     getRaceName() {
-        // In a real implementation, would load from races.json
+        if (!this.character.race) return 'Raça não definida';
+        
+        // Se for objeto, retorna o nome
+        if (typeof this.character.race === 'object') {
+            const raceName = this.character.race.name || this.character.race.nome || 'Raça não definida';
+            if (this.character.subrace) {
+                return `${raceName} (${this.character.subrace})`;
+            }
+            return raceName;
+        }
+        
+        // Se for string, retorna direto
         let raceName = this.character.race || '';
         if (this.character.subrace) {
             raceName += ` (${this.character.subrace})`;
