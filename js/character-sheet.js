@@ -58,11 +58,11 @@ class CharacterSheet {
         try {
             console.log('🔄 Carregando dados do Supabase...');
             
-            // Carregar dados do Supabase
+            // Carregar dados do Supabase (tabelas com prefixo game_)
             const [racesResult, classesResult, backgroundsResult] = await Promise.all([
-                supabase.from('races').select('*').order('name'),
-                supabase.from('classes').select('*').order('name'),
-                supabase.from('backgrounds').select('*').order('name')
+                supabase.from('game_races').select('*').order('name'),
+                supabase.from('game_classes').select('*').order('name'),
+                supabase.from('game_backgrounds').select('*').order('name')
             ]);
 
             console.log('📦 Resultados:', { racesResult, classesResult, backgroundsResult });
