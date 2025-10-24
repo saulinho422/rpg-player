@@ -21,17 +21,226 @@ class CharacterSheet {
     }
 
     async init() {
+        await this.checkAuth();
+        
+        // Se não tem ID, está em modo de criação
         if (!this.characterId) {
-            alert('Personagem não encontrado!');
-            window.location.href = 'dashboard.html';
+            this.initCreationMode();
             return;
         }
 
-        await this.checkAuth();
         await this.loadCharacter();
         this.populateSheet();
         this.calculateAll();
         this.setupEventListeners();
+    }
+
+    async initCreationMode() {
+        // Inicializar personagem vazio
+        this.character = {
+            name: '',
+            race: null,
+            class: null,
+            background: null,
+            alignment: null,
+            level: 1,
+            attributes: { str: 10, dex: 10, con: 10, int: 10, wis: 10, cha: 10 }
+        };
+
+        // Carregar dados dos JSONs
+        await this.loadGameData();
+        
+        // Setup event listeners dos modais
+        this.setupCreationListeners();
+    }
+
+    async loadGameData() {
+        try {
+            const [racesRes, classesRes, backgroundsRes] = await Promise.all([
+                fetch('js/data/races.json'),
+                fetch('js/data/classes.json'),
+                fetch('js/data/backgrounds.json')
+            ]);
+
+            this.races = await racesRes.json();
+            this.classes = await classesRes.json();
+            this.backgrounds = await backgroundsRes.json();
+            
+            this.alignments = [
+                { id: 'leal-bom', name: 'Leal e Bom', icon: '⚖️✨', description: 'Honra e compaixão' },
+                { id: 'neutro-bom', name: 'Neutro e Bom', icon: '🕊️', description: 'Bondade equilibrada' },
+                { id: 'caotico-bom', name: 'Caótico e Bom', icon: '🦋', description: 'Liberdade benevolente' },
+                { id: 'leal-neutro', name: 'Leal e Neutro', icon: '⚖️', description: 'Ordem e tradição' },
+                { id: 'neutro', name: 'Neutro', icon: '⚖️⚪', description: 'Equilíbrio perfeito' },
+                { id: 'caotico-neutro', name: 'Caótico e Neutro', icon: '🎲', description: 'Liberdade individual' },
+                { id: 'leal-mau', name: 'Leal e Mau', icon: '⚖️👿', description: 'Tirania organizada' },
+                { id: 'neutro-mau', name: 'Neutro e Mau', icon: '💀', description: 'Egoísmo puro' },
+                { id: 'caotico-mau', name: 'Caótico e Mau', icon: '🔥', description: 'Destruição caótica' }
+            ];
+        } catch (error) {
+            console.error('Erro ao carregar dados:', error);
+        }
+    }
+
+    setupCreationListeners() {
+        // Abrir modais
+        document.getElementById('raceBox')?.addEventListener('click', () => this.openRaceModal());
+        document.getElementById('classBox')?.addEventListener('click', () => this.openClassModal());
+        document.getElementById('backgroundBox')?.addEventListener('click', () => this.openBackgroundModal());
+        document.getElementById('alignmentBox')?.addEventListener('click', () => this.openAlignmentModal());
+
+        // Fechar modais com X
+        document.querySelectorAll('.modal .close').forEach(closeBtn => {
+            closeBtn.addEventListener('click', (e) => {
+                e.target.closest('.modal').classList.remove('active');
+            });
+        });
+
+        // Fechar modal ao clicar fora
+        document.querySelectorAll('.modal').forEach(modal => {
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    modal.classList.remove('active');
+                }
+            });
+        });
+
+        // Botão voltar
+        document.getElementById('backBtn')?.addEventListener('click', () => {
+            window.location.href = 'dashboard.html';
+        });
+    }
+
+    openRaceModal() {
+        const modal = document.getElementById('raceModal');
+        const grid = document.getElementById('raceGrid');
+        
+        grid.innerHTML = '';
+        
+        this.races.forEach(race => {
+            const card = document.createElement('div');
+            card.className = 'modal-card';
+            if (this.character.race?.id === race.id) card.classList.add('selected');
+            
+            card.innerHTML = `
+                <div class="card-icon">${race.icon || '🧙'}</div>
+                <h3>${race.name}</h3>
+                <p><strong>+${race.ability_score_increase.join(', +')}</strong></p>
+                <p>${race.description?.substring(0, 100)}...</p>
+            `;
+            
+            card.addEventListener('click', () => this.selectRace(race));
+            grid.appendChild(card);
+        });
+        
+        modal.classList.add('active');
+    }
+
+    openClassModal() {
+        const modal = document.getElementById('classModal');
+        const grid = document.getElementById('classGrid');
+        
+        grid.innerHTML = '';
+        
+        this.classes.forEach(cls => {
+            const card = document.createElement('div');
+            card.className = 'modal-card';
+            if (this.character.class?.id === cls.id) card.classList.add('selected');
+            
+            card.innerHTML = `
+                <div class="card-icon">${cls.icon || '⚔️'}</div>
+                <h3>${cls.name}</h3>
+                <p><strong>DV:</strong> 1d${cls.hit_die}</p>
+                <p>${cls.description?.substring(0, 100)}...</p>
+            `;
+            
+            card.addEventListener('click', () => this.selectClass(cls));
+            grid.appendChild(card);
+        });
+        
+        modal.classList.add('active');
+    }
+
+    openBackgroundModal() {
+        const modal = document.getElementById('backgroundModal');
+        const grid = document.getElementById('backgroundGrid');
+        
+        grid.innerHTML = '';
+        
+        this.backgrounds.forEach(bg => {
+            const card = document.createElement('div');
+            card.className = 'modal-card';
+            if (this.character.background?.id === bg.id) card.classList.add('selected');
+            
+            card.innerHTML = `
+                <div class="card-icon">${bg.icon || '📜'}</div>
+                <h3>${bg.name}</h3>
+                <p>${bg.description?.substring(0, 120)}...</p>
+            `;
+            
+            card.addEventListener('click', () => this.selectBackground(bg));
+            grid.appendChild(card);
+        });
+        
+        modal.classList.add('active');
+    }
+
+    openAlignmentModal() {
+        const modal = document.getElementById('alignmentModal');
+        const grid = document.getElementById('alignmentGrid');
+        
+        grid.innerHTML = '';
+        
+        this.alignments.forEach(align => {
+            const card = document.createElement('div');
+            card.className = 'alignment-card';
+            if (this.character.alignment?.id === align.id) card.classList.add('selected');
+            
+            card.innerHTML = `
+                <div class="card-icon">${align.icon}</div>
+                <h4>${align.name}</h4>
+                <p>${align.description}</p>
+            `;
+            
+            card.addEventListener('click', () => this.selectAlignment(align));
+            grid.appendChild(card);
+        });
+        
+        modal.classList.add('active');
+    }
+
+    selectRace(race) {
+        this.character.race = race;
+        document.getElementById('charRaceDisplay').textContent = race.name;
+        document.getElementById('raceModal').classList.remove('active');
+        this.saveCreationProgress();
+    }
+
+    selectClass(cls) {
+        this.character.class = cls;
+        document.getElementById('charClassDisplay').textContent = `${cls.name} - Nível ${this.character.level}`;
+        document.getElementById('classModal').classList.remove('active');
+        this.saveCreationProgress();
+    }
+
+    selectBackground(bg) {
+        this.character.background = bg;
+        document.getElementById('charBackgroundDisplay').textContent = bg.name;
+        document.getElementById('backgroundModal').classList.remove('active');
+        this.saveCreationProgress();
+    }
+
+    selectAlignment(align) {
+        this.character.alignment = align;
+        document.getElementById('charAlignmentDisplay').textContent = align.name;
+        document.getElementById('alignmentModal').classList.remove('active');
+        this.saveCreationProgress();
+    }
+
+    saveCreationProgress() {
+        // Salvar no localStorage temporariamente
+        localStorage.setItem('character_creation', JSON.stringify(this.character));
+        console.log('Progresso salvo:', this.character);
     }
 
     async checkAuth() {
