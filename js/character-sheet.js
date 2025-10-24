@@ -56,6 +56,8 @@ class CharacterSheet {
 
     async loadGameData() {
         try {
+            console.log('🔄 Carregando dados do Supabase...');
+            
             // Carregar dados do Supabase
             const [racesResult, classesResult, backgroundsResult] = await Promise.all([
                 supabase.from('races').select('*').order('name'),
@@ -63,13 +65,24 @@ class CharacterSheet {
                 supabase.from('backgrounds').select('*').order('name')
             ]);
 
-            if (racesResult.error) throw racesResult.error;
-            if (classesResult.error) throw classesResult.error;
-            if (backgroundsResult.error) throw backgroundsResult.error;
+            console.log('📦 Resultados:', { racesResult, classesResult, backgroundsResult });
 
-            this.races = racesResult.data;
-            this.classes = classesResult.data;
-            this.backgrounds = backgroundsResult.data;
+            if (racesResult.error) {
+                console.error('❌ Erro em races:', racesResult.error);
+                throw racesResult.error;
+            }
+            if (classesResult.error) {
+                console.error('❌ Erro em classes:', classesResult.error);
+                throw classesResult.error;
+            }
+            if (backgroundsResult.error) {
+                console.error('❌ Erro em backgrounds:', backgroundsResult.error);
+                throw backgroundsResult.error;
+            }
+
+            this.races = racesResult.data || [];
+            this.classes = classesResult.data || [];
+            this.backgrounds = backgroundsResult.data || [];
             
             // Alinhamentos são fixos (não vêm do banco)
             this.alignments = [
@@ -84,14 +97,19 @@ class CharacterSheet {
                 { id: 'caotico-mau', name: 'Caótico e Mau', icon: '🔥', description: 'Destruição caótica' }
             ];
 
-            console.log('Dados carregados:', {
+            console.log('✅ Dados carregados com sucesso:', {
                 races: this.races.length,
                 classes: this.classes.length,
                 backgrounds: this.backgrounds.length
             });
+
+            // Se não tiver dados, avisar
+            if (this.races.length === 0 || this.classes.length === 0 || this.backgrounds.length === 0) {
+                console.warn('⚠️ Algumas tabelas estão vazias no banco de dados!');
+            }
         } catch (error) {
-            console.error('Erro ao carregar dados do Supabase:', error);
-            alert('Erro ao carregar dados do jogo. Recarregue a página.');
+            console.error('❌ ERRO FATAL ao carregar dados:', error);
+            alert(`Erro ao carregar dados do jogo: ${error.message}\n\nVerifique se as tabelas races, classes e backgrounds existem no Supabase.`);
         }
     }
 
