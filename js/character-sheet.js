@@ -161,36 +161,11 @@ class CharacterSheet {
             
             // Aceita tanto 'name' quanto 'nome'
             const raceName = race.name || race.nome || 'Sem Nome';
-            const raceDesc = race.description || race.descricao || '';
             const raceIcon = race.icon || race.icone || '🧙';
-            
-            // Mostrar bônus de atributos se existir
-            let bonusText = '';
-            const bonuses = race.ability_bonuses || race.aumentoAtributos;
-            if (bonuses) {
-                const bonusArray = Object.entries(bonuses)
-                    .filter(([key, val]) => val > 0)
-                    .map(([key, val]) => {
-                        // Mapear nomes de atributos em português para inglês
-                        const attrMap = {
-                            'for': 'FOR', 'des': 'DES', 'con': 'CON',
-                            'int': 'INT', 'sab': 'SAB', 'car': 'CAR',
-                            'str': 'FOR', 'dex': 'DES', 'wis': 'SAB', 'cha': 'CAR'
-                        };
-                        const attrName = attrMap[key.toLowerCase()] || key.toUpperCase();
-                        return `${attrName} +${val}`;
-                    })
-                    .join(', ');
-                if (bonusArray) {
-                    bonusText = `<p><strong>${bonusArray}</strong></p>`;
-                }
-            }
             
             card.innerHTML = `
                 <div class="card-icon">${raceIcon}</div>
                 <h3>${raceName}</h3>
-                ${bonusText}
-                <p>${raceDesc.substring(0, 100)}${raceDesc.length > 100 ? '...' : ''}</p>
             `;
             
             card.addEventListener('click', () => this.selectRace(race));
@@ -219,20 +194,11 @@ class CharacterSheet {
             
             // Aceita tanto campos em inglês quanto em português
             const className = cls.name || cls.nome || 'Sem Nome';
-            const classDesc = cls.description || cls.descricao || '';
             const classIcon = cls.icon || cls.icone || '⚔️';
-            const hitDie = cls.hit_die || cls.hitDice || cls.dado_vida || '?';
-            const primaryAbility = cls.primary_ability || cls.habilidade_primaria || 'Variável';
-            
-            // Extrair apenas o número do dado de vida (ex: "1d8" -> "8")
-            const dieNumber = hitDie.toString().replace(/\D/g, '');
             
             card.innerHTML = `
                 <div class="card-icon">${classIcon}</div>
                 <h3>${className}</h3>
-                <p><strong>Dado de Vida:</strong> d${dieNumber}</p>
-                <p><strong>Habilidade:</strong> ${primaryAbility}</p>
-                <p>${classDesc.substring(0, 80)}${classDesc.length > 80 ? '...' : ''}</p>
             `;
             
             card.addEventListener('click', () => this.selectClass(cls));
@@ -240,6 +206,93 @@ class CharacterSheet {
         });
         
         modal.classList.add('active');
+    }
+
+    openSubclassModal(classData) {
+        // Verifica se a classe tem subclasses
+        const subclasses = classData.subclasses || classData.subclasses || [];
+        
+        if (!subclasses || subclasses.length === 0) {
+            // Se não tem subclasses, apenas confirma a seleção
+            this.confirmClassSelection(classData, null);
+            return;
+        }
+
+        const modal = document.getElementById('subclassModal');
+        if (!modal) {
+            // Criar modal dinamicamente se não existir
+            this.createSubclassModal();
+            return this.openSubclassModal(classData);
+        }
+
+        const grid = document.getElementById('subclassGrid');
+        const title = modal.querySelector('h2');
+        
+        const className = classData.name || classData.nome || 'Classe';
+        title.textContent = `⚔️ Escolha sua Subclasse de ${className}`;
+        
+        grid.innerHTML = '';
+        
+        subclasses.forEach(subcls => {
+            const card = document.createElement('div');
+            card.className = 'modal-card';
+            
+            const subclassName = subcls.name || subcls.nome || 'Sem Nome';
+            const subclassIcon = subcls.icon || subcls.icone || '🎯';
+            
+            card.innerHTML = `
+                <div class="card-icon">${subclassIcon}</div>
+                <h3>${subclassName}</h3>
+            `;
+            
+            card.addEventListener('click', () => {
+                this.confirmClassSelection(classData, subcls);
+                modal.classList.remove('active');
+            });
+            grid.appendChild(card);
+        });
+        
+        modal.classList.add('active');
+    }
+
+    createSubclassModal() {
+        const modalHTML = `
+            <div id="subclassModal" class="modal">
+                <div class="modal-content">
+                    <span class="close">&times;</span>
+                    <h2>⚔️ Escolha sua Subclasse</h2>
+                    <div class="modal-grid" id="subclassGrid"></div>
+                </div>
+            </div>
+        `;
+        
+        document.body.insertAdjacentHTML('beforeend', modalHTML);
+        
+        // Adicionar event listeners
+        const modal = document.getElementById('subclassModal');
+        const closeBtn = modal.querySelector('.close');
+        
+        closeBtn.addEventListener('click', () => {
+            modal.classList.remove('active');
+        });
+        
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.classList.remove('active');
+            }
+        });
+    }
+
+    confirmClassSelection(classData, subclass) {
+        this.character.class = classData;
+        this.character.subclass = subclass;
+        
+        const className = classData.name || classData.nome || 'Classe Selecionada';
+        const subclassName = subclass ? ` (${subclass.name || subclass.nome})` : '';
+        
+        document.getElementById('charClassDisplay').textContent = `${className}${subclassName} - Nível ${this.character.level}`;
+        document.getElementById('classModal').classList.remove('active');
+        this.saveCreationProgress();
     }
 
     openBackgroundModal() {
@@ -261,13 +314,11 @@ class CharacterSheet {
             
             // Aceita tanto campos em inglês quanto em português
             const bgName = bg.name || bg.nome || 'Sem Nome';
-            const bgDesc = bg.description || bg.descricao || '';
             const bgIcon = bg.icon || bg.icone || '📜';
             
             card.innerHTML = `
                 <div class="card-icon">${bgIcon}</div>
                 <h3>${bgName}</h3>
-                <p>${bgDesc.substring(0, 120)}${bgDesc.length > 120 ? '...' : ''}</p>
             `;
             
             card.addEventListener('click', () => this.selectBackground(bg));
@@ -310,11 +361,13 @@ class CharacterSheet {
     }
 
     selectClass(cls) {
-        this.character.class = cls;
-        const className = cls.name || cls.nome || 'Classe Selecionada';
-        document.getElementById('charClassDisplay').textContent = `${className} - Nível ${this.character.level}`;
+        // Fecha o modal de classe
         document.getElementById('classModal').classList.remove('active');
-        this.saveCreationProgress();
+        
+        // Abre o modal de subclasse
+        setTimeout(() => {
+            this.openSubclassModal(cls);
+        }, 300);
     }
 
     selectBackground(bg) {
