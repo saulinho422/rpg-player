@@ -10,9 +10,6 @@
     <div class="sheet-container">
         <!-- Header Controls -->
         <div class="sheet-controls">
-            <button id="printBtn" class="control-btn">🖨️ Imprimir</button>
-            <button id="editBtn" class="control-btn">✏️ Editar</button>
-            <button id="deleteBtn" class="control-btn danger">🗑️ Excluir</button>
             <button id="backBtn" class="control-btn">← Voltar</button>
         </div>
 
@@ -25,20 +22,20 @@
                 </div>
                 
                 <div class="header-info">
-                    <div class="info-box">
-                        <input type="text" id="charClass" readonly>
+                    <div class="info-box clickable" id="classBox">
+                        <div class="info-display" id="charClassDisplay">Selecionar Classe</div>
                         <label>Classe & Nível</label>
                     </div>
-                    <div class="info-box">
-                        <input type="text" id="charBackground" readonly>
+                    <div class="info-box clickable" id="backgroundBox">
+                        <div class="info-display" id="charBackgroundDisplay">Selecionar Antecedente</div>
                         <label>Antecedente</label>
                     </div>
-                    <div class="info-box">
-                        <input type="text" id="charRace" readonly>
+                    <div class="info-box clickable" id="raceBox">
+                        <div class="info-display" id="charRaceDisplay">Selecionar Raça</div>
                         <label>Raça</label>
                     </div>
-                    <div class="info-box">
-                        <input type="text" id="charAlignment" readonly>
+                    <div class="info-box clickable" id="alignmentBox">
+                        <div class="info-display" id="charAlignmentDisplay">Selecionar Tendência</div>
                         <label>Tendência</label>
                     </div>
                     <div class="info-box">
@@ -475,6 +472,42 @@
         </div>
     </div>
 
-    <script src="js/character-sheet.js"></script>
+    <!-- Modal: Race Selection -->
+    <div id="raceModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>🏰 Escolha sua Raça</h2>
+            <div class="modal-grid" id="raceGrid"></div>
+        </div>
+    </div>
+
+    <!-- Modal: Class Selection -->
+    <div id="classModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>⚔️ Escolha sua Classe</h2>
+            <div class="modal-grid" id="classGrid"></div>
+        </div>
+    </div>
+
+    <!-- Modal: Background Selection -->
+    <div id="backgroundModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>📜 Escolha seu Antecedente</h2>
+            <div class="modal-grid" id="backgroundGrid"></div>
+        </div>
+    </div>
+
+    <!-- Modal: Alignment Selection -->
+    <div id="alignmentModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>⚖️ Escolha sua Tendência</h2>
+            <div class="alignment-grid" id="alignmentGrid"></div>
+        </div>
+    </div>
+
+    <script type="module" src="js/character-sheet.js"></script>
 </body>
 </html>
