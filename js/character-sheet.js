@@ -56,16 +56,22 @@ class CharacterSheet {
 
     async loadGameData() {
         try {
-            const [racesRes, classesRes, backgroundsRes] = await Promise.all([
-                fetch('js/data/races.json'),
-                fetch('js/data/classes.json'),
-                fetch('js/data/backgrounds.json')
+            // Carregar dados do Supabase
+            const [racesResult, classesResult, backgroundsResult] = await Promise.all([
+                supabase.from('races').select('*').order('name'),
+                supabase.from('classes').select('*').order('name'),
+                supabase.from('backgrounds').select('*').order('name')
             ]);
 
-            this.races = await racesRes.json();
-            this.classes = await classesRes.json();
-            this.backgrounds = await backgroundsRes.json();
+            if (racesResult.error) throw racesResult.error;
+            if (classesResult.error) throw classesResult.error;
+            if (backgroundsResult.error) throw backgroundsResult.error;
+
+            this.races = racesResult.data;
+            this.classes = classesResult.data;
+            this.backgrounds = backgroundsResult.data;
             
+            // Alinhamentos são fixos (não vêm do banco)
             this.alignments = [
                 { id: 'leal-bom', name: 'Leal e Bom', icon: '⚖️✨', description: 'Honra e compaixão' },
                 { id: 'neutro-bom', name: 'Neutro e Bom', icon: '🕊️', description: 'Bondade equilibrada' },
@@ -77,8 +83,15 @@ class CharacterSheet {
                 { id: 'neutro-mau', name: 'Neutro e Mau', icon: '💀', description: 'Egoísmo puro' },
                 { id: 'caotico-mau', name: 'Caótico e Mau', icon: '🔥', description: 'Destruição caótica' }
             ];
+
+            console.log('Dados carregados:', {
+                races: this.races.length,
+                classes: this.classes.length,
+                backgrounds: this.backgrounds.length
+            });
         } catch (error) {
-            console.error('Erro ao carregar dados:', error);
+            console.error('Erro ao carregar dados do Supabase:', error);
+            alert('Erro ao carregar dados do jogo. Recarregue a página.');
         }
     }
 
@@ -122,10 +135,20 @@ class CharacterSheet {
             card.className = 'modal-card';
             if (this.character.race?.id === race.id) card.classList.add('selected');
             
+            // Mostrar bônus de atributos se existir
+            let bonusText = '';
+            if (race.ability_bonuses) {
+                const bonuses = Object.entries(race.ability_bonuses)
+                    .filter(([key, val]) => val > 0)
+                    .map(([key, val]) => `${key.toUpperCase()} +${val}`)
+                    .join(', ');
+                bonusText = `<p><strong>${bonuses}</strong></p>`;
+            }
+            
             card.innerHTML = `
                 <div class="card-icon">${race.icon || '🧙'}</div>
                 <h3>${race.name}</h3>
-                <p><strong>+${race.ability_score_increase.join(', +')}</strong></p>
+                ${bonusText}
                 <p>${race.description?.substring(0, 100)}...</p>
             `;
             
@@ -150,8 +173,9 @@ class CharacterSheet {
             card.innerHTML = `
                 <div class="card-icon">${cls.icon || '⚔️'}</div>
                 <h3>${cls.name}</h3>
-                <p><strong>DV:</strong> 1d${cls.hit_die}</p>
-                <p>${cls.description?.substring(0, 100)}...</p>
+                <p><strong>Dado de Vida:</strong> d${cls.hit_die}</p>
+                <p><strong>Habilidade:</strong> ${cls.primary_ability || 'Variável'}</p>
+                <p>${cls.description?.substring(0, 80)}...</p>
             `;
             
             card.addEventListener('click', () => this.selectClass(cls));
