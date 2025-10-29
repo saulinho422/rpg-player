@@ -1,0 +1,158 @@
+/* =====================================
+   PALETA DE CORES DO PROJETO
+   Baseada no plano_de_fundo1.png
+   ===================================== */
+
+:root {
+    /* Cores Primárias */
+    --color-gold: #d4af37;           /* Dourado principal */
+    --color-gold-light: #f0c84f;     /* Dourado claro */
+    --color-gold-dark: #c9b037;      /* Dourado escuro */
+    --color-gold-darker: #b8941f;    /* Dourado mais escuro */
+    
+    /* Cores Secundárias - Tons Escuros */
+    --color-dark-navy: #1a1a2e;      /* Azul marinho escuro */
+    --color-medium-navy: #16213e;    /* Azul marinho médio */
+    --color-deep-blue: #0f3460;      /* Azul profundo */
+    --color-black-overlay: rgba(10, 10, 20, 0.85); /* Overlay escuro */
+    
+    /* Cores de Texto */
+    --color-text-cream: #e8dcc6;     /* Creme para texto principal */
+    --color-text-brown: #2c1810;     /* Marrom para texto escuro */
+    --color-text-brown-light: #8b4513; /* Marrom claro */
+    
+    /* Cores de Estado */
+    --color-success: #2ecc71;        /* Verde sucesso */
+    --color-success-dark: #27ae60;   /* Verde escuro */
+    --color-error: #e74c3c;          /* Vermelho erro */
+    --color-error-dark: #c0392b;     /* Vermelho escuro */
+    --color-info: #17a2b8;           /* Azul informação */
+    
+    /* Backgrounds com Transparência */
+    --bg-overlay-light: rgba(212, 175, 55, 0.1);
+    --bg-overlay-medium: rgba(212, 175, 55, 0.3);
+    --bg-dark-transparent: rgba(0, 0, 0, 0.3);
+    --bg-dark-semi: rgba(0, 0, 0, 0.5);
+    --bg-navy-transparent: rgba(15, 52, 96, 0.4);
+    --bg-navy-semi: rgba(15, 52, 96, 0.6);
+    --bg-navy-strong: rgba(15, 52, 96, 0.8);
+    
+    /* Borders */
+    --border-gold: rgba(212, 175, 55, 0.3);
+    --border-gold-strong: rgba(212, 175, 55, 0.5);
+    
+    /* Shadows */
+    --shadow-small: 0 4px 12px rgba(0, 0, 0, 0.15);
+    --shadow-medium: 0 8px 20px rgba(212, 175, 55, 0.4);
+    --shadow-large: 0 8px 32px rgba(0, 0, 0, 0.3);
+    --shadow-gold: 0 0 15px rgba(212, 175, 55, 0.2);
+    --shadow-text: 2px 2px 0px #8b4513, 4px 4px 8px rgba(0,0,0,0.5), 0 0 20px rgba(212, 175, 55, 0.3);
+    
+    /* Gradientes */
+    --gradient-gold: linear-gradient(135deg, #d4af37, #c9b037);
+    --gradient-gold-light: linear-gradient(180deg, #f0c84f 0%, #d4af37 100%);
+    --gradient-gold-dark: linear-gradient(180deg, #d4af37 0%, #b8941f 100%);
+    --gradient-navy: linear-gradient(135deg, rgba(15, 52, 96, 0.6) 0%, rgba(22, 33, 62, 0.6) 100%);
+    --gradient-navy-strong: linear-gradient(135deg, rgba(15, 52, 96, 0.8) 0%, rgba(22, 33, 62, 0.8) 100%);
+    --gradient-success: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+    --gradient-error: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+    
+    /* Fontes */
+    --font-primary: 'Cinzel', serif;
+    --font-decorative: 'Cinzel Decorative', serif;
+    --font-classic: 'Book Antiqua', 'Palatino Linotype', serif;
+    
+    /* Background Image */
+    --bg-image: url('../img/plano_de_fundo1.png');
+}
+
+/* =====================================
+   CLASSES UTILITÁRIAS
+   ===================================== */
+
+/* Background Padrão com Imagem */
+.bg-theme {
+    background: var(--bg-image) center/cover no-repeat fixed;
+    position: relative;
+}
+
+.bg-theme::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: var(--color-black-overlay);
+    z-index: -1;
+}
+
+/* Títulos com Estilo Medieval */
+.title-medieval {
+    font-family: var(--font-decorative);
+    color: var(--color-gold);
+    text-shadow: var(--shadow-text);
+    letter-spacing: 3px;
+}
+
+/* Botões Primários */
+.btn-primary {
+    background: var(--gradient-gold);
+    color: var(--color-dark-navy);
+    font-family: var(--font-primary);
+    font-weight: 700;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-medium);
+}
+
+/* Cards com Backdrop */
+.card-glass {
+    background: var(--bg-overlay-light);
+    backdrop-filter: blur(10px);
+    border: 2px solid var(--border-gold);
+    border-radius: 15px;
+    box-shadow: var(--shadow-large);
+}
+
+/* Inputs com Tema */
+.input-theme {
+    background: var(--bg-dark-transparent);
+    border: 2px solid var(--border-gold);
+    border-radius: 10px;
+    color: var(--color-text-cream);
+    font-family: var(--font-primary);
+    transition: all 0.3s ease;
+}
+
+.input-theme:focus {
+    outline: none;
+    border-color: var(--color-gold);
+    background: var(--bg-dark-semi);
+    box-shadow: var(--shadow-gold);
+}
+
+/* Mensagens de Estado */
+.message-success {
+    background: rgba(40, 167, 69, 0.2);
+    border: 1px solid var(--color-success);
+    color: var(--color-success);
+}
+
+.message-error {
+    background: rgba(220, 53, 69, 0.2);
+    border: 1px solid var(--color-error);
+    color: var(--color-error);
+}
+
+.message-info {
+    background: rgba(23, 162, 184, 0.2);
+    border: 1px solid var(--color-info);
+    color: var(--color-info);
+}
