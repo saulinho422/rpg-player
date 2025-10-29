@@ -23,6 +23,22 @@
     {
       "source": "/onboarding",
       "destination": "/onboarding.html"
+    },
+    {
+      "source": "/attribute-method",
+      "destination": "/attribute-method.html"
+    },
+    {
+      "source": "/roll-4d6",
+      "destination": "/roll-4d6.html"
+    },
+    {
+      "source": "/distribute-attributes",
+      "destination": "/distribute-attributes.html"
+    },
+    {
+      "source": "/character-sheet",
+      "destination": "/character-sheet.html"
     }
   ],
   "headers": [
