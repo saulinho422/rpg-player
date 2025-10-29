@@ -43,7 +43,8 @@ async function signInWithGoogle() {
         const { data, error } = await supabase.auth.signInWithOAuth({
             provider: 'google',
             options: {
-                redirectTo: `${window.location.origin}/onboarding.html`
+                // Redireciona para a página atual para processar o callback
+                redirectTo: `${window.location.origin}/login.html`
             }
         })
         
@@ -346,23 +347,34 @@ async function logout() {
 document.addEventListener('DOMContentLoaded', async () => {
     console.log('🚀 Iniciando auth-supabase-only.js')
     
-    // CORREÇÃO: Verifica se há hash de confirmação de email na URL
+    // CORREÇÃO: Verifica se há hash de callback do OAuth/confirmação de email na URL
     const hashParams = new URLSearchParams(window.location.hash.substring(1))
     const accessToken = hashParams.get('access_token')
+    const type = hashParams.get('type')
     
     if (accessToken) {
-        console.log('📧 Token de confirmação de email detectado!')
-        showMessage('✅ Email confirmado! Configurando sua conta...', 'success')
+        console.log('� Callback de autenticação detectado!', { type })
         
-        // Aguarda um pouco para o Supabase processar
+        // Aguarda o Supabase processar a sessão
         setTimeout(async () => {
             const { data: { session } } = await supabase.auth.getSession()
             if (session) {
+                console.log('✅ Sessão criada após callback:', session.user.id)
+                
                 localStorage.setItem('isLoggedIn', 'true')
                 localStorage.setItem('currentUserId', session.user.id)
-                localStorage.setItem('onboardingCompleted', 'false')
                 
-                window.location.href = 'onboarding.html'
+                // Verifica se é login com Google (signup) ou confirmação de email
+                if (type === 'signup') {
+                    console.log('📧 Confirmação de email detectada')
+                    showMessage('✅ Email confirmado! Configurando sua conta...', 'success')
+                } else {
+                    console.log('🔐 Login com Google detectado')
+                    showMessage('✅ Autenticado com Google! Verificando perfil...', 'success')
+                }
+                
+                // Verifica o perfil e redireciona adequadamente
+                await checkUserProfile(session.user)
             }
         }, 1000)
         
