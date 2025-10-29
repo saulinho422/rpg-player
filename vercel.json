@@ -1,4 +1,5 @@
 {
+  "buildCommand": "echo 'Building...'",
   "redirects": [
     {
       "source": "/character-creation.html",
