@@ -17,8 +17,9 @@ export default defineConfig({
         dashboard: resolve(__dirname, 'dashboard.html'),
         aguarde: resolve(__dirname, 'aguarde-confirmacao.html'),
         characterSheet: resolve(__dirname, 'character-sheet.html'),
-        migrateData: resolve(__dirname, 'migrate-data.html'),
-        migrationRunner: resolve(__dirname, 'migration-runner.html'),
+        attributeMethod: resolve(__dirname, 'attribute-method.html'),
+        roll4d6: resolve(__dirname, 'roll-4d6.html'),
+        distributeAttributes: resolve(__dirname, 'distribute-attributes.html'),
         testSupabase: resolve(__dirname, 'test-supabase.html')
       }
     }
