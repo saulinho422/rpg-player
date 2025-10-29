@@ -90,11 +90,12 @@ body::before {
 /* Distribution Area */
 .distribution-area {
     display: grid;
-    grid-template-columns: 220px auto 1fr;
-    gap: 25px;
+    grid-template-columns: 200px auto 1fr;
+    gap: 20px;
     align-items: start;
     flex: 1;
     overflow: hidden;
+    min-height: 0;
 }
 
 /* Values Section */
@@ -202,33 +203,21 @@ body::before {
 
 .attributes-grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 12px;
-    overflow-y: auto;
-    padding-right: 5px;
-}
-
-.attributes-grid::-webkit-scrollbar {
-    width: 6px;
-}
-
-.attributes-grid::-webkit-scrollbar-track {
-    background: rgba(212, 175, 55, 0.1);
-    border-radius: 10px;
-}
-
-.attributes-grid::-webkit-scrollbar-thumb {
-    background: rgba(212, 175, 55, 0.5);
-    border-radius: 10px;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    height: 100%;
 }
 
 .attribute-slot {
     background: linear-gradient(135deg, rgba(15, 52, 96, 0.4) 0%, rgba(22, 33, 62, 0.4) 100%);
     border: 3px solid rgba(212, 175, 55, 0.3);
-    border-radius: 12px;
-    padding: 12px;
+    border-radius: 10px;
+    padding: 10px 8px;
     text-align: center;
     transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
 }
 
 .attribute-slot:hover {
@@ -237,35 +226,35 @@ body::before {
 }
 
 .attribute-icon {
-    font-size: 24px;
-    margin-bottom: 6px;
+    font-size: 22px;
+    margin-bottom: 4px;
     filter: drop-shadow(0 0 10px rgba(212, 175, 55, 0.5));
 }
 
 .attribute-name {
-    font-size: 14px;
+    font-size: 12px;
     font-weight: 700;
     color: var(--secondary-color);
-    margin-bottom: 10px;
-    letter-spacing: 1px;
+    margin-bottom: 6px;
+    letter-spacing: 0.5px;
 }
 
 .attribute-drop-zone {
     width: 100%;
-    height: 70px;
+    height: 60px;
     background: rgba(0, 0, 0, 0.3);
     border: 3px dashed rgba(212, 175, 55, 0.3);
-    border-radius: 10px;
+    border-radius: 8px;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-bottom: 10px;
+    margin-bottom: 6px;
     transition: all 0.3s ease;
     position: relative;
 }
 
 .drop-hint {
-    font-size: 12px;
+    font-size: 10px;
     color: rgba(232, 220, 198, 0.5);
 }
 
@@ -282,7 +271,7 @@ body::before {
 }
 
 .attribute-value {
-    font-size: 36px;
+    font-size: 32px;
     font-weight: 900;
     color: var(--secondary-color);
     text-shadow: 0 0 20px rgba(212, 175, 55, 0.8);
@@ -292,19 +281,19 @@ body::before {
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 6px;
-    padding: 6px;
+    gap: 4px;
+    padding: 4px;
     background: rgba(212, 175, 55, 0.1);
-    border-radius: 6px;
+    border-radius: 5px;
 }
 
 .mod-label {
-    font-size: 11px;
+    font-size: 9px;
     color: rgba(232, 220, 198, 0.7);
 }
 
 .mod-value {
-    font-size: 18px;
+    font-size: 16px;
     font-weight: 900;
     color: var(--secondary-color);
 }
@@ -355,24 +344,33 @@ body::before {
 /* Responsive */
 @media (max-width: 1200px) {
     .distribution-area {
-        grid-template-columns: 200px auto 1fr;
-        gap: 20px;
+        grid-template-columns: 180px auto 1fr;
+        gap: 15px;
     }
     
     .value-chip {
-        width: 70px;
-        height: 70px;
-        font-size: 32px;
+        width: 65px;
+        height: 65px;
+        font-size: 28px;
     }
     
     .attributes-grid {
-        gap: 12px;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+    }
+    
+    .attribute-drop-zone {
+        height: 55px;
+    }
+    
+    .attribute-value {
+        font-size: 28px;
     }
 }
 
 @media (max-width: 768px) {
     body {
-        padding: 10px;
+        padding: 8px;
         overflow: hidden;
     }
     
@@ -383,105 +381,106 @@ body::before {
     
     .back-btn {
         position: static;
-        margin-bottom: 10px;
-        padding: 10px 20px;
-        font-size: 14px;
+        margin-bottom: 8px;
+        padding: 8px 16px;
+        font-size: 12px;
     }
     
     .distribute-header {
-        margin: 10px 0;
+        margin: 8px 0 10px;
     }
     
     .distribute-header h1 {
-        font-size: 20px;
-        margin-bottom: 5px;
+        font-size: 18px;
+        margin-bottom: 4px;
     }
     
     .distribute-header p {
-        font-size: 12px;
+        font-size: 11px;
     }
     
     /* Layout lado a lado no mobile */
     .distribution-area {
-        grid-template-columns: 110px auto 1fr;
-        gap: 10px;
+        grid-template-columns: 100px auto 1fr;
+        gap: 8px;
     }
     
     .values-section h3,
     .attributes-section h3 {
-        font-size: 12px;
-        margin-bottom: 8px;
+        font-size: 11px;
+        margin-bottom: 6px;
     }
     
     .values-pool {
-        gap: 8px;
+        gap: 6px;
     }
     
     .value-chip {
-        width: 55px;
-        height: 55px;
-        font-size: 24px;
+        width: 50px;
+        height: 50px;
+        font-size: 22px;
     }
     
     .arrow {
-        font-size: 24px;
+        font-size: 20px;
     }
     
     .attributes-grid {
-        grid-template-columns: 1fr;
-        gap: 8px;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 6px;
     }
     
     .attribute-slot {
-        padding: 10px;
+        padding: 6px 4px;
     }
     
     .attribute-icon {
-        font-size: 20px;
-        margin-bottom: 4px;
+        font-size: 18px;
+        margin-bottom: 3px;
     }
     
     .attribute-name {
-        font-size: 12px;
-        margin-bottom: 6px;
+        font-size: 10px;
+        margin-bottom: 4px;
     }
     
     .attribute-drop-zone {
-        height: 55px;
-        margin-bottom: 6px;
+        height: 45px;
+        margin-bottom: 4px;
+        border-width: 2px;
     }
     
     .drop-hint {
-        font-size: 9px;
+        font-size: 8px;
     }
     
     .attribute-value {
-        font-size: 28px;
+        font-size: 24px;
     }
     
     .attribute-modifier {
-        padding: 5px;
-        gap: 4px;
+        padding: 3px;
+        gap: 3px;
     }
     
     .mod-label {
-        font-size: 9px;
+        font-size: 8px;
     }
     
     .mod-value {
-        font-size: 14px;
+        font-size: 12px;
     }
     
     .actions-area {
         flex-direction: row;
-        gap: 10px;
-        margin-top: 10px;
+        gap: 8px;
+        margin-top: 8px;
     }
     
     .reset-btn,
     .finish-btn {
-        padding: 10px 20px;
-        font-size: 12px;
+        padding: 8px 16px;
+        font-size: 11px;
         flex: 1;
     }
 }
