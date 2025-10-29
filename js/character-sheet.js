@@ -36,6 +36,19 @@ class CharacterSheet {
     }
 
     async initCreationMode() {
+        // Verifica se deve limpar o localStorage (novo personagem)
+        const params = new URLSearchParams(window.location.search);
+        const isNewCharacter = params.get('new') === 'true';
+        
+        if (isNewCharacter) {
+            // Limpa dados do personagem anterior
+            localStorage.removeItem('characterAttributes');
+            localStorage.removeItem('characterModifiers');
+            localStorage.removeItem('attributeValues');
+            localStorage.removeItem('characterAvatar');
+            console.log('🧹 localStorage limpo para novo personagem');
+        }
+        
         // Inicializar personagem vazio
         this.character = {
             name: '',
@@ -47,8 +60,10 @@ class CharacterSheet {
             attributes: { str: 10, dex: 10, con: 10, int: 10, wis: 10, cha: 10 }
         };
 
-        // Carregar atributos do localStorage se existirem
-        this.loadAttributesFromLocalStorage();
+        // Carregar atributos do localStorage se existirem (para continuar edição)
+        if (!isNewCharacter) {
+            this.loadAttributesFromLocalStorage();
+        }
 
         // Carregar dados dos JSONs
         await this.loadGameData();
@@ -1066,27 +1081,132 @@ function enableEditMode() {
     console.log('✅ Modo de edição ativado');
 }
 
-function finishCharacterCreation() {
-    // Verifica se os atributos foram definidos
-    const attributes = localStorage.getItem('characterAttributes');
-    
-    if (!attributes) {
-        alert('Por favor, defina os valores dos atributos primeiro através do Menu → Valores de Atributo');
-        return;
+async function finishCharacterCreation() {
+    try {
+        // Verifica autenticação
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) {
+            alert('Você precisa estar logado para salvar um personagem!');
+            window.location.href = 'login.html';
+            return;
+        }
+
+        // Verifica se os atributos foram definidos
+        const attributesStr = localStorage.getItem('characterAttributes');
+        if (!attributesStr) {
+            alert('Por favor, defina os valores dos atributos primeiro através do Menu → Valores de Atributo');
+            return;
+        }
+
+        const attributes = JSON.parse(attributesStr);
+        
+        // Validações
+        const charName = document.getElementById('charName')?.value;
+        if (!charName || charName.trim() === '') {
+            alert('Por favor, dê um nome ao seu personagem!');
+            return;
+        }
+
+        // Pega dados selecionados (devem estar salvos na instância CharacterSheet)
+        const characterData = {
+            user_id: user.id,
+            name: charName.trim(),
+            race_id: null, // Implementar seleção de raça
+            class_id: null, // Implementar seleção de classe
+            background_id: null, // Implementar seleção de background
+            alignment: null, // Implementar seleção de alinhamento
+            level: 1,
+            experience: 0,
+            strength: attributes.str || 10,
+            dexterity: attributes.dex || 10,
+            constitution: attributes.con || 10,
+            intelligence: attributes.int || 10,
+            wisdom: attributes.wis || 10,
+            charisma: attributes.cha || 10,
+            current_hp: 10, // Calcular baseado na classe e constituição
+            max_hp: 10,
+            avatar_url: localStorage.getItem('characterAvatar') || null
+        };
+
+        console.log('💾 Salvando personagem:', characterData);
+
+        // Salva no Supabase
+        const { data, error } = await supabase
+            .from('characters')
+            .insert([characterData])
+            .select();
+
+        if (error) {
+            console.error('❌ Erro ao salvar:', error);
+            alert(`Erro ao salvar personagem: ${error.message}`);
+            return;
+        }
+
+        console.log('✅ Personagem salvo com sucesso:', data);
+        
+        // Limpa localStorage
+        localStorage.removeItem('characterAttributes');
+        localStorage.removeItem('characterModifiers');
+        localStorage.removeItem('attributeValues');
+        localStorage.removeItem('characterAvatar');
+        
+        alert('✅ Personagem criado com sucesso!');
+        
+        // Redireciona para dashboard
+        window.location.href = 'dashboard.html';
+        
+    } catch (error) {
+        console.error('❌ Erro fatal:', error);
+        alert(`Erro ao finalizar personagem: ${error.message}`);
     }
+}
+
+// Character Image Upload
+function initCharacterImageUpload() {
+    const container = document.getElementById('characterImageContainer');
+    const input = document.getElementById('characterImageInput');
+    const image = document.getElementById('charImage');
     
-    // Aqui você pode adicionar mais validações
-    const charName = document.getElementById('charName')?.value;
-    if (!charName || charName.trim() === '') {
-        alert('Por favor, dê um nome ao seu personagem!');
-        return;
+    if (!container || !input || !image) return;
+    
+    // Clique no container abre o seletor de arquivo
+    container.addEventListener('click', () => {
+        input.click();
+    });
+    
+    // Quando selecionar arquivo
+    input.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        
+        // Validar tipo
+        if (!file.type.startsWith('image/')) {
+            alert('Por favor, selecione uma imagem válida!');
+            return;
+        }
+        
+        // Validar tamanho (máx 5MB)
+        if (file.size > 5 * 1024 * 1024) {
+            alert('A imagem deve ter no máximo 5MB!');
+            return;
+        }
+        
+        // Ler e exibir
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            image.src = event.target.result;
+            // Salvar no localStorage temporariamente
+            localStorage.setItem('characterAvatar', event.target.result);
+            console.log('✅ Imagem do personagem atualizada');
+        };
+        reader.readAsDataURL(file);
+    });
+    
+    // Carregar imagem salva se existir
+    const savedAvatar = localStorage.getItem('characterAvatar');
+    if (savedAvatar) {
+        image.src = savedAvatar;
     }
-    
-    // Salvar personagem (implementar depois)
-    alert('Personagem finalizado! (Implementar salvamento no banco de dados)');
-    
-    // Por enquanto, redireciona para dashboard
-    // window.location.href = 'dashboard.html';
 }
 
 // Initialize on page load
@@ -1094,4 +1214,5 @@ document.addEventListener('DOMContentLoaded', () => {
     new CharacterSheet();
     initSidebarMenu();
     initEditMode();
+    initCharacterImageUpload();
 });

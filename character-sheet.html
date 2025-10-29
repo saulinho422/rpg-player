@@ -382,8 +382,13 @@
                 <!-- Right Column: Personality, Features, etc -->
                 <div class="right-column">
                     <!-- Character Image -->
-                    <div class="character-image">
-                        <img id="charImage" src="" alt="Personagem">
+                    <div class="character-image" id="characterImageContainer">
+                        <img id="charImage" src="img/perfil_empty_user.png" alt="Personagem">
+                        <div class="upload-overlay" id="imageUploadOverlay">
+                            <span>📷</span>
+                            <small>Clique para alterar</small>
+                        </div>
+                        <input type="file" id="characterImageInput" accept="image/*" style="display: none;">
                     </div>
 
                     <!-- Personality Traits -->
