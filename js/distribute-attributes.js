@@ -71,18 +71,23 @@ class AttributeDistributor {
     }
     
     setupDragAndDrop() {
+        let draggedChip = null;
+        
         // Event listeners para os chips de valores
         document.addEventListener('dragstart', (e) => {
             if (e.target.classList.contains('value-chip')) {
+                draggedChip = e.target;
                 e.target.classList.add('dragging');
                 e.dataTransfer.effectAllowed = 'move';
                 e.dataTransfer.setData('text/plain', e.target.dataset.value);
+                e.dataTransfer.setData('index', e.target.dataset.index);
             }
         });
         
         document.addEventListener('dragend', (e) => {
             if (e.target.classList.contains('value-chip')) {
                 e.target.classList.remove('dragging');
+                draggedChip = null;
             }
         });
         
@@ -105,32 +110,34 @@ class AttributeDistributor {
                 zone.classList.remove('drag-over');
                 
                 const value = parseInt(e.dataTransfer.getData('text/plain'));
+                const index = e.dataTransfer.getData('index');
                 const attribute = zone.dataset.attribute;
                 
-                this.assignValue(attribute, value);
+                this.assignValue(attribute, value, index, draggedChip);
             });
         });
     }
     
-    assignValue(attribute, value) {
-        // Verifica se o valor já está sendo usado
-        const alreadyUsed = Object.values(this.assignments).includes(value);
-        
-        if (alreadyUsed && this.assignments[attribute] !== value) {
-            alert('Este valor já está sendo usado em outro atributo!');
-            return;
-        }
+    assignValue(attribute, value, index, chipElement) {
+        // Verifica se o valor já está sendo usado no MESMO índice
+        const currentAssignment = this.assignments[attribute];
         
         // Remove valor anterior se existir
-        if (this.assignments[attribute]) {
-            this.returnValueToPool(this.assignments[attribute]);
+        if (currentAssignment && currentAssignment.chip) {
+            this.returnValueToPool(currentAssignment.value, currentAssignment.index);
         }
         
-        // Atribui novo valor
-        this.assignments[attribute] = value;
+        // Atribui novo valor com referência ao chip
+        this.assignments[attribute] = {
+            value: value,
+            index: index,
+            chip: chipElement
+        };
         
-        // Remove do pool
-        this.removeValueFromPool(value);
+        // Remove do pool apenas o chip específico
+        if (chipElement && chipElement.parentNode) {
+            chipElement.remove();
+        }
         
         // Atualiza display
         this.updateAttributeDisplay(attribute, value);
@@ -142,22 +149,20 @@ class AttributeDistributor {
         this.checkCompletion();
     }
     
-    removeValueFromPool(value) {
-        const chips = document.querySelectorAll('.value-chip');
-        chips.forEach(chip => {
-            if (parseInt(chip.dataset.value) === value && !chip.classList.contains('used')) {
-                chip.remove();
-            }
-        });
+    removeValueFromPool(chipElement) {
+        if (chipElement && chipElement.parentNode) {
+            chipElement.remove();
+        }
     }
     
-    returnValueToPool(value) {
+    returnValueToPool(value, index) {
         const pool = document.getElementById('valuesPool');
         const chip = document.createElement('div');
         chip.className = 'value-chip';
         chip.textContent = value;
         chip.draggable = true;
         chip.dataset.value = value;
+        chip.dataset.index = index;
         
         // Insere na posição correta (ordenado)
         const chips = Array.from(pool.children);
@@ -258,17 +263,23 @@ class AttributeDistributor {
     }
     
     finish() {
+        // Extrai apenas os valores dos assignments
+        const attributes = {};
+        Object.keys(this.assignments).forEach(attr => {
+            attributes[attr] = this.assignments[attr].value;
+        });
+        
         // Salva no localStorage
-        localStorage.setItem('characterAttributes', JSON.stringify(this.assignments));
+        localStorage.setItem('characterAttributes', JSON.stringify(attributes));
         
         // Calcula e salva modificadores
         const modifiers = {};
-        Object.keys(this.assignments).forEach(attr => {
-            modifiers[attr] = Math.floor((this.assignments[attr] - 10) / 2);
+        Object.keys(attributes).forEach(attr => {
+            modifiers[attr] = Math.floor((attributes[attr] - 10) / 2);
         });
         localStorage.setItem('characterModifiers', JSON.stringify(modifiers));
         
-        console.log('✅ Atributos salvos:', this.assignments);
+        console.log('✅ Atributos salvos:', attributes);
         console.log('✅ Modificadores salvos:', modifiers);
         
         // Redireciona para a ficha
