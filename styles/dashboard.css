@@ -376,29 +376,36 @@ body::before {
 
 .characters-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     gap: 25px;
 }
 
 .character-card {
-    background: rgba(212, 175, 55, 0.1);
+    background: linear-gradient(135deg, rgba(15, 52, 96, 0.6) 0%, rgba(22, 33, 62, 0.6) 100%);
     backdrop-filter: blur(10px);
     border: 2px solid rgba(212, 175, 55, 0.3);
     border-radius: 15px;
-    padding: 25px;
+    padding: 30px 20px;
     transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 .character-card:hover {
     transform: translateY(-5px);
-    box-shadow: 0 10px 25px rgba(212, 175, 55, 0.2);
+    box-shadow: 0 10px 30px rgba(212, 175, 55, 0.3);
+    border-color: rgba(212, 175, 55, 0.5);
 }
 
 .character-avatar {
     position: relative;
-    width: 80px;
-    height: 80px;
+    width: 120px;
+    height: 120px;
     margin: 0 auto 20px;
+    border-radius: 50%;
+    overflow: hidden;
+    background: rgba(212, 175, 55, 0.1);
 }
 
 .character-avatar img {
@@ -407,6 +414,8 @@ body::before {
     border-radius: 50%;
     border: 3px solid #d4af37;
     object-fit: cover;
+    object-position: center;
+    display: block;
 }
 
 .character-level {
@@ -424,33 +433,42 @@ body::before {
 .character-info {
     text-align: center;
     margin-bottom: 20px;
+    width: 100%;
 }
 
 .character-info h3 {
     color: #d4af37;
-    font-size: 1.3rem;
+    font-size: 1.4rem;
     font-weight: 700;
     margin-bottom: 8px;
     font-family: 'Cinzel Decorative', serif;
+    text-shadow: 0 2px 10px rgba(212, 175, 55, 0.3);
 }
 
 .character-class {
-    color: #c9b037;
+    color: #e8dcc6;
     font-weight: 600;
-    margin-bottom: 10px;
+    margin-bottom: 12px;
+    font-size: 1rem;
 }
 
 .character-stats {
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
+    gap: 20px;
     font-size: 0.9rem;
     color: #e8dcc6;
+    padding: 10px;
+    background: rgba(212, 175, 55, 0.1);
+    border-radius: 8px;
 }
 
 .character-actions {
     display: flex;
-    gap: 10px;
+    gap: 12px;
     justify-content: center;
+    width: 100%;
+    margin-top: auto;
 }
 
 /* =====================================
