@@ -1111,20 +1111,20 @@ async function finishCharacterCreation() {
         const characterData = {
             user_id: user.id,
             name: charName.trim(),
-            race_id: null, // Implementar seleção de raça
-            class_id: null, // Implementar seleção de classe
-            background_id: null, // Implementar seleção de background
+            race: null, // Implementar seleção de raça
+            character_class: null, // Implementar seleção de classe
+            background: null, // Implementar seleção de background
             alignment: null, // Implementar seleção de alinhamento
             level: 1,
-            experience: 0,
+            experience_points: 0,
             strength: attributes.str || 10,
             dexterity: attributes.dex || 10,
             constitution: attributes.con || 10,
             intelligence: attributes.int || 10,
             wisdom: attributes.wis || 10,
             charisma: attributes.cha || 10,
-            current_hp: 10, // Calcular baseado na classe e constituição
-            max_hp: 10,
+            hit_points_current: 10, // Calcular baseado na classe e constituição
+            hit_points_max: 10,
             avatar_url: localStorage.getItem('characterAvatar') || null
         };
 
