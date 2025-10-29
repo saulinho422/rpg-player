@@ -47,11 +47,76 @@ class CharacterSheet {
             attributes: { str: 10, dex: 10, con: 10, int: 10, wis: 10, cha: 10 }
         };
 
+        // Carregar atributos do localStorage se existirem
+        this.loadAttributesFromLocalStorage();
+
         // Carregar dados dos JSONs
         await this.loadGameData();
         
         // Setup event listeners dos modais
         this.setupCreationListeners();
+        
+        // Atualizar visualização dos atributos
+        this.updateAttributeDisplays();
+    }
+
+    loadAttributesFromLocalStorage() {
+        const storedAttributes = localStorage.getItem('characterAttributes');
+        const storedModifiers = localStorage.getItem('characterModifiers');
+        
+        if (storedAttributes) {
+            try {
+                const attributes = JSON.parse(storedAttributes);
+                this.character.attributes = attributes;
+                console.log('✅ Atributos carregados do localStorage:', attributes);
+            } catch (error) {
+                console.error('❌ Erro ao carregar atributos:', error);
+            }
+        }
+        
+        if (storedModifiers) {
+            try {
+                this.modifiers = JSON.parse(storedModifiers);
+                console.log('✅ Modificadores carregados do localStorage:', this.modifiers);
+            } catch (error) {
+                console.error('❌ Erro ao carregar modificadores:', error);
+            }
+        }
+    }
+
+    updateAttributeDisplays() {
+        // Mapear atributos para os IDs dos inputs
+        const attrMap = {
+            str: 'strValue',
+            dex: 'dexValue',
+            con: 'conValue',
+            int: 'intValue',
+            wis: 'wisValue',
+            cha: 'chaValue'
+        };
+
+        const modMap = {
+            str: 'strMod',
+            dex: 'dexMod',
+            con: 'conMod',
+            int: 'intMod',
+            wis: 'wisMod',
+            cha: 'chaMod'
+        };
+
+        Object.keys(attrMap).forEach(key => {
+            const input = document.getElementById(attrMap[key]);
+            if (input && this.character.attributes[key]) {
+                input.value = this.character.attributes[key];
+                
+                // Calcular e mostrar modificador
+                const mod = Math.floor((this.character.attributes[key] - 10) / 2);
+                const modElement = document.getElementById(modMap[key]);
+                if (modElement) {
+                    modElement.textContent = mod >= 0 ? `+${mod}` : mod;
+                }
+            }
+        });
     }
 
     async loadGameData() {

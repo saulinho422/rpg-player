@@ -37,6 +37,10 @@ body::before {
 .sheet-container {
     max-width: 1200px;
     margin: 0 auto;
+    background: rgba(245, 230, 211, 0.95);
+    padding: 30px;
+    border-radius: 20px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
 }
 
 /* Controls */
