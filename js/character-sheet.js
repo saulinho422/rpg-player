@@ -922,7 +922,111 @@ class CharacterSheet {
     }
 }
 
+// =====================================
+// SIDEBAR MENU
+// =====================================
+
+function initSidebarMenu() {
+    const menuBtn = document.getElementById('menuBtn');
+    const sidebar = document.getElementById('sidebarMenu');
+    const overlay = document.getElementById('sidebarOverlay');
+    const closeBtn = document.querySelector('.close-sidebar');
+    
+    if (!menuBtn || !sidebar || !overlay) return;
+    
+    // Abrir menu
+    menuBtn.addEventListener('click', () => {
+        sidebar.classList.add('active');
+        overlay.classList.add('active');
+    });
+    
+    // Fechar menu
+    const closeSidebar = () => {
+        sidebar.classList.remove('active');
+        overlay.classList.remove('active');
+    };
+    
+    closeBtn.addEventListener('click', closeSidebar);
+    overlay.addEventListener('click', closeSidebar);
+    
+    // Ações do menu
+    document.querySelectorAll('.sidebar-item').forEach(item => {
+        item.addEventListener('click', () => {
+            const action = item.dataset.action;
+            
+            if (action === 'attribute-method') {
+                // Salva o ID do personagem para retornar depois
+                const params = new URLSearchParams(window.location.search);
+                const charId = params.get('id');
+                if (charId) {
+                    localStorage.setItem('editingCharacterId', charId);
+                }
+                
+                window.location.href = 'attribute-method.html';
+            }
+            
+            closeSidebar();
+        });
+    });
+}
+
+// =====================================
+// MODO EDITÁVEL
+// =====================================
+
+function initEditMode() {
+    const params = new URLSearchParams(window.location.search);
+    const isNewCharacter = !params.get('id');
+    const finishBtn = document.getElementById('finishBtn');
+    
+    if (isNewCharacter) {
+        // Modo de criação - ficha editável
+        enableEditMode();
+        if (finishBtn) {
+            finishBtn.style.display = 'block';
+            finishBtn.addEventListener('click', finishCharacterCreation);
+        }
+    }
+}
+
+function enableEditMode() {
+    // Torna campos editáveis
+    const nameInput = document.getElementById('charName');
+    if (nameInput) {
+        nameInput.removeAttribute('readonly');
+        nameInput.placeholder = 'Digite o nome do personagem';
+    }
+    
+    // Habilita outros campos conforme necessário
+    console.log('✅ Modo de edição ativado');
+}
+
+function finishCharacterCreation() {
+    // Verifica se os atributos foram definidos
+    const attributes = localStorage.getItem('characterAttributes');
+    
+    if (!attributes) {
+        alert('Por favor, defina os valores dos atributos primeiro através do Menu → Valores de Atributo');
+        return;
+    }
+    
+    // Aqui você pode adicionar mais validações
+    const charName = document.getElementById('charName')?.value;
+    if (!charName || charName.trim() === '') {
+        alert('Por favor, dê um nome ao seu personagem!');
+        return;
+    }
+    
+    // Salvar personagem (implementar depois)
+    alert('Personagem finalizado! (Implementar salvamento no banco de dados)');
+    
+    // Por enquanto, redireciona para dashboard
+    // window.location.href = 'dashboard.html';
+}
+
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', () => {
     new CharacterSheet();
+    initSidebarMenu();
+    initEditMode();
 });

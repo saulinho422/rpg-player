@@ -1,0 +1,202 @@
+/* Attribute Method Selection Styles */
+
+:root {
+    --primary-color: #8b0000;
+    --secondary-color: #d4af37;
+    --text-color: #2c1810;
+    --bg-dark: #1a1a2e;
+    --bg-medium: #16213e;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Cinzel', serif;
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+    min-height: 100vh;
+    color: #e8dcc6;
+    padding: 20px;
+}
+
+.method-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    position: relative;
+}
+
+.back-btn {
+    position: absolute;
+    top: 0;
+    left: 0;
+    padding: 12px 24px;
+    background: rgba(212, 175, 55, 0.1);
+    border: 2px solid rgba(212, 175, 55, 0.3);
+    border-radius: 8px;
+    color: var(--secondary-color);
+    font-family: 'Cinzel', serif;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.back-btn:hover {
+    background: rgba(212, 175, 55, 0.2);
+    border-color: var(--secondary-color);
+    transform: translateX(-5px);
+}
+
+.method-header {
+    text-align: center;
+    margin: 80px 0 60px;
+}
+
+.method-header h1 {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: 48px;
+    color: var(--secondary-color);
+    text-shadow: 
+        0 0 30px rgba(212, 175, 55, 0.8),
+        0 4px 15px rgba(0, 0, 0, 0.7);
+    margin-bottom: 20px;
+}
+
+.method-header p {
+    font-size: 20px;
+    color: rgba(232, 220, 198, 0.8);
+}
+
+.methods-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 40px;
+    margin-top: 40px;
+}
+
+.method-card {
+    background: linear-gradient(135deg, rgba(15, 52, 96, 0.6) 0%, rgba(22, 33, 62, 0.6) 100%);
+    border: 3px solid rgba(212, 175, 55, 0.4);
+    border-radius: 20px;
+    padding: 40px;
+    text-align: center;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.method-card::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(212, 175, 55, 0.1) 0%, transparent 70%);
+    opacity: 0;
+    transition: opacity 0.4s ease;
+}
+
+.method-card:hover::before {
+    opacity: 1;
+}
+
+.method-card:hover {
+    border-color: var(--secondary-color);
+    transform: translateY(-10px) scale(1.02);
+    box-shadow: 
+        0 20px 60px rgba(212, 175, 55, 0.4),
+        inset 0 0 40px rgba(212, 175, 55, 0.1);
+}
+
+.method-icon {
+    font-size: 80px;
+    margin-bottom: 20px;
+    filter: drop-shadow(0 0 20px rgba(212, 175, 55, 0.6));
+    animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+}
+
+.method-card h2 {
+    font-family: 'Cinzel', serif;
+    font-size: 28px;
+    color: var(--secondary-color);
+    margin-bottom: 20px;
+    text-shadow: 0 0 15px rgba(212, 175, 55, 0.5);
+}
+
+.method-description {
+    font-size: 16px;
+    line-height: 1.6;
+    color: rgba(232, 220, 198, 0.9);
+    margin-bottom: 30px;
+    min-height: 80px;
+}
+
+.method-features {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 30px;
+}
+
+.feature {
+    background: rgba(212, 175, 55, 0.15);
+    padding: 10px 15px;
+    border-radius: 8px;
+    border: 1px solid rgba(212, 175, 55, 0.3);
+    color: #e8dcc6;
+    font-size: 14px;
+    transition: all 0.3s ease;
+}
+
+.method-card:hover .feature {
+    background: rgba(212, 175, 55, 0.25);
+    border-color: rgba(212, 175, 55, 0.5);
+}
+
+.select-method-btn {
+    width: 100%;
+    padding: 15px 30px;
+    background: linear-gradient(135deg, var(--secondary-color) 0%, #c9a32a 100%);
+    border: none;
+    border-radius: 12px;
+    color: var(--text-color);
+    font-family: 'Cinzel', serif;
+    font-size: 18px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(212, 175, 55, 0.4);
+}
+
+.select-method-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(212, 175, 55, 0.6);
+    background: linear-gradient(135deg, #f0c84f 0%, var(--secondary-color) 100%);
+}
+
+.select-method-btn:active {
+    transform: translateY(-1px);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .methods-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .method-header h1 {
+        font-size: 32px;
+    }
+    
+    .method-card {
+        padding: 30px;
+    }
+}

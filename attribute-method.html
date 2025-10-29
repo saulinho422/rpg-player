@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Escolha o Método de Atributos - RPG Player</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Cinzel+Decorative:wght@400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles/attribute-method.css">
+</head>
+<body>
+    <div class="method-container">
+        <button id="backBtn" class="back-btn">← Voltar</button>
+        
+        <div class="method-header">
+            <h1>🎲 Escolha o Método de Atributos</h1>
+            <p>Como você deseja determinar os valores dos seus atributos?</p>
+        </div>
+
+        <div class="methods-grid">
+            <!-- Método 4d6 -->
+            <div class="method-card" data-method="4d6">
+                <div class="method-icon">🎲</div>
+                <h2>4d6 - Role os Dados</h2>
+                <p class="method-description">
+                    Role 4 dados de 6 lados, descarte o menor valor e some os 3 restantes. 
+                    Faça isso 6 vezes para gerar seus atributos.
+                </p>
+                <div class="method-features">
+                    <div class="feature">✨ Mais emocionante</div>
+                    <div class="feature">🎰 Resultados variados</div>
+                    <div class="feature">🎬 Animações incríveis</div>
+                </div>
+                <button class="select-method-btn" data-method="4d6">
+                    Escolher 4d6
+                </button>
+            </div>
+
+            <!-- Método Valores Padrões -->
+            <div class="method-card" data-method="standard">
+                <div class="method-icon">📊</div>
+                <h2>Valores Padrões</h2>
+                <p class="method-description">
+                    Use os valores padrões balanceados: 15, 14, 13, 12, 10, 8. 
+                    Distribua-os entre os atributos como preferir.
+                </p>
+                <div class="method-features">
+                    <div class="feature">⚖️ Balanceado</div>
+                    <div class="feature">⚡ Rápido</div>
+                    <div class="feature">🎯 Previsível</div>
+                </div>
+                <button class="select-method-btn" data-method="standard">
+                    Escolher Valores Padrões
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        document.getElementById('backBtn').addEventListener('click', () => {
+            window.history.back();
+        });
+
+        document.querySelectorAll('.select-method-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const method = btn.dataset.method;
+                
+                if (method === '4d6') {
+                    window.location.href = 'roll-4d6.html';
+                } else if (method === 'standard') {
+                    // Vai direto para distribuição com valores padrões
+                    localStorage.setItem('attributeValues', JSON.stringify([15, 14, 13, 12, 10, 8]));
+                    window.location.href = 'distribute-attributes.html';
+                }
+            });
+        });
+    </script>
+</body>
+</html>

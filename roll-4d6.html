@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rolagem 4d6 - RPG Player</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Cinzel+Decorative:wght@400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles/roll-4d6.css">
+</head>
+<body>
+    <div class="roll-container">
+        <button id="backBtn" class="back-btn">← Voltar</button>
+        
+        <div class="roll-header">
+            <h1>🎲 Rolagem 4d6</h1>
+            <p>Role 4 dados, descarte o menor e some os 3 restantes</p>
+            <div class="roll-progress">
+                <span id="rollCount">0</span> / 6 Rolagens
+            </div>
+        </div>
+
+        <div class="dice-area">
+            <div id="diceContainer" class="dice-container"></div>
+            
+            <div class="roll-result">
+                <div id="resultDisplay" class="result-display">
+                    <span class="result-label">Resultado:</span>
+                    <span id="currentResult" class="result-value">--</span>
+                </div>
+            </div>
+
+            <button id="rollBtn" class="roll-btn">
+                🎲 Rolar Dados
+            </button>
+        </div>
+
+        <div class="results-area">
+            <h3>📊 Valores Obtidos</h3>
+            <div id="storedResults" class="stored-results">
+                <div class="empty-result">?</div>
+                <div class="empty-result">?</div>
+                <div class="empty-result">?</div>
+                <div class="empty-result">?</div>
+                <div class="empty-result">?</div>
+                <div class="empty-result">?</div>
+            </div>
+            
+            <button id="distributeBtn" class="distribute-btn" style="display: none;">
+                ✓ Distribuir Valores
+            </button>
+        </div>
+    </div>
+
+    <script type="module" src="js/roll-4d6.js"></script>
+</body>
+</html>

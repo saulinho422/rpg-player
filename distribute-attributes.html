@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Distribuir Atributos - RPG Player</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Cinzel+Decorative:wght@400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles/distribute-attributes.css">
+</head>
+<body>
+    <div class="distribute-container">
+        <button id="backBtn" class="back-btn">← Voltar</button>
+        
+        <div class="distribute-header">
+            <h1>⚔️ Distribua seus Atributos</h1>
+            <p>Arraste os valores para os atributos que desejar</p>
+        </div>
+
+        <div class="distribution-area">
+            <!-- Valores Disponíveis -->
+            <div class="values-section">
+                <h3>📊 Valores Disponíveis</h3>
+                <div id="valuesPool" class="values-pool"></div>
+            </div>
+
+            <!-- Seta Decorativa -->
+            <div class="arrow-separator">
+                <div class="arrow">→</div>
+            </div>
+
+            <!-- Atributos -->
+            <div class="attributes-section">
+                <h3>🎯 Atributos</h3>
+                <div class="attributes-grid">
+                    <div class="attribute-slot" data-attribute="str">
+                        <div class="attribute-icon">💪</div>
+                        <div class="attribute-name">FORÇA</div>
+                        <div class="attribute-drop-zone" data-attribute="str">
+                            <span class="drop-hint">Arraste aqui</span>
+                        </div>
+                        <div class="attribute-modifier">
+                            <span class="mod-label">Modificador:</span>
+                            <span class="mod-value" data-mod="str">+0</span>
+                        </div>
+                    </div>
+
+                    <div class="attribute-slot" data-attribute="dex">
+                        <div class="attribute-icon">🏃</div>
+                        <div class="attribute-name">DESTREZA</div>
+                        <div class="attribute-drop-zone" data-attribute="dex">
+                            <span class="drop-hint">Arraste aqui</span>
+                        </div>
+                        <div class="attribute-modifier">
+                            <span class="mod-label">Modificador:</span>
+                            <span class="mod-value" data-mod="dex">+0</span>
+                        </div>
+                    </div>
+
+                    <div class="attribute-slot" data-attribute="con">
+                        <div class="attribute-icon">❤️</div>
+                        <div class="attribute-name">CONSTITUIÇÃO</div>
+                        <div class="attribute-drop-zone" data-attribute="con">
+                            <span class="drop-hint">Arraste aqui</span>
+                        </div>
+                        <div class="attribute-modifier">
+                            <span class="mod-label">Modificador:</span>
+                            <span class="mod-value" data-mod="con">+0</span>
+                        </div>
+                    </div>
+
+                    <div class="attribute-slot" data-attribute="int">
+                        <div class="attribute-icon">🧠</div>
+                        <div class="attribute-name">INTELIGÊNCIA</div>
+                        <div class="attribute-drop-zone" data-attribute="int">
+                            <span class="drop-hint">Arraste aqui</span>
+                        </div>
+                        <div class="attribute-modifier">
+                            <span class="mod-label">Modificador:</span>
+                            <span class="mod-value" data-mod="int">+0</span>
+                        </div>
+                    </div>
+
+                    <div class="attribute-slot" data-attribute="wis">
+                        <div class="attribute-icon">🦉</div>
+                        <div class="attribute-name">SABEDORIA</div>
+                        <div class="attribute-drop-zone" data-attribute="wis">
+                            <span class="drop-hint">Arraste aqui</span>
+                        </div>
+                        <div class="attribute-modifier">
+                            <span class="mod-label">Modificador:</span>
+                            <span class="mod-value" data-mod="wis">+0</span>
+                        </div>
+                    </div>
+
+                    <div class="attribute-slot" data-attribute="cha">
+                        <div class="attribute-icon">✨</div>
+                        <div class="attribute-name">CARISMA</div>
+                        <div class="attribute-drop-zone" data-attribute="cha">
+                            <span class="drop-hint">Arraste aqui</span>
+                        </div>
+                        <div class="attribute-modifier">
+                            <span class="mod-label">Modificador:</span>
+                            <span class="mod-value" data-mod="cha">+0</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="actions-area">
+            <button id="resetBtn" class="reset-btn">↻ Resetar</button>
+            <button id="finishBtn" class="finish-btn" style="display: none;">
+                ✓ Finalizar
+            </button>
+        </div>
+    </div>
+
+    <script type="module" src="js/distribute-attributes.js"></script>
+</body>
+</html>

@@ -30,9 +30,15 @@ body {
 /* Controls */
 .sheet-controls {
     display: flex;
-    gap: 10px;
-    justify-content: flex-end;
+    justify-content: space-between;
+    align-items: center;
     margin-bottom: 20px;
+}
+
+.controls-left,
+.controls-right {
+    display: flex;
+    gap: 10px;
 }
 
 .control-btn {
@@ -43,6 +49,7 @@ body {
     cursor: pointer;
     font-weight: 600;
     transition: all 0.3s;
+    font-family: 'Book Antiqua', serif;
 }
 
 .control-btn:hover {
@@ -51,9 +58,134 @@ body {
     border-color: var(--primary-color);
 }
 
+.control-btn.primary-btn {
+    background: var(--secondary-color);
+    border-color: var(--secondary-color);
+    color: var(--text-color);
+}
+
+.control-btn.primary-btn:hover {
+    background: #c9a32a;
+    border-color: #c9a32a;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
 .control-btn.danger:hover {
     background: #c41e3a;
     border-color: #c41e3a;
+}
+
+.menu-btn {
+    font-size: 18px;
+}
+
+/* Sidebar Menu */
+.sidebar-menu {
+    position: fixed;
+    left: -320px;
+    top: 0;
+    width: 320px;
+    height: 100%;
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    box-shadow: 4px 0 20px rgba(0,0,0,0.5);
+    transition: left 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 10000;
+    overflow-y: auto;
+}
+
+.sidebar-menu.active {
+    left: 0;
+}
+
+.sidebar-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+    z-index: 9999;
+}
+
+.sidebar-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.sidebar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    border-bottom: 2px solid var(--secondary-color);
+}
+
+.sidebar-header h3 {
+    color: var(--secondary-color);
+    font-family: 'Cinzel', serif;
+    font-size: 24px;
+    margin: 0;
+    text-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
+}
+
+.close-sidebar {
+    background: none;
+    border: none;
+    color: var(--secondary-color);
+    font-size: 28px;
+    cursor: pointer;
+    transition: all 0.3s;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+}
+
+.close-sidebar:hover {
+    background: rgba(212, 175, 55, 0.2);
+    transform: rotate(90deg);
+}
+
+.sidebar-content {
+    padding: 20px;
+}
+
+.sidebar-item {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 15px 20px;
+    background: rgba(212, 175, 55, 0.1);
+    border: 2px solid rgba(212, 175, 55, 0.3);
+    border-radius: 10px;
+    margin-bottom: 15px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: 'Cinzel', serif;
+}
+
+.sidebar-item:hover {
+    background: rgba(212, 175, 55, 0.2);
+    border-color: var(--secondary-color);
+    transform: translateX(10px);
+}
+
+.sidebar-icon {
+    font-size: 32px;
+    filter: drop-shadow(0 0 10px rgba(212, 175, 55, 0.5));
+}
+
+.sidebar-text {
+    color: #e8dcc6;
+    font-size: 16px;
+    font-weight: 600;
 }
 
 /* Sheet Pages */
@@ -186,12 +318,13 @@ body {
 }
 
 .attr-value input {
-    width: 100%;
+    width: 60px;
+    height: 60px;
     padding: 5px;
     text-align: center;
     border: 2px solid var(--border-color);
     border-radius: 50%;
-    font-size: 16px;
+    font-size: 18px;
     font-weight: bold;
     background: #fff;
 }

@@ -10,8 +10,29 @@
     <div class="sheet-container">
         <!-- Header Controls -->
         <div class="sheet-controls">
-            <button id="backBtn" class="control-btn">← Voltar</button>
+            <div class="controls-left">
+                <button id="menuBtn" class="control-btn menu-btn" title="Menu">☰ Menu</button>
+                <button id="backBtn" class="control-btn">← Voltar</button>
+            </div>
+            <div class="controls-right">
+                <button id="finishBtn" class="control-btn primary-btn" style="display: none;">✓ Finalizar Personagem</button>
+            </div>
         </div>
+
+        <!-- Sidebar Menu -->
+        <div id="sidebarMenu" class="sidebar-menu">
+            <div class="sidebar-header">
+                <h3>Menu</h3>
+                <button class="close-sidebar">✕</button>
+            </div>
+            <div class="sidebar-content">
+                <button class="sidebar-item" data-action="attribute-method">
+                    <span class="sidebar-icon">🎲</span>
+                    <span class="sidebar-text">Valores de Atributo</span>
+                </button>
+            </div>
+        </div>
+        <div id="sidebarOverlay" class="sidebar-overlay"></div>
 
         <!-- Page 1: Main Character Sheet -->
         <div class="sheet-page page-1">
