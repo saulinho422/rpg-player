@@ -461,7 +461,7 @@ body::before {
 
 .experience-cards {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    grid-template-columns: repeat(3, 1fr);
     gap: 25px;
 }
 
@@ -534,7 +534,7 @@ body::before {
 
 .role-cards {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    grid-template-columns: repeat(3, 1fr);
     gap: 25px;
 }
 

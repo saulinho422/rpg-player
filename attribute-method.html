@@ -62,17 +62,30 @@
             window.history.back();
         });
 
+        // Função para redirecionar baseado no método
+        function selectMethod(method) {
+            if (method === '4d6') {
+                window.location.href = 'roll-4d6.html';
+            } else if (method === 'standard') {
+                localStorage.setItem('attributeValues', JSON.stringify([15, 14, 13, 12, 10, 8]));
+                window.location.href = 'distribute-attributes.html';
+            }
+        }
+
+        // Adicionar evento nos botões
         document.querySelectorAll('.select-method-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
                 const method = btn.dataset.method;
-                
-                if (method === '4d6') {
-                    window.location.href = 'roll-4d6.html';
-                } else if (method === 'standard') {
-                    // Vai direto para distribuição com valores padrões
-                    localStorage.setItem('attributeValues', JSON.stringify([15, 14, 13, 12, 10, 8]));
-                    window.location.href = 'distribute-attributes.html';
-                }
+                selectMethod(method);
+            });
+        });
+
+        // Adicionar evento nos cards
+        document.querySelectorAll('.method-card').forEach(card => {
+            card.addEventListener('click', () => {
+                const method = card.dataset.method;
+                selectMethod(method);
             });
         });
     </script>

@@ -41,9 +41,8 @@ body::before {
 }
 
 .back-btn {
-    position: absolute;
-    top: 0;
-    left: 0;
+    display: inline-block;
+    margin-bottom: 30px;
     padding: 12px 24px;
     background: rgba(212, 175, 55, 0.1);
     border: 2px solid rgba(212, 175, 55, 0.3);
@@ -53,6 +52,7 @@ body::before {
     font-size: 16px;
     cursor: pointer;
     transition: all 0.3s ease;
+    z-index: 10;
 }
 
 .back-btn:hover {
@@ -63,7 +63,7 @@ body::before {
 
 .method-header {
     text-align: center;
-    margin: 80px 0 60px;
+    margin: 20px 0 60px;
 }
 
 .method-header h1 {
@@ -97,6 +97,7 @@ body::before {
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     position: relative;
     overflow: hidden;
+    cursor: pointer;
 }
 
 .method-card::before {
