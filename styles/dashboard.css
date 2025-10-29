@@ -781,6 +781,78 @@ body::before {
         gap: 20px;
     }
     
+    /* Card de personagem estilo vertical mobile */
+    .character-card {
+        display: flex;
+        flex-direction: column;
+        padding: 0;
+        overflow: hidden;
+        position: relative;
+    }
+    
+    .character-avatar {
+        width: 100%;
+        height: 200px;
+        margin: 0;
+        position: relative;
+    }
+    
+    .character-avatar img {
+        width: 100%;
+        height: 100%;
+        border-radius: 0;
+        border: none;
+        object-fit: cover;
+        object-position: center;
+    }
+    
+    .character-level {
+        position: absolute;
+        bottom: 10px;
+        right: 10px;
+        background: rgba(212, 175, 55, 0.95);
+        color: #1a1a2e;
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-size: 0.9rem;
+        font-weight: 700;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    }
+    
+    .character-info {
+        padding: 20px;
+        text-align: left;
+        background: linear-gradient(135deg, rgba(15, 52, 96, 0.8) 0%, rgba(22, 33, 62, 0.8) 100%);
+    }
+    
+    .character-info h3 {
+        font-size: 1.5rem;
+        margin-bottom: 5px;
+    }
+    
+    .character-class {
+        font-size: 1rem;
+        margin-bottom: 15px;
+        color: rgba(212, 175, 55, 0.8);
+    }
+    
+    .character-stats {
+        flex-direction: row;
+        gap: 15px;
+        padding: 10px 0;
+        border-top: 1px solid rgba(212, 175, 55, 0.2);
+        margin-top: 10px;
+    }
+    
+    .character-stats span {
+        font-size: 0.9rem;
+    }
+    
+    .character-actions {
+        padding: 15px 20px;
+        background: rgba(10, 10, 20, 0.5);
+    }
+    
     .user-details {
         display: none;
     }
