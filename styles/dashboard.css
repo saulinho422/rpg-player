@@ -420,14 +420,17 @@ body::before {
 
 .character-level {
     position: absolute;
-    bottom: -5px;
-    right: -5px;
+    bottom: -8px;
+    right: 50%;
+    transform: translateX(50%);
     background: linear-gradient(135deg, #d4af37, #c9b037);
     color: #1a1a2e;
-    padding: 4px 8px;
-    border-radius: 12px;
-    font-size: 0.8rem;
+    padding: 5px 12px;
+    border-radius: 15px;
+    font-size: 0.75rem;
     font-weight: 700;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    border: 2px solid rgba(26, 26, 46, 0.8);
 }
 
 .character-info {
