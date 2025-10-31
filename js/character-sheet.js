@@ -67,8 +67,11 @@ class CharacterSheet {
             this.updateAttributeDisplays();
             
             // Se há um rascunho carregado, popular a ficha
-            if (draft) {
-                this.populateSheet();
+            if (draft && this.character) {
+                // Aguardar um pouco para garantir que DOM está pronto
+                setTimeout(() => {
+                    this.populateSheet();
+                }, 100);
             }
             
             // Setup auto-save para rascunho
@@ -152,7 +155,9 @@ class CharacterSheet {
     }
 
     convertDraftToCharacter(draft) {
-        return {
+        console.log('🔄 Convertendo rascunho para personagem:', draft);
+        
+        const character = {
             id: draft.id,
             name: draft.name || '',
             race: draft.race,
@@ -172,6 +177,9 @@ class CharacterSheet {
             hpCurrent: draft.hit_points_current || 8,
             image: draft.avatar_url
         };
+        
+        console.log('✅ Personagem convertido:', character);
+        return character;
     }
 
     async saveDraft() {
@@ -694,31 +702,57 @@ class CharacterSheet {
     }
 
     populateSheet() {
-        // Header information
-        document.getElementById('charName').value = this.character.name || '';
-        document.getElementById('charClass').value = `${this.getClassName()} Nível ${this.character.level}`;
-        document.getElementById('charBackground').value = this.getBackgroundName();
-        document.getElementById('charRace').value = this.getRaceName();
-        document.getElementById('charAlignment').value = this.formatAlignment(this.character.alignment);
+        // Verificações de segurança
+        if (!this.character) {
+            console.warn('⚠️ populateSheet: character não está definido');
+            return;
+        }
 
-        // Attributes
-        Object.keys(this.character.attributes).forEach(attr => {
-            const value = this.character.attributes[attr];
-            document.getElementById(`${attr}Value`).value = value;
-            
-            // Calculate and display modifier
-            const modifier = Math.floor((value - 10) / 2);
-            document.getElementById(`${attr}Mod`).textContent = modifier >= 0 ? `+${modifier}` : modifier;
-        });
+        // Header information - com verificação de elementos
+        const charNameEl = document.getElementById('charName');
+        if (charNameEl) charNameEl.value = this.character.name || '';
 
-        // HP
-        document.getElementById('hpMax').value = this.character.hp;
-        document.getElementById('hpCurrent').value = this.character.hp;
+        const charClassEl = document.getElementById('charClass');
+        if (charClassEl) charClassEl.value = `${this.getClassName()} Nível ${this.character.level}`;
 
-        // Hit Dice
+        const charBackgroundEl = document.getElementById('charBackground');
+        if (charBackgroundEl) charBackgroundEl.value = this.getBackgroundName();
+
+        const charRaceEl = document.getElementById('charRace');
+        if (charRaceEl) charRaceEl.value = this.getRaceName();
+
+        const charAlignmentEl = document.getElementById('charAlignment');
+        if (charAlignmentEl) charAlignmentEl.value = this.formatAlignment(this.character.alignment);
+
+        // Attributes - com verificação
+        if (this.character.attributes) {
+            Object.keys(this.character.attributes).forEach(attr => {
+                const value = this.character.attributes[attr];
+                const valueEl = document.getElementById(`${attr}Value`);
+                const modEl = document.getElementById(`${attr}Mod`);
+                
+                if (valueEl) valueEl.value = value;
+                
+                if (modEl) {
+                    // Calculate and display modifier
+                    const modifier = Math.floor((value - 10) / 2);
+                    modEl.textContent = modifier >= 0 ? `+${modifier}` : modifier;
+                }
+            });
+        }
+
+        // HP - com verificação
+        const hpMaxEl = document.getElementById('hpMax');
+        const hpCurrentEl = document.getElementById('hpCurrent');
+        if (hpMaxEl) hpMaxEl.value = this.character.hp || 8;
+        if (hpCurrentEl && !hpCurrentEl.value) hpCurrentEl.value = this.character.hpCurrent || this.character.hp || 8;
+
+        // Hit Dice - com verificação
         const hitDice = this.getHitDice();
-        document.getElementById('hitDiceTotal').value = `${this.character.level}${hitDice}`;
-        document.getElementById('hitDiceCurrent').value = `${this.character.level}${hitDice}`;
+        const hitDiceTotalEl = document.getElementById('hitDiceTotal');
+        const hitDiceCurrentEl = document.getElementById('hitDiceCurrent');
+        if (hitDiceTotalEl) hitDiceTotalEl.value = `${this.character.level}${hitDice}`;
+        if (hitDiceCurrentEl && !hitDiceCurrentEl.value) hitDiceCurrentEl.value = `${this.character.level}${hitDice}`;
 
         // Skills - mark proficient skills
         if (this.character.skills && this.character.skills.length > 0) {
