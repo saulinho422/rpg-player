@@ -66,6 +66,11 @@ class CharacterSheet {
             // Atualizar visualização dos atributos
             this.updateAttributeDisplays();
             
+            // Se há um rascunho carregado, popular a ficha
+            if (draft) {
+                this.populateSheet();
+            }
+            
             // Setup auto-save para rascunho
             this.setupAutoSave();
             
@@ -217,12 +222,23 @@ class CharacterSheet {
         });
 
         // Auto-save em mudanças importantes
-        const importantFields = ['charName', 'charRace', 'charClass', 'charBackground'];
+        const nameField = document.getElementById('charName');
+        if (nameField) {
+            nameField.addEventListener('input', (e) => {
+                this.character.name = e.target.value;
+                // Auto-save após 2 segundos de inatividade
+                clearTimeout(this.nameTimeout);
+                this.nameTimeout = setTimeout(() => this.saveDraft(), 2000);
+            });
+        }
+
+        // Outros campos importantes
+        const importantFields = ['charRace', 'charClass', 'charBackground'];
         importantFields.forEach(fieldId => {
             const field = document.getElementById(fieldId);
             if (field) {
                 field.addEventListener('change', () => {
-                    setTimeout(() => this.saveDraft(), 1000); // Delay para evitar muitas chamadas
+                    setTimeout(() => this.saveDraft(), 1000);
                 });
             }
         });
@@ -1236,7 +1252,7 @@ async function finishCharacterCreation() {
             return;
         }
 
-        if (!character.attributes || Object.values(character.attributes).some(val => val < 8 || val > 18)) {
+        if (!character.attributes || Object.values(character.attributes).some(val => val < 3 || val > 30 || !val)) {
             alert('Por favor, defina os valores dos atributos primeiro através do Menu → Valores de Atributo');
             return;
         }

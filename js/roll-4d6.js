@@ -142,12 +142,26 @@ class DiceRoller {
         // Ordena valores do maior para o menor
         const sortedValues = [...this.storedValues].sort((a, b) => b - a);
         
-        // Salva no localStorage
-        localStorage.setItem('attributeValues', JSON.stringify(sortedValues));
-        localStorage.setItem('attributeMethod', '4d6');
+        console.log('✅ Valores 4d6 gerados:', sortedValues);
+        
+        // Passa valores via URL (sem localStorage)
+        const params = new URLSearchParams(window.location.search);
+        const characterId = params.get('id');
+        const returnTo = params.get('return_to');
+        
+        // Constrói URL com valores
+        const valuesParam = encodeURIComponent(JSON.stringify(sortedValues));
+        let targetUrl = `distribute-attributes.html?values=${valuesParam}&method=4d6`;
+        
+        if (characterId) {
+            targetUrl += `&id=${characterId}`;
+        }
+        if (returnTo) {
+            targetUrl += `&return_to=${returnTo}`;
+        }
         
         // Redireciona para página de distribuição
-        window.location.href = 'distribute-attributes.html';
+        window.location.href = targetUrl;
     }
     
     playDiceSound() {

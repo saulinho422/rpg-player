@@ -64,11 +64,27 @@
 
         // Função para redirecionar baseado no método
         function selectMethod(method) {
+            // Pega parâmetros da URL atual
+            const params = new URLSearchParams(window.location.search);
+            const characterId = params.get('id');
+            const returnTo = params.get('return_to');
+            
             if (method === '4d6') {
-                window.location.href = 'roll-4d6.html';
+                let targetUrl = 'roll-4d6.html';
+                if (characterId) targetUrl += `?id=${characterId}`;
+                if (returnTo) targetUrl += `${characterId ? '&' : '?'}return_to=${returnTo}`;
+                
+                window.location.href = targetUrl;
             } else if (method === 'standard') {
-                localStorage.setItem('attributeValues', JSON.stringify([15, 14, 13, 12, 10, 8]));
-                window.location.href = 'distribute-attributes.html';
+                // Passa valores padrões via URL (sem localStorage)
+                const standardValues = [15, 14, 13, 12, 10, 8];
+                const valuesParam = encodeURIComponent(JSON.stringify(standardValues));
+                let targetUrl = `distribute-attributes.html?values=${valuesParam}&method=standard`;
+                
+                if (characterId) targetUrl += `&id=${characterId}`;
+                if (returnTo) targetUrl += `&return_to=${returnTo}`;
+                
+                window.location.href = targetUrl;
             }
         }
 
