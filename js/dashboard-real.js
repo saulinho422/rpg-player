@@ -42,16 +42,23 @@ export class DashboardService {
     static async loadUserCharacters() {
         try {
             const userId = localStorage.getItem('currentUserId')
-            if (!userId) return []
+            console.log('🔍 Dashboard: Carregando personagens para userId:', userId)
+            
+            if (!userId) {
+                console.warn('⚠️ Dashboard: Nenhum userId encontrado no localStorage')
+                return []
+            }
             
             const characters = await CharacterService.getUserCharacters(userId)
+            console.log('👥 Dashboard: Personagens carregados:', characters)
             
             // Atualiza a seção de personagens
             this.updateCharactersSection(characters)
+            console.log('✅ Dashboard: Seção de personagens atualizada')
             
             return characters
         } catch (error) {
-            console.error('Erro ao carregar personagens:', error)
+            console.error('❌ Dashboard: Erro ao carregar personagens:', error)
             return []
         }
     }
@@ -160,16 +167,22 @@ export class DashboardService {
     }
     
     static updateCharactersSection(characters) {
+        console.log('🎨 Dashboard: Atualizando seção de personagens com:', characters)
+        
         const charactersGrid = document.querySelector('.characters-grid')
-        if (!charactersGrid) return
+        if (!charactersGrid) {
+            console.error('❌ Dashboard: Elemento .characters-grid não encontrado!')
+            return
+        }
         
         if (characters.length === 0) {
+            console.log('📝 Dashboard: Nenhum personagem encontrado, exibindo mensagem')
             charactersGrid.innerHTML = `
                 <div class="no-data-message">
                     <div class="no-data-icon">👤</div>
                     <h3>Nenhum personagem ainda</h3>
                     <p>Crie seu primeiro personagem para começar suas aventuras!</p>
-                    <button class="btn-primary" onclick="window.location.href='character-creation.html'">+ Criar Personagem</button>
+                    <button class="btn-primary" onclick="window.location.href='character-sheet.html?new=true'">+ Criar Personagem</button>
                 </div>
             `
             return
@@ -178,20 +191,21 @@ export class DashboardService {
         const charactersHTML = characters.map(character => `
             <div class="character-card" data-character-id="${character.id}">
                 <div class="character-avatar">
-                    <img src="${character.avatar_url || 'https://via.placeholder.com/80'}" alt="Personagem">
-                    <div class="character-level">Nível ${character.level}</div>
+                    <img src="${character.avatar_url || 'https://via.placeholder.com/400x200'}" alt="${character.name}">
                 </div>
-                <div class="character-info">
-                    <h3>${character.name}</h3>
-                    <div class="character-class">${character.character_class || 'Classe não definida'} ${character.race ? `${character.race}` : ''}</div>
-                    <div class="character-stats">
-                        <span>HP: ${character.hit_points_current}/${character.hit_points_max}</span>
-                        <span>CA: ${character.armor_class}</span>
+                <div class="character-overlay">
+                    <div class="character-level">Nível ${character.level || 1}</div>
+                    <div class="character-info">
+                        <h3>${character.name}</h3>
+                        <div class="character-details">
+                            <div class="character-class">${character.character_class || 'Aventureiro'}</div>
+                            <div class="character-race">${character.race || 'Humano'}</div>
+                        </div>
                     </div>
-                </div>
-                <div class="character-actions">
-                    <button class="btn-secondary" onclick="editCharacter('${character.id}')">Editar</button>
-                    <button class="btn-primary" onclick="playCharacter('${character.id}')">Jogar</button>
+                    <div class="character-actions">
+                        <button class="btn-secondary" onclick="window.location.href='character-sheet.html?id=${character.id}'">Editar</button>
+                        <button class="btn-primary" disabled>Jogar</button>
+                    </div>
                 </div>
             </div>
         `).join('')
@@ -333,6 +347,8 @@ export class DashboardService {
     
     static async loadAllData() {
         try {
+            console.log('🚀 Dashboard: Iniciando carregamento de todos os dados')
+            
             // Exibe loading
             this.showLoading(true)
             
@@ -344,6 +360,13 @@ export class DashboardService {
                 this.loadRecentActivities()
             ])
             
+            console.log('📊 Dashboard: Dados carregados:', {
+                userData: userData ? 'OK' : 'NULL',
+                characters: characters ? `${characters.length} personagens` : 'NULL',
+                campaigns: campaigns ? `${campaigns.length} campanhas` : 'NULL',
+                activities: activities ? `${activities.length} atividades` : 'NULL'
+            })
+            
             // Remove loading
             this.showLoading(false)
             
@@ -354,7 +377,7 @@ export class DashboardService {
                 activities
             }
         } catch (error) {
-            console.error('Erro ao carregar dados do dashboard:', error)
+            console.error('❌ Dashboard: Erro ao carregar dados:', error)
             this.showLoading(false)
             this.showError('Erro ao carregar dados. Tente recarregar a página.')
             return null

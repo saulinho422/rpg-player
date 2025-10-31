@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste - Dados do Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-section {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .success { color: green; }
+        .error { color: red; }
+        .info { color: blue; }
+        .warning { color: orange; }
+        pre {
+            background: #f8f8f8;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧪 Teste - Dados do Dashboard</h1>
+    
+    <div class="test-section">
+        <h2>1. Verificação de Autenticação</h2>
+        <div id="auth-status">Verificando...</div>
+        <button onclick="testAuth()">🔄 Testar Novamente</button>
+    </div>
+    
+    <div class="test-section">
+        <h2>2. Teste de Conexão com Banco</h2>
+        <div id="db-status">Verificando...</div>
+        <button onclick="testDatabase()">🔄 Testar Novamente</button>
+    </div>
+    
+    <div class="test-section">
+        <h2>3. Carregamento de Personagens</h2>
+        <div id="characters-status">Verificando...</div>
+        <button onclick="testCharacters()">🔄 Testar Novamente</button>
+        <pre id="characters-data"></pre>
+    </div>
+    
+    <div class="test-section">
+        <h2>4. Dados do localStorage</h2>
+        <div id="localStorage-status">Verificando...</div>
+        <button onclick="testLocalStorage()">🔄 Testar Novamente</button>
+        <pre id="localStorage-data"></pre>
+    </div>
+    
+    <div class="test-section">
+        <h2>5. Logs do Console</h2>
+        <div id="console-logs"></div>
+        <button onclick="clearLogs()">🗑️ Limpar Logs</button>
+    </div>
+
+    <script type="module">
+        import { checkAuth } from './js/auth-supabase-only.js'
+        import { CharacterService } from './js/database.js'
+        import { DashboardService } from './js/dashboard-real.js'
+        
+        const logs = []
+        
+        // Captura logs do console
+        const originalLog = console.log
+        const originalError = console.error
+        const originalWarn = console.warn
+        
+        console.log = function(...args) {
+            logs.push({type: 'log', message: args.join(' '), time: new Date().toLocaleTimeString()})
+            updateConsoleLogs()
+            originalLog.apply(console, arguments)
+        }
+        
+        console.error = function(...args) {
+            logs.push({type: 'error', message: args.join(' '), time: new Date().toLocaleTimeString()})
+            updateConsoleLogs()
+            originalError.apply(console, arguments)
+        }
+        
+        console.warn = function(...args) {
+            logs.push({type: 'warn', message: args.join(' '), time: new Date().toLocaleTimeString()})
+            updateConsoleLogs()
+            originalWarn.apply(console, arguments)
+        }
+        
+        function updateConsoleLogs() {
+            const logsElement = document.getElementById('console-logs')
+            logsElement.innerHTML = logs.map(log => 
+                `<div class="${log.type}"><strong>${log.time}</strong> [${log.type.toUpperCase()}] ${log.message}</div>`
+            ).slice(-10).join('')
+        }
+        
+        async function testAuth() {
+            const statusEl = document.getElementById('auth-status')
+            statusEl.innerHTML = 'Testando autenticação...'
+            
+            try {
+                const user = await checkAuth()
+                if (user) {
+                    statusEl.innerHTML = `<span class="success">✅ Autenticado como: ${user.email} (ID: ${user.id})</span>`
+                } else {
+                    statusEl.innerHTML = `<span class="error">❌ Não autenticado</span>`
+                }
+            } catch (error) {
+                statusEl.innerHTML = `<span class="error">❌ Erro: ${error.message}</span>`
+            }
+        }
+        
+        async function testDatabase() {
+            const statusEl = document.getElementById('db-status')
+            statusEl.innerHTML = 'Testando conexão com banco...'
+            
+            try {
+                // Tenta fazer uma consulta simples
+                const userId = localStorage.getItem('currentUserId')
+                if (!userId) {
+                    throw new Error('Nenhum userId no localStorage')
+                }
+                
+                const characters = await CharacterService.getUserCharacters(userId)
+                statusEl.innerHTML = `<span class="success">✅ Conexão OK - Encontrados ${characters.length} personagens</span>`
+            } catch (error) {
+                statusEl.innerHTML = `<span class="error">❌ Erro na conexão: ${error.message}</span>`
+            }
+        }
+        
+        async function testCharacters() {
+            const statusEl = document.getElementById('characters-status')
+            const dataEl = document.getElementById('characters-data')
+            
+            statusEl.innerHTML = 'Carregando personagens...'
+            dataEl.innerHTML = ''
+            
+            try {
+                const userId = localStorage.getItem('currentUserId')
+                if (!userId) {
+                    throw new Error('Nenhum userId no localStorage')
+                }
+                
+                const characters = await CharacterService.getUserCharacters(userId)
+                statusEl.innerHTML = `<span class="success">✅ ${characters.length} personagens encontrados</span>`
+                dataEl.innerHTML = JSON.stringify(characters, null, 2)
+            } catch (error) {
+                statusEl.innerHTML = `<span class="error">❌ Erro: ${error.message}</span>`
+            }
+        }
+        
+        function testLocalStorage() {
+            const statusEl = document.getElementById('localStorage-status')
+            const dataEl = document.getElementById('localStorage-data')
+            
+            const relevantKeys = ['isLoggedIn', 'currentUserId', 'userName', 'userLevel', 'userAvatar']
+            const data = {}
+            
+            relevantKeys.forEach(key => {
+                data[key] = localStorage.getItem(key)
+            })
+            
+            statusEl.innerHTML = `<span class="info">📋 Dados do localStorage:</span>`
+            dataEl.innerHTML = JSON.stringify(data, null, 2)
+        }
+        
+        function clearLogs() {
+            logs.length = 0
+            updateConsoleLogs()
+        }
+        
+        // Torna as funções globais para uso nos botões
+        window.testAuth = testAuth
+        window.testDatabase = testDatabase
+        window.testCharacters = testCharacters
+        window.testLocalStorage = testLocalStorage
+        window.clearLogs = clearLogs
+        
+        // Executa todos os testes automaticamente
+        document.addEventListener('DOMContentLoaded', async () => {
+            await testAuth()
+            await testDatabase()
+            await testCharacters()
+            testLocalStorage()
+        })
+    </script>
+</body>
+</html>
