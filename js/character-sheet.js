@@ -36,67 +36,196 @@ class CharacterSheet {
     }
 
     async initCreationMode() {
-        // Verifica se deve limpar o localStorage (novo personagem)
-        const params = new URLSearchParams(window.location.search);
-        const isNewCharacter = params.get('new') === 'true';
-        
-        if (isNewCharacter) {
-            // Limpa dados do personagem anterior
-            localStorage.removeItem('characterAttributes');
-            localStorage.removeItem('characterModifiers');
-            localStorage.removeItem('attributeValues');
-            localStorage.removeItem('characterAvatar');
-            console.log('🧹 localStorage limpo para novo personagem');
-        }
-        
-        // Inicializar personagem vazio
-        this.character = {
-            name: '',
-            race: null,
-            class: null,
-            background: null,
-            alignment: null,
-            level: 1,
-            attributes: { str: 10, dex: 10, con: 10, int: 10, wis: 10, cha: 10 }
-        };
+        try {
+            // Verificar se existe um rascunho para este usuário
+            const draft = await this.loadOrCreateDraft();
+            
+            if (draft) {
+                console.log('📝 Rascunho encontrado, continuando criação:', draft);
+                this.character = this.convertDraftToCharacter(draft);
+                this.characterId = draft.id; // Para permitir edição do rascunho
+            } else {
+                // Inicializar personagem vazio
+                this.character = {
+                    name: '',
+                    race: null,
+                    class: null,
+                    background: null,
+                    alignment: null,
+                    level: 1,
+                    attributes: { str: 10, dex: 10, con: 10, int: 10, wis: 10, cha: 10 }
+                };
+            }
 
-        // Carregar atributos do localStorage se existirem (para continuar edição)
-        if (!isNewCharacter) {
-            this.loadAttributesFromLocalStorage();
+            // Carregar dados dos JSONs
+            await this.loadGameData();
+            
+            // Setup event listeners dos modais
+            this.setupCreationListeners();
+            
+            // Atualizar visualização dos atributos
+            this.updateAttributeDisplays();
+            
+            // Setup auto-save para rascunho
+            this.setupAutoSave();
+            
+        } catch (error) {
+            console.error('❌ Erro ao inicializar modo de criação:', error);
+            alert('Erro ao inicializar criação de personagem!');
         }
-
-        // Carregar dados dos JSONs
-        await this.loadGameData();
-        
-        // Setup event listeners dos modais
-        this.setupCreationListeners();
-        
-        // Atualizar visualização dos atributos
-        this.updateAttributeDisplays();
     }
 
-    loadAttributesFromLocalStorage() {
-        const storedAttributes = localStorage.getItem('characterAttributes');
-        const storedModifiers = localStorage.getItem('characterModifiers');
-        
-        if (storedAttributes) {
-            try {
-                const attributes = JSON.parse(storedAttributes);
-                this.character.attributes = attributes;
-                console.log('✅ Atributos carregados do localStorage:', attributes);
-            } catch (error) {
-                console.error('❌ Erro ao carregar atributos:', error);
+    async loadOrCreateDraft() {
+        try {
+            const { data: { user } } = await supabase.auth.getUser();
+            if (!user) return null;
+
+            // Buscar rascunho existente
+            const { data: drafts, error } = await supabase
+                .from('characters')
+                .select('*')
+                .eq('user_id', user.id)
+                .eq('is_draft', true)
+                .order('updated_at', { ascending: false })
+                .limit(1);
+
+            if (error) throw error;
+
+            // Se encontrou um rascunho, retorna
+            if (drafts && drafts.length > 0) {
+                return drafts[0];
             }
-        }
-        
-        if (storedModifiers) {
-            try {
-                this.modifiers = JSON.parse(storedModifiers);
-                console.log('✅ Modificadores carregados do localStorage:', this.modifiers);
-            } catch (error) {
-                console.error('❌ Erro ao carregar modificadores:', error);
+
+            // Se não encontrou, verifica se deve criar um novo
+            const params = new URLSearchParams(window.location.search);
+            const isNewCharacter = params.get('new') === 'true';
+            
+            if (isNewCharacter) {
+                // Criar novo rascunho
+                const newDraft = await this.createNewDraft(user.id);
+                return newDraft;
             }
+
+            return null;
+        } catch (error) {
+            console.error('❌ Erro ao carregar/criar rascunho:', error);
+            return null;
         }
+    }
+
+    async createNewDraft(userId) {
+        try {
+            const { data, error } = await supabase
+                .from('characters')
+                .insert([{
+                    user_id: userId,
+                    name: '',
+                    is_draft: true,
+                    draft_step: 'basic_info',
+                    level: 1,
+                    strength: 10,
+                    dexterity: 10,
+                    constitution: 10,
+                    intelligence: 10,
+                    wisdom: 10,
+                    charisma: 10,
+                    hit_points_max: 8,
+                    hit_points_current: 8,
+                    armor_class: 10
+                }])
+                .select()
+                .single();
+
+            if (error) throw error;
+            
+            console.log('✅ Novo rascunho criado:', data);
+            return data;
+        } catch (error) {
+            console.error('❌ Erro ao criar rascunho:', error);
+            return null;
+        }
+    }
+
+    convertDraftToCharacter(draft) {
+        return {
+            id: draft.id,
+            name: draft.name || '',
+            race: draft.race,
+            class: draft.character_class,
+            background: draft.background,
+            alignment: draft.alignment,
+            level: draft.level || 1,
+            attributes: {
+                str: draft.strength || 10,
+                dex: draft.dexterity || 10,
+                con: draft.constitution || 10,
+                int: draft.intelligence || 10,
+                wis: draft.wisdom || 10,
+                cha: draft.charisma || 10
+            },
+            hp: draft.hit_points_max || 8,
+            hpCurrent: draft.hit_points_current || 8,
+            image: draft.avatar_url
+        };
+    }
+
+    async saveDraft() {
+        if (!this.characterId) return;
+        
+        try {
+            const updateData = {
+                name: this.character.name || '',
+                race: this.character.race,
+                character_class: this.character.class,
+                background: this.character.background,
+                alignment: this.character.alignment,
+                level: this.character.level || 1,
+                strength: this.character.attributes?.str || 10,
+                dexterity: this.character.attributes?.dex || 10,
+                constitution: this.character.attributes?.con || 10,
+                intelligence: this.character.attributes?.int || 10,
+                wisdom: this.character.attributes?.wis || 10,
+                charisma: this.character.attributes?.cha || 10,
+                hit_points_max: this.character.hp || 8,
+                hit_points_current: this.character.hpCurrent || 8,
+                avatar_url: this.character.image,
+                updated_at: new Date().toISOString()
+            };
+
+            const { error } = await supabase
+                .from('characters')
+                .update(updateData)
+                .eq('id', this.characterId);
+
+            if (error) throw error;
+            
+            console.log('✅ Rascunho salvo automaticamente');
+        } catch (error) {
+            console.error('❌ Erro ao salvar rascunho:', error);
+        }
+    }
+
+    setupAutoSave() {
+        // Auto-save a cada 30 segundos
+        this.autoSaveInterval = setInterval(() => {
+            this.saveDraft();
+        }, 30000);
+
+        // Auto-save quando sair da página
+        window.addEventListener('beforeunload', () => {
+            this.saveDraft();
+        });
+
+        // Auto-save em mudanças importantes
+        const importantFields = ['charName', 'charRace', 'charClass', 'charBackground'];
+        importantFields.forEach(fieldId => {
+            const field = document.getElementById(fieldId);
+            if (field) {
+                field.addEventListener('change', () => {
+                    setTimeout(() => this.saveDraft(), 1000); // Delay para evitar muitas chamadas
+                });
+            }
+        });
     }
 
     updateAttributeDisplays() {
@@ -465,10 +594,10 @@ class CharacterSheet {
         this.saveCreationProgress();
     }
 
-    saveCreationProgress() {
-        // Salvar no localStorage temporariamente
-        localStorage.setItem('character_creation', JSON.stringify(this.character));
-        console.log('Progresso salvo:', this.character);
+    async saveCreationProgress() {
+        // Salvar rascunho no banco de dados
+        await this.saveDraft();
+        console.log('Progresso salvo no banco:', this.character);
     }
 
     async checkAuth() {
@@ -1035,14 +1164,15 @@ function initSidebarMenu() {
             const action = item.dataset.action;
             
             if (action === 'attribute-method') {
-                // Salva o ID do personagem para retornar depois
+                // Vai para a página de atributos, mas mantém o ID na URL
                 const params = new URLSearchParams(window.location.search);
                 const charId = params.get('id');
-                if (charId) {
-                    localStorage.setItem('editingCharacterId', charId);
-                }
                 
-                window.location.href = 'attribute-method.html';
+                if (charId) {
+                    window.location.href = `attribute-method.html?return_to=character-sheet.html&id=${charId}`;
+                } else {
+                    window.location.href = 'attribute-method.html?return_to=character-sheet.html';
+                }
             }
             
             closeSidebar();
@@ -1091,64 +1221,87 @@ async function finishCharacterCreation() {
             return;
         }
 
-        // Verifica se os atributos foram definidos
-        const attributesStr = localStorage.getItem('characterAttributes');
-        if (!attributesStr) {
-            alert('Por favor, defina os valores dos atributos primeiro através do Menu → Valores de Atributo');
+        // Pega a instância do CharacterSheet
+        const characterSheet = window.characterSheetInstance;
+        if (!characterSheet || !characterSheet.character) {
+            alert('Erro: dados do personagem não encontrados!');
             return;
         }
 
-        const attributes = JSON.parse(attributesStr);
+        const character = characterSheet.character;
         
         // Validações
-        const charName = document.getElementById('charName')?.value;
-        if (!charName || charName.trim() === '') {
+        if (!character.name || character.name.trim() === '') {
             alert('Por favor, dê um nome ao seu personagem!');
             return;
         }
 
-        // Pega dados selecionados (devem estar salvos na instância CharacterSheet)
-        const characterData = {
-            user_id: user.id,
-            name: charName.trim(),
-            race: null, // Implementar seleção de raça
-            character_class: null, // Implementar seleção de classe
-            background: null, // Implementar seleção de background
-            alignment: null, // Implementar seleção de alinhamento
-            level: 1,
-            experience_points: 0,
-            strength: attributes.str || 10,
-            dexterity: attributes.dex || 10,
-            constitution: attributes.con || 10,
-            intelligence: attributes.int || 10,
-            wisdom: attributes.wis || 10,
-            charisma: attributes.cha || 10,
-            hit_points_current: 10, // Calcular baseado na classe e constituição
-            hit_points_max: 10,
-            avatar_url: localStorage.getItem('characterAvatar') || null
-        };
-
-        console.log('💾 Salvando personagem:', characterData);
-
-        // Salva no Supabase
-        const { data, error } = await supabase
-            .from('characters')
-            .insert([characterData])
-            .select();
-
-        if (error) {
-            console.error('❌ Erro ao salvar:', error);
-            alert(`Erro ao salvar personagem: ${error.message}`);
+        if (!character.attributes || Object.values(character.attributes).some(val => val < 8 || val > 18)) {
+            alert('Por favor, defina os valores dos atributos primeiro através do Menu → Valores de Atributo');
             return;
         }
 
-        console.log('✅ Personagem salvo com sucesso:', data);
+        // Se é um rascunho, converte para personagem final
+        if (characterSheet.characterId) {
+            // Atualiza rascunho para personagem completo
+            const { error } = await supabase
+                .from('characters')
+                .update({
+                    is_draft: false,
+                    draft_step: null,
+                    name: character.name.trim(),
+                    updated_at: new Date().toISOString()
+                })
+                .eq('id', characterSheet.characterId);
+
+            if (error) {
+                console.error('❌ Erro ao finalizar personagem:', error);
+                alert(`Erro ao salvar personagem: ${error.message}`);
+                return;
+            }
+
+            console.log('✅ Personagem finalizado com sucesso!');
+        } else {
+            // Caso não tenha rascunho, criar personagem novo
+            const characterData = {
+                user_id: user.id,
+                name: character.name.trim(),
+                race: character.race,
+                character_class: character.class,
+                background: character.background,
+                alignment: character.alignment,
+                level: character.level || 1,
+                experience_points: 0,
+                strength: character.attributes.str || 10,
+                dexterity: character.attributes.dex || 10,
+                constitution: character.attributes.con || 10,
+                intelligence: character.attributes.int || 10,
+                wisdom: character.attributes.wis || 10,
+                charisma: character.attributes.cha || 10,
+                hit_points_current: character.hpCurrent || 8,
+                hit_points_max: character.hp || 8,
+                avatar_url: character.image,
+                is_draft: false
+            };
+
+            const { data, error } = await supabase
+                .from('characters')
+                .insert([characterData])
+                .select();
+
+            if (error) {
+                console.error('❌ Erro ao salvar:', error);
+                alert(`Erro ao salvar personagem: ${error.message}`);
+                return;
+            }
+
+            console.log('✅ Personagem salvo com sucesso:', data);
+        }
         
-        // Limpa localStorage
-        localStorage.removeItem('characterAttributes');
-        localStorage.removeItem('characterModifiers');
-        localStorage.removeItem('attributeValues');
-        localStorage.removeItem('characterAvatar');
+        // Para o auto-save
+        if (characterSheet.autoSaveInterval) {
+            clearInterval(characterSheet.autoSaveInterval);
+        }
         
         alert('✅ Personagem criado com sucesso!');
         
@@ -1195,23 +1348,23 @@ function initCharacterImageUpload() {
         const reader = new FileReader();
         reader.onload = (event) => {
             image.src = event.target.result;
-            // Salvar no localStorage temporariamente
-            localStorage.setItem('characterAvatar', event.target.result);
+            
+            // Salvar no personagem e fazer auto-save
+            const characterSheet = window.characterSheetInstance;
+            if (characterSheet && characterSheet.character) {
+                characterSheet.character.image = event.target.result;
+                characterSheet.saveDraft();
+            }
+            
             console.log('✅ Imagem do personagem atualizada');
         };
         reader.readAsDataURL(file);
     });
-    
-    // Carregar imagem salva se existir
-    const savedAvatar = localStorage.getItem('characterAvatar');
-    if (savedAvatar) {
-        image.src = savedAvatar;
-    }
 }
 
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', () => {
-    new CharacterSheet();
+    window.characterSheetInstance = new CharacterSheet();
     initSidebarMenu();
     initEditMode();
     initCharacterImageUpload();

@@ -18,23 +18,70 @@ class AttributeDistributor {
     }
     
     init() {
-        this.loadValues();
-        this.renderValues();
         this.setupEventListeners();
         this.setupDragAndDrop();
     }
     
-    loadValues() {
-        // Carrega valores do localStorage
-        const storedValues = localStorage.getItem('attributeValues');
-        
-        if (storedValues) {
-            this.values = JSON.parse(storedValues);
-            console.log('✅ Valores carregados:', this.values);
-        } else {
-            console.error('❌ Nenhum valor encontrado!');
-            alert('Erro: Nenhum valor de atributo encontrado. Redirecionando...');
-            window.location.href = 'attribute-method.html';
+    async loadValues() {
+        try {
+            // Tenta carregar dos parâmetros da URL (método preferido)
+            const params = new URLSearchParams(window.location.search);
+            const values = params.get('values');
+            
+            if (values) {
+                this.values = JSON.parse(decodeURIComponent(values));
+                console.log('✅ Valores carregados da URL:', this.values);
+                return;
+            }
+
+            // Se não tem na URL, verifica se tem personagem para carregar
+            const characterId = params.get('id');
+            if (characterId) {
+                await this.loadFromDatabase(characterId);
+                return;
+            }
+
+            // Fallback: valores padrão se nada foi encontrado
+            console.warn('⚠️ Nenhum valor encontrado, usando padrão');
+            this.values = [15, 14, 13, 12, 10, 8]; // Array padrão
+            
+        } catch (error) {
+            console.error('❌ Erro ao carregar valores:', error);
+            // Usa valores padrão em caso de erro
+            this.values = [15, 14, 13, 12, 10, 8];
+        }
+    }
+
+    async loadFromDatabase(characterId) {
+        try {
+            const { createClient } = await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.38.0/+esm');
+            const supabase = createClient(
+                'https://bifiatkpfmrrnfhvgrpb.supabase.co',
+                'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpZmlhdGtwZm1ycm5maHZncnBiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA0ODM2NTMsImV4cCI6MjA3NjA1OTY1M30.g5S4aT-ml_cgGoJHWudB36EWz-3bonFZW3DEIWNOUAM'
+            );
+
+            const { data, error } = await supabase
+                .from('characters')
+                .select('strength, dexterity, constitution, intelligence, wisdom, charisma')
+                .eq('id', characterId)
+                .single();
+
+            if (error) throw error;
+
+            if (data) {
+                // Converte atributos salvos em valores disponíveis para redistribuir
+                this.values = [
+                    data.strength, data.dexterity, data.constitution,
+                    data.intelligence, data.wisdom, data.charisma
+                ].sort((a, b) => b - a); // Ordena decrescente
+                
+                console.log('✅ Atributos carregados do banco:', this.values);
+            } else {
+                this.values = [15, 14, 13, 12, 10, 8]; // Padrão
+            }
+        } catch (error) {
+            console.error('❌ Erro ao carregar do banco:', error);
+            this.values = [15, 14, 13, 12, 10, 8]; // Padrão
         }
     }
     
@@ -262,32 +309,89 @@ class AttributeDistributor {
         document.getElementById('finishBtn').style.display = 'none';
     }
     
-    finish() {
-        // Extrai apenas os valores dos assignments
-        const attributes = {};
-        Object.keys(this.assignments).forEach(attr => {
-            attributes[attr] = this.assignments[attr].value;
-        });
-        
-        // Salva no localStorage
-        localStorage.setItem('characterAttributes', JSON.stringify(attributes));
-        
-        // Calcula e salva modificadores
-        const modifiers = {};
-        Object.keys(attributes).forEach(attr => {
-            modifiers[attr] = Math.floor((attributes[attr] - 10) / 2);
-        });
-        localStorage.setItem('characterModifiers', JSON.stringify(modifiers));
-        
-        console.log('✅ Atributos salvos:', attributes);
-        console.log('✅ Modificadores salvos:', modifiers);
-        
-        // Redireciona para a ficha
-        const characterId = new URLSearchParams(window.location.search).get('characterId');
+    async finish() {
+        try {
+            // Extrai apenas os valores dos assignments
+            const attributes = {};
+            Object.keys(this.assignments).forEach(attr => {
+                attributes[attr] = this.assignments[attr].value;
+            });
+            
+            console.log('✅ Atributos definidos:', attributes);
+            
+            // Salva no banco de dados
+            await this.saveAttributesToDatabase(attributes);
+            
+            // Redireciona para a ficha
+            const params = new URLSearchParams(window.location.search);
+            const characterId = params.get('id');
+            const returnTo = params.get('return_to');
+            
+            if (characterId && returnTo) {
+                window.location.href = `${returnTo}?id=${characterId}`;
+            } else if (characterId) {
+                window.location.href = `character-sheet.html?id=${characterId}`;
+            } else {
+                window.location.href = 'character-sheet.html';
+            }
+        } catch (error) {
+            console.error('❌ Erro ao salvar atributos:', error);
+            alert('Erro ao salvar atributos. Tente novamente.');
+        }
+    }
+
+    async saveAttributesToDatabase(attributes) {
+        // Importa Supabase
+        const { createClient } = await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.38.0/+esm');
+        const supabase = createClient(
+            'https://bifiatkpfmrrnfhvgrpb.supabase.co',
+            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpZmlhdGtwZm1ycm5maHZncnBiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA0ODM2NTMsImV4cCI6MjA3NjA1OTY1M30.g5S4aT-ml_cgGoJHWudB36EWz-3bonFZW3DEIWNOUAM'
+        );
+
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) {
+            throw new Error('Usuário não autenticado');
+        }
+
+        // Busca o rascunho mais recente ou cria um novo
+        const params = new URLSearchParams(window.location.search);
+        let characterId = params.get('id');
+
+        if (!characterId) {
+            // Buscar rascunho existente
+            const { data: drafts } = await supabase
+                .from('characters')
+                .select('id')
+                .eq('user_id', user.id)
+                .eq('is_draft', true)
+                .order('updated_at', { ascending: false })
+                .limit(1);
+
+            if (drafts && drafts.length > 0) {
+                characterId = drafts[0].id;
+            }
+        }
+
         if (characterId) {
-            window.location.href = `character-sheet.html?id=${characterId}`;
+            // Atualiza o personagem/rascunho existente
+            const { error } = await supabase
+                .from('characters')
+                .update({
+                    strength: attributes.str,
+                    dexterity: attributes.dex,
+                    constitution: attributes.con,
+                    intelligence: attributes.int,
+                    wisdom: attributes.wis,
+                    charisma: attributes.cha,
+                    draft_step: 'attributes_complete',
+                    updated_at: new Date().toISOString()
+                })
+                .eq('id', characterId);
+
+            if (error) throw error;
+            console.log('✅ Atributos salvos no personagem:', characterId);
         } else {
-            window.location.href = 'character-sheet.html';
+            throw new Error('Nenhum personagem encontrado para atualizar');
         }
     }
 }
@@ -312,6 +416,9 @@ style.textContent = `
 document.head.appendChild(style);
 
 // Inicializa quando a página carregar
-document.addEventListener('DOMContentLoaded', () => {
-    new AttributeDistributor();
+document.addEventListener('DOMContentLoaded', async () => {
+    const distributor = new AttributeDistributor();
+    await distributor.loadValues();
+    distributor.renderValues();
+    distributor.renderAttributes();
 });
