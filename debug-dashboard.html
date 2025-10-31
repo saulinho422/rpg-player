@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Dashboard - RPG Player</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background: #1a1a1a; color: #fff; }
+        .debug-section { margin: 20px 0; padding: 15px; border: 1px solid #333; border-radius: 8px; }
+        .debug-title { color: #d4af37; font-weight: bold; margin-bottom: 10px; }
+        .debug-content { background: #2a2a2a; padding: 10px; border-radius: 4px; white-space: pre-wrap; }
+        button { background: #d4af37; color: #000; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; margin: 5px; }
+        button:hover { background: #b8941f; }
+        .status { padding: 5px 10px; border-radius: 4px; margin: 5px 0; }
+        .success { background: #28a745; }
+        .error { background: #dc3545; }
+        .warning { background: #ffc107; color: #000; }
+    </style>
+</head>
+<body>
+    <h1>🔍 Debug Dashboard - RPG Player</h1>
+    
+    <div class="debug-section">
+        <div class="debug-title">🔐 Status de Autenticação</div>
+        <div id="authStatus" class="debug-content">Verificando...</div>
+        <button onclick="checkAuth()">Verificar Auth</button>
+    </div>
+
+    <div class="debug-section">
+        <div class="debug-title">👥 Personagens do Usuário</div>
+        <div id="charactersStatus" class="debug-content">Aguardando...</div>
+        <button onclick="checkCharacters()">Buscar Personagens</button>
+        <button onclick="createTestCharacter()">Criar Personagem Teste</button>
+    </div>
+
+    <div class="debug-section">
+        <div class="debug-title">📊 Estrutura da Tabela Characters</div>
+        <div id="tableStructure" class="debug-content">Aguardando...</div>
+        <button onclick="checkTableStructure()">Verificar Estrutura</button>
+    </div>
+
+    <div class="debug-section">
+        <div class="debug-title">🎲 Campanhas</div>
+        <div id="campaignsStatus" class="debug-content">Aguardando...</div>
+        <button onclick="checkCampaigns()">Buscar Campanhas</button>
+    </div>
+
+    <div class="debug-section">
+        <div class="debug-title">📜 Atividades</div>
+        <div id="activitiesStatus" class="debug-content">Aguardando...</div>
+        <button onclick="checkActivities()">Buscar Atividades</button>
+    </div>
+
+    <script type="module">
+        import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.38.0/+esm'
+        import { CharacterService, CampaignService, ActivityService } from './js/database.js'
+
+        const SUPABASE_URL = 'https://bifiatkpfmrrnfhvgrpb.supabase.co'
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpZmlhdGtwZm1ycm5maHZncnBiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA0ODM2NTMsImV4cCI6MjA3NjA1OTY1M30.g5S4aT-ml_cgGoJHWudB36EWz-3bonFZW3DEIWNOUAM'
+
+        const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+
+        window.checkAuth = async function() {
+            try {
+                const { data: { user }, error } = await supabase.auth.getUser()
+                
+                if (error) throw error
+                
+                const statusEl = document.getElementById('authStatus')
+                if (user) {
+                    statusEl.innerHTML = `
+                        <div class="status success">✅ AUTENTICADO</div>
+                        <strong>User ID:</strong> ${user.id}
+                        <strong>Email:</strong> ${user.email}
+                        <strong>Confirmado:</strong> ${user.email_confirmed_at ? 'Sim' : 'Não'}
+                    `
+                } else {
+                    statusEl.innerHTML = `<div class="status error">❌ NÃO AUTENTICADO</div>`
+                }
+            } catch (error) {
+                document.getElementById('authStatus').innerHTML = `
+                    <div class="status error">❌ ERRO: ${error.message}</div>
+                `
+            }
+        }
+
+        window.checkCharacters = async function() {
+            try {
+                const { data: { user } } = await supabase.auth.getUser()
+                if (!user) {
+                    document.getElementById('charactersStatus').innerHTML = `<div class="status error">❌ Usuário não autenticado</div>`
+                    return
+                }
+
+                const characters = await CharacterService.getUserCharacters(user.id)
+                
+                document.getElementById('charactersStatus').innerHTML = `
+                    <div class="status ${characters.length ? 'success' : 'warning'}">
+                        ${characters.length ? '✅' : '⚠️'} Encontrados: ${characters.length} personagens
+                    </div>
+                    ${JSON.stringify(characters, null, 2)}
+                `
+            } catch (error) {
+                document.getElementById('charactersStatus').innerHTML = `
+                    <div class="status error">❌ ERRO: ${error.message}</div>
+                `
+            }
+        }
+
+        window.createTestCharacter = async function() {
+            try {
+                const { data: { user } } = await supabase.auth.getUser()
+                if (!user) {
+                    alert('Usuário não autenticado!')
+                    return
+                }
+
+                const testCharacter = {
+                    user_id: user.id,
+                    name: 'Personagem Teste',
+                    character_class: 'Guerreiro',
+                    race: 'Humano',
+                    level: 1,
+                    strength: 15,
+                    dexterity: 14,
+                    constitution: 13,
+                    intelligence: 12,
+                    wisdom: 10,
+                    charisma: 8,
+                    hit_points_max: 10,
+                    hit_points_current: 10,
+                    is_draft: false
+                }
+
+                const { data, error } = await supabase
+                    .from('characters')
+                    .insert([testCharacter])
+                    .select()
+
+                if (error) throw error
+
+                alert('✅ Personagem teste criado!')
+                checkCharacters()
+            } catch (error) {
+                alert(`❌ Erro: ${error.message}`)
+            }
+        }
+
+        window.checkTableStructure = async function() {
+            try {
+                // Tentar fazer uma query para verificar colunas
+                const { data, error } = await supabase
+                    .from('characters')
+                    .select('*')
+                    .limit(1)
+
+                if (error) throw error
+
+                const columns = data && data[0] ? Object.keys(data[0]) : []
+                
+                document.getElementById('tableStructure').innerHTML = `
+                    <div class="status success">✅ Tabela acessível</div>
+                    <strong>Colunas encontradas:</strong>
+                    ${columns.map(col => `• ${col}`).join('\n')}
+                `
+            } catch (error) {
+                document.getElementById('tableStructure').innerHTML = `
+                    <div class="status error">❌ ERRO: ${error.message}</div>
+                `
+            }
+        }
+
+        window.checkCampaigns = async function() {
+            try {
+                const { data: { user } } = await supabase.auth.getUser()
+                if (!user) return
+
+                const campaigns = await CampaignService.getUserCampaigns(user.id)
+                
+                document.getElementById('campaignsStatus').innerHTML = `
+                    <div class="status ${campaigns.length ? 'success' : 'warning'}">
+                        ${campaigns.length ? '✅' : '⚠️'} Encontradas: ${campaigns.length} campanhas
+                    </div>
+                    ${JSON.stringify(campaigns, null, 2)}
+                `
+            } catch (error) {
+                document.getElementById('campaignsStatus').innerHTML = `
+                    <div class="status error">❌ ERRO: ${error.message}</div>
+                `
+            }
+        }
+
+        window.checkActivities = async function() {
+            try {
+                const { data: { user } } = await supabase.auth.getUser()
+                if (!user) return
+
+                const activities = await ActivityService.getUserActivities(user.id, 5)
+                
+                document.getElementById('activitiesStatus').innerHTML = `
+                    <div class="status ${activities.length ? 'success' : 'warning'}">
+                        ${activities.length ? '✅' : '⚠️'} Encontradas: ${activities.length} atividades
+                    </div>
+                    ${JSON.stringify(activities, null, 2)}
+                `
+            } catch (error) {
+                document.getElementById('activitiesStatus').innerHTML = `
+                    <div class="status error">❌ ERRO: ${error.message}</div>
+                `
+            }
+        }
+
+        // Auto-executar verificações
+        document.addEventListener('DOMContentLoaded', () => {
+            checkAuth()
+            setTimeout(checkTableStructure, 1000)
+        })
+    </script>
+</body>
+</html>

@@ -5,6 +5,12 @@
 import { DashboardService } from './dashboard-real.js'
 import { checkAuth } from './auth-supabase-only.js'
 
+// Previne múltiplas inicializações
+if (window.dashboardInitialized) {
+    console.warn('⚠️ Dashboard já foi inicializado, ignorando nova inicialização');
+} else {
+    window.dashboardInitialized = true;
+
 // =====================================
 // CONTROLE DE ABAS
 // =====================================
@@ -297,10 +303,18 @@ function checkAuthentication() {
 // =====================================
 
 document.addEventListener('DOMContentLoaded', async () => {
+    // Verifica se já foi inicializado
+    if (!window.dashboardInitialized) {
+        console.warn('⚠️ Dashboard não foi marcado como inicializado, abortando');
+        return;
+    }
+    
     // Verifica autenticação primeiro
     if (!checkAuthentication()) {
         return
     }
+    
+    console.log('🚀 Inicializando dashboard...');
     
     // Inicializa todos os módulos
     initTabNavigation()
@@ -366,3 +380,5 @@ window.dashboardFunctions = {
     isMobileDevice,
     isLandscape
 }
+
+} // Fecha a verificação de dashboardInitialized

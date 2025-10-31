@@ -3,6 +3,12 @@
 // =====================================
 
 import { UserService, CharacterService, CampaignService, ActivityService } from './database.js'
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.38.0/+esm'
+
+const supabase = createClient(
+    'https://bifiatkpfmrrnfhvgrpb.supabase.co',
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpZmlhdGtwZm1ycm5maHZncnBiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA0ODM2NTMsImV4cCI6MjA3NjA1OTY1M30.g5S4aT-ml_cgGoJHWudB36EWz-3bonFZW3DEIWNOUAM'
+)
 
 export class DashboardService {
     
@@ -41,22 +47,37 @@ export class DashboardService {
     
     static async loadUserCharacters() {
         try {
-            const userId = localStorage.getItem('currentUserId')
+            // Primeiro tenta pegar do Supabase auth
+            const { data: { user } } = await supabase.auth.getUser();
+            let userId = user?.id;
+            
+            // Fallback para localStorage se não houver sessão ativa
+            if (!userId) {
+                userId = localStorage.getItem('currentUserId');
+            }
+            
             console.log('🔍 Dashboard: Carregando personagens para userId:', userId)
             
             if (!userId) {
-                console.warn('⚠️ Dashboard: Nenhum userId encontrado no localStorage')
+                console.warn('⚠️ Dashboard: Nenhum userId encontrado (nem auth nem localStorage)')
                 return []
             }
             
             const characters = await CharacterService.getUserCharacters(userId)
             console.log('👥 Dashboard: Personagens carregados:', characters)
             
+            // Filtra apenas personagens não-rascunho ou rascunhos com nome
+            const validCharacters = characters.filter(char => 
+                !char.is_draft || (char.is_draft && char.name && char.name.trim() !== '')
+            );
+            
+            console.log('👥 Dashboard: Personagens válidos (não-rascunhos vazios):', validCharacters.length);
+            
             // Atualiza a seção de personagens
-            this.updateCharactersSection(characters)
+            this.updateCharactersSection(validCharacters)
             console.log('✅ Dashboard: Seção de personagens atualizada')
             
-            return characters
+            return validCharacters
         } catch (error) {
             console.error('❌ Dashboard: Erro ao carregar personagens:', error)
             return []

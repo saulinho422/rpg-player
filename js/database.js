@@ -9,7 +9,21 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
 const SUPABASE_URL = 'https://bifiatkpfmrrnfhvgrpb.supabase.co'
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpZmlhdGtwZm1ycm5maHZncnBiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA0ODM2NTMsImV4cCI6MjA3NjA1OTY1M30.g5S4aT-ml_cgGoJHWudB36EWz-3bonFZW3DEIWNOUAM'
 
-const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+// Singleton - evita multiple instances
+let supabaseInstance = null;
+function getSupabaseClient() {
+    if (!supabaseInstance) {
+        supabaseInstance = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+            auth: {
+                storageKey: 'rpg-player-auth',
+                storage: window.localStorage
+            }
+        });
+    }
+    return supabaseInstance;
+}
+
+const supabase = getSupabaseClient();
 
 // =====================================
 // FUNÇÃO PARA OBTER CLIENTE AUTENTICADO
@@ -268,18 +282,23 @@ export class CharacterService {
     // Lista personagens do usuário
     static async getUserCharacters(userId) {
         try {
+            console.log('🔍 Buscando personagens para userId:', userId);
+            
             const { data, error } = await supabase
                 .from('characters')
                 .select('*')
                 .eq('user_id', userId)
-                .eq('is_active', true)
                 .order('created_at', { ascending: false })
             
-            if (error) throw error
+            if (error) {
+                console.error('❌ Erro na query de personagens:', error);
+                throw error;
+            }
             
+            console.log('📊 Personagens encontrados:', data?.length || 0, data);
             return data || []
         } catch (error) {
-            console.error('Erro ao buscar personagens:', error)
+            console.error('❌ Erro ao buscar personagens:', error)
             return []
         }
     }
