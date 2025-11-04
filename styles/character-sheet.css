@@ -335,7 +335,27 @@ form.charsheet header section.misc ul li input {
 form.charsheet main {
     display: flex;
     justify-content: space-between;
+    gap: var(--gutter);
     margin-top: calc(var(--gutter) * 2);
+}
+
+/* Three Column Layout */
+form.charsheet main .left-column {
+    width: 32%;
+    display: flex;
+    flex-direction: column;
+}
+
+form.charsheet main .center-column {
+    width: 32%;
+    display: flex;
+    flex-direction: column;
+}
+
+form.charsheet main .right-column {
+    width: 32%;
+    display: flex;
+    flex-direction: column;
 }
 
 form.charsheet main div.label-container {
@@ -357,18 +377,13 @@ form.charsheet main div.label-container > label {
     font-size: 8px;
 }
 
-form.charsheet main > section {
-    width: 32%;
-    display: flex;
-    flex-direction: column;
-}
-
 /* Attributes Section */
 form.charsheet main section.attributes {
     width: 100%;
     display: flex;
     flex-direction: row;
     justify-content: space-between;
+    margin-bottom: var(--gutter);
 }
 
 form.charsheet main section.attributes div.scores {
