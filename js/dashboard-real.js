@@ -4,6 +4,7 @@
 
 import { UserService, CharacterService, CampaignService, ActivityService } from './database.js'
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.38.0/+esm'
+import defaultAvatar from '../img/perfil_empty_user.png'
 
 const supabase = createClient(
     'https://bifiatkpfmrrnfhvgrpb.supabase.co',
@@ -167,7 +168,7 @@ export class DashboardService {
             } else {
                 // Fallback se não tiver avatar_url
                 console.log('⚠️ Avatar URL vazio, usando fallback')
-                userAvatar.src = '/img/perfil_empty_user.png'
+                userAvatar.src = defaultAvatar
             }
         } else {
             console.log('❌ Elemento userAvatar não encontrado no DOM')
