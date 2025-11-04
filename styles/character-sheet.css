@@ -236,18 +236,23 @@ form.charsheet div.textblock label {
     border: 2px solid var(--primary-color);
     border-top: 0;
     font-size: 11px;
-    width: calc(100% - calc(var(--radius) * 2) - 2px);
+    width: 100%;
     border-radius: 0 0 var(--radius) var(--radius);
     padding: 6px 0;
     font-weight: bold;
     background: var(--faded-light);
     color: var(--text-dark);
+    margin: 0;
 }
 
 form.charsheet div.textblock textarea {
     border: 2px solid var(--primary-color);
+    border-bottom: 0;
+    border-radius: var(--radius) var(--radius) 0 0;
     background: var(--bg-input);
     color: var(--text-dark);
+    width: 100%;
+    margin: 0;
 }
 
 form.charsheet ul {
@@ -611,6 +616,7 @@ form.charsheet main section.combat > div.armorclass,
 form.charsheet main section.combat > div.initiative,
 form.charsheet main section.combat > div.speed {
     flex-basis: 33.333%;
+    margin: 0 4px;
 }
 
 form.charsheet main section.combat > div.armorclass > div,
