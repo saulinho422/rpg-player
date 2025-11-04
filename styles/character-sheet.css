@@ -295,6 +295,9 @@ form.charsheet header section.charname input {
     padding: 0.5em;
     margin: 5px;
     border: 0;
+    background: var(--bg-input);
+    color: var(--text-dark);
+    font-weight: 500;
 }
 
 form.charsheet header section.charname label {
@@ -348,6 +351,7 @@ form.charsheet main > section {
     width: 32%;
     display: flex;
     flex-direction: column;
+    gap: var(--gutter);
 }
 
 form.charsheet main div.label-container {
@@ -444,10 +448,15 @@ form.charsheet main > section section.attributes div.scores ul li div.modifier i
 }
 
 /* Attribute Applications */
+form.charsheet main > section section.attributes div.attr-applications {
+    margin-left: var(--gutter);
+}
+
 form.charsheet main > section section.attributes div.attr-applications div.inspiration {
     display: flex;
     flex-direction: row-reverse;
     justify-content: flex-end;
+    margin-bottom: var(--gutter);
 }
 
 form.charsheet main > section section.attributes div.attr-applications div.inspiration input {
@@ -461,6 +470,7 @@ form.charsheet main > section section.attributes div.attr-applications div.profi
     display: flex;
     flex-direction: row-reverse;
     justify-content: flex-end;
+    margin-bottom: var(--gutter);
 }
 
 form.charsheet main > section section.attributes div.attr-applications div.proficiencybonus input {
@@ -477,6 +487,7 @@ form.charsheet main > section section.attributes div.attr-applications div.list-
     padding: var(--gutter) calc(var(--gutter) / 2);
     background: var(--bg);
     box-shadow: var(--shadow);
+    margin-bottom: var(--gutter);
 }
 
 form.charsheet main > section section.attributes div.attr-applications div.list-section div.label {
@@ -548,16 +559,37 @@ form.charsheet main div.passive-perception {
     justify-content: flex-end;
 }
 
+form.charsheet main div.passive-perception {
+    margin-top: var(--gutter);
+}
+
 form.charsheet main div.passive-perception input {
     width: var(--small-box-width);
     height: calc(var(--small-box-width) - 2px);
     text-align: center;
-    border: 1px solid black;
+    border: 2px solid var(--primary-color);
     border-radius: var(--radius);
+    background: var(--bg-input);
+    color: var(--text-dark);
+}
+
+form.charsheet main div.otherprofs {
+    margin-top: var(--gutter);
 }
 
 form.charsheet main div.otherprofs textarea {
     height: 26em;
+    background: var(--bg-input);
+    color: var(--text-dark);
+}
+
+form.charsheet main div.otherprofs label {
+    font-size: 10px;
+    font-weight: bold;
+    text-align: center;
+    padding: 6px 4px;
+    word-wrap: break-word;
+    line-height: 1.2;
 }
 
 /* Combat Section */
@@ -588,6 +620,7 @@ form.charsheet main section.combat > div.speed > div {
     flex-direction: column-reverse;
     align-items: center;
     margin-top: var(--gutter);
+    padding: 0 8px;
 }
 
 form.charsheet main section.combat > div.armorclass > div label,
