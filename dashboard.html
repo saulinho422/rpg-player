@@ -129,8 +129,7 @@
                 <div class="tab-content" id="personagens-tab">
                     <div class="content-header">
                         <h2>👥 Meus Personagens</h2>
-                        <button class="add-btn" onclick="window.location.href='character-sheet.html?new=true'">+ Criar Personagem</button>
-                        <button class="add-btn" onclick="debugCharacters()" style="background: #e74c3c; margin-left: 10px;">🐛 Debug</button>
+                        <button class="add-btn disabled-btn" id="createCharacterBtn" style="background: #95a5a6; cursor: not-allowed;">+ Criar Personagem</button>
                     </div>
 
                     <div class="characters-grid">
@@ -283,5 +282,84 @@
     <script type="module" src="js/database.js"></script>
     <script type="module" src="js/dashboard-real.js"></script>
     <script type="module" src="js/dashboard.js"></script>
+    
+    <script>
+        // Adiciona evento ao botão de criar personagem
+        document.addEventListener('DOMContentLoaded', function() {
+            const createBtn = document.getElementById('createCharacterBtn');
+            if (createBtn) {
+                createBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    showNotification('🚧 A criação de personagem está em desenvolvimento', 'info');
+                });
+            }
+        });
+        
+        // Função para mostrar notificações
+        function showNotification(message, type = 'info') {
+            // Remove notificação anterior se existir
+            const existingNotification = document.querySelector('.notification-toast');
+            if (existingNotification) {
+                existingNotification.remove();
+            }
+            
+            // Cria nova notificação
+            const notification = document.createElement('div');
+            notification.className = `notification-toast ${type}`;
+            notification.textContent = message;
+            
+            // Estilos inline
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 15px 25px;
+                background: linear-gradient(135deg, #3498db, #2980b9);
+                color: white;
+                border-radius: 10px;
+                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+                z-index: 10000;
+                font-family: 'Cinzel', serif;
+                font-size: 14px;
+                animation: slideInRight 0.3s ease-out;
+                max-width: 300px;
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // Remove após 3 segundos
+            setTimeout(() => {
+                notification.style.animation = 'slideOutRight 0.3s ease-out';
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+        
+        // Adiciona animações CSS
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideInRight {
+                from {
+                    transform: translateX(400px);
+                    opacity: 0;
+                }
+                to {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+            }
+            
+            @keyframes slideOutRight {
+                from {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+                to {
+                    transform: translateX(400px);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
 </body>
 </html>
