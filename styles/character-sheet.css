@@ -3,21 +3,24 @@
 /* Core Theme Variables */
 :root {
     --primary-color: #d4af37;
-    --secondary-color: #d4af37;
-    --text-color: #e8dcc6;
+    --secondary-color: #c9b037;
+    --text-color: #f5f5f5;
+    --text-dark: #2c2c2c;
     --border-color: #d4af37;
-    --bg-color: rgba(15, 52, 96, 0.6);
-    --bg-dark: #1a1a2e;
+    --bg-color: rgba(15, 52, 96, 0.3);
+    --bg-dark: #2c3e50;
     --sheet-width: 800px;
-    --bg: white;
-    --faded: #ddd;
-    --faded-light: #eee;
-    --faded-dark: #bbb;
-    --radius: 10px;
-    --gutter: 10px;
-    --bubble-size: 10px;
-    --small-box-width: 30px;
-    --large-box-width: 70px;
+    --bg: #ffffff;
+    --bg-input: #f8f9fa;
+    --faded: #6c757d;
+    --faded-light: #e9ecef;
+    --faded-dark: #495057;
+    --radius: 8px;
+    --gutter: 12px;
+    --bubble-size: 12px;
+    --small-box-width: 35px;
+    --large-box-width: 80px;
+    --shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
 * {
@@ -28,32 +31,22 @@
 
 body {
     font-family: 'Book Antiqua', 'Palatino Linotype', serif;
-    background: url('../img/plano_de_fundo1.png') center/cover no-repeat fixed;
+    background: linear-gradient(135deg, #2c3e50 0%, #34495e 50%, #2c3e50 100%);
     color: var(--text-color);
     padding: 20px;
     position: relative;
-}
-
-body::before {
-    content: '';
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(10, 10, 20, 0.85);
-    z-index: -1;
+    min-height: 100vh;
 }
 
 /* Container */
 .sheet-container {
     max-width: 1200px;
     margin: 0 auto;
-    background: rgba(26, 26, 46, 0.95);
+    background: rgba(255, 255, 255, 0.97);
     padding: 30px;
-    border-radius: 20px;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
-    border: 2px solid rgba(212, 175, 55, 0.3);
+    border-radius: 15px;
+    box-shadow: 0 15px 50px rgba(0, 0, 0, 0.3);
+    border: 3px solid var(--primary-color);
 }
 
 /* Controls */
@@ -228,6 +221,7 @@ form.charsheet {
     margin-right: auto;
     margin-left: auto;
     margin-top: 10px;
+    color: var(--text-dark);
 }
 
 form.charsheet div.textblock {
@@ -239,17 +233,21 @@ form.charsheet div.textblock {
 
 form.charsheet div.textblock label {
     text-align: center;
-    border: 1px solid black;
+    border: 2px solid var(--primary-color);
     border-top: 0;
-    font-size: 10px;
+    font-size: 11px;
     width: calc(100% - calc(var(--radius) * 2) - 2px);
     border-radius: 0 0 var(--radius) var(--radius);
-    padding: 4px 0;
+    padding: 6px 0;
     font-weight: bold;
+    background: var(--faded-light);
+    color: var(--text-dark);
 }
 
 form.charsheet div.textblock textarea {
-    border: 1px solid black;
+    border: 2px solid var(--primary-color);
+    background: var(--bg-input);
+    color: var(--text-dark);
 }
 
 form.charsheet ul {
@@ -279,17 +277,18 @@ form.charsheet header {
 }
 
 form.charsheet header section.charname {
-    border: 1px solid black;
+    border: 2px solid var(--primary-color);
     border-right: 0;
     border-radius: var(--radius) 0 0 var(--radius);
-    padding: 5px 0;
-    background-color: var(--faded-light);
+    padding: 8px 0;
+    background: linear-gradient(135deg, var(--faded-light) 0%, var(--bg) 100%);
     width: 30%;
     display: flex;
     flex-direction: column-reverse;
     bottom: 0;
     top: 0;
     margin: auto;
+    box-shadow: var(--shadow);
 }
 
 form.charsheet header section.charname input {
@@ -304,10 +303,12 @@ form.charsheet header section.charname label {
 
 form.charsheet header section.misc {
     width: 70%;
-    border: 1px solid black;
+    border: 2px solid var(--primary-color);
     border-radius: var(--radius);
     padding-left: 1em;
     padding-right: 1em;
+    background: linear-gradient(135deg, var(--bg) 0%, var(--faded-light) 100%);
+    box-shadow: var(--shadow);
 }
 
 form.charsheet header section.misc ul {
@@ -328,7 +329,11 @@ form.charsheet header section.misc ul li label {
 
 form.charsheet header section.misc ul li input {
     border: 0;
-    border-bottom: 1px solid var(--faded);
+    border-bottom: 2px solid var(--primary-color);
+    background: transparent;
+    color: var(--text-dark);
+    font-weight: 500;
+    padding: 4px 2px;
 }
 
 /* Main Layout */
@@ -374,9 +379,11 @@ form.charsheet main > section section.attributes {
 
 form.charsheet main > section section.attributes div.scores {
     width: calc(70px + 31px);
-    background-color: var(--faded-dark);
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
     border-radius: var(--radius);
     padding-bottom: calc(var(--gutter) / 2);
+    box-shadow: var(--shadow);
+    border: 2px solid var(--primary-color);
 }
 
 form.charsheet main > section section.attributes div.scores label {
@@ -393,14 +400,16 @@ form.charsheet main > section section.attributes div.scores ul {
 }
 
 form.charsheet main > section section.attributes div.scores ul li {
-    height: 80px;
-    width: 70px;
-    background-color: var(--bg);
-    border: 1px solid black;
+    height: 85px;
+    width: 75px;
+    background: var(--bg);
+    border: 2px solid var(--text-dark);
     text-align: center;
     display: flex;
     flex-direction: column;
     border-radius: var(--radius);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    margin: 2px 0;
 }
 
 form.charsheet main > section section.attributes div.scores ul li input {
@@ -411,9 +420,11 @@ form.charsheet main > section section.attributes div.scores ul li input {
 
 form.charsheet main > section section.attributes div.scores ul li div.score input {
     text-align: center;
-    font-size: 40px;
-    padding: 2px 0px 0px 0px;
+    font-size: 36px;
+    font-weight: bold;
+    padding: 4px 0px;
     background: var(--bg);
+    color: var(--text-dark);
 }
 
 form.charsheet main > section section.attributes div.scores ul li div.modifier {
@@ -422,12 +433,14 @@ form.charsheet main > section section.attributes div.scores ul li div.modifier {
 
 form.charsheet main > section section.attributes div.scores ul li div.modifier input {
     background: var(--bg);
-    width: calc(var(--radius) * 3);
-    height: calc(var(--radius) * 2);
-    border: 1px inset black;
+    width: calc(var(--radius) * 3.5);
+    height: calc(var(--radius) * 2.2);
+    border: 2px solid var(--text-dark);
     border-radius: calc(var(--radius) * 2);
-    margin: -1px;
+    margin: 2px;
     text-align: center;
+    font-weight: bold;
+    color: var(--text-dark);
 }
 
 /* Attribute Applications */
@@ -459,9 +472,11 @@ form.charsheet main > section section.attributes div.attr-applications div.profi
 }
 
 form.charsheet main > section section.attributes div.attr-applications div.list-section {
-    border: 1px solid black;
+    border: 2px solid var(--primary-color);
     border-radius: var(--radius);
     padding: var(--gutter) calc(var(--gutter) / 2);
+    background: var(--bg);
+    box-shadow: var(--shadow);
 }
 
 form.charsheet main > section section.attributes div.attr-applications div.list-section div.label {
@@ -494,25 +509,32 @@ form.charsheet main > section section.attributes div.attr-applications div.list-
 }
 
 form.charsheet main > section section.attributes div.attr-applications div.list-section ul li input[type="text"] {
-    width: 30px;
+    width: 35px;
     font-size: 12px;
+    font-weight: bold;
     text-align: center;
     border: 0;
-    border-bottom: 1px solid black;
+    border-bottom: 2px solid var(--primary-color);
     order: 2;
+    background: var(--bg-input);
+    color: var(--text-dark);
+    padding: 2px;
 }
 
 form.charsheet main > section section.attributes div.attr-applications div.list-section ul li input[type="checkbox"] {
     appearance: none;
     width: var(--bubble-size);
     height: var(--bubble-size);
-    border: 1px solid black;
+    border: 2px solid var(--primary-color);
     border-radius: var(--bubble-size);
     order: 1;
+    background: var(--bg);
+    cursor: pointer;
 }
 
 form.charsheet main > section section.attributes div.attr-applications div.list-section ul li input[type="checkbox"]:checked {
-    background-color: black;
+    background: var(--primary-color);
+    border-color: var(--secondary-color);
 }
 
 /* Box Elements */
@@ -540,10 +562,13 @@ form.charsheet main div.otherprofs textarea {
 
 /* Combat Section */
 form.charsheet main section.combat {
-    background-color: var(--faded-light);
+    background: linear-gradient(135deg, var(--faded-light) 0%, var(--bg) 100%);
     display: flex;
     flex-wrap: wrap;
     border-radius: var(--radius);
+    border: 2px solid var(--primary-color);
+    box-shadow: var(--shadow);
+    padding: 8px;
 }
 
 form.charsheet main section.combat > div {
