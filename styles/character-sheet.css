@@ -347,6 +347,27 @@ form.charsheet main > section {
     gap: var(--gutter);
 }
 
+form.charsheet main .left-column {
+    width: 32%;
+    display: flex;
+    flex-direction: column;
+    gap: var(--gutter);
+}
+
+form.charsheet main .center-column {
+    width: 32%;
+    display: flex;
+    flex-direction: column;
+    gap: var(--gutter);
+}
+
+form.charsheet main .right-column {
+    width: 32%;
+    display: flex;
+    flex-direction: column;
+    gap: var(--gutter);
+}
+
 form.charsheet main div.label-container {
     position: relative;
     width: 100%;
@@ -370,8 +391,14 @@ form.charsheet main div.label-container > label {
 form.charsheet main section.attributes {
     width: 100%;
     display: flex;
-    flex-direction: row;
-    justify-content: space-between;
+    flex-direction: column;
+    gap: var(--gutter);
+}
+
+/* Attributes Layout Container */
+form.charsheet main section.attributes .attr-layout {
+    display: flex;
+    gap: var(--gutter);
     margin-bottom: var(--gutter);
 }
 
@@ -380,6 +407,14 @@ form.charsheet main section.attributes div.scores {
     background-color: var(--faded-dark);
     border-radius: var(--radius);
     padding-bottom: calc(var(--gutter) / 2);
+    flex-shrink: 0;
+}
+
+form.charsheet main section.attributes div.attr-applications {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: var(--gutter);
 }
 
 form.charsheet main section.attributes div.scores label {
