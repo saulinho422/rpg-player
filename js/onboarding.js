@@ -17,6 +17,8 @@ class OnboardingSystem {
             experience: '',
             role: ''
         }
+        this.lastNotification = null // Controle de notificações
+        this.notificationTimeout = null
         
         this.init()
     }
@@ -120,11 +122,12 @@ class OnboardingSystem {
     // =====================================
     
     validateCurrentStep() {
-        switch (this.currentStep) {
-            case 1: // Avatar
+        switch(this.currentStep) {
+            case 1: // Avatar - OPCIONAL, não precisa validar
+                // Se não tiver avatar, usa a imagem padrão
                 if (!this.userData.avatar) {
-                    this.showMessage('Selecione um avatar antes de continuar!', 'error')
-                    return false
+                    this.userData.avatar = 'img/perfil_empty_user.png'
+                    this.userData.avatarType = 'default'
                 }
                 break
                 
@@ -168,9 +171,6 @@ class OnboardingSystem {
         // Navegação
         document.getElementById('nextBtn')?.addEventListener('click', () => this.nextStep())
         document.getElementById('prevBtn')?.addEventListener('click', () => this.prevStep())
-        
-        // Skip onboarding
-        document.getElementById('skipOnboarding')?.addEventListener('click', () => this.skipOnboarding())
         
         // Logout button
         document.getElementById('logoutBtn')?.addEventListener('click', async () => {
@@ -495,6 +495,20 @@ class OnboardingSystem {
     // =====================================
     
     showMessage(message, type = 'info') {
+        // Previne notificações duplicadas consecutivas
+        if (this.lastNotification === message) {
+            console.log('⚠️ Notificação duplicada bloqueada:', message)
+            return
+        }
+        
+        this.lastNotification = message
+        
+        // Reseta o controle após 1 segundo
+        clearTimeout(this.notificationTimeout)
+        this.notificationTimeout = setTimeout(() => {
+            this.lastNotification = null
+        }, 1000)
+        
         let messagesContainer = document.getElementById('messages')
         if (!messagesContainer) {
             messagesContainer = document.createElement('div')
