@@ -207,7 +207,7 @@ export class DashboardService {
                     <div class="no-data-icon">👤</div>
                     <h3>Nenhum personagem ainda</h3>
                     <p>Crie seu primeiro personagem para começar suas aventuras!</p>
-                    <button class="btn-primary" onclick="window.location.href='character-sheet.html?new=true'">+ Criar Personagem</button>
+                    <button class="btn-primary" style="background: #95a5a6; cursor: not-allowed;" onclick="event.preventDefault(); showNotification('🚧 A criação de personagem está em desenvolvimento', 'info')">+ Criar Personagem</button>
                 </div>
             `
             return
