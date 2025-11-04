@@ -127,7 +127,7 @@ class OnboardingSystem {
             case 1: // Avatar - OPCIONAL, não precisa validar
                 // Se não tiver avatar, usa a imagem padrão
                 if (!this.userData.avatar) {
-                    this.userData.avatar = 'img/perfil_empty_user.png'
+                    this.userData.avatar = '/img/perfil_empty_user.png'
                     this.userData.avatarType = 'default'
                 }
                 break
@@ -496,7 +496,7 @@ class OnboardingSystem {
             // Garante que há uma foto de perfil (padrão se necessário)
             if (!this.userData.avatar) {
                 console.log('⚠️ Avatar vazio, aplicando imagem padrão...')
-                this.userData.avatar = 'img/perfil_empty_user.png'
+                this.userData.avatar = '/img/perfil_empty_user.png'
                 this.userData.avatarType = 'default'
                 console.log('✅ Imagem padrão aplicada:', this.userData.avatar)
             } else {

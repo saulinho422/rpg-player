@@ -167,7 +167,7 @@ export class DashboardService {
             } else {
                 // Fallback se não tiver avatar_url
                 console.log('⚠️ Avatar URL vazio, usando fallback')
-                userAvatar.src = 'img/perfil_empty_user.png'
+                userAvatar.src = '/img/perfil_empty_user.png'
             }
         } else {
             console.log('❌ Elemento userAvatar não encontrado no DOM')
