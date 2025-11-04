@@ -333,7 +333,7 @@ body::before {
 
 .input-validation {
     position: absolute;
-    bottom: -25px;
+    top: calc(100% + 13px);
     left: 0;
     right: 0;
     text-align: center;

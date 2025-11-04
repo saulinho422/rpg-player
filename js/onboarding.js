@@ -493,6 +493,14 @@ class OnboardingSystem {
             
             console.log('✅ Step 1 - UserId OK')
             
+            // Garante que há uma foto de perfil (padrão se necessário)
+            if (!this.userData.avatar) {
+                console.log('⚠️ Avatar vazio, aplicando imagem padrão...')
+                this.userData.avatar = 'img/perfil_empty_user.png'
+                this.userData.avatarType = 'default'
+                console.log('✅ Imagem padrão aplicada:', this.userData.avatar)
+            }
+            
             // Valida dados obrigatórios
             console.log('🔍 Step 2 - Validando dados obrigatórios...')
             if (!this.userData.name || !this.userData.age || !this.userData.experience || !this.userData.role) {
