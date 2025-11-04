@@ -12,6 +12,7 @@ class CharacterSheet {
         this.character = null;
         this.characterId = this.getCharacterIdFromURL();
         this.currentUser = null;
+        this.gameData = {};
         this.init();
     }
 
@@ -22,6 +23,7 @@ class CharacterSheet {
 
     async init() {
         await this.checkAuth();
+        await this.loadGameData();
         
         // Se não tem ID, está em modo de criação
         if (!this.characterId) {
@@ -35,6 +37,40 @@ class CharacterSheet {
         this.setupEventListeners();
     }
 
+    async checkAuth() {
+        try {
+            const { data: { user } } = await supabase.auth.getUser();
+            if (!user) {
+                window.location.href = '/login.html';
+                return;
+            }
+            this.currentUser = user;
+        } catch (error) {
+            console.error('❌ Erro na autenticação:', error);
+            window.location.href = '/login.html';
+        }
+    }
+
+    async loadGameData() {
+        try {
+            const [racesRes, classesRes, backgroundsRes, alignmentsRes] = await Promise.all([
+                fetch('js/data/races.json'),
+                fetch('js/data/classes.json'),
+                fetch('js/data/backgrounds.json'),
+                fetch('js/data/alignments.json')
+            ]);
+
+            this.gameData = {
+                races: await racesRes.json(),
+                classes: await classesRes.json(),
+                backgrounds: await backgroundsRes.json(),
+                alignments: await alignmentsRes.json()
+            };
+        } catch (error) {
+            console.error('❌ Erro ao carregar dados do jogo:', error);
+        }
+    }
+
     async initCreationMode() {
         try {
             // Verificar se existe um rascunho para este usuário
@@ -43,7 +79,7 @@ class CharacterSheet {
             if (draft) {
                 console.log('📝 Rascunho encontrado, continuando criação:', draft);
                 this.character = this.convertDraftToCharacter(draft);
-                this.characterId = draft.id; // Para permitir edição do rascunho
+                this.characterId = draft.id;
             } else {
                 // Inicializar personagem vazio
                 this.character = {
@@ -56,23 +92,16 @@ class CharacterSheet {
                     attributes: { str: 10, dex: 10, con: 10, int: 10, wis: 10, cha: 10 }
                 };
             }
-
-            // Carregar dados dos JSONs
-            await this.loadGameData();
             
-            // Setup event listeners dos modais
+            // Popular a ficha com dados existentes
+            this.populateSheet();
+            
+            // Setup event listeners
+            this.setupEventListeners();
             this.setupCreationListeners();
             
-            // Atualizar visualização dos atributos
-            this.updateAttributeDisplays();
-            
-            // Se há um rascunho carregado, popular a ficha
-            if (draft && this.character) {
-                // Aguardar um pouco para garantir que DOM está pronto
-                setTimeout(() => {
-                    this.populateSheet();
-                }, 100);
-            }
+            // Atualizar cálculos
+            this.calculateAll();
             
             // Setup auto-save para rascunho
             this.setupAutoSave();
@@ -182,8 +211,306 @@ class CharacterSheet {
         return character;
     }
 
+    async loadCharacter() {
+        try {
+            const { data, error } = await supabase
+                .from('characters')
+                .select('*')
+                .eq('id', this.characterId)
+                .eq('user_id', this.currentUser.id)
+                .single();
+
+            if (error) throw error;
+
+            this.character = this.convertDraftToCharacter(data);
+        } catch (error) {
+            console.error('❌ Erro ao carregar personagem:', error);
+            alert('Erro ao carregar personagem!');
+        }
+    }
+
+    populateSheet() {
+        if (!this.character) return;
+
+        // Informações básicas
+        this.setInputValue('charname', this.character.name);
+        this.setInputValue('classlevel', this.character.class ? `${this.character.class} ${this.character.level}` : '');
+        this.setInputValue('background', this.character.background);
+        this.setInputValue('race', this.character.race);
+        this.setInputValue('alignment', this.character.alignment);
+        this.setInputValue('experiencepoints', '0');
+
+        // Atributos
+        if (this.character.attributes) {
+            this.setInputValue('Strengthscore', this.character.attributes.str);
+            this.setInputValue('Dexterityscore', this.character.attributes.dex);
+            this.setInputValue('Constitutionscore', this.character.attributes.con);
+            this.setInputValue('Intelligencescore', this.character.attributes.int);
+            this.setInputValue('Wisdomscore', this.character.attributes.wis);
+            this.setInputValue('Charismascore', this.character.attributes.cha);
+        }
+
+        // HP
+        this.setInputValue('maxhp', this.character.hp);
+        this.setInputValue('currenthp', this.character.hpCurrent);
+
+        // Hit Dice
+        if (this.character.class) {
+            const hitDie = this.getHitDieForClass(this.character.class);
+            this.setInputValue('totalhd', `${this.character.level}${hitDie}`);
+        }
+    }
+
+    setInputValue(id, value) {
+        const element = document.getElementById(id);
+        if (element && value !== undefined && value !== null) {
+            element.value = value;
+        }
+    }
+
+    getHitDieForClass(className) {
+        const classDice = {
+            'Barbarian': 'd12',
+            'Fighter': 'd10',
+            'Paladin': 'd10',
+            'Ranger': 'd10',
+            'Bard': 'd8',
+            'Cleric': 'd8',
+            'Druid': 'd8',
+            'Monk': 'd8',
+            'Rogue': 'd8',
+            'Warlock': 'd8',
+            'Sorcerer': 'd6',
+            'Wizard': 'd6'
+        };
+        return classDice[className] || 'd8';
+    }
+
+    calculateAll() {
+        this.calculateModifiers();
+        this.calculateProficiencyBonus();
+        this.calculateSavingThrows();
+        this.calculateSkills();
+        this.calculatePassivePerception();
+        this.calculateCombatStats();
+    }
+
+    calculateModifiers() {
+        const attributes = ['Strength', 'Dexterity', 'Constitution', 'Intelligence', 'Wisdom', 'Charisma'];
+        
+        attributes.forEach(attr => {
+            const scoreElement = document.getElementById(`${attr}score`);
+            const modElement = document.getElementById(`${attr}mod`);
+            
+            if (scoreElement && modElement) {
+                const score = parseInt(scoreElement.value) || 10;
+                const modifier = Math.floor((score - 10) / 2);
+                const modString = modifier >= 0 ? `+${modifier}` : `${modifier}`;
+                modElement.value = modString;
+
+                // Atualizar no objeto character
+                if (this.character && this.character.attributes) {
+                    const attrKey = attr.toLowerCase().substring(0, 3);
+                    this.character.attributes[attrKey] = score;
+                }
+            }
+        });
+    }
+
+    calculateProficiencyBonus() {
+        const level = this.character?.level || 1;
+        const profBonus = Math.ceil(level / 4) + 1;
+        const element = document.getElementById('proficiencybonus');
+        if (element) {
+            element.value = `+${profBonus}`;
+        }
+        return profBonus;
+    }
+
+    calculateSavingThrows() {
+        const attributes = ['Strength', 'Dexterity', 'Constitution', 'Intelligence', 'Wisdom', 'Charisma'];
+        const profBonus = this.calculateProficiencyBonus();
+        
+        attributes.forEach(attr => {
+            const modElement = document.getElementById(`${attr}mod`);
+            const saveElement = document.getElementById(`${attr}-save`);
+            const profElement = document.getElementById(`${attr}-save-prof`);
+            
+            if (modElement && saveElement) {
+                const modifier = parseInt(modElement.value) || 0;
+                const isProficient = profElement?.checked || false;
+                const saveBonus = modifier + (isProficient ? profBonus : 0);
+                const saveString = saveBonus >= 0 ? `+${saveBonus}` : `${saveBonus}`;
+                saveElement.value = saveString;
+            }
+        });
+    }
+
+    calculateSkills() {
+        const skills = [
+            { name: 'Acrobatics', attr: 'Dexterity' },
+            { name: 'Animal Handling', attr: 'Wisdom' },
+            { name: 'Arcana', attr: 'Intelligence' },
+            { name: 'Athletics', attr: 'Strength' },
+            { name: 'Deception', attr: 'Charisma' },
+            { name: 'History', attr: 'Intelligence' },
+            { name: 'Insight', attr: 'Wisdom' },
+            { name: 'Intimidation', attr: 'Charisma' },
+            { name: 'Investigation', attr: 'Intelligence' },
+            { name: 'Medicine', attr: 'Wisdom' },
+            { name: 'Nature', attr: 'Intelligence' },
+            { name: 'Perception', attr: 'Wisdom' },
+            { name: 'Performance', attr: 'Charisma' },
+            { name: 'Persuasion', attr: 'Charisma' },
+            { name: 'Religion', attr: 'Intelligence' },
+            { name: 'Sleight of Hand', attr: 'Dexterity' },
+            { name: 'Stealth', attr: 'Dexterity' },
+            { name: 'Survival', attr: 'Wisdom' }
+        ];
+
+        const profBonus = this.calculateProficiencyBonus();
+
+        skills.forEach(skill => {
+            const skillElement = document.getElementById(skill.name.replace(' ', '_'));
+            const profElement = document.getElementById(`${skill.name.replace(' ', '_')}-prof`);
+            const modElement = document.getElementById(`${skill.attr}mod`);
+            
+            if (skillElement && modElement) {
+                const modifier = parseInt(modElement.value) || 0;
+                const isProficient = profElement?.checked || false;
+                const skillBonus = modifier + (isProficient ? profBonus : 0);
+                const skillString = skillBonus >= 0 ? `+${skillBonus}` : `${skillBonus}`;
+                skillElement.value = skillString;
+            }
+        });
+    }
+
+    calculatePassivePerception() {
+        const perceptionElement = document.getElementById('Perception');
+        const passiveElement = document.getElementById('passiveperception');
+        
+        if (perceptionElement && passiveElement) {
+            const perceptionBonus = parseInt(perceptionElement.value) || 0;
+            const passivePerception = 10 + perceptionBonus;
+            passiveElement.value = passivePerception;
+        }
+    }
+
+    calculateCombatStats() {
+        // AC básica (10 + mod Dex)
+        const dexModElement = document.getElementById('Dexteritymod');
+        const acElement = document.getElementById('ac');
+        
+        if (dexModElement && acElement) {
+            const dexMod = parseInt(dexModElement.value) || 0;
+            const baseAC = 10 + dexMod;
+            acElement.value = baseAC;
+        }
+
+        // Iniciativa (mod Dex)
+        const initiativeElement = document.getElementById('initiative');
+        if (dexModElement && initiativeElement) {
+            const dexMod = parseInt(dexModElement.value) || 0;
+            const initiativeString = dexMod >= 0 ? `+${dexMod}` : `${dexMod}`;
+            initiativeElement.value = initiativeString;
+        }
+
+        // Velocidade padrão
+        const speedElement = document.getElementById('speed');
+        if (speedElement && !speedElement.value) {
+            speedElement.value = '30';
+        }
+    }
+
+    setupEventListeners() {
+        // Controles do header
+        const backBtn = document.getElementById('backBtn');
+        const menuBtn = document.getElementById('menuBtn');
+        const finishBtn = document.getElementById('finishBtn');
+
+        if (backBtn) {
+            backBtn.addEventListener('click', () => {
+                window.location.href = '/dashboard.html';
+            });
+        }
+
+        if (menuBtn) {
+            menuBtn.addEventListener('click', () => {
+                this.toggleSidebar();
+            });
+        }
+
+        if (finishBtn) {
+            finishBtn.addEventListener('click', () => {
+                this.saveCharacter();
+            });
+        }
+
+        // Sidebar
+        const sidebarOverlay = document.getElementById('sidebarOverlay');
+        const closeSidebar = document.querySelector('.close-sidebar');
+
+        if (sidebarOverlay) {
+            sidebarOverlay.addEventListener('click', () => {
+                this.toggleSidebar();
+            });
+        }
+
+        if (closeSidebar) {
+            closeSidebar.addEventListener('click', () => {
+                this.toggleSidebar();
+            });
+        }
+
+        // Event listeners para atributos
+        const attributes = ['Strength', 'Dexterity', 'Constitution', 'Intelligence', 'Wisdom', 'Charisma'];
+        attributes.forEach(attr => {
+            const element = document.getElementById(`${attr}score`);
+            if (element) {
+                element.addEventListener('input', () => {
+                    this.calculateAll();
+                });
+            }
+        });
+
+        // Event listeners para proficiências
+        const proficiencyElements = document.querySelectorAll('input[type="checkbox"][id$="-prof"]');
+        proficiencyElements.forEach(element => {
+            element.addEventListener('change', () => {
+                this.calculateAll();
+            });
+        });
+    }
+
+    setupCreationListeners() {
+        // Event listeners para campos básicos
+        const charNameElement = document.getElementById('charname');
+        if (charNameElement) {
+            charNameElement.addEventListener('input', (e) => {
+                if (this.character) {
+                    this.character.name = e.target.value;
+                }
+            });
+        }
+
+        // Mostrar botão de salvar se está em modo de criação
+        const finishBtn = document.getElementById('finishBtn');
+        if (finishBtn) {
+            finishBtn.style.display = 'block';
+        }
+    }
+
+    setupAutoSave() {
+        // Auto-save a cada 30 segundos
+        if (this.characterId) {
+            setInterval(() => {
+                this.saveDraft();
+            }, 30000);
+        }
+    }
+
     async saveDraft() {
-        if (!this.characterId) return;
+        if (!this.characterId || !this.character) return;
         
         try {
             const updateData = {
@@ -201,7 +528,6 @@ class CharacterSheet {
                 charisma: this.character.attributes?.cha || 10,
                 hit_points_max: this.character.hp || 8,
                 hit_points_current: this.character.hpCurrent || 8,
-                avatar_url: this.character.image,
                 updated_at: new Date().toISOString()
             };
 
@@ -212,1210 +538,63 @@ class CharacterSheet {
 
             if (error) throw error;
             
-            console.log('✅ Rascunho salvo automaticamente');
+            console.log('💾 Rascunho salvo automaticamente');
         } catch (error) {
             console.error('❌ Erro ao salvar rascunho:', error);
         }
     }
 
-    setupAutoSave() {
-        // Auto-save a cada 30 segundos
-        this.autoSaveInterval = setInterval(() => {
-            this.saveDraft();
-        }, 30000);
-
-        // Auto-save quando sair da página
-        window.addEventListener('beforeunload', () => {
-            this.saveDraft();
-        });
-
-        // Auto-save em mudanças importantes
-        const nameField = document.getElementById('charName');
-        if (nameField) {
-            nameField.addEventListener('input', (e) => {
-                this.character.name = e.target.value;
-                // Auto-save após 2 segundos de inatividade
-                clearTimeout(this.nameTimeout);
-                this.nameTimeout = setTimeout(() => this.saveDraft(), 2000);
-            });
-        }
-
-        // Outros campos importantes
-        const importantFields = ['charRace', 'charClass', 'charBackground'];
-        importantFields.forEach(fieldId => {
-            const field = document.getElementById(fieldId);
-            if (field) {
-                field.addEventListener('change', () => {
-                    setTimeout(() => this.saveDraft(), 1000);
-                });
-            }
-        });
-    }
-
-    updateAttributeDisplays() {
-        // Mapear atributos para os IDs dos inputs
-        const attrMap = {
-            str: 'strValue',
-            dex: 'dexValue',
-            con: 'conValue',
-            int: 'intValue',
-            wis: 'wisValue',
-            cha: 'chaValue'
-        };
-
-        const modMap = {
-            str: 'strMod',
-            dex: 'dexMod',
-            con: 'conMod',
-            int: 'intMod',
-            wis: 'wisMod',
-            cha: 'chaMod'
-        };
-
-        Object.keys(attrMap).forEach(key => {
-            const input = document.getElementById(attrMap[key]);
-            if (input && this.character.attributes[key]) {
-                input.value = this.character.attributes[key];
-                
-                // Calcular e mostrar modificador
-                const mod = Math.floor((this.character.attributes[key] - 10) / 2);
-                const modElement = document.getElementById(modMap[key]);
-                if (modElement) {
-                    modElement.textContent = mod >= 0 ? `+${mod}` : mod;
-                }
-            }
-        });
-    }
-
-    async loadGameData() {
-        try {
-            console.log('🔄 Carregando dados do Supabase...');
-            
-            // Carregar dados do Supabase (tabelas com prefixo game_)
-            const [racesResult, classesResult, backgroundsResult] = await Promise.all([
-                supabase.from('game_races').select('*'),
-                supabase.from('game_classes').select('*'),
-                supabase.from('game_backgrounds').select('*')
-            ]);
-
-            console.log('📦 Resultados:', { racesResult, classesResult, backgroundsResult });
-
-            if (racesResult.error) {
-                console.error('❌ Erro em races:', racesResult.error);
-                throw racesResult.error;
-            }
-            if (classesResult.error) {
-                console.error('❌ Erro em classes:', classesResult.error);
-                throw classesResult.error;
-            }
-            if (backgroundsResult.error) {
-                console.error('❌ Erro em backgrounds:', backgroundsResult.error);
-                throw backgroundsResult.error;
-            }
-
-            this.races = racesResult.data || [];
-            this.classes = classesResult.data || [];
-            this.backgrounds = backgroundsResult.data || [];
-            
-            // Alinhamentos são fixos (não vêm do banco)
-            this.alignments = [
-                { id: 'leal-bom', name: 'Leal e Bom', icon: '⚖️✨', description: 'Honra e compaixão' },
-                { id: 'neutro-bom', name: 'Neutro e Bom', icon: '🕊️', description: 'Bondade equilibrada' },
-                { id: 'caotico-bom', name: 'Caótico e Bom', icon: '🦋', description: 'Liberdade benevolente' },
-                { id: 'leal-neutro', name: 'Leal e Neutro', icon: '⚖️', description: 'Ordem e tradição' },
-                { id: 'neutro', name: 'Neutro', icon: '⚖️⚪', description: 'Equilíbrio perfeito' },
-                { id: 'caotico-neutro', name: 'Caótico e Neutro', icon: '🎲', description: 'Liberdade individual' },
-                { id: 'leal-mau', name: 'Leal e Mau', icon: '⚖️👿', description: 'Tirania organizada' },
-                { id: 'neutro-mau', name: 'Neutro e Mau', icon: '💀', description: 'Egoísmo puro' },
-                { id: 'caotico-mau', name: 'Caótico e Mau', icon: '🔥', description: 'Destruição caótica' }
-            ];
-
-            console.log('✅ Dados carregados com sucesso:', {
-                races: this.races.length,
-                classes: this.classes.length,
-                backgrounds: this.backgrounds.length
-            });
-
-            // Se não tiver dados, avisar
-            if (this.races.length === 0 || this.classes.length === 0 || this.backgrounds.length === 0) {
-                console.warn('⚠️ Algumas tabelas estão vazias no banco de dados!');
-            }
-        } catch (error) {
-            console.error('❌ ERRO FATAL ao carregar dados:', error);
-            alert(`Erro ao carregar dados do jogo: ${error.message}\n\nVerifique se as tabelas races, classes e backgrounds existem no Supabase.`);
-        }
-    }
-
-    setupCreationListeners() {
-        // Abrir modais
-        document.getElementById('raceBox')?.addEventListener('click', () => this.openRaceModal());
-        document.getElementById('classBox')?.addEventListener('click', () => this.openClassModal());
-        document.getElementById('backgroundBox')?.addEventListener('click', () => this.openBackgroundModal());
-        document.getElementById('alignmentBox')?.addEventListener('click', () => this.openAlignmentModal());
-
-        // Fechar modais com X
-        document.querySelectorAll('.modal .close').forEach(closeBtn => {
-            closeBtn.addEventListener('click', (e) => {
-                e.target.closest('.modal').classList.remove('active');
-            });
-        });
-
-        // Fechar modal ao clicar fora
-        document.querySelectorAll('.modal').forEach(modal => {
-            modal.addEventListener('click', (e) => {
-                if (e.target === modal) {
-                    modal.classList.remove('active');
-                }
-            });
-        });
-
-        // Botão voltar
-        document.getElementById('backBtn')?.addEventListener('click', () => {
-            window.location.href = 'dashboard.html';
-        });
-    }
-
-    openRaceModal() {
-        const modal = document.getElementById('raceModal');
-        const grid = document.getElementById('raceGrid');
-        
-        grid.innerHTML = '';
-        
-        if (!this.races || this.races.length === 0) {
-            grid.innerHTML = '<p style="color: white; text-align: center; padding: 2rem;">Nenhuma raça disponível. Verifique o banco de dados.</p>';
-            modal.classList.add('active');
-            return;
-        }
-        
-        this.races.forEach(race => {
-            const card = document.createElement('div');
-            card.className = 'modal-card';
-            if (this.character.race?.id === race.id) card.classList.add('selected');
-            
-            // Aceita tanto 'name' quanto 'nome'
-            const raceName = race.name || race.nome || 'Sem Nome';
-            const raceIcon = race.icon || race.icone || '🧙';
-            
-            card.innerHTML = `
-                <div class="card-icon">${raceIcon}</div>
-                <h3>${raceName}</h3>
-            `;
-            
-            card.addEventListener('click', () => this.selectRace(race));
-            grid.appendChild(card);
-        });
-        
-        modal.classList.add('active');
-    }
-
-    openClassModal() {
-        const modal = document.getElementById('classModal');
-        const grid = document.getElementById('classGrid');
-        
-        grid.innerHTML = '';
-        
-        if (!this.classes || this.classes.length === 0) {
-            grid.innerHTML = '<p style="color: white; text-align: center; padding: 2rem;">Nenhuma classe disponível. Verifique o banco de dados.</p>';
-            modal.classList.add('active');
-            return;
-        }
-        
-        this.classes.forEach(cls => {
-            const card = document.createElement('div');
-            card.className = 'modal-card';
-            if (this.character.class?.id === cls.id) card.classList.add('selected');
-            
-            // Aceita tanto campos em inglês quanto em português
-            const className = cls.name || cls.nome || 'Sem Nome';
-            const classIcon = cls.icon || cls.icone || '⚔️';
-            
-            card.innerHTML = `
-                <div class="card-icon">${classIcon}</div>
-                <h3>${className}</h3>
-            `;
-            
-            card.addEventListener('click', () => this.selectClass(cls));
-            grid.appendChild(card);
-        });
-        
-        modal.classList.add('active');
-    }
-
-    openSubclassModal(classData) {
-        // Verifica se a classe tem subclasses
-        const subclasses = classData.subclasses || classData.subclasses || [];
-        
-        if (!subclasses || subclasses.length === 0) {
-            // Se não tem subclasses, apenas confirma a seleção
-            this.confirmClassSelection(classData, null);
-            return;
-        }
-
-        const modal = document.getElementById('subclassModal');
-        if (!modal) {
-            // Criar modal dinamicamente se não existir
-            this.createSubclassModal();
-            return this.openSubclassModal(classData);
-        }
-
-        const grid = document.getElementById('subclassGrid');
-        const title = modal.querySelector('h2');
-        
-        const className = classData.name || classData.nome || 'Classe';
-        title.textContent = `⚔️ Escolha sua Subclasse de ${className}`;
-        
-        grid.innerHTML = '';
-        
-        subclasses.forEach(subcls => {
-            const card = document.createElement('div');
-            card.className = 'modal-card';
-            
-            const subclassName = subcls.name || subcls.nome || 'Sem Nome';
-            const subclassIcon = subcls.icon || subcls.icone || '🎯';
-            
-            card.innerHTML = `
-                <div class="card-icon">${subclassIcon}</div>
-                <h3>${subclassName}</h3>
-            `;
-            
-            card.addEventListener('click', () => {
-                this.confirmClassSelection(classData, subcls);
-                modal.classList.remove('active');
-            });
-            grid.appendChild(card);
-        });
-        
-        modal.classList.add('active');
-    }
-
-    createSubclassModal() {
-        const modalHTML = `
-            <div id="subclassModal" class="modal">
-                <div class="modal-content">
-                    <span class="close">&times;</span>
-                    <h2>⚔️ Escolha sua Subclasse</h2>
-                    <div class="modal-grid" id="subclassGrid"></div>
-                </div>
-            </div>
-        `;
-        
-        document.body.insertAdjacentHTML('beforeend', modalHTML);
-        
-        // Adicionar event listeners
-        const modal = document.getElementById('subclassModal');
-        const closeBtn = modal.querySelector('.close');
-        
-        closeBtn.addEventListener('click', () => {
-            modal.classList.remove('active');
-        });
-        
-        modal.addEventListener('click', (e) => {
-            if (e.target === modal) {
-                modal.classList.remove('active');
-            }
-        });
-    }
-
-    confirmClassSelection(classData, subclass) {
-        this.character.class = classData;
-        this.character.subclass = subclass;
-        
-        const className = classData.name || classData.nome || 'Classe Selecionada';
-        const subclassName = subclass ? ` (${subclass.name || subclass.nome})` : '';
-        
-        document.getElementById('charClassDisplay').textContent = `${className}${subclassName} - Nível ${this.character.level}`;
-        document.getElementById('classModal').classList.remove('active');
-        this.saveCreationProgress();
-    }
-
-    openBackgroundModal() {
-        const modal = document.getElementById('backgroundModal');
-        const grid = document.getElementById('backgroundGrid');
-        
-        grid.innerHTML = '';
-        
-        if (!this.backgrounds || this.backgrounds.length === 0) {
-            grid.innerHTML = '<p style="color: white; text-align: center; padding: 2rem;">Nenhum antecedente disponível. Verifique o banco de dados.</p>';
-            modal.classList.add('active');
-            return;
-        }
-        
-        this.backgrounds.forEach(bg => {
-            const card = document.createElement('div');
-            card.className = 'modal-card';
-            if (this.character.background?.id === bg.id) card.classList.add('selected');
-            
-            // Aceita tanto campos em inglês quanto em português
-            const bgName = bg.name || bg.nome || 'Sem Nome';
-            const bgIcon = bg.icon || bg.icone || '📜';
-            
-            card.innerHTML = `
-                <div class="card-icon">${bgIcon}</div>
-                <h3>${bgName}</h3>
-            `;
-            
-            card.addEventListener('click', () => this.selectBackground(bg));
-            grid.appendChild(card);
-        });
-        
-        modal.classList.add('active');
-    }
-
-    openAlignmentModal() {
-        const modal = document.getElementById('alignmentModal');
-        const grid = document.getElementById('alignmentGrid');
-        
-        grid.innerHTML = '';
-        
-        this.alignments.forEach(align => {
-            const card = document.createElement('div');
-            card.className = 'alignment-card';
-            if (this.character.alignment?.id === align.id) card.classList.add('selected');
-            
-            card.innerHTML = `
-                <div class="card-icon">${align.icon}</div>
-                <h4>${align.name}</h4>
-                <p>${align.description}</p>
-            `;
-            
-            card.addEventListener('click', () => this.selectAlignment(align));
-            grid.appendChild(card);
-        });
-        
-        modal.classList.add('active');
-    }
-
-    selectRace(race) {
-        this.character.race = race;
-        const raceName = race.name || race.nome || 'Raça Selecionada';
-        document.getElementById('charRaceDisplay').textContent = raceName;
-        document.getElementById('raceModal').classList.remove('active');
-        this.saveCreationProgress();
-    }
-
-    selectClass(cls) {
-        // Fecha o modal de classe
-        document.getElementById('classModal').classList.remove('active');
-        
-        // Abre o modal de subclasse
-        setTimeout(() => {
-            this.openSubclassModal(cls);
-        }, 300);
-    }
-
-    selectBackground(bg) {
-        this.character.background = bg;
-        const bgName = bg.name || bg.nome || 'Antecedente Selecionado';
-        document.getElementById('charBackgroundDisplay').textContent = bgName;
-        document.getElementById('backgroundModal').classList.remove('active');
-        this.saveCreationProgress();
-    }
-
-    selectAlignment(align) {
-        this.character.alignment = align;
-        document.getElementById('charAlignmentDisplay').textContent = align.name;
-        document.getElementById('alignmentModal').classList.remove('active');
-        this.saveCreationProgress();
-    }
-
-    async saveCreationProgress() {
-        // Salvar rascunho no banco de dados
-        await this.saveDraft();
-        console.log('Progresso salvo no banco:', this.character);
-    }
-
-    async checkAuth() {
-        const { data: { user } } = await supabase.auth.getUser();
-        
-        if (!user) {
-            alert('Você precisa estar logado para visualizar este personagem!');
-            window.location.href = 'login.html';
-            return;
-        }
-        
-        this.currentUser = user;
-    }
-
-    async loadCharacter() {
-        try {
-            const { data, error } = await supabase
-                .from('characters')
-                .select('*')
-                .eq('id', this.characterId)
-                .single();
-
-            if (error) throw error;
-
-            if (!data) {
-                alert('Personagem não encontrado!');
-                window.location.href = 'dashboard.html';
-                return;
-            }
-
-            // Verificar se o personagem pertence ao usuário
-            if (data.user_id !== this.currentUser.id) {
-                alert('Você não tem permissão para visualizar este personagem!');
-                window.location.href = 'dashboard.html';
-                return;
-            }
-
-            // Converter dados do Supabase para o formato esperado
-            this.character = {
-                id: data.id,
-                name: data.name,
-                image: data.avatar_url,
-                class: data.character_class,
-                race: data.race,
-                background: data.background,
-                alignment: data.alignment,
-                level: data.level,
-                hp: data.hit_points_max,
-                hpCurrent: data.hit_points_current,
-                attributes: {
-                    str: data.strength,
-                    dex: data.dexterity,
-                    con: data.constitution,
-                    int: data.intelligence,
-                    wis: data.wisdom,
-                    cha: data.charisma
-                },
-                skills: data.skills?.proficient || [],
-                languages: data.custom_fields?.languages || [],
-                proficiencies: data.custom_fields?.proficiencies || [],
-                subrace: data.custom_fields?.subrace,
-                subclass: data.custom_fields?.subclass,
-                appearance: data.custom_fields?.appearance || {},
-                personality: {
-                    traits: data.personality_traits || '',
-                    ideals: data.ideals || '',
-                    bonds: data.bonds || '',
-                    flaws: data.flaws || ''
-                }
-            };
-
-            console.log('✅ Personagem carregado do Supabase:', this.character);
-        } catch (error) {
-            console.error('❌ Erro ao carregar personagem:', error);
-            alert('Erro ao carregar o personagem!');
-            window.location.href = 'dashboard.html';
-        }
-    }
-
-    populateSheet() {
-        // Verificações de segurança
-        if (!this.character) {
-            console.warn('⚠️ populateSheet: character não está definido');
-            return;
-        }
-
-        // Header information - com verificação de elementos
-        const charNameEl = document.getElementById('charName');
-        if (charNameEl) charNameEl.value = this.character.name || '';
-
-        const charClassEl = document.getElementById('charClass');
-        if (charClassEl) charClassEl.value = `${this.getClassName()} Nível ${this.character.level}`;
-
-        const charBackgroundEl = document.getElementById('charBackground');
-        if (charBackgroundEl) charBackgroundEl.value = this.getBackgroundName();
-
-        const charRaceEl = document.getElementById('charRace');
-        if (charRaceEl) charRaceEl.value = this.getRaceName();
-
-        const charAlignmentEl = document.getElementById('charAlignment');
-        if (charAlignmentEl) charAlignmentEl.value = this.formatAlignment(this.character.alignment);
-
-        // Attributes - com verificação
-        if (this.character.attributes) {
-            Object.keys(this.character.attributes).forEach(attr => {
-                const value = this.character.attributes[attr];
-                const valueEl = document.getElementById(`${attr}Value`);
-                const modEl = document.getElementById(`${attr}Mod`);
-                
-                if (valueEl) valueEl.value = value;
-                
-                if (modEl) {
-                    // Calculate and display modifier
-                    const modifier = Math.floor((value - 10) / 2);
-                    modEl.textContent = modifier >= 0 ? `+${modifier}` : modifier;
-                }
-            });
-        }
-
-        // HP - com verificação
-        const hpMaxEl = document.getElementById('hpMax');
-        const hpCurrentEl = document.getElementById('hpCurrent');
-        if (hpMaxEl) hpMaxEl.value = this.character.hp || 8;
-        if (hpCurrentEl && !hpCurrentEl.value) hpCurrentEl.value = this.character.hpCurrent || this.character.hp || 8;
-
-        // Hit Dice - com verificação
-        const hitDice = this.getHitDice();
-        const hitDiceTotalEl = document.getElementById('hitDiceTotal');
-        const hitDiceCurrentEl = document.getElementById('hitDiceCurrent');
-        if (hitDiceTotalEl) hitDiceTotalEl.value = `${this.character.level}${hitDice}`;
-        if (hitDiceCurrentEl && !hitDiceCurrentEl.value) hitDiceCurrentEl.value = `${this.character.level}${hitDice}`;
-
-        // Skills - mark proficient skills
-        if (this.character.skills && this.character.skills.length > 0) {
-            const skillMapping = {
-                'acrobatics': 'skillAcrobatics',
-                'animal-handling': 'skillAnimalHandling',
-                'arcana': 'skillArcana',
-                'athletics': 'skillAthletics',
-                'deception': 'skillDeception',
-                'history': 'skillHistory',
-                'insight': 'skillInsight',
-                'intimidation': 'skillIntimidation',
-                'investigation': 'skillInvestigation',
-                'medicine': 'skillMedicine',
-                'nature': 'skillNature',
-                'perception': 'skillPerception',
-                'performance': 'skillPerformance',
-                'persuasion': 'skillPersuasion',
-                'religion': 'skillReligion',
-                'sleight-of-hand': 'skillSleightOfHand',
-                'stealth': 'skillStealth',
-                'survival': 'skillSurvival'
-            };
-
-            this.character.skills.forEach(skill => {
-                const elementId = skillMapping[skill];
-                if (elementId) {
-                    document.getElementById(elementId).checked = true;
-                }
-            });
-        }
-
-        // Languages and proficiencies
-        let languagesText = '';
-        if (this.character.languages && this.character.languages.length > 0) {
-            languagesText += 'Idiomas: ' + this.character.languages.join(', ') + '\n\n';
-        }
-        if (this.character.proficiencies && this.character.proficiencies.length > 0) {
-            languagesText += 'Proficiências: ' + this.character.proficiencies.join(', ');
-        }
-        document.getElementById('languages').value = languagesText;
-
-        // Personality
-        if (this.character.personality) {
-            document.getElementById('personalityTraits').value = this.character.personality.traits || '';
-            document.getElementById('ideals').value = this.character.personality.ideals || '';
-            document.getElementById('bonds').value = this.character.personality.bonds || '';
-            document.getElementById('flaws').value = this.character.personality.flaws || '';
-        }
-
-        // Appearance (Page 2)
-        if (this.character.appearance) {
-            document.getElementById('age').value = this.character.appearance.age || '';
-            document.getElementById('height').value = this.character.appearance.height || '';
-            document.getElementById('weight').value = this.character.appearance.weight || '';
-            document.getElementById('eyes').value = this.character.appearance.eyes || '';
-            document.getElementById('skin').value = this.character.appearance.skin || '';
-            document.getElementById('hair').value = this.character.appearance.hair || '';
-        }
-
-        // Character Image
-        if (this.character.image) {
-            document.getElementById('charImage').src = this.character.image;
-            document.getElementById('charImage').style.display = 'block';
-        }
-
-        // Speed
-        document.getElementById('speed').textContent = '9m'; // Default, can be modified by race
-    }
-
-    calculateAll() {
-        this.calculateProficiencyBonus();
-        this.calculateSavingThrows();
-        this.calculateSkills();
-        this.calculatePassivePerception();
-        this.calculateArmorClass();
-        this.calculateInitiative();
-    }
-
-    calculateProficiencyBonus() {
-        const level = this.character.level;
-        const profBonus = Math.ceil(level / 4) + 1;
-        document.getElementById('profBonus').textContent = `+${profBonus}`;
-        return profBonus;
-    }
-
-    calculateSavingThrows() {
-        const profBonus = this.calculateProficiencyBonus();
-        const savingThrows = this.getProficientSaves();
-
-        const attributes = ['str', 'dex', 'con', 'int', 'wis', 'cha'];
-        attributes.forEach(attr => {
-            const attrValue = this.character.attributes[attr];
-            const modifier = Math.floor((attrValue - 10) / 2);
-            const isProficient = savingThrows.includes(attr);
-            
-            if (isProficient) {
-                document.getElementById(`save${this.capitalize(attr)}`).checked = true;
-            }
-
-            const totalMod = modifier + (isProficient ? profBonus : 0);
-            const modText = totalMod >= 0 ? `+${totalMod}` : totalMod;
-            document.getElementById(`save${this.capitalize(attr)}Mod`).textContent = modText;
-        });
-    }
-
-    calculateSkills() {
-        const profBonus = this.calculateProficiencyBonus();
-        
-        const skillsData = [
-            { id: 'Acrobatics', ability: 'dex' },
-            { id: 'AnimalHandling', ability: 'wis' },
-            { id: 'Arcana', ability: 'int' },
-            { id: 'Athletics', ability: 'str' },
-            { id: 'Deception', ability: 'cha' },
-            { id: 'History', ability: 'int' },
-            { id: 'Insight', ability: 'wis' },
-            { id: 'Intimidation', ability: 'cha' },
-            { id: 'Investigation', ability: 'int' },
-            { id: 'Medicine', ability: 'wis' },
-            { id: 'Nature', ability: 'int' },
-            { id: 'Perception', ability: 'wis' },
-            { id: 'Performance', ability: 'cha' },
-            { id: 'Persuasion', ability: 'cha' },
-            { id: 'Religion', ability: 'int' },
-            { id: 'SleightOfHand', ability: 'dex' },
-            { id: 'Stealth', ability: 'dex' },
-            { id: 'Survival', ability: 'wis' }
-        ];
-
-        skillsData.forEach(skill => {
-            const checkbox = document.getElementById(`skill${skill.id}`);
-            const modSpan = checkbox.nextElementSibling;
-            
-            const attrValue = this.character.attributes[skill.ability];
-            const modifier = Math.floor((attrValue - 10) / 2);
-            const isProficient = checkbox.checked;
-            
-            const totalMod = modifier + (isProficient ? profBonus : 0);
-            const modText = totalMod >= 0 ? `+${totalMod}` : totalMod;
-            modSpan.textContent = modText;
-        });
-    }
-
-    calculatePassivePerception() {
-        const wisValue = this.character.attributes.wis;
-        const wisMod = Math.floor((wisValue - 10) / 2);
-        const profBonus = this.calculateProficiencyBonus();
-        const isPerceptionProficient = document.getElementById('skillPerception').checked;
-        
-        const passivePerception = 10 + wisMod + (isPerceptionProficient ? profBonus : 0);
-        document.getElementById('passivePerception').textContent = passivePerception;
-    }
-
-    calculateArmorClass() {
-        // Base AC = 10 + DEX modifier
-        // This is a simplified calculation - in a full implementation,
-        // would need to account for armor, shields, etc.
-        const dexValue = this.character.attributes.dex;
-        const dexMod = Math.floor((dexValue - 10) / 2);
-        const ac = 10 + dexMod;
-        
-        document.getElementById('armorClass').textContent = ac;
-    }
-
-    calculateInitiative() {
-        const dexValue = this.character.attributes.dex;
-        const dexMod = Math.floor((dexValue - 10) / 2);
-        const initiative = dexMod >= 0 ? `+${dexMod}` : dexMod;
-        
-        document.getElementById('initiative').textContent = initiative;
-    }
-
-    // Helper methods to get class/race/background names
-    getClassName() {
-        if (!this.character.class) return 'Classe não definida';
-        
-        // Se for objeto, retorna o nome
-        if (typeof this.character.class === 'object') {
-            return this.character.class.name || this.character.class.nome || 'Classe não definida';
-        }
-        
-        // Se for string, usa o mapeamento
-        const classMap = {
-            'barbaro': 'Bárbaro',
-            'bardo': 'Bardo',
-            'bruxo': 'Bruxo',
-            'clerigo': 'Clérigo',
-            'druida': 'Druida',
-            'feiticeiro': 'Feiticeiro',
-            'guerreiro': 'Guerreiro',
-            'ladino': 'Ladino',
-            'mago': 'Mago',
-            'monge': 'Monge',
-            'paladino': 'Paladino',
-            'patrulheiro': 'Patrulheiro',
-            'artifice': 'Artífice'
-        };
-        return classMap[this.character.class] || this.character.class;
-    }
-
-    getBackgroundName() {
-        if (!this.character.background) return 'Antecedente não definido';
-        
-        // Se for objeto, retorna o nome
-        if (typeof this.character.background === 'object') {
-            return this.character.background.name || this.character.background.nome || 'Antecedente não definido';
-        }
-        
-        // Se for string, usa o mapeamento
-        const bgMap = {
-            'acolito': 'Acólito',
-            'artesao-guilda': 'Artesão de Guilda',
-            'artista': 'Artista',
-            'charlatao': 'Charlatão',
-            'criminoso': 'Criminoso',
-            'eremita': 'Eremita',
-            'forasteiro': 'Forasteiro',
-            'heroi-povo': 'Herói do Povo',
-            'marinheiro': 'Marinheiro',
-            'nobre': 'Nobre',
-            'orfao': 'Órfão',
-            'sabio': 'Sábio',
-            'soldado': 'Soldado'
-        };
-        return bgMap[this.character.background] || this.character.background;
-    }
-
-    getRaceName() {
-        if (!this.character.race) return 'Raça não definida';
-        
-        // Se for objeto, retorna o nome
-        if (typeof this.character.race === 'object') {
-            const raceName = this.character.race.name || this.character.race.nome || 'Raça não definida';
-            if (this.character.subrace) {
-                return `${raceName} (${this.character.subrace})`;
-            }
-            return raceName;
-        }
-        
-        // Se for string, retorna direto
-        let raceName = this.character.race || '';
-        if (this.character.subrace) {
-            raceName += ` (${this.character.subrace})`;
-        }
-        return raceName;
-    }
-
-    formatAlignment(alignment) {
-        const alignmentMap = {
-            'leal-bom': 'Leal e Bom',
-            'neutro-bom': 'Neutro e Bom',
-            'caotico-bom': 'Caótico e Bom',
-            'leal-neutro': 'Leal e Neutro',
-            'neutro': 'Neutro',
-            'caotico-neutro': 'Caótico e Neutro',
-            'leal-mau': 'Leal e Mau',
-            'neutro-mau': 'Neutro e Mau',
-            'caotico-mau': 'Caótico e Mau'
-        };
-        return alignmentMap[alignment] || alignment;
-    }
-
-    getHitDice() {
-        // Map class to hit dice
-        const hitDiceMap = {
-            'barbaro': 'd12',
-            'bardo': 'd8',
-            'bruxo': 'd8',
-            'clerigo': 'd8',
-            'druida': 'd8',
-            'feiticeiro': 'd6',
-            'guerreiro': 'd10',
-            'ladino': 'd8',
-            'mago': 'd6',
-            'monge': 'd8',
-            'paladino': 'd10',
-            'patrulheiro': 'd10',
-            'artifice': 'd8'
-        };
-        return hitDiceMap[this.character.class] || 'd8';
-    }
-
-    getProficientSaves() {
-        // Map class to proficient saving throws
-        const savesMap = {
-            'barbaro': ['str', 'con'],
-            'bardo': ['dex', 'cha'],
-            'bruxo': ['wis', 'cha'],
-            'clerigo': ['wis', 'cha'],
-            'druida': ['int', 'wis'],
-            'feiticeiro': ['con', 'cha'],
-            'guerreiro': ['str', 'con'],
-            'ladino': ['dex', 'int'],
-            'mago': ['int', 'wis'],
-            'monge': ['str', 'dex'],
-            'paladino': ['wis', 'cha'],
-            'patrulheiro': ['str', 'dex'],
-            'artifice': ['con', 'int']
-        };
-        return savesMap[this.character.class] || [];
-    }
-
-    capitalize(str) {
-        return str.charAt(0).toUpperCase() + str.slice(1);
-    }
-
-    setupEventListeners() {
-        // Print button
-        document.getElementById('printBtn').addEventListener('click', () => {
-            window.print();
-        });
-
-        // Edit button
-        document.getElementById('editBtn').addEventListener('click', () => {
-            this.toggleEditMode();
-        });
-
-        // Delete button
-        document.getElementById('deleteBtn').addEventListener('click', () => {
-            if (confirm('Tem certeza que deseja excluir este personagem? Esta ação não pode ser desfeita.')) {
-                this.deleteCharacter();
-            }
-        });
-
-        // Back button
-        document.getElementById('backBtn').addEventListener('click', () => {
-            window.location.href = 'dashboard.html';
-        });
-
-        // Auto-save on input changes
-        const inputs = document.querySelectorAll('input, textarea');
-        inputs.forEach(input => {
-            if (!input.readOnly && !input.disabled) {
-                input.addEventListener('change', () => this.saveCharacter());
-            }
-        });
-
-        // Skill checkboxes - recalculate on change
-        document.querySelectorAll('.skill-item input[type="checkbox"]').forEach(checkbox => {
-            checkbox.addEventListener('change', () => {
-                this.calculateSkills();
-                this.calculatePassivePerception();
-                this.saveCharacter();
-            });
-        });
-    }
-
-    toggleEditMode() {
-        const isEditing = document.body.classList.toggle('edit-mode');
-        
-        const readonlyFields = document.querySelectorAll('input[readonly], textarea[readonly]');
-        readonlyFields.forEach(field => {
-            if (isEditing) {
-                field.removeAttribute('readonly');
-                field.classList.add('editable');
-            } else {
-                field.setAttribute('readonly', true);
-                field.classList.remove('editable');
-            }
-        });
-
-        const editBtn = document.getElementById('editBtn');
-        editBtn.textContent = isEditing ? '💾 Salvar' : '✏️ Editar';
-        
-        if (!isEditing) {
-            this.saveCharacter();
-        }
-    }
-
     async saveCharacter() {
+        if (!this.character) return;
+
         try {
-            // Atualizar dados do personagem
-            const updates = {
-                name: document.getElementById('charName').value,
-                hit_points_max: parseInt(document.getElementById('hpMax').value) || this.character.hp,
-                hit_points_current: parseInt(document.getElementById('hpCurrent').value) || this.character.hp,
-                
-                // Atualizar aparência se houver mudanças
-                custom_fields: {
-                    ...this.character.custom_fields,
-                    appearance: {
-                        age: document.getElementById('age').value,
-                        height: document.getElementById('height').value,
-                        weight: document.getElementById('weight').value,
-                        eyes: document.getElementById('eyes').value,
-                        skin: document.getElementById('skin').value,
-                        hair: document.getElementById('hair').value
-                    }
-                },
-                
+            const updateData = {
+                name: this.character.name || 'Personagem Sem Nome',
+                race: this.character.race,
+                character_class: this.character.class,
+                background: this.character.background,
+                alignment: this.character.alignment,
+                level: this.character.level || 1,
+                strength: this.character.attributes?.str || 10,
+                dexterity: this.character.attributes?.dex || 10,
+                constitution: this.character.attributes?.con || 10,
+                intelligence: this.character.attributes?.int || 10,
+                wisdom: this.character.attributes?.wis || 10,
+                charisma: this.character.attributes?.cha || 10,
+                hit_points_max: this.character.hp || 8,
+                hit_points_current: this.character.hpCurrent || 8,
+                is_draft: false,
                 updated_at: new Date().toISOString()
             };
 
             const { error } = await supabase
                 .from('characters')
-                .update(updates)
+                .update(updateData)
                 .eq('id', this.characterId);
 
             if (error) throw error;
-
-            console.log('✅ Personagem salvo no Supabase');
+            
+            alert('✅ Personagem salvo com sucesso!');
+            window.location.href = '/dashboard.html';
             
         } catch (error) {
             console.error('❌ Erro ao salvar personagem:', error);
-            alert('Erro ao salvar as alterações.');
+            alert('Erro ao salvar personagem!');
         }
     }
 
-    async deleteCharacter() {
-        try {
-            const { error } = await supabase
-                .from('characters')
-                .delete()
-                .eq('id', this.characterId);
-
-            if (error) throw error;
-
-            console.log('✅ Personagem excluído do Supabase');
-            window.location.href = 'dashboard.html';
-            
-        } catch (error) {
-            console.error('❌ Erro ao excluir personagem:', error);
-            alert('Erro ao excluir o personagem.');
+    toggleSidebar() {
+        const sidebar = document.getElementById('sidebarMenu');
+        const overlay = document.getElementById('sidebarOverlay');
+        
+        if (sidebar && overlay) {
+            sidebar.classList.toggle('active');
+            overlay.classList.toggle('active');
         }
     }
 }
 
-// =====================================
-// SIDEBAR MENU
-// =====================================
-
-function initSidebarMenu() {
-    const menuBtn = document.getElementById('menuBtn');
-    const sidebar = document.getElementById('sidebarMenu');
-    const overlay = document.getElementById('sidebarOverlay');
-    const closeBtn = document.querySelector('.close-sidebar');
-    
-    if (!menuBtn || !sidebar || !overlay) return;
-    
-    // Abrir menu
-    menuBtn.addEventListener('click', () => {
-        sidebar.classList.add('active');
-        overlay.classList.add('active');
-    });
-    
-    // Fechar menu
-    const closeSidebar = () => {
-        sidebar.classList.remove('active');
-        overlay.classList.remove('active');
-    };
-    
-    closeBtn.addEventListener('click', closeSidebar);
-    overlay.addEventListener('click', closeSidebar);
-    
-    // Ações do menu
-    document.querySelectorAll('.sidebar-item').forEach(item => {
-        item.addEventListener('click', () => {
-            const action = item.dataset.action;
-            
-            if (action === 'attribute-method') {
-                // Vai para a página de atributos, mas mantém o ID na URL
-                const params = new URLSearchParams(window.location.search);
-                const charId = params.get('id');
-                
-                if (charId) {
-                    window.location.href = `attribute-method.html?return_to=character-sheet.html&id=${charId}`;
-                } else {
-                    window.location.href = 'attribute-method.html?return_to=character-sheet.html';
-                }
-            }
-            
-            closeSidebar();
-        });
-    });
-}
-
-// =====================================
-// MODO EDITÁVEL
-// =====================================
-
-function initEditMode() {
-    const params = new URLSearchParams(window.location.search);
-    const isNewCharacter = !params.get('id');
-    const finishBtn = document.getElementById('finishBtn');
-    
-    if (isNewCharacter) {
-        // Modo de criação - ficha editável
-        enableEditMode();
-        if (finishBtn) {
-            finishBtn.style.display = 'block';
-            finishBtn.addEventListener('click', finishCharacterCreation);
-        }
-    }
-}
-
-function enableEditMode() {
-    // Torna campos editáveis
-    const nameInput = document.getElementById('charName');
-    if (nameInput) {
-        nameInput.removeAttribute('readonly');
-        nameInput.placeholder = 'Digite o nome do personagem';
-    }
-    
-    // Habilita outros campos conforme necessário
-    console.log('✅ Modo de edição ativado');
-}
-
-async function finishCharacterCreation() {
-    try {
-        // Verifica autenticação
-        const { data: { user } } = await supabase.auth.getUser();
-        if (!user) {
-            alert('Você precisa estar logado para salvar um personagem!');
-            window.location.href = 'login.html';
-            return;
-        }
-
-        // Pega a instância do CharacterSheet
-        const characterSheet = window.characterSheetInstance;
-        if (!characterSheet || !characterSheet.character) {
-            alert('Erro: dados do personagem não encontrados!');
-            return;
-        }
-
-        const character = characterSheet.character;
-        
-        // Validações
-        if (!character.name || character.name.trim() === '') {
-            alert('Por favor, dê um nome ao seu personagem!');
-            return;
-        }
-
-        if (!character.attributes || Object.values(character.attributes).some(val => val < 3 || val > 30 || !val)) {
-            alert('Por favor, defina os valores dos atributos primeiro através do Menu → Valores de Atributo');
-            return;
-        }
-
-        // Se é um rascunho, converte para personagem final
-        if (characterSheet.characterId) {
-            // Atualiza rascunho para personagem completo
-            const { error } = await supabase
-                .from('characters')
-                .update({
-                    is_draft: false,
-                    draft_step: null,
-                    name: character.name.trim(),
-                    updated_at: new Date().toISOString()
-                })
-                .eq('id', characterSheet.characterId);
-
-            if (error) {
-                console.error('❌ Erro ao finalizar personagem:', error);
-                alert(`Erro ao salvar personagem: ${error.message}`);
-                return;
-            }
-
-            console.log('✅ Personagem finalizado com sucesso!');
-        } else {
-            // Caso não tenha rascunho, criar personagem novo
-            const characterData = {
-                user_id: user.id,
-                name: character.name.trim(),
-                race: character.race,
-                character_class: character.class,
-                background: character.background,
-                alignment: character.alignment,
-                level: character.level || 1,
-                experience_points: 0,
-                strength: character.attributes.str || 10,
-                dexterity: character.attributes.dex || 10,
-                constitution: character.attributes.con || 10,
-                intelligence: character.attributes.int || 10,
-                wisdom: character.attributes.wis || 10,
-                charisma: character.attributes.cha || 10,
-                hit_points_current: character.hpCurrent || 8,
-                hit_points_max: character.hp || 8,
-                avatar_url: character.image,
-                is_draft: false
-            };
-
-            const { data, error } = await supabase
-                .from('characters')
-                .insert([characterData])
-                .select();
-
-            if (error) {
-                console.error('❌ Erro ao salvar:', error);
-                alert(`Erro ao salvar personagem: ${error.message}`);
-                return;
-            }
-
-            console.log('✅ Personagem salvo com sucesso:', data);
-        }
-        
-        // Para o auto-save
-        if (characterSheet.autoSaveInterval) {
-            clearInterval(characterSheet.autoSaveInterval);
-        }
-        
-        alert('✅ Personagem criado com sucesso!');
-        
-        // Redireciona para dashboard
-        window.location.href = 'dashboard.html';
-        
-    } catch (error) {
-        console.error('❌ Erro fatal:', error);
-        alert(`Erro ao finalizar personagem: ${error.message}`);
-    }
-}
-
-// Character Image Upload
-function initCharacterImageUpload() {
-    const container = document.getElementById('characterImageContainer');
-    const input = document.getElementById('characterImageInput');
-    const image = document.getElementById('charImage');
-    
-    if (!container || !input || !image) return;
-    
-    // Clique no container abre o seletor de arquivo
-    container.addEventListener('click', () => {
-        input.click();
-    });
-    
-    // Quando selecionar arquivo
-    input.addEventListener('change', (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
-        
-        // Validar tipo
-        if (!file.type.startsWith('image/')) {
-            alert('Por favor, selecione uma imagem válida!');
-            return;
-        }
-        
-        // Validar tamanho (máx 5MB)
-        if (file.size > 5 * 1024 * 1024) {
-            alert('A imagem deve ter no máximo 5MB!');
-            return;
-        }
-        
-        // Ler e exibir
-        const reader = new FileReader();
-        reader.onload = (event) => {
-            image.src = event.target.result;
-            
-            // Salvar no personagem e fazer auto-save
-            const characterSheet = window.characterSheetInstance;
-            if (characterSheet && characterSheet.character) {
-                characterSheet.character.image = event.target.result;
-                characterSheet.saveDraft();
-            }
-            
-            console.log('✅ Imagem do personagem atualizada');
-        };
-        reader.readAsDataURL(file);
-    });
-}
-
-// Initialize on page load
+// Inicializar quando o DOM estiver carregado
 document.addEventListener('DOMContentLoaded', () => {
-    window.characterSheetInstance = new CharacterSheet();
-    initSidebarMenu();
-    initEditMode();
-    initCharacterImageUpload();
+    new CharacterSheet();
 });
