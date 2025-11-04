@@ -446,7 +446,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (window.location.pathname.includes('login.html')) {
             // NÃO redireciona automaticamente - deixa usuário fazer logout se quiser
             console.log('ℹ️ Usuário já está logado, mas permanece na página de login')
-            showMessage('Você já está logado! Faça logout se quiser trocar de conta.', 'info')
+            // Notificação removida - silencioso
         } else if (window.location.pathname.includes('onboarding.html')) {
             // Se está no onboarding, verifica se realmente precisa estar aqui
             console.log('🔍 Verificando se usuário precisa mesmo do onboarding')
