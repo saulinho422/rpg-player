@@ -74,8 +74,7 @@
             </header>
 
             <main>
-                <!-- Left Column: Attributes -->
-                <section class="left-column">
+                <section>
                     <section class="attributes">
                         <div class="scores">
                             <ul>
@@ -298,27 +297,26 @@
                     </section>
                 </section>
 
-                <!-- Center Column: Combat -->
-                <section class="center-column">
+                <section>
                     <section class="combat">
                         <div class="armorclass">
                             <div>
                                 <label for="ac">Armor Class</label>
-                                <input type="text" name="ac" id="ac" placeholder="10">
+                                <input name="ac" id="ac" placeholder="10">
                             </div>
                         </div>
 
                         <div class="initiative">
                             <div>
                                 <label for="initiative">Initiative</label>
-                                <input type="text" name="initiative" id="initiative" placeholder="+0">
+                                <input name="initiative" id="initiative" placeholder="+0">
                             </div>
                         </div>
 
                         <div class="speed">
                             <div>
                                 <label for="speed">Speed</label>
-                                <input type="text" name="speed" id="speed" placeholder="30">
+                                <input name="speed" id="speed" placeholder="30">
                             </div>
                         </div>
 
@@ -326,16 +324,16 @@
                             <div class="regular">
                                 <div class="max">
                                     <label for="maxhp">Hit Point Maximum</label>
-                                    <input type="text" name="maxhp" id="maxhp" placeholder="10">
+                                    <input name="maxhp" id="maxhp" placeholder="10">
                                 </div>
                                 <div class="current">
                                     <label for="currenthp">Current Hit Points</label>
-                                    <input type="text" name="currenthp" id="currenthp">
+                                    <input name="currenthp" id="currenthp">
                                 </div>
                             </div>
                             <div class="temporary">
                                 <label for="temphp">Temporary Hit Points</label>
-                                <input type="text" name="temphp" id="temphp">
+                                <input name="temphp" id="temphp">
                             </div>
                         </div>
 
@@ -343,11 +341,11 @@
                             <div>
                                 <div class="total">
                                     <label for="totalhd">Total</label>
-                                    <input type="text" name="totalhd" id="totalhd" placeholder="2d10">
+                                    <input name="totalhd" id="totalhd" placeholder="2d10">
                                 </div>
                                 <div class="remaining">
                                     <label for="remaininghd">Hit Dice</label>
-                                    <input type="text" name="remaininghd" id="remaininghd">
+                                    <input name="remaininghd" id="remaininghd">
                                 </div>
                             </div>
                         </div>
@@ -361,17 +359,17 @@
                                     <div class="deathsuccesses">
                                         <label>Successes</label>
                                         <div class="bubbles">
-                                            <input type="checkbox" name="deathsuccess1" id="deathsuccess1">
-                                            <input type="checkbox" name="deathsuccess2" id="deathsuccess2">
-                                            <input type="checkbox" name="deathsuccess3" id="deathsuccess3">
+                                            <input name="deathsuccess1" id="deathsuccess1" type="checkbox">
+                                            <input name="deathsuccess2" id="deathsuccess2" type="checkbox">
+                                            <input name="deathsuccess3" id="deathsuccess3" type="checkbox">
                                         </div>
                                     </div>
                                     <div class="deathfails">
                                         <label>Failures</label>
                                         <div class="bubbles">
-                                            <input type="checkbox" name="deathfail1" id="deathfail1">
-                                            <input type="checkbox" name="deathfail2" id="deathfail2">
-                                            <input type="checkbox" name="deathfail3" id="deathfail3">
+                                            <input name="deathfail1" id="deathfail1" type="checkbox">
+                                            <input name="deathfail2" id="deathfail2" type="checkbox">
+                                            <input name="deathfail3" id="deathfail3" type="checkbox">
                                         </div>
                                     </div>
                                 </div>
@@ -392,37 +390,19 @@
                                 </thead>
                                 <tbody>
                                     <tr>
-                                        <td>
-                                            <input type="text" name="atkname1" id="atkname1">
-                                        </td>
-                                        <td>
-                                            <input type="text" name="atkbonus1" id="atkbonus1">
-                                        </td>
-                                        <td>
-                                            <input type="text" name="atkdamage1" id="atkdamage1">
-                                        </td>
+                                        <td><input name="atkname1" id="atkname1"></td>
+                                        <td><input name="atkbonus1" id="atkbonus1"></td>
+                                        <td><input name="atkdamage1" id="atkdamage1"></td>
                                     </tr>
                                     <tr>
-                                        <td>
-                                            <input type="text" name="atkname2" id="atkname2">
-                                        </td>
-                                        <td>
-                                            <input type="text" name="atkbonus2" id="atkbonus2">
-                                        </td>
-                                        <td>
-                                            <input type="text" name="atkdamage2" id="atkdamage2">
-                                        </td>
+                                        <td><input name="atkname2" id="atkname2"></td>
+                                        <td><input name="atkbonus2" id="atkbonus2"></td>
+                                        <td><input name="atkdamage2" id="atkdamage2"></td>
                                     </tr>
                                     <tr>
-                                        <td>
-                                            <input type="text" name="atkname3" id="atkname3">
-                                        </td>
-                                        <td>
-                                            <input type="text" name="atkbonus3" id="atkbonus3">
-                                        </td>
-                                        <td>
-                                            <input type="text" name="atkdamage3" id="atkdamage3">
-                                        </td>
+                                        <td><input name="atkname3" id="atkname3"></td>
+                                        <td><input name="atkbonus3" id="atkbonus3"></td>
+                                        <td><input name="atkdamage3" id="atkdamage3"></td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -462,8 +442,7 @@
                     </section>
                 </section>
 
-                <!-- Right Column: Personality & Features -->
-                <section class="right-column">
+                <section>
                     <section class="flavor">
                         <div class="personality">
                             <label for="personality">Personality</label>

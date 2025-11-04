@@ -340,22 +340,11 @@ form.charsheet main {
 }
 
 /* Three Column Layout */
-form.charsheet main .left-column {
+form.charsheet main > section {
     width: 32%;
     display: flex;
     flex-direction: column;
-}
-
-form.charsheet main .center-column {
-    width: 32%;
-    display: flex;
-    flex-direction: column;
-}
-
-form.charsheet main .right-column {
-    width: 32%;
-    display: flex;
-    flex-direction: column;
+    gap: var(--gutter);
 }
 
 form.charsheet main div.label-container {
