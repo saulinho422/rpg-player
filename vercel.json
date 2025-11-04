@@ -39,6 +39,10 @@
     {
       "source": "/character-sheet",
       "destination": "/character-sheet.html"
+    },
+    {
+      "source": "/admin-dashboard",
+      "destination": "/admin-dashboard.html"
     }
   ],
   "headers": [

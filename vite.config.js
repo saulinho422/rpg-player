@@ -20,7 +20,8 @@ export default defineConfig({
         attributeMethod: resolve(__dirname, 'attribute-method.html'),
         roll4d6: resolve(__dirname, 'roll-4d6.html'),
         distributeAttributes: resolve(__dirname, 'distribute-attributes.html'),
-        testSupabase: resolve(__dirname, 'test-supabase.html')
+        testSupabase: resolve(__dirname, 'test-supabase.html'),
+        adminDashboard: resolve(__dirname, 'admin-dashboard.html')
       }
     }
   }

@@ -230,6 +230,25 @@ async function checkUserProfile(user) {
         console.log('🔍 profile existe:', !!profile)
         console.log('🔍 onboarding_completed:', profile?.onboarding_completed)
         console.log('🔍 display_name:', profile?.display_name)
+        console.log('🔍 is_owner:', profile?.is_owner)
+        console.log('🔍 is_admin:', profile?.is_admin)
+        
+        // ⚡ VERIFICAÇÃO DE PERMISSÕES ADMIN/OWNER
+        if (profile && (profile.is_owner || profile.is_admin)) {
+            console.log('👑 Usuário é ADMIN/OWNER - redirecionando para admin dashboard')
+            
+            localStorage.setItem('userName', profile.display_name || profile.email || 'Admin')
+            localStorage.setItem('userAvatar', profile.avatar_url || '')
+            localStorage.setItem('isAdmin', 'true')
+            localStorage.setItem('isOwner', profile.is_owner ? 'true' : 'false')
+            
+            showMessage('🛡️ Bem-vindo, Administrador!', 'success')
+            
+            setTimeout(() => {
+                window.location.href = 'admin-dashboard.html'
+            }, 1500)
+            return
+        }
         
         if (profile && profile.onboarding_completed === true) {
             console.log('✅ Usuário já completou onboarding, indo para dashboard')
