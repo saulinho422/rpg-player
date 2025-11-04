@@ -11,17 +11,34 @@ async function checkAdminAccess() {
 
     const { data: profile, error } = await supabase
         .from('profiles')
-        .select('is_owner, is_admin, is_beta_tester, full_name, email')
+        .select('is_owner, is_admin, is_beta_tester, display_name')
         .eq('id', user.id)
         .single();
 
-    if (error || (!profile.is_owner && !profile.is_admin)) {
+    console.log('🔍 Admin Check - User:', user.id);
+    console.log('🔍 Admin Check - Profile:', profile);
+    console.log('🔍 Admin Check - Error:', error);
+
+    if (error) {
+        console.error('❌ Erro ao buscar perfil:', error);
+        showNotification('❌ Erro ao verificar permissões: ' + error.message, 'error');
+        setTimeout(() => {
+            window.location.href = '/dashboard.html';
+        }, 2000);
+        return null;
+    }
+
+    if (!profile.is_owner && !profile.is_admin) {
+        console.warn('⚠️ Usuário não tem permissões de admin');
         showNotification('❌ Você não tem permissão para acessar esta página', 'error');
         setTimeout(() => {
             window.location.href = '/dashboard.html';
         }, 2000);
         return null;
     }
+
+    console.log('✅ Acesso admin autorizado!');
+    return profile;
 
     return profile;
 }
@@ -41,7 +58,7 @@ function displayUserBadge(profile) {
         roleText += ' | 🧪 BETA TESTER';
     }
     
-    badge.textContent = `${profile.full_name || profile.email} - ${roleText}`;
+    badge.textContent = `${profile.display_name || 'Admin'} - ${roleText}`;
 }
 
 // Carregar contadores de todas as tabelas
