@@ -499,6 +499,9 @@ class OnboardingSystem {
                 this.userData.avatar = 'img/perfil_empty_user.png'
                 this.userData.avatarType = 'default'
                 console.log('✅ Imagem padrão aplicada:', this.userData.avatar)
+            } else {
+                console.log('✅ Avatar já existe:', this.userData.avatar)
+                console.log('📋 Tipo:', this.userData.avatarType)
             }
             
             // Valida dados obrigatórios

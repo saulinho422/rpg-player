@@ -139,6 +139,10 @@ export class DashboardService {
         const userLevel = document.getElementById('userLevel')
         const userAvatar = document.getElementById('userAvatar')
         
+        console.log('🎨 updateUserHeader - userStats recebido:', userStats)
+        console.log('🖼️ Avatar URL:', userStats.avatar_url)
+        console.log('📋 Avatar Type:', userStats.avatar_type)
+        
         if (userName && userStats.display_name) {
             userName.textContent = userStats.display_name
         }
@@ -149,17 +153,24 @@ export class DashboardService {
         
         if (userAvatar) {
             if (userStats.avatar_url) {
+                console.log('✅ Avatar URL existe:', userStats.avatar_url)
                 if (userStats.avatar_type === 'preset') {
                     // Se é emoji, cria SVG
+                    console.log('🎭 Tipo: preset (emoji)')
                     userAvatar.src = `data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40"><text x="50%" y="50%" text-anchor="middle" dy=".3em" font-size="24">${encodeURIComponent(userStats.avatar_url)}</text></svg>`
                 } else {
                     // Se é URL de imagem (upload ou default)
+                    console.log('🖼️ Tipo: upload/default (imagem)', userStats.avatar_url)
                     userAvatar.src = userStats.avatar_url
+                    console.log('📍 Avatar src definido como:', userAvatar.src)
                 }
             } else {
                 // Fallback se não tiver avatar_url
+                console.log('⚠️ Avatar URL vazio, usando fallback')
                 userAvatar.src = 'img/perfil_empty_user.png'
             }
+        } else {
+            console.log('❌ Elemento userAvatar não encontrado no DOM')
         }
     }
     
