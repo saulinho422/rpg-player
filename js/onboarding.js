@@ -2,7 +2,7 @@
 // ONBOARDING - SISTEMA COMPLETO COM BANCO REAL
 // =====================================
 
-import { UserService } from './database.js'
+import { UserService, supabase } from './database.js'
 import { checkAuth } from './auth-supabase-only.js'
 
 class OnboardingSystem {
@@ -46,8 +46,9 @@ class OnboardingSystem {
     // NAVEGAÇÃO ENTRE ETAPAS
     // =====================================
     
-    nextStep() {
-        if (!this.validateCurrentStep()) {
+    async nextStep() {
+        const isValid = await this.validateCurrentStep()
+        if (!isValid) {
             return false
         }
         
@@ -121,7 +122,7 @@ class OnboardingSystem {
     // VALIDAÇÃO DAS ETAPAS
     // =====================================
     
-    validateCurrentStep() {
+    async validateCurrentStep() {
         switch(this.currentStep) {
             case 1: // Avatar - OPCIONAL, não precisa validar
                 // Se não tiver avatar, usa a imagem padrão
@@ -134,6 +135,13 @@ class OnboardingSystem {
             case 2: // Nome
                 if (!this.userData.name || this.userData.name.length < 2) {
                     this.showMessage('Digite um nome válido (mínimo 2 caracteres)!', 'error')
+                    return false
+                }
+                
+                // Verifica se o nome já existe
+                const nameExists = await this.isNameTaken(this.userData.name)
+                if (nameExists) {
+                    this.showMessage('Este nome já está em uso! Escolha uma das sugestões abaixo.', 'error')
                     return false
                 }
                 break
@@ -305,12 +313,13 @@ class OnboardingSystem {
     initNameListeners() {
         const nameInput = document.getElementById('playerName')
         const nameValidation = document.getElementById('nameValidation')
+        let debounceTimeout = null
         
         nameInput?.addEventListener('input', (e) => {
             const name = e.target.value.trim()
             this.userData.name = name
             
-            // Validação em tempo real
+            // Validação básica em tempo real
             if (name.length === 0) {
                 nameValidation.textContent = ''
                 nameValidation.className = 'input-validation'
@@ -321,8 +330,12 @@ class OnboardingSystem {
                 nameValidation.textContent = 'Nome muito longo (máximo 30 caracteres)'
                 nameValidation.className = 'input-validation invalid'
             } else {
-                nameValidation.textContent = 'Nome válido ✓'
-                nameValidation.className = 'input-validation valid'
+                nameValidation.textContent = 'Verificando disponibilidade...'
+                nameValidation.className = 'input-validation'
+                
+                // Debounce para não fazer muitas consultas
+                clearTimeout(debounceTimeout)
+                debounceTimeout = setTimeout(() => this.checkNameAvailability(name, nameValidation), 500)
             }
         })
         
@@ -332,10 +345,84 @@ class OnboardingSystem {
                 const suggestedName = btn.dataset.name
                 nameInput.value = suggestedName
                 this.userData.name = suggestedName
-                nameValidation.textContent = 'Nome válido ✓'
-                nameValidation.className = 'input-validation valid'
+                this.checkNameAvailability(suggestedName, nameValidation)
             })
         })
+    }
+    
+    async checkNameAvailability(name, validationElement) {
+        try {
+            const { data, error } = await supabase
+                .from('profiles')
+                .select('display_name')
+                .ilike('display_name', name)
+                .limit(1)
+            
+            if (error) {
+                console.error('Erro ao verificar nome:', error)
+                validationElement.textContent = 'Nome válido ✓'
+                validationElement.className = 'input-validation valid'
+                return
+            }
+            
+            if (data && data.length > 0) {
+                // Nome já existe - gera sugestões
+                const suggestions = this.generateNameSuggestions(name)
+                validationElement.innerHTML = `
+                    ❌ Nome já existe! Tente:<br>
+                    <small style="color: #d4af37; cursor: pointer;" onclick="onboarding.selectSuggestion('${suggestions[0]}')">${suggestions[0]}</small> • 
+                    <small style="color: #d4af37; cursor: pointer;" onclick="onboarding.selectSuggestion('${suggestions[1]}')">${suggestions[1]}</small> • 
+                    <small style="color: #d4af37; cursor: pointer;" onclick="onboarding.selectSuggestion('${suggestions[2]}')">${suggestions[2]}</small>
+                `
+                validationElement.className = 'input-validation invalid'
+            } else {
+                validationElement.textContent = 'Nome disponível ✓'
+                validationElement.className = 'input-validation valid'
+            }
+        } catch (error) {
+            console.error('Erro ao verificar nome:', error)
+            validationElement.textContent = 'Nome válido ✓'
+            validationElement.className = 'input-validation valid'
+        }
+    }
+    
+    generateNameSuggestions(name) {
+        const suffixes = ['_RPG', '_' + Math.floor(Math.random() * 999), ' II', ' III', ' Junior', ' o Valente', ' Aventureiro']
+        const random = Math.floor(Math.random() * suffixes.length)
+        
+        return [
+            name + suffixes[random],
+            name + suffixes[(random + 1) % suffixes.length],
+            name + suffixes[(random + 2) % suffixes.length]
+        ]
+    }
+    
+    selectSuggestion(name) {
+        const nameInput = document.getElementById('playerName')
+        const nameValidation = document.getElementById('nameValidation')
+        nameInput.value = name
+        this.userData.name = name
+        this.checkNameAvailability(name, nameValidation)
+    }
+    
+    async isNameTaken(name) {
+        try {
+            const { data, error } = await supabase
+                .from('profiles')
+                .select('display_name')
+                .ilike('display_name', name)
+                .limit(1)
+            
+            if (error) {
+                console.error('Erro ao verificar nome:', error)
+                return false
+            }
+            
+            return data && data.length > 0
+        } catch (error) {
+            console.error('Erro ao verificar nome:', error)
+            return false
+        }
     }
     
     initAgeListeners() {
