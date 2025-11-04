@@ -335,8 +335,7 @@ form.charsheet header section.misc ul li input {
 form.charsheet main {
     display: flex;
     justify-content: space-between;
-    gap: var(--gutter);
-    margin-top: calc(var(--gutter) * 2);
+    margin-top: 20px;
 }
 
 /* Three Column Layout */
@@ -344,28 +343,6 @@ form.charsheet main > section {
     width: 32%;
     display: flex;
     flex-direction: column;
-    gap: var(--gutter);
-}
-
-form.charsheet main .left-column {
-    width: 32%;
-    display: flex;
-    flex-direction: column;
-    gap: var(--gutter);
-}
-
-form.charsheet main .center-column {
-    width: 32%;
-    display: flex;
-    flex-direction: column;
-    gap: var(--gutter);
-}
-
-form.charsheet main .right-column {
-    width: 32%;
-    display: flex;
-    flex-direction: column;
-    gap: var(--gutter);
 }
 
 form.charsheet main div.label-container {
@@ -388,41 +365,26 @@ form.charsheet main div.label-container > label {
 }
 
 /* Attributes Section */
-form.charsheet main section.attributes {
+form.charsheet main > section section.attributes {
     width: 100%;
     display: flex;
-    flex-direction: column;
-    gap: var(--gutter);
+    flex-direction: row;
+    justify-content: space-between;
 }
 
-/* Attributes Layout Container */
-form.charsheet main section.attributes .attr-layout {
-    display: flex;
-    gap: var(--gutter);
-    margin-bottom: var(--gutter);
-}
-
-form.charsheet main section.attributes div.scores {
+form.charsheet main > section section.attributes div.scores {
     width: calc(70px + 31px);
     background-color: var(--faded-dark);
     border-radius: var(--radius);
     padding-bottom: calc(var(--gutter) / 2);
-    flex-shrink: 0;
 }
 
-form.charsheet main section.attributes div.attr-applications {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: var(--gutter);
-}
-
-form.charsheet main section.attributes div.scores label {
+form.charsheet main > section section.attributes div.scores label {
     font-size: 8px;
     font-weight: bold;
 }
 
-form.charsheet main section.attributes div.scores ul {
+form.charsheet main > section section.attributes div.scores ul {
     display: flex;
     flex-direction: column;
     justify-content: space-around;
@@ -430,7 +392,7 @@ form.charsheet main section.attributes div.scores ul {
     height: 100%;
 }
 
-form.charsheet main section.attributes div.scores ul li {
+form.charsheet main > section section.attributes div.scores ul li {
     height: 80px;
     width: 70px;
     background-color: var(--bg);
@@ -441,24 +403,24 @@ form.charsheet main section.attributes div.scores ul li {
     border-radius: var(--radius);
 }
 
-form.charsheet main section.attributes div.scores ul li input {
+form.charsheet main > section section.attributes div.scores ul li input {
     width: 100%;
     padding: 0;
     border: 0;
 }
 
-form.charsheet main section.attributes div.scores ul li div.score input {
+form.charsheet main > section section.attributes div.scores ul li div.score input {
     text-align: center;
     font-size: 40px;
     padding: 2px 0px 0px 0px;
     background: var(--bg);
 }
 
-form.charsheet main section.attributes div.scores ul li div.modifier {
+form.charsheet main > section section.attributes div.scores ul li div.modifier {
     margin-top: 3px;
 }
 
-form.charsheet main section.attributes div.scores ul li div.modifier input {
+form.charsheet main > section section.attributes div.scores ul li div.modifier input {
     background: var(--bg);
     width: calc(var(--radius) * 3);
     height: calc(var(--radius) * 2);
@@ -469,26 +431,26 @@ form.charsheet main section.attributes div.scores ul li div.modifier input {
 }
 
 /* Attribute Applications */
-form.charsheet main section.attributes div.attr-applications div.inspiration {
+form.charsheet main > section section.attributes div.attr-applications div.inspiration {
     display: flex;
     flex-direction: row-reverse;
     justify-content: flex-end;
 }
 
-form.charsheet main section.attributes div.attr-applications div.inspiration input {
+form.charsheet main > section section.attributes div.attr-applications div.inspiration input {
     appearance: none;
     border: 1px solid black;
     padding: calc(var(--small-box-width) / 2);
     border-radius: var(--radius);
 }
 
-form.charsheet main section.attributes div.attr-applications div.proficiencybonus {
+form.charsheet main > section section.attributes div.attr-applications div.proficiencybonus {
     display: flex;
     flex-direction: row-reverse;
     justify-content: flex-end;
 }
 
-form.charsheet main section.attributes div.attr-applications div.proficiencybonus input {
+form.charsheet main > section section.attributes div.attr-applications div.proficiencybonus input {
     width: var(--small-box-width);
     height: calc(var(--small-box-width) - 2);
     border: 1px solid black;
@@ -496,13 +458,13 @@ form.charsheet main section.attributes div.attr-applications div.proficiencybonu
     border-radius: var(--radius);
 }
 
-form.charsheet main section.attributes div.attr-applications div.list-section {
+form.charsheet main > section section.attributes div.attr-applications div.list-section {
     border: 1px solid black;
     border-radius: var(--radius);
     padding: var(--gutter) calc(var(--gutter) / 2);
 }
 
-form.charsheet main section.attributes div.attr-applications div.list-section div.label {
+form.charsheet main > section section.attributes div.attr-applications div.list-section div.label {
     margin-top: var(--gutter);
     margin-bottom: calc(var(--gutter) / 4);
     text-align: center;
@@ -511,27 +473,27 @@ form.charsheet main section.attributes div.attr-applications div.list-section di
     font-weight: bold;
 }
 
-form.charsheet main section.attributes div.attr-applications div.list-section ul li {
+form.charsheet main > section section.attributes div.attr-applications div.list-section ul li {
     display: flex;
     align-items: center;
 }
 
-form.charsheet main section.attributes div.attr-applications div.list-section ul li > * {
+form.charsheet main > section section.attributes div.attr-applications div.list-section ul li > * {
     margin-left: calc(var(--gutter) / 2);
 }
 
-form.charsheet main section.attributes div.attr-applications div.list-section ul li label {
+form.charsheet main > section section.attributes div.attr-applications div.list-section ul li label {
     text-transform: none;
     font-size: 8px;
     text-align: left;
     order: 3;
 }
 
-form.charsheet main section.attributes div.attr-applications div.list-section ul li label span.skill {
+form.charsheet main > section section.attributes div.attr-applications div.list-section ul li label span.skill {
     color: var(--faded-dark);
 }
 
-form.charsheet main section.attributes div.attr-applications div.list-section ul li input[type="text"] {
+form.charsheet main > section section.attributes div.attr-applications div.list-section ul li input[type="text"] {
     width: 30px;
     font-size: 12px;
     text-align: center;
@@ -540,7 +502,7 @@ form.charsheet main section.attributes div.attr-applications div.list-section ul
     order: 2;
 }
 
-form.charsheet main section.attributes div.attr-applications div.list-section ul li input[type="checkbox"] {
+form.charsheet main > section section.attributes div.attr-applications div.list-section ul li input[type="checkbox"] {
     appearance: none;
     width: var(--bubble-size);
     height: var(--bubble-size);
@@ -549,7 +511,7 @@ form.charsheet main section.attributes div.attr-applications div.list-section ul
     order: 1;
 }
 
-form.charsheet main section.attributes div.attr-applications div.list-section ul li input[type="checkbox"]:checked {
+form.charsheet main > section section.attributes div.attr-applications div.list-section ul li input[type="checkbox"]:checked {
     background-color: black;
 }
 
