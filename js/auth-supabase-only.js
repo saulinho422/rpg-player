@@ -444,9 +444,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         console.log('🔐 Sessão encontrada ao carregar página:', session.user.email)
         
         if (window.location.pathname.includes('login.html')) {
-            // Se já está logado e está na página de login, redireciona
-            console.log('🔄 Redirecionando usuário logado da página de login')
-            await checkUserProfile(session.user)
+            // NÃO redireciona automaticamente - deixa usuário fazer logout se quiser
+            console.log('ℹ️ Usuário já está logado, mas permanece na página de login')
+            showMessage('Você já está logado! Faça logout se quiser trocar de conta.', 'info')
         } else if (window.location.pathname.includes('onboarding.html')) {
             // Se está no onboarding, verifica se realmente precisa estar aqui
             console.log('🔍 Verificando se usuário precisa mesmo do onboarding')
