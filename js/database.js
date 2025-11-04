@@ -119,13 +119,10 @@ export class UserService {
                 error = result.error
             } else {
                 console.log('✅ Criando novo perfil...')
-                // Usa UPSERT seguro - atualiza se existe, cria se não existe
+                // Usa INSERT direto (mais seguro com RLS)
                 const result = await supabase
                     .from('profiles')
-                    .upsert(dataToSave, { 
-                        onConflict: 'id',
-                        ignoreDuplicates: false 
-                    })
+                    .insert(dataToSave)
                     .select()
                     .single()
                 
