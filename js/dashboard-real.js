@@ -66,12 +66,16 @@ export class DashboardService {
             const characters = await CharacterService.getUserCharacters(userId)
             console.log('👥 Dashboard: Personagens carregados:', characters)
             
-            // Filtra apenas personagens não-rascunho ou rascunhos com nome
-            const validCharacters = characters.filter(char => 
-                !char.is_draft || (char.is_draft && char.name && char.name.trim() !== '')
-            );
+            // Mostra TODOS os personagens que têm nome (rascunho ou finalizado)
+            const validCharacters = characters.filter(char => {
+                const hasName = char.name && char.name.trim() !== '';
+                
+                console.log(`👤 Personagem "${char.name || '(sem nome)'}": is_draft=${char.is_draft}, hasName=${hasName}, showing=${hasName}`);
+                
+                return hasName;
+            });
             
-            console.log('👥 Dashboard: Personagens válidos (não-rascunhos vazios):', validCharacters.length);
+            console.log('👥 Dashboard: Personagens com nome:', validCharacters.length, 'de', characters.length, 'total');
             
             // Atualiza a seção de personagens
             this.updateCharactersSection(validCharacters)
