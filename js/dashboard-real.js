@@ -147,13 +147,18 @@ export class DashboardService {
             userLevel.textContent = `Nível ${userStats.player_level}`
         }
         
-        if (userAvatar && userStats.avatar_url) {
-            if (userStats.avatar_type === 'preset') {
-                // Se é emoji, cria SVG
-                userAvatar.src = `data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40"><text x="50%" y="50%" text-anchor="middle" dy=".3em" font-size="24">${encodeURIComponent(userStats.avatar_url)}</text></svg>`
+        if (userAvatar) {
+            if (userStats.avatar_url) {
+                if (userStats.avatar_type === 'preset') {
+                    // Se é emoji, cria SVG
+                    userAvatar.src = `data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40"><text x="50%" y="50%" text-anchor="middle" dy=".3em" font-size="24">${encodeURIComponent(userStats.avatar_url)}</text></svg>`
+                } else {
+                    // Se é URL de imagem (upload ou default)
+                    userAvatar.src = userStats.avatar_url
+                }
             } else {
-                // Se é URL de imagem
-                userAvatar.src = userStats.avatar_url
+                // Fallback se não tiver avatar_url
+                userAvatar.src = 'img/perfil_empty_user.png'
             }
         }
     }
