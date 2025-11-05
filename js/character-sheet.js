@@ -886,11 +886,11 @@ class CharacterCreationWizard {
         try {
             console.log('📦 Carregando dados do jogo...');
             
-            // Carregar raças
+            // Carregar raças (ordenar por name_pt em português)
             const { data: races, error: racesError } = await supabase
                 .from('races')
                 .select('*')
-                .order('name');
+                .order('name_pt');
             
             if (!racesError && races) {
                 this.gameData.races = races;
@@ -901,18 +901,18 @@ class CharacterCreationWizard {
             const { data: subraces, error: subracesError } = await supabase
                 .from('subraces')
                 .select('*')
-                .order('name');
+                .order('name_pt');
             
             if (!subracesError && subraces) {
                 this.gameData.subraces = subraces;
                 console.log(`✅ ${subraces.length} subraças carregadas`);
             }
 
-            // Carregar classes
+            // Carregar classes (ordenar por name_pt)
             const { data: classes, error: classesError } = await supabase
                 .from('classes')
                 .select('*')
-                .order('name');
+                .order('name_pt');
             
             if (!classesError && classes) {
                 this.gameData.classes = classes;
@@ -923,14 +923,14 @@ class CharacterCreationWizard {
             const { data: subclasses, error: subclassesError } = await supabase
                 .from('subclasses')
                 .select('*')
-                .order('name');
+                .order('name_pt');
             
             if (!subclassesError && subclasses) {
                 this.gameData.subclasses = subclasses;
                 console.log(`✅ ${subclasses.length} subclasses carregadas`);
             }
 
-            // Carregar perícias
+            // Carregar perícias (a tabela skills não tem name_pt, usar name)
             const { data: skills, error: skillsError} = await supabase
                 .from('skills')
                 .select('*')
@@ -941,16 +941,19 @@ class CharacterCreationWizard {
                 console.log(`✅ ${skills.length} perícias carregadas`);
             }
 
-            // Criar antecedentes padrão se não existirem no banco
-            this.gameData.backgrounds = [
-                { id: 1, name: 'Acólito', description: 'Você serviu em um templo, dedicando sua vida a um deus.' },
-                { id: 2, name: 'Criminoso', description: 'Você tem histórico de infração às leis e sobrevive nas sombras.' },
-                { id: 3, name: 'Herói do Povo', description: 'Você vem das classes trabalhadoras e é campeão do povo.' },
-                { id: 4, name: 'Nobre', description: 'Você pertence à aristocracia e conhece as intrigas da corte.' },
-                { id: 5, name: 'Sábio', description: 'Você dedicou sua vida ao estudo e busca pelo conhecimento.' },
-                { id: 6, name: 'Soldado', description: 'Você treinou para a guerra e conhece as táticas de batalha.' }
-            ];
-            console.log(`✅ ${this.gameData.backgrounds.length} antecedentes padrão criados`);
+            // Carregar antecedentes do banco de dados (usar 'nome' ao invés de 'name')
+            const { data: backgrounds, error: backgroundsError } = await supabase
+                .from('game_backgrounds')
+                .select('*')
+                .order('nome');
+            
+            if (!backgroundsError && backgrounds && backgrounds.length > 0) {
+                this.gameData.backgrounds = backgrounds;
+                console.log(`✅ ${backgrounds.length} antecedentes carregados do banco`);
+            } else {
+                console.warn('⚠️ Nenhum antecedente encontrado no banco');
+                this.gameData.backgrounds = [];
+            }
             
         } catch (error) {
             console.error('❌ Erro ao carregar dados do jogo:', error);
@@ -1138,12 +1141,18 @@ class CharacterCreationWizard {
     renderRaceStep() {
         const racesHtml = this.gameData.races.map(race => {
             const isSelected = this.wizardData.race?.id === race.id;
+            // Parsear traits se for string JSON
+            const traits = typeof race.traits === 'string' ? JSON.parse(race.traits) : race.traits;
+            const traitsText = Array.isArray(traits) && traits.length > 0 ? traits.slice(0, 2).join(', ') : '';
+            
             return `
                 <div class="selection-card ${isSelected ? 'selected' : ''}" data-race-id="${race.id}">
-                    <h3>${race.name}</h3>
+                    <h3>${race.name_pt || race.name}</h3>
                     <p>${race.description || 'Raça disponível'}</p>
                     <div class="card-details">
-                        ${race.speed ? `Velocidade: ${race.speed}ft` : ''}
+                        <small><strong>Bônus:</strong> ${race.ability_score_increase || 'Variável'}</small><br>
+                        ${race.speed ? `<small><strong>Velocidade:</strong> ${race.speed}</small><br>` : ''}
+                        ${traitsText ? `<small><strong>Traços:</strong> ${traitsText}...</small>` : ''}
                     </div>
                 </div>
             `;
@@ -1158,10 +1167,14 @@ class CharacterCreationWizard {
                     <div class="selection-grid">
                         ${subraces.map(subrace => {
                             const isSelected = this.wizardData.subrace?.id === subrace.id;
+                            const subTraits = typeof subrace.traits === 'string' ? JSON.parse(subrace.traits) : subrace.traits;
+                            const subTraitsText = Array.isArray(subTraits) && subTraits.length > 0 ? subTraits[0] : '';
+                            
                             return `
                                 <div class="selection-card ${isSelected ? 'selected' : ''}" data-subrace-id="${subrace.id}">
-                                    <h3>${subrace.name}</h3>
+                                    <h3>${subrace.name_pt || subrace.name}</h3>
                                     <p>${subrace.description || 'Sub-raça disponível'}</p>
+                                    ${subTraitsText ? `<div class="card-details"><small>${subTraitsText}</small></div>` : ''}
                                 </div>
                             `;
                         }).join('')}
@@ -1207,12 +1220,18 @@ class CharacterCreationWizard {
     renderClassStep() {
         const classesHtml = this.gameData.classes.map(cls => {
             const isSelected = this.wizardData.class?.id === cls.id;
+            // Parsear saving_throws se for string JSON
+            const savingThrows = typeof cls.saving_throws === 'string' ? JSON.parse(cls.saving_throws) : cls.saving_throws;
+            const savesText = Array.isArray(savingThrows) ? savingThrows.join(', ') : '';
+            
             return `
                 <div class="selection-card ${isSelected ? 'selected' : ''}" data-class-id="${cls.id}">
-                    <h3>${cls.name}</h3>
+                    <h3>${cls.name_pt || cls.name}</h3>
                     <p>${cls.description || 'Classe disponível'}</p>
                     <div class="card-details">
-                        Dado de Vida: ${cls.hit_die || 'd8'}
+                        <small><strong>Dado de Vida:</strong> d${cls.hit_die || '8'}</small><br>
+                        <small><strong>Salvaguardas:</strong> ${savesText}</small><br>
+                        <small><strong>Perícias:</strong> Escolha ${cls.skills_choose || 2}</small>
                     </div>
                 </div>
             `;
@@ -1223,14 +1242,15 @@ class CharacterCreationWizard {
             const subclasses = this.gameData.subclasses.filter(sc => sc.class_id === this.wizardData.class.id);
             if (subclasses.length > 0) {
                 subclassHtml = `
-                    <h4 style="color: var(--primary-color); margin-top: 30px; margin-bottom: 15px;">Subclasse</h4>
+                    <h4 style="color: var(--primary-color); margin-top: 30px; margin-bottom: 15px;">Subclasse (Opcional)</h4>
                     <div class="selection-grid">
                         ${subclasses.map(subclass => {
                             const isSelected = this.wizardData.subclass?.id === subclass.id;
                             return `
                                 <div class="selection-card ${isSelected ? 'selected' : ''}" data-subclass-id="${subclass.id}">
-                                    <h3>${subclass.name}</h3>
+                                    <h3>${subclass.name_pt || subclass.name}</h3>
                                     <p>${subclass.description || 'Subclasse disponível'}</p>
+                                    ${subclass.level_available ? `<div class="card-details"><small>Disponível no nível ${subclass.level_available}</small></div>` : ''}
                                 </div>
                             `;
                         }).join('')}
@@ -1280,8 +1300,12 @@ class CharacterCreationWizard {
             return;
         }
 
-        const classSkills = this.wizardData.class.skill_proficiencies || [];
-        const maxSkills = this.wizardData.class.skill_choices || 2;
+        // Parsear skills_available se for string JSON
+        const classSkills = typeof this.wizardData.class.skills_available === 'string' 
+            ? JSON.parse(this.wizardData.class.skills_available) 
+            : this.wizardData.class.skills_available || [];
+        
+        const maxSkills = this.wizardData.class.skills_choose || 2;
 
         const skillsHtml = this.gameData.skills
             .filter(skill => classSkills.includes(skill.name))
@@ -1456,10 +1480,14 @@ class CharacterCreationWizard {
 
         const backgroundsHtml = this.gameData.backgrounds.map(bg => {
             const isSelected = this.wizardData.background?.id === bg.id;
+            // Usar 'nome' e 'descricao' do banco real
+            const bgName = bg.nome || bg.name || 'Sem nome';
+            const bgDesc = bg.descricao || bg.description || '';
+            
             return `
                 <div class="selection-card ${isSelected ? 'selected' : ''}" data-background-id="${bg.id}">
-                    <h3>${bg.name}</h3>
-                    <p>${bg.description}</p>
+                    <h3>${bgName}</h3>
+                    <p>${bgDesc.substring(0, 120)}${bgDesc.length > 120 ? '...' : ''}</p>
                 </div>
             `;
         }).join('');
@@ -1603,13 +1631,18 @@ class CharacterCreationWizard {
             const dexMod = Math.floor((this.wizardData.attributes.dex - 10) / 2);
             const baseAC = 10 + dexMod;
 
+            // Parsear saving_throws da classe
+            const savingThrows = typeof this.wizardData.class?.saving_throws === 'string' 
+                ? JSON.parse(this.wizardData.class.saving_throws) 
+                : this.wizardData.class?.saving_throws || [];
+
             const characterData = {
                 name: this.wizardData.name,
-                race: this.wizardData.race?.name || null,
-                subrace: this.wizardData.subrace?.name || null,
-                character_class: this.wizardData.class?.name || null,
-                subclass: this.wizardData.subclass?.name || null,
-                background: this.wizardData.background?.name || null,
+                race: this.wizardData.race?.name_pt || this.wizardData.race?.name || null,
+                subrace: this.wizardData.subrace?.name_pt || this.wizardData.subrace?.name || null,
+                character_class: this.wizardData.class?.name_pt || this.wizardData.class?.name || null,
+                subclass: this.wizardData.subclass?.name_pt || this.wizardData.subclass?.name || null,
+                background: this.wizardData.background?.nome || this.wizardData.background?.name || null,
                 alignment: this.wizardData.alignment,
                 level: this.wizardData.level,
                 strength: this.wizardData.attributes.str,
@@ -1621,11 +1654,12 @@ class CharacterCreationWizard {
                 hit_points_max: maxHP,
                 hit_points_current: maxHP,
                 armor_class: baseAC,
-                speed: this.wizardData.race?.speed || 30,
+                speed: parseInt(this.wizardData.race?.speed) || 30,
                 proficiency_bonus: Math.ceil(this.wizardData.level / 4) + 1,
                 avatar_url: this.wizardData.image,
-                skill_proficiencies: this.wizardData.skills,
-                equipment: this.wizardData.equipment,
+                skill_proficiencies: this.wizardData.skills, // Já é array
+                saving_throw_proficiencies: savingThrows, // Array de salvaguardas da classe
+                equipment: this.wizardData.equipment, // Já é array
                 is_draft: false,
                 updated_at: new Date().toISOString()
             };
@@ -1654,9 +1688,9 @@ class CharacterCreationWizard {
             this.characterSheet.character = {
                 id: this.characterSheet.characterId,
                 name: this.wizardData.name,
-                race: this.wizardData.race?.name,
-                class: this.wizardData.class?.name,
-                background: this.wizardData.background?.name,
+                race: this.wizardData.race?.name_pt || this.wizardData.race?.name,
+                class: this.wizardData.class?.name_pt || this.wizardData.class?.name,
+                background: this.wizardData.background?.nome || this.wizardData.background?.name,
                 alignment: this.wizardData.alignment,
                 level: this.wizardData.level,
                 attributes: this.wizardData.attributes,
