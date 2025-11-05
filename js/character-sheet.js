@@ -493,11 +493,35 @@ class CharacterSheet {
             });
         }
 
+        // Fechar modais com X
+        document.querySelectorAll('.modal .close').forEach(closeBtn => {
+            closeBtn.addEventListener('click', (e) => {
+                e.target.closest('.modal').classList.remove('active');
+            });
+        });
+
+        // Fechar modal ao clicar fora
+        document.querySelectorAll('.modal').forEach(modal => {
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    modal.classList.remove('active');
+                }
+            });
+        });
+
         // Mostrar botão de salvar se está em modo de criação
         const finishBtn = document.getElementById('finishBtn');
         if (finishBtn) {
             finishBtn.style.display = 'block';
+            finishBtn.addEventListener('click', () => this.saveCharacter());
         }
+
+        // Abrir modal de raça automaticamente após 2 segundos se não tiver raça selecionada
+        setTimeout(() => {
+            if (!this.character.race) {
+                this.openRaceModal();
+            }
+        }, 2000);
     }
 
     setupAutoSave() {
@@ -507,6 +531,167 @@ class CharacterSheet {
                 this.saveDraft();
             }, 30000);
         }
+    }
+
+    openRaceModal() {
+        const modal = document.getElementById('raceModal');
+        const grid = document.getElementById('raceGrid');
+        
+        if (!modal || !grid) return;
+        
+        grid.innerHTML = '';
+        
+        if (!this.gameData.races || this.gameData.races.length === 0) {
+            grid.innerHTML = '<p style="color: white; text-align: center; padding: 2rem;">Nenhuma raça disponível.</p>';
+            modal.classList.add('active');
+            return;
+        }
+        
+        this.gameData.races.forEach(race => {
+            const card = document.createElement('div');
+            card.className = 'modal-item';
+            if (this.character.race === race.name) card.classList.add('selected');
+            
+            card.innerHTML = `
+                <h3>${race.name}</h3>
+                <p>${race.description || ''}</p>
+            `;
+            
+            card.addEventListener('click', () => this.selectRace(race));
+            grid.appendChild(card);
+        });
+        
+        modal.classList.add('active');
+    }
+
+    openClassModal() {
+        const modal = document.getElementById('classModal');
+        const grid = document.getElementById('classGrid');
+        
+        if (!modal || !grid) return;
+        
+        grid.innerHTML = '';
+        
+        if (!this.gameData.classes || this.gameData.classes.length === 0) {
+            grid.innerHTML = '<p style="color: white; text-align: center; padding: 2rem;">Nenhuma classe disponível.</p>';
+            modal.classList.add('active');
+            return;
+        }
+        
+        this.gameData.classes.forEach(cls => {
+            const card = document.createElement('div');
+            card.className = 'modal-item';
+            if (this.character.class === cls.name) card.classList.add('selected');
+            
+            card.innerHTML = `
+                <h3>${cls.name}</h3>
+                <p>${cls.description || ''}</p>
+            `;
+            
+            card.addEventListener('click', () => this.selectClass(cls));
+            grid.appendChild(card);
+        });
+        
+        modal.classList.add('active');
+    }
+
+    openBackgroundModal() {
+        const modal = document.getElementById('backgroundModal');
+        const grid = document.getElementById('backgroundGrid');
+        
+        if (!modal || !grid) return;
+        
+        grid.innerHTML = '';
+        
+        if (!this.gameData.backgrounds || this.gameData.backgrounds.length === 0) {
+            grid.innerHTML = '<p style="color: white; text-align: center; padding: 2rem;">Nenhum antecedente disponível.</p>';
+            modal.classList.add('active');
+            return;
+        }
+        
+        this.gameData.backgrounds.forEach(bg => {
+            const card = document.createElement('div');
+            card.className = 'modal-item';
+            if (this.character.background === bg.name) card.classList.add('selected');
+            
+            card.innerHTML = `
+                <h3>${bg.name}</h3>
+                <p>${bg.description || ''}</p>
+            `;
+            
+            card.addEventListener('click', () => this.selectBackground(bg));
+            grid.appendChild(card);
+        });
+        
+        modal.classList.add('active');
+    }
+
+    openAlignmentModal() {
+        const modal = document.getElementById('alignmentModal');
+        const grid = document.getElementById('alignmentGrid');
+        
+        if (!modal || !grid) return;
+        
+        grid.innerHTML = '';
+        
+        if (!this.gameData.alignments || this.gameData.alignments.length === 0) {
+            grid.innerHTML = '<p style="color: white; text-align: center; padding: 2rem;">Nenhuma tendência disponível.</p>';
+            modal.classList.add('active');
+            return;
+        }
+        
+        this.gameData.alignments.forEach(align => {
+            const card = document.createElement('div');
+            card.className = 'alignment-item';
+            if (this.character.alignment === align.name) card.classList.add('selected');
+            
+            card.innerHTML = `
+                <h4>${align.name}</h4>
+                <p>${align.description || ''}</p>
+            `;
+            
+            card.addEventListener('click', () => this.selectAlignment(align));
+            grid.appendChild(card);
+        });
+        
+        modal.classList.add('active');
+    }
+
+    selectRace(race) {
+        this.character.race = race.name;
+        document.getElementById('race').value = race.name;
+        document.getElementById('raceModal').classList.remove('active');
+        this.saveDraft();
+        
+        // Abrir modal de classe após selecionar raça
+        setTimeout(() => this.openClassModal(), 500);
+    }
+
+    selectClass(cls) {
+        this.character.class = cls.name;
+        document.getElementById('classlevel').value = `${cls.name} ${this.character.level || 1}`;
+        document.getElementById('classModal').classList.remove('active');
+        this.saveDraft();
+        
+        // Abrir modal de antecedente após selecionar classe
+        setTimeout(() => this.openBackgroundModal(), 500);
+    }
+
+    selectBackground(bg) {
+        this.character.background = bg.name;
+        document.getElementById('background').value = bg.name;
+        document.getElementById('backgroundModal').classList.remove('active');
+        this.saveDraft();
+        
+        // Abrir modal de tendência após selecionar antecedente
+        setTimeout(() => this.openAlignmentModal(), 500);
+    }
+
+    selectAlignment(align) {
+        this.character.alignment = align.name;
+        document.getElementById('alignment').value = align.name;
+        document.getElementById('alignmentModal').classList.remove('active');
+        this.saveDraft();
     }
 
     async saveDraft() {

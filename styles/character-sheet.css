@@ -1120,6 +1120,12 @@ form.charsheet main section.features div textarea {
     background-color: rgba(0, 0, 0, 0.4);
 }
 
+.modal.active {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
 .modal-content {
     background-color: rgba(26, 26, 46, 0.98);
     margin: 5% auto;
