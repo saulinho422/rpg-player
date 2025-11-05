@@ -1,0 +1,13 @@
+id,nome,categoria,custo,ca,peso,furtividade,created_at
+acolchoada,Acolchoada,Armaduras Leves,"{""quantidade"":5,""moeda"":""po""}",11 + mod. de Destreza,4,Desvantagem,2025-10-17 02:22:58.79979+00
+brunea,Brunea,Armaduras Médias,"{""quantidade"":50,""moeda"":""po""}",14 + mod. de Destreza (máx 2),22.5,Desvantagem,2025-10-17 02:22:59.281017+00
+camisao-malha,Camisão de Malha,Armaduras Médias,"{""quantidade"":50,""moeda"":""po""}",13 + mod. de Destreza (máx 2),10,Normal,2025-10-17 02:22:59.181515+00
+cota-aneis,Cota de Anéis,Armaduras Pesadas,"{""quantidade"":30,""moeda"":""po""}",14,20,Desvantagem,2025-10-17 02:22:59.581786+00
+cota-malha,Cota de Malha,Armaduras Pesadas,"{""quantidade"":75,""moeda"":""po""}",16,27.5,Desvantagem,2025-10-17 02:22:59.677989+00
+couro,Couro,Armaduras Leves,"{""quantidade"":10,""moeda"":""po""}",11 + mod. de Destreza,5,Normal,2025-10-17 02:22:58.889239+00
+couro-batido,Couro Batido,Armaduras Leves,"{""quantidade"":45,""moeda"":""po""}",12 + mod. de Destreza,6.5,Normal,2025-10-17 02:22:58.983608+00
+escudo,Escudo,Escudos,"{""quantidade"":10,""moeda"":""po""}",+2,3,Normal,2025-10-17 02:22:59.86451+00
+gibao-peles,Gibão de Peles,Armaduras Médias,"{""quantidade"":10,""moeda"":""po""}",12 + mod. de Destreza (máx 2),6,Normal,2025-10-17 02:22:59.094792+00
+meia-armadura,Meia-armadura,Armaduras Médias,"{""quantidade"":750,""moeda"":""po""}",15 + mod. de Destreza (máx 2),20,Desvantagem,2025-10-17 02:22:59.465089+00
+peitoral-aco,Peitoral de Aço,Armaduras Médias,"{""quantidade"":400,""moeda"":""po""}",14 + mod. de Destreza (máx 2),10,Normal,2025-10-17 02:22:59.369952+00
+placas,Placas,Armaduras Pesadas,"{""quantidade"":1500,""moeda"":""po""}",18,32.5,Desvantagem,2025-10-17 02:22:59.775151+00

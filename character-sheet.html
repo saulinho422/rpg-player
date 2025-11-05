@@ -505,6 +505,59 @@
                 <div class="alignment-grid" id="alignmentGrid"></div>
             </div>
         </div>
+
+        <!-- Modal: Character Creation Wizard -->
+        <div id="characterCreationModal" class="creation-modal">
+            <div class="creation-modal-content">
+                <div class="creation-header">
+                    <h2>🎭 Criar Novo Personagem</h2>
+                    <button class="close-creation" title="Fechar">✕</button>
+                </div>
+                
+                <div class="progress-bar">
+                    <div class="progress-step active">
+                        <div class="step-number">1</div>
+                        <span>Nome</span>
+                    </div>
+                    <div class="progress-step">
+                        <div class="step-number">2</div>
+                        <span>Raça</span>
+                    </div>
+                    <div class="progress-step">
+                        <div class="step-number">3</div>
+                        <span>Classe</span>
+                    </div>
+                    <div class="progress-step">
+                        <div class="step-number">4</div>
+                        <span>Perícias</span>
+                    </div>
+                    <div class="progress-step">
+                        <div class="step-number">5</div>
+                        <span>Atributos</span>
+                    </div>
+                    <div class="progress-step">
+                        <div class="step-number">6</div>
+                        <span>Detalhes</span>
+                    </div>
+                    <div class="progress-step">
+                        <div class="step-number">7</div>
+                        <span>Equipamento</span>
+                    </div>
+                    <div class="progress-step">
+                        <div class="step-number">8</div>
+                        <span>Finalizar</span>
+                    </div>
+                    <div class="progress-fill"></div>
+                </div>
+                
+                <div id="creationContent" class="creation-body"></div>
+                
+                <div class="creation-footer">
+                    <button id="prevBtn" class="wizard-btn secondary-btn hidden">← Anterior</button>
+                    <button id="nextBtn" class="wizard-btn primary-btn">Próximo →</button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script type="module" src="js/character-sheet.js"></script>

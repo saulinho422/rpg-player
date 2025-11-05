@@ -1,0 +1,36 @@
+id,nome,categoria,custo,dano,peso,propriedades,created_at
+adaga,Adaga,Armas Corpo a Corpo Simples,"{""quantidade"":2,""moeda"":""po""}",1d4,0.5,"[""Acuidade"",""Leve"",""Arremesso (distância 6/18)""]",2025-10-17 02:22:55.446186+00
+alabarda,Alabarda,Armas Corpo a Corpo Marciais,"{""quantidade"":20,""moeda"":""po""}",1d10,3,"[""Pesada"",""Alcance"",""Duas mãos""]",2025-10-17 02:22:56.800664+00
+arco-curto,Arco Curto,Armas à Distância Simples,"{""quantidade"":25,""moeda"":""po""}",1d6,1,"[""Munição (distância 24/96)"",""Duas mãos""]",2025-10-17 02:22:56.418205+00
+arco-longo,Arco Longo,Armas à Distância Marciais,"{""quantidade"":50,""moeda"":""po""}",1d8,1,"[""Munição (distância 45/180)"",""Pesada"",""Duas mãos""]",2025-10-17 02:22:58.336089+00
+ataque-desarmado,Ataque Desarmado,Armas Corpo a Corpo Simples,"{""quantidade"":0,""moeda"":""—""}",1,0,[],2025-10-17 02:22:55.550803+00
+azagaia,Azagaia,Armas Corpo a Corpo Simples,"{""quantidade"":5,""moeda"":""pp""}",1d6,1,"[""Arremesso (distância 9/36)""]",2025-10-17 02:22:55.655849+00
+besta-leve,Besta Leve,Armas à Distância Simples,"{""quantidade"":25,""moeda"":""po""}",1d8,2.5,"[""Munição (distância 24/96)"",""Recarga"",""Duas mãos""]",2025-10-17 02:22:56.508837+00
+besta-mao,Besta de Mão,Armas à Distância Marciais,"{""quantidade"":75,""moeda"":""po""}",1d6,1.5,"[""Munição (distância 9/36)"",""Leve"",""Recarga""]",2025-10-17 02:22:58.42984+00
+besta-pesada,Besta Pesada,Armas à Distância Marciais,"{""quantidade"":50,""moeda"":""po""}",1d10,9,"[""Munição (distância 30/120)"",""Pesada"",""Recarga"",""Duas mãos""]",2025-10-17 02:22:58.52039+00
+bordao,Bordão,Armas Corpo a Corpo Simples,"{""quantidade"":2,""moeda"":""pp""}",1d6,2,"[""Versátil (1d8)""]",2025-10-17 02:22:55.747166+00
+chicote,Chicote,Armas Corpo a Corpo Marciais,"{""quantidade"":2,""moeda"":""po""}",1d4,1.5,"[""Acuidade"",""Alcance""]",2025-10-17 02:22:56.88802+00
+cimitarra,Cimitarra,Armas Corpo a Corpo Marciais,"{""quantidade"":25,""moeda"":""po""}",1d6,1.5,"[""Acuidade"",""Leve""]",2025-10-17 02:22:56.990179+00
+clava,Clava,Armas Corpo a Corpo Simples,"{""quantidade"":1,""moeda"":""pp""}",1d4,1,"[""Leve""]",2025-10-17 02:22:55.847065+00
+dardo,Dardo,Armas à Distância Simples,"{""quantidade"":5,""moeda"":""pc""}",1d4,0.125,"[""Acuidade"",""Arremesso (distância 6/18)""]",2025-10-17 02:22:56.606903+00
+espada-curta,Espada Curta,Armas Corpo a Corpo Marciais,"{""quantidade"":10,""moeda"":""po""}",1d6,1,"[""Acuidade"",""Leve""]",2025-10-17 02:22:57.083189+00
+espada-grande,Espada Grande,Armas Corpo a Corpo Marciais,"{""quantidade"":50,""moeda"":""po""}",2d6,3,"[""Pesada"",""Duas mãos""]",2025-10-17 02:22:57.170198+00
+espada-longa,Espada Longa,Armas Corpo a Corpo Marciais,"{""quantidade"":15,""moeda"":""po""}",1d8,1.5,"[""Versátil (1d10)""]",2025-10-17 02:22:57.261797+00
+foice-curta,Foice Curta,Armas Corpo a Corpo Simples,"{""quantidade"":1,""moeda"":""po""}",1d4,1,"[""Leve""]",2025-10-17 02:22:55.957054+00
+funda,Funda,Armas à Distância Simples,"{""quantidade"":1,""moeda"":""pp""}",1d4,0,"[""Munição (distância 9/36)""]",2025-10-17 02:22:56.70466+00
+glaive,Glaive,Armas Corpo a Corpo Marciais,"{""quantidade"":20,""moeda"":""po""}",1d10,3,"[""Pesada"",""Alcance"",""Duas mãos""]",2025-10-17 02:22:57.351788+00
+lanca,Lança,Armas Corpo a Corpo Simples,"{""quantidade"":1,""moeda"":""po""}",1d6,1.5,"[""Arremesso (distância 6/18)"",""Versátil (1d8)""]",2025-10-17 02:22:56.049628+00
+lanca-montaria,Lança de Montaria,Armas Corpo a Corpo Marciais,"{""quantidade"":10,""moeda"":""po""}",1d12,3,"[""Alcance"",""Especial""]",2025-10-17 02:22:57.447103+00
+maca,Maça,Armas Corpo a Corpo Simples,"{""quantidade"":5,""moeda"":""po""}",1d6,2,[],2025-10-17 02:22:56.144124+00
+machadinha,Machadinha,Armas Corpo a Corpo Simples,"{""quantidade"":5,""moeda"":""po""}",1d6,1,"[""Leve"",""Arremesso (distância 6/18)""]",2025-10-17 02:22:56.235105+00
+machado-batalha,Machado de Batalha,Armas Corpo a Corpo Marciais,"{""quantidade"":10,""moeda"":""po""}",1d8,2,"[""Versátil (1d10)""]",2025-10-17 02:22:57.535703+00
+machado-grande,Machado Grande,Armas Corpo a Corpo Marciais,"{""quantidade"":30,""moeda"":""po""}",1d12,3.5,"[""Pesada"",""Duas mãos""]",2025-10-17 02:22:57.655929+00
+malho,Malho,Armas Corpo a Corpo Marciais,"{""quantidade"":10,""moeda"":""po""}",2d6,5,"[""Pesada"",""Duas mãos""]",2025-10-17 02:22:57.753405+00
+mangual,Mangual,Armas Corpo a Corpo Marciais,"{""quantidade"":10,""moeda"":""po""}",1d8,1,[],2025-10-17 02:22:57.848793+00
+martelo-guerra,Martelo de Guerra,Armas Corpo a Corpo Marciais,"{""quantidade"":15,""moeda"":""po""}",1d8,1,"[""Versátil (1d10)""]",2025-10-17 02:22:57.941372+00
+martelo-leve,Martelo Leve,Armas Corpo a Corpo Simples,"{""quantidade"":2,""moeda"":""po""}",1d4,1,"[""Leve"",""Arremesso (distância 6/18)""]",2025-10-17 02:22:56.328008+00
+picareta-guerra,Picareta de Guerra,Armas Corpo a Corpo Marciais,"{""quantidade"":5,""moeda"":""po""}",1d8,1,[],2025-10-17 02:22:58.047317+00
+rapieira,Rapieira,Armas Corpo a Corpo Marciais,"{""quantidade"":25,""moeda"":""po""}",1d8,1,"[""Acuidade""]",2025-10-17 02:22:58.151487+00
+rede,Rede,Armas à Distância Marciais,"{""quantidade"":1,""moeda"":""po""}",—,1.5,"[""Arremesso (distância 1,5/4,5)"",""Especial""]",2025-10-17 02:22:58.615669+00
+tridente,Tridente,Armas Corpo a Corpo Marciais,"{""quantidade"":5,""moeda"":""po""}",1d6,2,"[""Arremesso (distância 6/18)"",""Versátil (1d8)""]",2025-10-17 02:22:58.239163+00
+zarabatana,Zarabatana,Armas à Distância Marciais,"{""quantidade"":10,""moeda"":""po""}",1,0.5,"[""Munição (distância 7,5/30)"",""Recarga""]",2025-10-17 02:22:58.704066+00
