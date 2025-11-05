@@ -27,7 +27,7 @@ class CharacterSheet {
         
         // Se não tem ID, está em modo de criação
         if (!this.characterId) {
-            this.initCreationMode();
+            await this.initCreationMode();
             return;
         }
 
@@ -53,21 +53,36 @@ class CharacterSheet {
 
     async loadGameData() {
         try {
-            const [racesRes, classesRes, backgroundsRes, alignmentsRes] = await Promise.all([
-                fetch('js/data/races.json'),
-                fetch('js/data/classes.json'),
-                fetch('js/data/backgrounds.json'),
-                fetch('js/data/alignments.json')
+            console.log('📦 Carregando dados do banco de dados...');
+            
+            const [racesResult, classesResult, backgroundsResult, alignmentsResult] = await Promise.all([
+                supabase.from('races').select('*'),
+                supabase.from('classes').select('*'),
+                supabase.from('game_backgrounds').select('*'),
+                supabase.from('alignments').select('*')
             ]);
 
+            if (racesResult.error) throw new Error('Erro ao carregar raças: ' + racesResult.error.message);
+            if (classesResult.error) throw new Error('Erro ao carregar classes: ' + classesResult.error.message);
+            if (backgroundsResult.error) throw new Error('Erro ao carregar antecedentes: ' + backgroundsResult.error.message);
+            if (alignmentsResult.error) throw new Error('Erro ao carregar tendências: ' + alignmentsResult.error.message);
+
             this.gameData = {
-                races: await racesRes.json(),
-                classes: await classesRes.json(),
-                backgrounds: await backgroundsRes.json(),
-                alignments: await alignmentsRes.json()
+                races: racesResult.data || [],
+                classes: classesResult.data || [],
+                backgrounds: backgroundsResult.data || [],
+                alignments: alignmentsResult.data || []
             };
+
+            console.log('✅ Dados carregados:', {
+                races: this.gameData.races.length,
+                classes: this.gameData.classes.length,
+                backgrounds: this.gameData.backgrounds.length,
+                alignments: this.gameData.alignments.length
+            });
         } catch (error) {
             console.error('❌ Erro ao carregar dados do jogo:', error);
+            alert('Erro ao carregar dados do banco de dados: ' + error.message);
         }
     }
 
@@ -550,11 +565,15 @@ class CharacterSheet {
         this.gameData.races.forEach(race => {
             const card = document.createElement('div');
             card.className = 'modal-item';
-            if (this.character.race === race.name) card.classList.add('selected');
+            const raceName = race.name_pt || race.name || 'Sem Nome';
+            if (this.character.race === race.id) card.classList.add('selected');
             
             card.innerHTML = `
-                <h3>${race.name}</h3>
+                <h3>${raceName}</h3>
                 <p>${race.description || ''}</p>
+                <div class="stats">
+                    <small>Tamanho: ${race.size || 'Médio'} | Velocidade: ${race.speed || 30}ft</small>
+                </div>
             `;
             
             card.addEventListener('click', () => this.selectRace(race));
@@ -581,11 +600,15 @@ class CharacterSheet {
         this.gameData.classes.forEach(cls => {
             const card = document.createElement('div');
             card.className = 'modal-item';
-            if (this.character.class === cls.name) card.classList.add('selected');
+            const className = cls.name_pt || cls.name || 'Sem Nome';
+            if (this.character.class === cls.id) card.classList.add('selected');
             
             card.innerHTML = `
-                <h3>${cls.name}</h3>
+                <h3>${className}</h3>
                 <p>${cls.description || ''}</p>
+                <div class="stats">
+                    <small>Dado de Vida: d${cls.hit_die || 8} | Proficiências: ${cls.primary_ability || 'Variado'}</small>
+                </div>
             `;
             
             card.addEventListener('click', () => this.selectClass(cls));
@@ -612,10 +635,11 @@ class CharacterSheet {
         this.gameData.backgrounds.forEach(bg => {
             const card = document.createElement('div');
             card.className = 'modal-item';
-            if (this.character.background === bg.name) card.classList.add('selected');
+            const bgName = bg.name_pt || bg.name || 'Sem Nome';
+            if (this.character.background === bg.id) card.classList.add('selected');
             
             card.innerHTML = `
-                <h3>${bg.name}</h3>
+                <h3>${bgName}</h3>
                 <p>${bg.description || ''}</p>
             `;
             
@@ -643,10 +667,11 @@ class CharacterSheet {
         this.gameData.alignments.forEach(align => {
             const card = document.createElement('div');
             card.className = 'alignment-item';
-            if (this.character.alignment === align.name) card.classList.add('selected');
+            const alignName = align.name_pt || align.name || 'Sem Nome';
+            if (this.character.alignment === align.id) card.classList.add('selected');
             
             card.innerHTML = `
-                <h4>${align.name}</h4>
+                <h4>${alignName}</h4>
                 <p>${align.description || ''}</p>
             `;
             
@@ -658,40 +683,56 @@ class CharacterSheet {
     }
 
     selectRace(race) {
-        this.character.race = race.name;
-        document.getElementById('race').value = race.name;
+        this.character.race = race.id;
+        this.character.raceData = race;
+        const raceName = race.name_pt || race.name || 'Raça Selecionada';
+        document.getElementById('race').value = raceName;
         document.getElementById('raceModal').classList.remove('active');
         this.saveDraft();
+        
+        console.log('✅ Raça selecionada:', raceName);
         
         // Abrir modal de classe após selecionar raça
         setTimeout(() => this.openClassModal(), 500);
     }
 
     selectClass(cls) {
-        this.character.class = cls.name;
-        document.getElementById('classlevel').value = `${cls.name} ${this.character.level || 1}`;
+        this.character.class = cls.id;
+        this.character.classData = cls;
+        const className = cls.name_pt || cls.name || 'Classe Selecionada';
+        document.getElementById('classlevel').value = `${className} ${this.character.level || 1}`;
         document.getElementById('classModal').classList.remove('active');
         this.saveDraft();
+        
+        console.log('✅ Classe selecionada:', className);
         
         // Abrir modal de antecedente após selecionar classe
         setTimeout(() => this.openBackgroundModal(), 500);
     }
 
     selectBackground(bg) {
-        this.character.background = bg.name;
-        document.getElementById('background').value = bg.name;
+        this.character.background = bg.id;
+        this.character.backgroundData = bg;
+        const bgName = bg.name_pt || bg.name || 'Antecedente Selecionado';
+        document.getElementById('background').value = bgName;
         document.getElementById('backgroundModal').classList.remove('active');
         this.saveDraft();
+        
+        console.log('✅ Antecedente selecionado:', bgName);
         
         // Abrir modal de tendência após selecionar antecedente
         setTimeout(() => this.openAlignmentModal(), 500);
     }
 
     selectAlignment(align) {
-        this.character.alignment = align.name;
-        document.getElementById('alignment').value = align.name;
+        this.character.alignment = align.id;
+        this.character.alignmentData = align;
+        const alignName = align.name_pt || align.name || 'Tendência Selecionada';
+        document.getElementById('alignment').value = alignName;
         document.getElementById('alignmentModal').classList.remove('active');
         this.saveDraft();
+        
+        console.log('✅ Tendência selecionada:', alignName);
     }
 
     async saveDraft() {
