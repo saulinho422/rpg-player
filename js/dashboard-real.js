@@ -5,6 +5,8 @@
 import { UserService, CharacterService, CampaignService, ActivityService } from './database.js'
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.38.0/+esm'
 import defaultAvatar from '../img/perfil_empty_user.png'
+import emptyCharacterIcon from '../img/logo_personagem_vazio.png'
+import emptyTableIcon from '../img/logo_mesas.png'
 
 const supabase = createClient(
     'https://bifiatkpfmrrnfhvgrpb.supabase.co',
@@ -216,7 +218,9 @@ export class DashboardService {
             console.log('📝 Dashboard: Nenhum personagem encontrado, exibindo mensagem')
             charactersGrid.innerHTML = `
                 <div class="no-data-message">
-                    <div class="no-data-icon">👤</div>
+                    <div class="no-data-icon">
+                        <img src="${emptyCharacterIcon}" alt="Sem personagens" style="width: 120px; height: 120px; opacity: 0.6;">
+                    </div>
                     <h3>Nenhum personagem ainda</h3>
                     <p>Crie seu primeiro personagem para começar suas aventuras!</p>
                     <button class="btn-primary" style="background: #95a5a6; cursor: not-allowed;" onclick="event.preventDefault(); showNotification('🚧 A criação de personagem está em desenvolvimento', 'info')">+ Criar Personagem</button>
@@ -257,7 +261,9 @@ export class DashboardService {
         if (campaigns.length === 0) {
             campaignsGrid.innerHTML = `
                 <div class="no-data-message">
-                    <div class="no-data-icon">🎲</div>
+                    <div class="no-data-icon">
+                        <img src="${emptyTableIcon}" alt="Sem mesas" style="width: 120px; height: 120px; opacity: 0.6;">
+                    </div>
                     <h3>Nenhuma mesa ainda</h3>
                     <p>Participe de uma mesa ou crie a sua própria!</p>
                     <div style="display: flex; gap: 10px; justify-content: center; margin-top: 20px;">
