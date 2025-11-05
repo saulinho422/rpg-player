@@ -820,7 +820,902 @@ class CharacterSheet {
     }
 }
 
+// Character Creation Wizard
+class CharacterCreationWizard {
+    constructor(characterSheet) {
+        this.characterSheet = characterSheet;
+        this.currentStep = 0;
+        this.totalSteps = 8;
+        this.wizardData = {
+            name: '',
+            race: null,
+            subrace: null,
+            class: null,
+            subclass: null,
+            skills: [],
+            attributes: { str: 10, dex: 10, con: 10, int: 10, wis: 10, cha: 10 },
+            attributeMethod: 'roll',
+            alignment: null,
+            background: null,
+            equipment: [],
+            equipmentMethod: 'suggested',
+            level: 1,
+            image: null
+        };
+        this.gameData = {
+            races: [],
+            subraces: [],
+            classes: [],
+            subclasses: [],
+            skills: [],
+            backgrounds: []
+        };
+        this.init();
+    }
+
+    async init() {
+        console.log('🎯 Inicializando wizard...');
+        
+        // Carregar dados do jogo
+        await this.loadGameData();
+        
+        // Setup modal
+        this.modal = document.getElementById('characterCreationModal');
+        this.contentArea = document.getElementById('creationContent');
+        this.prevButton = document.getElementById('prevBtn');
+        this.nextButton = document.getElementById('nextBtn');
+        
+        if (!this.modal || !this.contentArea) {
+            console.error('❌ Elementos do modal não encontrados!');
+            return;
+        }
+        
+        // Setup event listeners
+        this.setupEventListeners();
+        
+        // Mostrar modal
+        this.showModal();
+        
+        // Renderizar primeira etapa
+        this.renderStep();
+        
+        console.log('✅ Wizard inicializado');
+    }
+
+    async loadGameData() {
+        try {
+            console.log('📦 Carregando dados do jogo...');
+            
+            // Carregar raças
+            const { data: races, error: racesError } = await supabase
+                .from('races')
+                .select('*')
+                .order('name');
+            
+            if (!racesError && races) {
+                this.gameData.races = races;
+                console.log(`✅ ${races.length} raças carregadas`);
+            }
+
+            // Carregar subraças
+            const { data: subraces, error: subracesError } = await supabase
+                .from('subraces')
+                .select('*')
+                .order('name');
+            
+            if (!subracesError && subraces) {
+                this.gameData.subraces = subraces;
+                console.log(`✅ ${subraces.length} subraças carregadas`);
+            }
+
+            // Carregar classes
+            const { data: classes, error: classesError } = await supabase
+                .from('classes')
+                .select('*')
+                .order('name');
+            
+            if (!classesError && classes) {
+                this.gameData.classes = classes;
+                console.log(`✅ ${classes.length} classes carregadas`);
+            }
+
+            // Carregar subclasses
+            const { data: subclasses, error: subclassesError } = await supabase
+                .from('subclasses')
+                .select('*')
+                .order('name');
+            
+            if (!subclassesError && subclasses) {
+                this.gameData.subclasses = subclasses;
+                console.log(`✅ ${subclasses.length} subclasses carregadas`);
+            }
+
+            // Carregar perícias
+            const { data: skills, error: skillsError} = await supabase
+                .from('skills')
+                .select('*')
+                .order('name');
+            
+            if (!skillsError && skills) {
+                this.gameData.skills = skills;
+                console.log(`✅ ${skills.length} perícias carregadas`);
+            }
+
+            // Criar antecedentes padrão se não existirem no banco
+            this.gameData.backgrounds = [
+                { id: 1, name: 'Acólito', description: 'Você serviu em um templo, dedicando sua vida a um deus.' },
+                { id: 2, name: 'Criminoso', description: 'Você tem histórico de infração às leis e sobrevive nas sombras.' },
+                { id: 3, name: 'Herói do Povo', description: 'Você vem das classes trabalhadoras e é campeão do povo.' },
+                { id: 4, name: 'Nobre', description: 'Você pertence à aristocracia e conhece as intrigas da corte.' },
+                { id: 5, name: 'Sábio', description: 'Você dedicou sua vida ao estudo e busca pelo conhecimento.' },
+                { id: 6, name: 'Soldado', description: 'Você treinou para a guerra e conhece as táticas de batalha.' }
+            ];
+            console.log(`✅ ${this.gameData.backgrounds.length} antecedentes padrão criados`);
+            
+        } catch (error) {
+            console.error('❌ Erro ao carregar dados do jogo:', error);
+        }
+    }
+
+    setupEventListeners() {
+        if (this.prevButton) {
+            this.prevButton.addEventListener('click', () => this.previousStep());
+        }
+        
+        if (this.nextButton) {
+            this.nextButton.addEventListener('click', () => this.nextStep());
+        }
+    }
+
+    showModal() {
+        if (this.modal) {
+            this.modal.classList.add('active');
+        }
+    }
+
+    hideModal() {
+        if (this.modal) {
+            this.modal.classList.remove('active');
+        }
+    }
+
+    renderStep() {
+        console.log(`📍 Renderizando etapa ${this.currentStep}`);
+        
+        // Atualizar barra de progresso
+        this.updateProgressBar();
+        
+        // Renderizar conteúdo da etapa
+        switch (this.currentStep) {
+            case 0:
+                this.renderNameStep();
+                break;
+            case 1:
+                this.renderRaceStep();
+                break;
+            case 2:
+                this.renderClassStep();
+                break;
+            case 3:
+                this.renderSkillsStep();
+                break;
+            case 4:
+                this.renderAttributesStep();
+                break;
+            case 5:
+                this.renderDetailsStep();
+                break;
+            case 6:
+                this.renderEquipmentStep();
+                break;
+            case 7:
+                this.renderFinalStep();
+                break;
+        }
+        
+        // Atualizar botões
+        this.updateButtons();
+    }
+
+    updateProgressBar() {
+        const steps = document.querySelectorAll('.progress-step');
+        const progressFill = document.querySelector('.progress-fill');
+        
+        steps.forEach((step, index) => {
+            step.classList.remove('active', 'completed');
+            if (index < this.currentStep) {
+                step.classList.add('completed');
+            } else if (index === this.currentStep) {
+                step.classList.add('active');
+            }
+        });
+        
+        if (progressFill) {
+            const percentage = (this.currentStep / (this.totalSteps - 1)) * 100;
+            progressFill.style.width = `${percentage}%`;
+        }
+    }
+
+    updateButtons() {
+        // Botão anterior
+        if (this.prevButton) {
+            if (this.currentStep === 0) {
+                this.prevButton.classList.add('hidden');
+            } else {
+                this.prevButton.classList.remove('hidden');
+            }
+        }
+        
+        // Botão próximo
+        if (this.nextButton) {
+            if (this.currentStep === this.totalSteps - 1) {
+                this.nextButton.textContent = 'Finalizar';
+                this.nextButton.classList.add('primary');
+            } else {
+                this.nextButton.textContent = 'Próximo';
+                this.nextButton.classList.remove('primary');
+            }
+            
+            // Validar se pode avançar
+            const canProceed = this.validateCurrentStep();
+            this.nextButton.disabled = !canProceed;
+        }
+    }
+
+    validateCurrentStep() {
+        switch (this.currentStep) {
+            case 0: // Nome
+                return this.wizardData.name.trim().length >= 2;
+            case 1: // Raça
+                return this.wizardData.race !== null;
+            case 2: // Classe
+                return this.wizardData.class !== null;
+            case 3: // Perícias
+                const requiredSkills = this.wizardData.class?.skill_choices || 2;
+                return this.wizardData.skills.length === requiredSkills;
+            case 4: // Atributos
+                return true;
+            case 5: // Detalhes (alinhamento + antecedente)
+                return this.wizardData.alignment !== null && this.wizardData.background !== null;
+            case 6: // Equipamentos
+                return this.wizardData.equipment.length > 0;
+            case 7: // Final
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    previousStep() {
+        if (this.currentStep > 0) {
+            this.currentStep--;
+            this.renderStep();
+        }
+    }
+
+    async nextStep() {
+        if (!this.validateCurrentStep()) return;
+        
+        if (this.currentStep === this.totalSteps - 1) {
+            await this.finalizeCharacter();
+        } else {
+            this.currentStep++;
+            this.renderStep();
+        }
+    }
+
+    // ETAPA 0: Nome
+    renderNameStep() {
+        this.contentArea.innerHTML = `
+            <div class="step-content">
+                <h3 class="step-title">Nome do Personagem</h3>
+                <p class="step-description">Escolha um nome épico para seu herói</p>
+                
+                <div class="creation-input-group">
+                    <label for="wizardCharName">Nome *</label>
+                    <input 
+                        type="text" 
+                        id="wizardCharName" 
+                        placeholder="Ex: Aragorn, Gandalf..."
+                        value="${this.wizardData.name}"
+                        maxlength="50"
+                    >
+                </div>
+            </div>
+        `;
+        
+        const input = document.getElementById('wizardCharName');
+        if (input) {
+            input.focus();
+            input.addEventListener('input', (e) => {
+                this.wizardData.name = e.target.value;
+                this.updateButtons();
+            });
+        }
+    }
+
+    // ETAPA 1: Raça + Sub-raça
+    renderRaceStep() {
+        const racesHtml = this.gameData.races.map(race => {
+            const isSelected = this.wizardData.race?.id === race.id;
+            return `
+                <div class="selection-card ${isSelected ? 'selected' : ''}" data-race-id="${race.id}">
+                    <h3>${race.name}</h3>
+                    <p>${race.description || 'Raça disponível'}</p>
+                    <div class="card-details">
+                        ${race.speed ? `Velocidade: ${race.speed}ft` : ''}
+                    </div>
+                </div>
+            `;
+        }).join('');
+
+        let subraceHtml = '';
+        if (this.wizardData.race) {
+            const subraces = this.gameData.subraces.filter(sr => sr.race_id === this.wizardData.race.id);
+            if (subraces.length > 0) {
+                subraceHtml = `
+                    <h4 style="color: var(--primary-color); margin-top: 30px; margin-bottom: 15px;">Sub-raça</h4>
+                    <div class="selection-grid">
+                        ${subraces.map(subrace => {
+                            const isSelected = this.wizardData.subrace?.id === subrace.id;
+                            return `
+                                <div class="selection-card ${isSelected ? 'selected' : ''}" data-subrace-id="${subrace.id}">
+                                    <h3>${subrace.name}</h3>
+                                    <p>${subrace.description || 'Sub-raça disponível'}</p>
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+                `;
+            }
+        }
+
+        this.contentArea.innerHTML = `
+            <div class="step-content">
+                <h3 class="step-title">Raça do Personagem</h3>
+                <p class="step-description">Escolha a raça que define seu personagem</p>
+                
+                <div class="selection-grid">
+                    ${racesHtml}
+                </div>
+                
+                ${subraceHtml}
+            </div>
+        `;
+        
+        document.querySelectorAll('[data-race-id]').forEach(card => {
+            card.addEventListener('click', () => {
+                const raceId = parseInt(card.dataset.raceId);
+                this.wizardData.race = this.gameData.races.find(r => r.id === raceId);
+                this.wizardData.subrace = null;
+                this.renderStep();
+            });
+        });
+
+        document.querySelectorAll('[data-subrace-id]').forEach(card => {
+            card.addEventListener('click', () => {
+                const subraceId = parseInt(card.dataset.subraceId);
+                this.wizardData.subrace = this.gameData.subraces.find(sr => sr.id === subraceId);
+                this.updateButtons();
+                document.querySelectorAll('[data-subrace-id]').forEach(c => c.classList.remove('selected'));
+                card.classList.add('selected');
+            });
+        });
+    }
+
+    // ETAPA 2: Classe + Subclasse
+    renderClassStep() {
+        const classesHtml = this.gameData.classes.map(cls => {
+            const isSelected = this.wizardData.class?.id === cls.id;
+            return `
+                <div class="selection-card ${isSelected ? 'selected' : ''}" data-class-id="${cls.id}">
+                    <h3>${cls.name}</h3>
+                    <p>${cls.description || 'Classe disponível'}</p>
+                    <div class="card-details">
+                        Dado de Vida: ${cls.hit_die || 'd8'}
+                    </div>
+                </div>
+            `;
+        }).join('');
+
+        let subclassHtml = '';
+        if (this.wizardData.class) {
+            const subclasses = this.gameData.subclasses.filter(sc => sc.class_id === this.wizardData.class.id);
+            if (subclasses.length > 0) {
+                subclassHtml = `
+                    <h4 style="color: var(--primary-color); margin-top: 30px; margin-bottom: 15px;">Subclasse</h4>
+                    <div class="selection-grid">
+                        ${subclasses.map(subclass => {
+                            const isSelected = this.wizardData.subclass?.id === subclass.id;
+                            return `
+                                <div class="selection-card ${isSelected ? 'selected' : ''}" data-subclass-id="${subclass.id}">
+                                    <h3>${subclass.name}</h3>
+                                    <p>${subclass.description || 'Subclasse disponível'}</p>
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+                `;
+            }
+        }
+
+        this.contentArea.innerHTML = `
+            <div class="step-content">
+                <h3 class="step-title">Classe do Personagem</h3>
+                <p class="step-description">Escolha a classe que define as habilidades</p>
+                
+                <div class="selection-grid">
+                    ${classesHtml}
+                </div>
+                
+                ${subclassHtml}
+            </div>
+        `;
+        
+        document.querySelectorAll('[data-class-id]').forEach(card => {
+            card.addEventListener('click', () => {
+                const classId = parseInt(card.dataset.classId);
+                this.wizardData.class = this.gameData.classes.find(c => c.id === classId);
+                this.wizardData.subclass = null;
+                this.wizardData.skills = [];
+                this.renderStep();
+            });
+        });
+
+        document.querySelectorAll('[data-subclass-id]').forEach(card => {
+            card.addEventListener('click', () => {
+                const subclassId = parseInt(card.dataset.subclassId);
+                this.wizardData.subclass = this.gameData.subclasses.find(sc => sc.id === subclassId);
+                this.updateButtons();
+                document.querySelectorAll('[data-subclass-id]').forEach(c => c.classList.remove('selected'));
+                card.classList.add('selected');
+            });
+        });
+    }
+
+    // ETAPA 3: Perícias
+    renderSkillsStep() {
+        if (!this.wizardData.class) {
+            this.contentArea.innerHTML = '<p>Erro: Classe não selecionada</p>';
+            return;
+        }
+
+        const classSkills = this.wizardData.class.skill_proficiencies || [];
+        const maxSkills = this.wizardData.class.skill_choices || 2;
+
+        const skillsHtml = this.gameData.skills
+            .filter(skill => classSkills.includes(skill.name))
+            .map(skill => {
+                const isSelected = this.wizardData.skills.includes(skill.name);
+                const isDisabled = !isSelected && this.wizardData.skills.length >= maxSkills;
+                
+                return `
+                    <div class="checkbox-item ${isDisabled ? 'disabled' : ''}" data-skill="${skill.name}">
+                        <input 
+                            type="checkbox" 
+                            id="skill-${skill.name.replace(/\s+/g, '-')}" 
+                            ${isSelected ? 'checked' : ''}
+                            ${isDisabled ? 'disabled' : ''}
+                        >
+                        <label for="skill-${skill.name.replace(/\s+/g, '-')}">${skill.name} (${skill.ability})</label>
+                    </div>
+                `;
+            }).join('');
+
+        this.contentArea.innerHTML = `
+            <div class="step-content">
+                <h3 class="step-title">Perícias da Classe</h3>
+                <p class="step-description">
+                    Escolha ${maxSkills} perícia(s)<br>
+                    <strong style="color: var(--primary-color);">Selecionadas: ${this.wizardData.skills.length} / ${maxSkills}</strong>
+                </p>
+                
+                <div class="checkbox-group">
+                    ${skillsHtml}
+                </div>
+            </div>
+        `;
+        
+        document.querySelectorAll('.checkbox-item input[type="checkbox"]').forEach(checkbox => {
+            checkbox.addEventListener('change', (e) => {
+                const skillName = e.target.closest('.checkbox-item').dataset.skill;
+                
+                if (e.target.checked) {
+                    if (this.wizardData.skills.length < maxSkills) {
+                        this.wizardData.skills.push(skillName);
+                    } else {
+                        e.target.checked = false;
+                    }
+                } else {
+                    this.wizardData.skills = this.wizardData.skills.filter(s => s !== skillName);
+                }
+                
+                this.renderStep();
+            });
+        });
+    }
+
+    // ETAPA 4: Atributos
+    renderAttributesStep() {
+        const toggleHtml = `
+            <div class="toggle-group">
+                <div class="toggle-option ${this.wizardData.attributeMethod === 'roll' ? 'active' : ''}" data-method="roll">
+                    4d6 (Rolar Dados)
+                </div>
+                <div class="toggle-option ${this.wizardData.attributeMethod === 'standard' ? 'active' : ''}" data-method="standard">
+                    Array Padrão
+                </div>
+            </div>
+        `;
+
+        const attributesHtml = `
+            <div class="attribute-distribution">
+                ${['str', 'dex', 'con', 'int', 'wis', 'cha'].map(attr => {
+                    const attrNames = { str: 'Força', dex: 'Destreza', con: 'Constituição', int: 'Inteligência', wis: 'Sabedoria', cha: 'Carisma' };
+                    const value = this.wizardData.attributes[attr];
+                    const modifier = Math.floor((value - 10) / 2);
+                    const modString = modifier >= 0 ? `+${modifier}` : modifier;
+                    
+                    return `
+                        <div class="attribute-box">
+                            <label>${attrNames[attr]}</label>
+                            <input type="number" id="wizard-${attr}" value="${value}" min="3" max="20" data-attr="${attr}">
+                            <span class="modifier">${modString}</span>
+                        </div>
+                    `;
+                }).join('')}
+            </div>
+        `;
+
+        this.contentArea.innerHTML = `
+            <div class="step-content">
+                <h3 class="step-title">Atributos</h3>
+                <p class="step-description">Escolha o método e distribua os valores</p>
+                
+                ${toggleHtml}
+                ${attributesHtml}
+                
+                ${this.wizardData.attributeMethod === 'roll' ? `
+                    <div style="text-align: center; margin-top: 20px;">
+                        <button class="upload-button" id="rollDiceBtn">🎲 Rolar Dados</button>
+                    </div>
+                ` : ''}
+            </div>
+        `;
+        
+        document.querySelectorAll('.toggle-option').forEach(option => {
+            option.addEventListener('click', () => {
+                this.wizardData.attributeMethod = option.dataset.method;
+                
+                if (this.wizardData.attributeMethod === 'standard') {
+                    const standardArray = [15, 14, 13, 12, 10, 8];
+                    const attrs = ['str', 'dex', 'con', 'int', 'wis', 'cha'];
+                    attrs.forEach((attr, i) => {
+                        this.wizardData.attributes[attr] = standardArray[i];
+                    });
+                }
+                
+                this.renderStep();
+            });
+        });
+
+        document.querySelectorAll('[data-attr]').forEach(input => {
+            input.addEventListener('input', (e) => {
+                const attr = e.target.dataset.attr;
+                const value = parseInt(e.target.value) || 10;
+                this.wizardData.attributes[attr] = Math.max(3, Math.min(20, value));
+                
+                const modifier = Math.floor((value - 10) / 2);
+                const modString = modifier >= 0 ? `+${modifier}` : modifier;
+                e.target.closest('.attribute-box').querySelector('.modifier').textContent = modString;
+            });
+        });
+
+        const rollBtn = document.getElementById('rollDiceBtn');
+        if (rollBtn) {
+            rollBtn.addEventListener('click', () => {
+                const attrs = ['str', 'dex', 'con', 'int', 'wis', 'cha'];
+                attrs.forEach(attr => {
+                    const rolls = [
+                        Math.floor(Math.random() * 6) + 1,
+                        Math.floor(Math.random() * 6) + 1,
+                        Math.floor(Math.random() * 6) + 1,
+                        Math.floor(Math.random() * 6) + 1
+                    ].sort((a, b) => b - a);
+                    
+                    this.wizardData.attributes[attr] = rolls[0] + rolls[1] + rolls[2];
+                });
+                
+                this.renderStep();
+            });
+        }
+    }
+
+    // ETAPA 5: Alinhamento + Antecedente
+    renderDetailsStep() {
+        const alignments = [
+            { value: 'Lawful Good', label: 'Leal e Bom' },
+            { value: 'Neutral Good', label: 'Neutro e Bom' },
+            { value: 'Chaotic Good', label: 'Caótico e Bom' },
+            { value: 'Lawful Neutral', label: 'Leal e Neutro' },
+            { value: 'True Neutral', label: 'Neutro' },
+            { value: 'Chaotic Neutral', label: 'Caótico e Neutro' },
+            { value: 'Lawful Evil', label: 'Leal e Mau' },
+            { value: 'Neutral Evil', label: 'Neutro e Mau' },
+            { value: 'Chaotic Evil', label: 'Caótico e Mau' }
+        ];
+
+        const alignmentsHtml = alignments.map(alignment => {
+            const isSelected = this.wizardData.alignment === alignment.value;
+            return `
+                <div class="selection-card ${isSelected ? 'selected' : ''}" data-alignment="${alignment.value}">
+                    <h3 style="font-size: 16px;">${alignment.label}</h3>
+                </div>
+            `;
+        }).join('');
+
+        const backgroundsHtml = this.gameData.backgrounds.map(bg => {
+            const isSelected = this.wizardData.background?.id === bg.id;
+            return `
+                <div class="selection-card ${isSelected ? 'selected' : ''}" data-background-id="${bg.id}">
+                    <h3>${bg.name}</h3>
+                    <p>${bg.description}</p>
+                </div>
+            `;
+        }).join('');
+
+        this.contentArea.innerHTML = `
+            <div class="step-content">
+                <h3 class="step-title">Alinhamento e Antecedente</h3>
+                <p class="step-description">Defina a personalidade e história</p>
+                
+                <h4 style="color: var(--primary-color); margin-bottom: 15px;">Alinhamento</h4>
+                <div class="selection-grid">
+                    ${alignmentsHtml}
+                </div>
+                
+                <h4 style="color: var(--primary-color); margin-top: 30px; margin-bottom: 15px;">Antecedente</h4>
+                <div class="selection-grid">
+                    ${backgroundsHtml}
+                </div>
+            </div>
+        `;
+        
+        document.querySelectorAll('[data-alignment]').forEach(card => {
+            card.addEventListener('click', () => {
+                this.wizardData.alignment = card.dataset.alignment;
+                document.querySelectorAll('[data-alignment]').forEach(c => c.classList.remove('selected'));
+                card.classList.add('selected');
+                this.updateButtons();
+            });
+        });
+
+        document.querySelectorAll('[data-background-id]').forEach(card => {
+            card.addEventListener('click', () => {
+                const bgId = parseInt(card.dataset.backgroundId);
+                this.wizardData.background = this.gameData.backgrounds.find(bg => bg.id === bgId);
+                document.querySelectorAll('[data-background-id]').forEach(c => c.classList.remove('selected'));
+                card.classList.add('selected');
+                this.updateButtons();
+            });
+        });
+    }
+
+    // ETAPA 6: Equipamentos
+    renderEquipmentStep() {
+        const suggestedEquipment = [
+            'Armadura de Couro',
+            'Espada Longa',
+            'Escudo',
+            'Mochila de Aventureiro',
+            '10 Tochas',
+            '10 Rações',
+            'Cantil',
+            '50 pés de Corda'
+        ];
+
+        this.contentArea.innerHTML = `
+            <div class="step-content">
+                <h3 class="step-title">Equipamentos Iniciais</h3>
+                <p class="step-description">Equipamento básico para suas aventuras</p>
+                
+                <div style="background: rgba(15, 52, 96, 0.4); border: 2px solid rgba(212, 175, 55, 0.3); border-radius: 10px; padding: 20px; margin-top: 20px;">
+                    <h4 style="color: var(--primary-color); margin-bottom: 15px;">Equipamento Inicial</h4>
+                    <ul style="color: var(--text-color); list-style: none; padding: 0;">
+                        ${suggestedEquipment.map(item => `
+                            <li style="padding: 8px 0; border-bottom: 1px solid rgba(212, 175, 55, 0.1);">
+                                ✓ ${item}
+                            </li>
+                        `).join('')}
+                    </ul>
+                </div>
+            </div>
+        `;
+        
+        this.wizardData.equipment = suggestedEquipment;
+    }
+
+    // ETAPA 7: Nível + Imagem
+    renderFinalStep() {
+        this.contentArea.innerHTML = `
+            <div class="step-content">
+                <h3 class="step-title">Finalização</h3>
+                <p class="step-description">Nível inicial e imagem (opcional)</p>
+                
+                <div class="level-selector">
+                    <h4 style="color: var(--primary-color);">Nível Inicial</h4>
+                    <div class="level-display">${this.wizardData.level}</div>
+                    <div class="level-slider">
+                        <input type="range" id="levelSlider" min="1" max="20" value="${this.wizardData.level}">
+                    </div>
+                </div>
+                
+                <div class="image-upload-area">
+                    <h4 style="color: var(--primary-color); margin-bottom: 15px;">Imagem (Opcional)</h4>
+                    <div class="image-preview" id="imagePreview">
+                        ${this.wizardData.image ? 
+                            `<img src="${this.wizardData.image}" alt="Personagem">` :
+                            '<div class="image-preview-placeholder">📷</div>'
+                        }
+                    </div>
+                    <input type="file" id="imageUpload" accept="image/*" style="display: none;">
+                    <button class="upload-button" id="uploadBtn">Adicionar Imagem</button>
+                    <button class="upload-button secondary" id="skipImageBtn">Pular</button>
+                </div>
+            </div>
+        `;
+        
+        const levelSlider = document.getElementById('levelSlider');
+        if (levelSlider) {
+            levelSlider.addEventListener('input', (e) => {
+                this.wizardData.level = parseInt(e.target.value);
+                document.querySelector('.level-display').textContent = this.wizardData.level;
+            });
+        }
+
+        const uploadBtn = document.getElementById('uploadBtn');
+        const imageUpload = document.getElementById('imageUpload');
+        
+        if (uploadBtn && imageUpload) {
+            uploadBtn.addEventListener('click', () => imageUpload.click());
+            
+            imageUpload.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = (event) => {
+                        this.wizardData.image = event.target.result;
+                        this.renderStep();
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+        }
+    }
+
+    async finalizeCharacter() {
+        try {
+            console.log('💾 Finalizando personagem...');
+            
+            const hitDie = this.getHitDieValue(this.wizardData.class.hit_die);
+            const conMod = Math.floor((this.wizardData.attributes.con - 10) / 2);
+            const maxHP = hitDie + conMod + ((this.wizardData.level - 1) * (Math.floor(hitDie / 2) + 1 + conMod));
+            const dexMod = Math.floor((this.wizardData.attributes.dex - 10) / 2);
+            const baseAC = 10 + dexMod;
+
+            const characterData = {
+                name: this.wizardData.name,
+                race: this.wizardData.race?.name || null,
+                subrace: this.wizardData.subrace?.name || null,
+                character_class: this.wizardData.class?.name || null,
+                subclass: this.wizardData.subclass?.name || null,
+                background: this.wizardData.background?.name || null,
+                alignment: this.wizardData.alignment,
+                level: this.wizardData.level,
+                strength: this.wizardData.attributes.str,
+                dexterity: this.wizardData.attributes.dex,
+                constitution: this.wizardData.attributes.con,
+                intelligence: this.wizardData.attributes.int,
+                wisdom: this.wizardData.attributes.wis,
+                charisma: this.wizardData.attributes.cha,
+                hit_points_max: maxHP,
+                hit_points_current: maxHP,
+                armor_class: baseAC,
+                speed: this.wizardData.race?.speed || 30,
+                proficiency_bonus: Math.ceil(this.wizardData.level / 4) + 1,
+                avatar_url: this.wizardData.image,
+                skill_proficiencies: this.wizardData.skills,
+                equipment: this.wizardData.equipment,
+                is_draft: false,
+                updated_at: new Date().toISOString()
+            };
+
+            if (this.characterSheet.characterId) {
+                const { error } = await supabase
+                    .from('characters')
+                    .update(characterData)
+                    .eq('id', this.characterSheet.characterId);
+
+                if (error) throw error;
+            } else {
+                characterData.user_id = this.characterSheet.currentUser.id;
+                
+                const { data, error } = await supabase
+                    .from('characters')
+                    .insert([characterData])
+                    .select()
+                    .single();
+
+                if (error) throw error;
+                
+                this.characterSheet.characterId = data.id;
+            }
+
+            this.characterSheet.character = {
+                id: this.characterSheet.characterId,
+                name: this.wizardData.name,
+                race: this.wizardData.race?.name,
+                class: this.wizardData.class?.name,
+                background: this.wizardData.background?.name,
+                alignment: this.wizardData.alignment,
+                level: this.wizardData.level,
+                attributes: this.wizardData.attributes,
+                hp: maxHP,
+                hpCurrent: maxHP,
+                image: this.wizardData.image
+            };
+
+            this.characterSheet.populateSheet();
+            this.characterSheet.calculateAll();
+            this.markProficientSkills();
+            this.hideModal();
+
+            alert('✅ Personagem criado com sucesso!');
+            window.location.href = '/dashboard.html';
+
+        } catch (error) {
+            console.error('❌ Erro ao finalizar personagem:', error);
+            alert('Erro ao criar personagem. Tente novamente.');
+        }
+    }
+
+    getHitDieValue(hitDie) {
+        const match = hitDie?.match(/d(\d+)/);
+        return match ? parseInt(match[1]) : 8;
+    }
+
+    markProficientSkills() {
+        this.wizardData.skills.forEach(skillName => {
+            const skillKey = skillName.replace(/\s+/g, '_');
+            const profCheckbox = document.getElementById(`${skillKey}-prof`);
+            if (profCheckbox) {
+                profCheckbox.checked = true;
+            }
+        });
+
+        if (this.wizardData.class) {
+            const savingThrows = this.wizardData.class.saving_throw_proficiencies || [];
+            savingThrows.forEach(save => {
+                const saveCheckbox = document.getElementById(`${save}-save-prof`);
+                if (saveCheckbox) {
+                    saveCheckbox.checked = true;
+                }
+            });
+        }
+
+        this.characterSheet.calculateAll();
+    }
+}
+
 // Inicializar quando o DOM estiver carregado
 document.addEventListener('DOMContentLoaded', () => {
-    new CharacterSheet();
+    const characterSheet = new CharacterSheet();
+    
+    // Se está em modo de criação, iniciar wizard
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('new') === 'true' || !params.get('id')) {
+        setTimeout(() => {
+            new CharacterCreationWizard(characterSheet);
+        }, 500);
+    }
 });
