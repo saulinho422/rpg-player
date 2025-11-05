@@ -137,7 +137,6 @@ export class DashboardService {
     
     static updateUserHeader(userStats) {
         const userName = document.getElementById('userName')
-        const userLevel = document.getElementById('userLevel')
         const userAvatar = document.getElementById('userAvatar')
         
         console.log('🎨 updateUserHeader - userStats recebido:', userStats)
@@ -146,10 +145,6 @@ export class DashboardService {
         
         if (userName && userStats.display_name) {
             userName.textContent = userStats.display_name
-        }
-        
-        if (userLevel) {
-            userLevel.textContent = `Nível ${userStats.player_level}`
         }
         
         if (userAvatar) {
