@@ -59,7 +59,7 @@ class CharacterSheet {
                 supabase.from('races').select('*'),
                 supabase.from('classes').select('*'),
                 supabase.from('game_backgrounds').select('*'),
-                supabase.from('alignments').select('*')
+                supabase.from('game_alignments').select('*')
             ]);
 
             if (racesResult.error) throw new Error('Erro ao carregar raças: ' + racesResult.error.message);
