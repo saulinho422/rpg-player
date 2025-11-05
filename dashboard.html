@@ -23,7 +23,8 @@
         <header class="dashboard-header">
             <div class="header-content">
                 <div class="logo">
-                    <h1>⚔️ RPG Player</h1>
+                    <img src="img/logo_vetorizada.png" alt="RPG Player" style="height: 50px; margin-right: 10px; vertical-align: middle;">
+                    <h1 style="display: inline-block; vertical-align: middle;">RPG Player</h1>
                 </div>
                 <div class="user-info">
                     <div class="user-avatar">
@@ -42,15 +43,21 @@
             <nav class="sidebar">
                 <div class="nav-menu">
                     <button class="nav-item active" data-tab="inicio">
-                        <span class="nav-icon">🏠</span>
+                        <span class="nav-icon">
+                            <img src="img/logo_inicio.png" alt="Início" style="width: 24px; height: 24px;">
+                        </span>
                         <span class="nav-text">Início</span>
                     </button>
                     <button class="nav-item" data-tab="personagens">
-                        <span class="nav-icon">👥</span>
+                        <span class="nav-icon">
+                            <img src="img/logo_personagem.png" alt="Personagens" style="width: 24px; height: 24px;">
+                        </span>
                         <span class="nav-text">Personagens</span>
                     </button>
                     <button class="nav-item" data-tab="mesas">
-                        <span class="nav-icon">🎲</span>
+                        <span class="nav-icon">
+                            <img src="img/logo_mesas.png" alt="Mesas" style="width: 24px; height: 24px;">
+                        </span>
                         <span class="nav-text">Mesas</span>
                     </button>
                 </div>
@@ -61,20 +68,24 @@
                 <!-- Tab: Início -->
                 <div class="tab-content active" id="inicio-tab">
                     <div class="content-header">
-                        <h2>🏠 Bem-vindo de volta!</h2>
+                        <h2>Bem-vindo de volta!</h2>
                         <p>Sua jornada épica continua...</p>
                     </div>
 
                     <div class="stats-grid">
                         <div class="stat-card">
-                            <div class="stat-icon">👥</div>
+                            <div class="stat-icon">
+                                <img src="img/logo_personagem.png" alt="Personagens" style="width: 40px; height: 40px;">
+                            </div>
                             <div class="stat-info">
                                 <div class="stat-number">3</div>
                                 <div class="stat-label">Personagens</div>
                             </div>
                         </div>
                         <div class="stat-card">
-                            <div class="stat-icon">🎲</div>
+                            <div class="stat-icon">
+                                <img src="img/logo_mesas.png" alt="Mesas Ativas" style="width: 40px; height: 40px;">
+                            </div>
                             <div class="stat-info">
                                 <div class="stat-number">2</div>
                                 <div class="stat-label">Mesas Ativas</div>
@@ -83,10 +94,12 @@
                     </div>
 
                     <div class="recent-activity">
-                        <h3>📜 Atividade Recente</h3>
+                        <h3>Atividade Recente</h3>
                         <div class="activity-list">
                             <div class="activity-item">
-                                <div class="activity-icon">⚔️</div>
+                                <div class="activity-icon">
+                                    <img src="img/logo_vetorizada.png" alt="" style="width: 30px; height: 30px;">
+                                </div>
                                 <div class="activity-content">
                                     <div class="activity-title">Batalha Épica Concluída</div>
                                     <div class="activity-time">Há 2 horas</div>
@@ -113,7 +126,7 @@
                 <!-- Tab: Personagens -->
                 <div class="tab-content" id="personagens-tab">
                     <div class="content-header">
-                        <h2>👥 Meus Personagens</h2>
+                        <h2>Meus Personagens</h2>
                         <button class="add-btn disabled-btn" id="createCharacterBtn" style="background: #95a5a6; cursor: not-allowed;">+ Criar Personagem</button>
                     </div>
 
@@ -183,7 +196,7 @@
                 <!-- Tab: Mesas -->
                 <div class="tab-content" id="mesas-tab">
                     <div class="content-header">
-                        <h2>🎲 Minhas Mesas</h2>
+                        <h2>Minhas Mesas</h2>
                         <button class="add-btn">+ Criar Mesa</button>
                     </div>
 
