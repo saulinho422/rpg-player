@@ -127,7 +127,7 @@
                 <div class="tab-content" id="personagens-tab">
                     <div class="content-header">
                         <h2>Meus Personagens</h2>
-                        <button class="add-btn disabled-btn" id="createCharacterBtn" style="background: #95a5a6; cursor: not-allowed;">+ Criar Personagem</button>
+                        <button class="add-btn" id="createCharacterBtn">+ Criar Personagem</button>
                     </div>
 
                     <div class="characters-grid">
@@ -288,7 +288,7 @@
             if (createBtn) {
                 createBtn.addEventListener('click', function(e) {
                     e.preventDefault();
-                    showNotification('🚧 A criação de personagem está em desenvolvimento', 'info');
+                    window.location.href = 'character-sheet.html?new=true';
                 });
             }
         });
@@ -361,3 +361,4 @@
     </script>
 </body>
 </html>
+
