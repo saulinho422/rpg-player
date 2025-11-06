@@ -2240,6 +2240,11 @@ class CharacterCreationWizard {
             console.log('💾 Finalizando personagem...');
             console.log('📊 Wizard Data:', this.wizardData);
             
+            // Verificar se já existe um personagem carregado
+            if (!this.characterSheet.characterId) {
+                throw new Error('Nenhum personagem carregado para atualizar!');
+            }
+
             const hitDie = this.getHitDieValue(this.wizardData.class.hit_die);
             const conMod = Math.floor((this.wizardData.attributes.con - 10) / 2);
             const maxHP = hitDie + conMod + ((this.wizardData.level - 1) * (Math.floor(hitDie / 2) + 1 + conMod));
@@ -2254,9 +2259,7 @@ class CharacterCreationWizard {
             const characterData = {
                 name: this.wizardData.name,
                 race: this.wizardData.race?.name_pt || this.wizardData.race?.name || null,
-                subrace: this.wizardData.subrace?.name_pt || this.wizardData.subrace?.name || null,
                 character_class: this.wizardData.class?.name_pt || this.wizardData.class?.name || null,
-                subclass: this.wizardData.subclass?.name_pt || this.wizardData.subclass?.name || null,
                 background: this.wizardData.background?.nome || this.wizardData.background?.name || null,
                 alignment: this.wizardData.alignment,
                 level: this.wizardData.level,
@@ -2271,73 +2274,61 @@ class CharacterCreationWizard {
                 armor_class: baseAC,
                 speed: parseInt(this.wizardData.race?.speed) || 30,
                 proficiency_bonus: Math.ceil(this.wizardData.level / 4) + 1,
-                avatar_url: this.wizardData.image,
-                skill_proficiencies: this.wizardData.skills, // Já é array
-                saving_throw_proficiencies: savingThrows, // Array de salvaguardas da classe
-                equipment: this.wizardData.equipment, // Já é array
-                is_draft: false,
+                saving_throws: savingThrows,
+                skills: this.wizardData.skills || [],
+                equipment: this.wizardData.equipment || [],
                 updated_at: new Date().toISOString()
             };
 
-            console.log('📦 Character Data a ser salvo:', characterData);
+            console.log('📦 Atualizando personagem ID:', this.characterSheet.characterId);
+            console.log('� Character Data:', characterData);
 
-            if (this.characterSheet.characterId) {
-                console.log('🔄 Atualizando personagem existente:', this.characterSheet.characterId);
-                const { error } = await supabase
-                    .from('characters')
-                    .update(characterData)
-                    .eq('id', this.characterSheet.characterId);
+            const { error } = await supabase
+                .from('characters')
+                .update(characterData)
+                .eq('id', this.characterSheet.characterId);
 
-                if (error) {
-                    console.error('❌ Erro ao atualizar:', error);
-                    throw error;
-                }
-            } else {
-                console.log('➕ Criando novo personagem');
-                characterData.user_id = this.characterSheet.currentUser.id;
-                
-                console.log('📦 Data com user_id:', characterData);
-                
-                const { data, error } = await supabase
-                    .from('characters')
-                    .insert([characterData])
-                    .select()
-                    .single();
-
-                if (error) {
-                    console.error('❌ Erro ao inserir:', error);
-                    console.error('❌ Detalhes do erro:', JSON.stringify(error, null, 2));
-                    throw error;
-                }
-                
-                console.log('✅ Personagem criado:', data);
-                this.characterSheet.characterId = data.id;
+            if (error) {
+                console.error('❌ Erro ao atualizar:', error);
+                throw error;
             }
 
+            console.log('✅ Personagem atualizado com sucesso!');
+
+            // Atualizar objeto character na memória
             this.characterSheet.character = {
-                id: this.characterSheet.characterId,
+                ...this.characterSheet.character,
                 name: this.wizardData.name,
                 race: this.wizardData.race?.name_pt || this.wizardData.race?.name,
-                class: this.wizardData.class?.name_pt || this.wizardData.class?.name,
+                character_class: this.wizardData.class?.name_pt || this.wizardData.class?.name,
                 background: this.wizardData.background?.nome || this.wizardData.background?.name,
                 alignment: this.wizardData.alignment,
                 level: this.wizardData.level,
-                attributes: this.wizardData.attributes,
-                hp: maxHP,
-                hpCurrent: maxHP,
-                image: this.wizardData.image
+                strength: this.wizardData.attributes.str,
+                dexterity: this.wizardData.attributes.dex,
+                constitution: this.wizardData.attributes.con,
+                intelligence: this.wizardData.attributes.int,
+                wisdom: this.wizardData.attributes.wis,
+                charisma: this.wizardData.attributes.cha,
+                hit_points_max: maxHP,
+                hit_points_current: maxHP,
+                armor_class: baseAC,
+                speed: parseInt(this.wizardData.race?.speed) || 30,
+                skills: this.wizardData.skills || [],
+                saving_throws: savingThrows,
+                equipment: this.wizardData.equipment || []
             };
 
             // Fechar modal
             this.hideModal();
 
-            // Preencher a ficha com os dados do personagem
+            // Recarregar e preencher a ficha com os dados atualizados
+            await this.characterSheet.loadCharacter();
             this.characterSheet.populateSheet();
             this.characterSheet.calculateAll();
-            this.markProficientSkills();
 
             // Mostrar mensagem de sucesso
-            alert('✅ Personagem criado com sucesso!');
+            alert('✅ Ficha preenchida com sucesso!');
 
         } catch (error) {
             console.error('❌ Erro ao finalizar personagem:', error);
