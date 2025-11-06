@@ -2287,13 +2287,16 @@ class CharacterCreationWizard {
                 image: this.wizardData.image
             };
 
+            // Fechar modal
+            this.hideModal();
+
+            // Preencher a ficha com os dados do personagem
             this.characterSheet.populateSheet();
             this.characterSheet.calculateAll();
             this.markProficientSkills();
-            this.hideModal();
 
+            // Mostrar mensagem de sucesso
             alert('✅ Personagem criado com sucesso!');
-            window.location.href = '/dashboard.html';
 
         } catch (error) {
             console.error('❌ Erro ao finalizar personagem:', error);
@@ -2302,8 +2305,17 @@ class CharacterCreationWizard {
     }
 
     getHitDieValue(hitDie) {
-        const match = hitDie?.match(/d(\d+)/);
-        return match ? parseInt(match[1]) : 8;
+        // Se já for um número, retornar direto
+        if (typeof hitDie === 'number') return hitDie;
+        
+        // Se for string, fazer parse
+        if (typeof hitDie === 'string') {
+            const match = hitDie.match(/d(\d+)/);
+            return match ? parseInt(match[1]) : 8;
+        }
+        
+        // Fallback
+        return 8;
     }
 
     markProficientSkills() {
