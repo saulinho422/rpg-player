@@ -1308,6 +1308,11 @@ class CharacterCreationWizard {
         
         const maxSkills = this.wizardData.class.skills_choose || 2;
 
+        console.log('🔍 Classe:', this.wizardData.class.name_pt);
+        console.log('🔍 Perícias disponíveis da classe:', classSkills);
+        console.log('🔍 Perícias no banco:', this.gameData.skills.map(s => s.name));
+        console.log('🔍 Máximo de perícias:', maxSkills);
+
         const skillsHtml = this.gameData.skills
             .filter(skill => classSkills.includes(skill.name))
             .map(skill => {
