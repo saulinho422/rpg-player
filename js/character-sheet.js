@@ -1165,7 +1165,14 @@ class CharacterCreationWizard {
                 }
                 // Verificar se todos os atributos foram preenchidos
                 const attrs = ['str', 'dex', 'con', 'int', 'wis', 'cha'];
-                return attrs.every(attr => this.wizardData.attributes[attr] !== 10 || this.wizardData.attributeMethod === 'standard');
+                const allAllocated = attrs.every(attr => this.wizardData.attributes[attr] !== 10 || this.wizardData.attributeMethod === 'standard');
+                
+                // Marcar que os atributos foram alocados
+                if (allAllocated && this.wizardData.availableValues.length === 0) {
+                    this.wizardData.attributesAllocated = true;
+                }
+                
+                return allAllocated;
             case 5: // Detalhes (alinhamento + antecedente)
                 return this.wizardData.alignment !== null && this.wizardData.background !== null;
             case 6: // Equipamentos
@@ -1557,7 +1564,9 @@ class CharacterCreationWizard {
             }
         } else {
             // Modo Array Padrão - valores fixos [15, 14, 13, 12, 10, 8]
-            if (this.wizardData.availableValues.length === 0) {
+            // Só preencher se ainda não iniciou a alocação
+            if (this.wizardData.availableValues.length === 0 && 
+                !this.wizardData.attributesAllocated) {
                 this.wizardData.availableValues = [15, 14, 13, 12, 10, 8];
             }
             
@@ -1619,6 +1628,7 @@ class CharacterCreationWizard {
                     this.wizardData.rolledValues = [];
                     this.wizardData.availableValues = [];
                     this.wizardData.attributes = { str: 10, dex: 10, con: 10, int: 10, wis: 10, cha: 10 };
+                    this.wizardData.attributesAllocated = false; // Reset da flag
                     
                     if (newMethod === 'standard') {
                         this.wizardData.availableValues = [15, 14, 13, 12, 10, 8];
