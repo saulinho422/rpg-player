@@ -838,7 +838,10 @@ class CharacterCreationWizard {
             alignment: null,
             background: null,
             equipment: [],
-            equipmentMethod: 'suggested',
+            equipmentMethod: 'package', // 'package' ou 'wealth'
+            equipmentChoices: {}, // Armazena escolhas (a), (b), (c) etc
+            startingWealth: 0,
+            purchasedItems: [],
             level: 1,
             image: null
         };
@@ -848,7 +851,10 @@ class CharacterCreationWizard {
             classes: [],
             subclasses: [],
             skills: [],
-            backgrounds: []
+            backgrounds: [],
+            weapons: [],
+            armors: [],
+            equipment: []
         };
         this.init();
     }
@@ -992,6 +998,39 @@ class CharacterCreationWizard {
                 console.warn('⚠️ Nenhum antecedente encontrado no banco');
                 this.gameData.backgrounds = [];
             }
+
+            // Carregar armas
+            const { data: weapons, error: weaponsError } = await supabase
+                .from('game_weapons')
+                .select('*')
+                .order('nome');
+            
+            if (!weaponsError && weapons) {
+                this.gameData.weapons = weapons;
+                console.log(`✅ ${weapons.length} armas carregadas`);
+            }
+
+            // Carregar armaduras
+            const { data: armors, error: armorsError } = await supabase
+                .from('game_armor')
+                .select('*')
+                .order('nome');
+            
+            if (!armorsError && armors) {
+                this.gameData.armors = armors;
+                console.log(`✅ ${armors.length} armaduras carregadas`);
+            }
+
+            // Carregar equipamentos gerais (incluindo pacotes)
+            const { data: equipment, error: equipmentError } = await supabase
+                .from('game_equipment')
+                .select('*')
+                .order('nome');
+            
+            if (!equipmentError && equipment) {
+                this.gameData.equipment = equipment;
+                console.log(`✅ ${equipment.length} equipamentos carregados`);
+            }
             
         } catch (error) {
             console.error('❌ Erro ao carregar dados do jogo:', error);
@@ -1112,10 +1151,15 @@ class CharacterCreationWizard {
             case 2: // Classe
                 return this.wizardData.class !== null;
             case 3: // Perícias
-                const requiredSkills = this.wizardData.class?.skill_choices || 2;
+                const requiredSkills = this.wizardData.class?.skills_choose || 2;
                 return this.wizardData.skills.length === requiredSkills;
-            case 4: // Atributos
-                return true;
+            case 4: // Atributos - verificar se todos os valores foram alocados
+                if (!this.wizardData.availableValues || this.wizardData.availableValues.length > 0) {
+                    return false; // Ainda tem valores não alocados
+                }
+                // Verificar se todos os atributos foram preenchidos
+                const attrs = ['str', 'dex', 'con', 'int', 'wis', 'cha'];
+                return attrs.every(attr => this.wizardData.attributes[attr] !== 10 || this.wizardData.attributeMethod === 'standard');
             case 5: // Detalhes (alinhamento + antecedente)
                 return this.wizardData.alignment !== null && this.wizardData.background !== null;
             case 6: // Equipamentos
@@ -1440,29 +1484,104 @@ class CharacterCreationWizard {
 
     // ETAPA 4: Atributos
     renderAttributesStep() {
+        // Inicializar arrays de valores se não existirem
+        if (!this.wizardData.rolledValues) {
+            this.wizardData.rolledValues = [];
+        }
+        if (!this.wizardData.availableValues) {
+            this.wizardData.availableValues = [];
+        }
+
+        const attrNames = { str: 'Força', dex: 'Destreza', con: 'Constituição', int: 'Inteligência', wis: 'Sabedoria', cha: 'Carisma' };
+        
         const toggleHtml = `
             <div class="toggle-group">
                 <div class="toggle-option ${this.wizardData.attributeMethod === 'roll' ? 'active' : ''}" data-method="roll">
-                    4d6 (Rolar Dados)
+                    🎲 4d6 (Rolar Dados)
                 </div>
                 <div class="toggle-option ${this.wizardData.attributeMethod === 'standard' ? 'active' : ''}" data-method="standard">
-                    Array Padrão
+                    📊 Array Padrão
                 </div>
             </div>
         `;
 
+        let methodContentHtml = '';
+
+        if (this.wizardData.attributeMethod === 'roll') {
+            // Modo 4d6 - Rolar valores individuais
+            const needsRolling = this.wizardData.rolledValues.length < 6;
+            
+            if (needsRolling) {
+                methodContentHtml = `
+                    <div style="text-align: center; margin: 30px 0;">
+                        <h4 style="color: var(--primary-color); margin-bottom: 15px;">
+                            Valores Rolados: ${this.wizardData.rolledValues.length} / 6
+                        </h4>
+                        <div class="rolled-values-display">
+                            ${this.wizardData.rolledValues.map(v => `<div class="rolled-value">${v}</div>`).join('')}
+                        </div>
+                        <button class="upload-button" id="rollSingleBtn" style="margin-top: 20px;">
+                            🎲 Rolar Próximo Valor (4d6)
+                        </button>
+                    </div>
+                `;
+            } else {
+                // Todos os 6 valores rolados - mostrar alocação
+                methodContentHtml = `
+                    <div style="margin: 20px 0;">
+                        <h4 style="color: var(--primary-color); margin-bottom: 15px; text-align: center;">
+                            Valores Disponíveis (clique para alocar)
+                        </h4>
+                        <div class="available-values-grid">
+                            ${this.wizardData.availableValues.map((value, idx) => `
+                                <div class="available-value" data-value="${value}" data-index="${idx}">
+                                    ${value}
+                                </div>
+                            `).join('')}
+                        </div>
+                        <p style="text-align: center; color: var(--text-color); margin-top: 10px; font-size: 14px;">
+                            Clique em um valor acima e depois no atributo abaixo
+                        </p>
+                    </div>
+                `;
+            }
+        } else {
+            // Modo Array Padrão - valores fixos [15, 14, 13, 12, 10, 8]
+            if (this.wizardData.availableValues.length === 0) {
+                this.wizardData.availableValues = [15, 14, 13, 12, 10, 8];
+            }
+            
+            methodContentHtml = `
+                <div style="margin: 20px 0;">
+                    <h4 style="color: var(--primary-color); margin-bottom: 15px; text-align: center;">
+                        Valores Disponíveis (clique para alocar)
+                    </h4>
+                    <div class="available-values-grid">
+                        ${this.wizardData.availableValues.map((value, idx) => `
+                            <div class="available-value" data-value="${value}" data-index="${idx}">
+                                ${value}
+                            </div>
+                        `).join('')}
+                    </div>
+                    <p style="text-align: center; color: var(--text-color); margin-top: 10px; font-size: 14px;">
+                        Clique em um valor acima e depois no atributo abaixo
+                    </p>
+                </div>
+            `;
+        }
+
         const attributesHtml = `
             <div class="attribute-distribution">
                 ${['str', 'dex', 'con', 'int', 'wis', 'cha'].map(attr => {
-                    const attrNames = { str: 'Força', dex: 'Destreza', con: 'Constituição', int: 'Inteligência', wis: 'Sabedoria', cha: 'Carisma' };
                     const value = this.wizardData.attributes[attr];
                     const modifier = Math.floor((value - 10) / 2);
                     const modString = modifier >= 0 ? `+${modifier}` : modifier;
+                    const hasValue = value !== 10 || this.wizardData.availableValues.length < 6;
                     
                     return `
-                        <div class="attribute-box">
+                        <div class="attribute-box ${hasValue ? 'has-value' : ''}" data-attr="${attr}">
                             <label>${attrNames[attr]}</label>
-                            <input type="number" id="wizard-${attr}" value="${value}" min="3" max="20" data-attr="${attr}">
+                            <div class="attribute-value">${value}</div>
                             <span class="modifier">${modString}</span>
                         </div>
                     `;
@@ -1476,62 +1595,96 @@ class CharacterCreationWizard {
                 <p class="step-description">Escolha o método e distribua os valores</p>
                 
                 ${toggleHtml}
-                ${attributesHtml}
-                
-                ${this.wizardData.attributeMethod === 'roll' ? `
-                    <div style="text-align: center; margin-top: 20px;">
-                        <button class="upload-button" id="rollDiceBtn">🎲 Rolar Dados</button>
-                    </div>
-                ` : ''}
+                ${methodContentHtml}
+                ${this.wizardData.availableValues.length === 6 || this.wizardData.rolledValues.length === 6 ? attributesHtml : ''}
             </div>
         `;
         
+        // Event listeners para toggle
         document.querySelectorAll('.toggle-option').forEach(option => {
             option.addEventListener('click', () => {
-                this.wizardData.attributeMethod = option.dataset.method;
+                const newMethod = option.dataset.method;
+                if (this.wizardData.attributeMethod !== newMethod) {
+                    this.wizardData.attributeMethod = newMethod;
+                    this.wizardData.rolledValues = [];
+                    this.wizardData.availableValues = [];
+                    this.wizardData.attributes = { str: 10, dex: 10, con: 10, int: 10, wis: 10, cha: 10 };
+                    
+                    if (newMethod === 'standard') {
+                        this.wizardData.availableValues = [15, 14, 13, 12, 10, 8];
+                    }
+                    
+                    this.renderStep();
+                }
+            });
+        });
+
+        // Event listener para rolar valor individual (4d6)
+        const rollSingleBtn = document.getElementById('rollSingleBtn');
+        if (rollSingleBtn) {
+            rollSingleBtn.addEventListener('click', () => {
+                // Rolar 4d6 e somar os 3 maiores
+                const rolls = [
+                    Math.floor(Math.random() * 6) + 1,
+                    Math.floor(Math.random() * 6) + 1,
+                    Math.floor(Math.random() * 6) + 1,
+                    Math.floor(Math.random() * 6) + 1
+                ].sort((a, b) => b - a);
                 
-                if (this.wizardData.attributeMethod === 'standard') {
-                    const standardArray = [15, 14, 13, 12, 10, 8];
-                    const attrs = ['str', 'dex', 'con', 'int', 'wis', 'cha'];
-                    attrs.forEach((attr, i) => {
-                        this.wizardData.attributes[attr] = standardArray[i];
-                    });
+                const value = rolls[0] + rolls[1] + rolls[2];
+                this.wizardData.rolledValues.push(value);
+                
+                // Se completou os 6 valores, transferir para availableValues
+                if (this.wizardData.rolledValues.length === 6) {
+                    this.wizardData.availableValues = [...this.wizardData.rolledValues];
                 }
                 
                 this.renderStep();
             });
-        });
-
-        document.querySelectorAll('[data-attr]').forEach(input => {
-            input.addEventListener('input', (e) => {
-                const attr = e.target.dataset.attr;
-                const value = parseInt(e.target.value) || 10;
-                this.wizardData.attributes[attr] = Math.max(3, Math.min(20, value));
-                
-                const modifier = Math.floor((value - 10) / 2);
-                const modString = modifier >= 0 ? `+${modifier}` : modifier;
-                e.target.closest('.attribute-box').querySelector('.modifier').textContent = modString;
-            });
-        });
-
-        const rollBtn = document.getElementById('rollDiceBtn');
-        if (rollBtn) {
-            rollBtn.addEventListener('click', () => {
-                const attrs = ['str', 'dex', 'con', 'int', 'wis', 'cha'];
-                attrs.forEach(attr => {
-                    const rolls = [
-                        Math.floor(Math.random() * 6) + 1,
-                        Math.floor(Math.random() * 6) + 1,
-                        Math.floor(Math.random() * 6) + 1,
-                        Math.floor(Math.random() * 6) + 1
-                    ].sort((a, b) => b - a);
-                    
-                    this.wizardData.attributes[attr] = rolls[0] + rolls[1] + rolls[2];
-                });
-                
-                this.renderStep();
-            });
         }
+
+        // Sistema de seleção e alocação de valores
+        let selectedValue = null;
+        let selectedIndex = null;
+
+        document.querySelectorAll('.available-value').forEach(valueDiv => {
+            valueDiv.addEventListener('click', () => {
+                // Remover seleção anterior
+                document.querySelectorAll('.available-value').forEach(v => v.classList.remove('selected'));
+                
+                // Selecionar novo valor
+                valueDiv.classList.add('selected');
+                selectedValue = parseInt(valueDiv.dataset.value);
+                selectedIndex = parseInt(valueDiv.dataset.index);
+            });
+        });
+
+        document.querySelectorAll('.attribute-box').forEach(attrBox => {
+            attrBox.addEventListener('click', () => {
+                if (selectedValue !== null && selectedIndex !== null) {
+                    const attr = attrBox.dataset.attr;
+                    const oldValue = this.wizardData.attributes[attr];
+                    
+                    // Se o atributo já tinha um valor alocado, devolver para availableValues
+                    if (oldValue !== 10) {
+                        this.wizardData.availableValues.push(oldValue);
+                    }
+                    
+                    // Alocar novo valor
+                    this.wizardData.attributes[attr] = selectedValue;
+                    
+                    // Remover valor de availableValues
+                    this.wizardData.availableValues.splice(selectedIndex, 1);
+                    
+                    // Resetar seleção
+                    selectedValue = null;
+                    selectedIndex = null;
+                    
+                    this.renderStep();
+                    this.updateButtons();
+                }
+            });
+        });
     }
 
     // ETAPA 5: Alinhamento + Antecedente
@@ -1609,37 +1762,362 @@ class CharacterCreationWizard {
     }
 
     // ETAPA 6: Equipamentos
+    // ETAPA 6: Equipamentos
     renderEquipmentStep() {
-        const suggestedEquipment = [
-            'Armadura de Couro',
-            'Espada Longa',
-            'Escudo',
-            'Mochila de Aventureiro',
-            '10 Tochas',
-            '10 Rações',
-            'Cantil',
-            '50 pés de Corda'
-        ];
+        if (!this.wizardData.class) {
+            this.contentArea.innerHTML = '<p>Erro: Classe não selecionada</p>';
+            return;
+        }
+
+        const toggleHtml = `
+            <div class="toggle-group">
+                <div class="toggle-option ${this.wizardData.equipmentMethod === 'package' ? 'active' : ''}" data-method="package">
+                    📦 Pacote da Classe
+                </div>
+                <div class="toggle-option ${this.wizardData.equipmentMethod === 'wealth' ? 'active' : ''}" data-method="wealth">
+                    💰 Riqueza Inicial
+                </div>
+            </div>
+        `;
+
+        let contentHtml = '';
+
+        if (this.wizardData.equipmentMethod === 'package') {
+            contentHtml = this.renderPackageMethod();
+        } else {
+            contentHtml = this.renderWealthMethod();
+        }
 
         this.contentArea.innerHTML = `
             <div class="step-content">
                 <h3 class="step-title">Equipamentos Iniciais</h3>
-                <p class="step-description">Equipamento básico para suas aventuras</p>
+                <p class="step-description">Escolha como obter seu equipamento inicial</p>
                 
-                <div style="background: rgba(15, 52, 96, 0.4); border: 2px solid rgba(212, 175, 55, 0.3); border-radius: 10px; padding: 20px; margin-top: 20px;">
-                    <h4 style="color: var(--primary-color); margin-bottom: 15px;">Equipamento Inicial</h4>
-                    <ul style="color: var(--text-color); list-style: none; padding: 0;">
-                        ${suggestedEquipment.map(item => `
-                            <li style="padding: 8px 0; border-bottom: 1px solid rgba(212, 175, 55, 0.1);">
-                                ✓ ${item}
-                            </li>
-                        `).join('')}
-                    </ul>
-                </div>
+                ${toggleHtml}
+                ${contentHtml}
             </div>
         `;
+
+        this.setupEquipmentListeners();
+    }
+
+    renderPackageMethod() {
+        // Parsear equipment_options da classe
+        let equipmentOptions = [];
+        try {
+            equipmentOptions = typeof this.wizardData.class.equipment_options === 'string'
+                ? JSON.parse(this.wizardData.class.equipment_options)
+                : this.wizardData.class.equipment_options || [];
+        } catch (error) {
+            console.error('Erro ao parsear equipment_options:', error);
+        }
+
+        if (equipmentOptions.length === 0) {
+            return `<p style="color: orange; text-align: center; margin: 20px;">Nenhuma opção de equipamento disponível para esta classe.</p>`;
+        }
+
+        // Renderizar cada opção como um grupo de escolha
+        const choicesHtml = equipmentOptions.map((option, index) => {
+            // Extrair opções (a), (b), (c) do texto
+            const matches = option.match(/\(([a-z])\)\s*([^(]+?)(?=\s*\([a-z]\)|$)/gi);
+            
+            if (!matches || matches.length === 0) {
+                // Item fixo sem escolha
+                return `
+                    <div class="equipment-fixed-item">
+                        <span class="fixed-icon">✓</span>
+                        <span>${option}</span>
+                    </div>
+                `;
+            }
+
+            const choices = matches.map(match => {
+                const letter = match.match(/\(([a-z])\)/)[1];
+                const text = match.replace(/\([a-z]\)\s*/i, '').trim();
+                return { letter, text };
+            });
+
+            const selectedChoice = this.wizardData.equipmentChoices[`choice_${index}`];
+
+            return `
+                <div class="equipment-choice-group">
+                    <h4 style="color: var(--primary-color); margin-bottom: 10px;">Escolha ${index + 1}:</h4>
+                    <div class="equipment-options">
+                        ${choices.map(choice => `
+                            <div class="equipment-option ${selectedChoice === choice.letter ? 'selected' : ''}" 
+                                 data-choice-index="${index}" 
+                                 data-choice-letter="${choice.letter}">
+                                <span class="option-letter">(${choice.letter})</span>
+                                <span class="option-text">${choice.text}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }).join('');
+
+        // Adicionar equipamento do antecedente
+        let backgroundEquipmentHtml = '';
+        if (this.wizardData.background) {
+            try {
+                const bgEquipment = typeof this.wizardData.background.equipamento === 'string'
+                    ? JSON.parse(this.wizardData.background.equipamento)
+                    : this.wizardData.background.equipamento || [];
+                
+                if (Array.isArray(bgEquipment) && bgEquipment.length > 0) {
+                    backgroundEquipmentHtml = `
+                        <div class="background-equipment">
+                            <h4 style="color: var(--secondary-color); margin: 20px 0 10px;">Equipamento do Antecedente:</h4>
+                            <div class="equipment-list">
+                                ${bgEquipment.map(item => `
+                                    <div class="equipment-fixed-item">
+                                        <span class="fixed-icon">✓</span>
+                                        <span>${item}</span>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error('Erro ao parsear equipamento do antecedente:', error);
+            }
+        }
+
+        return `
+            <div class="equipment-package-content">
+                ${choicesHtml}
+                ${backgroundEquipmentHtml}
+            </div>
+        `;
+    }
+
+    renderWealthMethod() {
+        // Verificar se já rolou a riqueza inicial
+        if (this.wizardData.startingWealth === 0) {
+            const wealthFormula = this.wizardData.class.starting_wealth || '4d4 x 10 po';
+            
+            return `
+                <div style="text-align: center; margin: 30px 0;">
+                    <h4 style="color: var(--primary-color); margin-bottom: 15px;">Riqueza Inicial da Classe</h4>
+                    <div class="wealth-display">
+                        <div class="wealth-formula">${wealthFormula}</div>
+                    </div>
+                    <button class="upload-button" id="rollWealthBtn" style="margin-top: 20px;">
+                        🎲 Rolar Riqueza Inicial
+                    </button>
+                    <p style="color: var(--text-color); font-size: 14px; margin-top: 15px;">
+                        Você usará este dinheiro para comprar seus equipamentos
+                    </p>
+                </div>
+            `;
+        }
+
+        // Mostrar loja de equipamentos
+        return this.renderShop();
+    }
+
+    renderShop() {
+        const categories = [
+            { name: 'Armas', items: this.gameData.weapons || [], key: 'weapons' },
+            { name: 'Armaduras', items: this.gameData.armors || [], key: 'armors' },
+            { name: 'Equipamentos', items: this.gameData.equipment || [], key: 'equipment' }
+        ];
+
+        const categoriesHtml = categories.map(category => {
+            if (category.items.length === 0) return '';
+
+            const itemsHtml = category.items.map(item => {
+                const custo = typeof item.custo === 'string' ? JSON.parse(item.custo) : item.custo;
+                const custoText = `${custo.quantidade} ${custo.moeda}`;
+                const isPurchased = this.wizardData.purchasedItems.some(p => p.id === item.id);
+
+                return `
+                    <div class="shop-item ${isPurchased ? 'purchased' : ''}" data-item-id="${item.id}" data-item-category="${category.key}">
+                        <div class="shop-item-header">
+                            <span class="shop-item-name">${item.nome}</span>
+                            <span class="shop-item-cost">${custoText}</span>
+                        </div>
+                        ${item.dano ? `<div class="shop-item-detail">Dano: ${item.dano}</div>` : ''}
+                        ${item.ca ? `<div class="shop-item-detail">CA: ${item.ca}</div>` : ''}
+                        <button class="shop-item-btn ${isPurchased ? 'remove' : 'add'}">
+                            ${isPurchased ? '✕ Remover' : '+ Adicionar'}
+                        </button>
+                    </div>
+                `;
+            }).join('');
+
+            return `
+                <div class="shop-category">
+                    <h4 style="color: var(--primary-color); margin: 15px 0;">${category.name}</h4>
+                    <div class="shop-items-grid">
+                        ${itemsHtml}
+                    </div>
+                </div>
+            `;
+        }).join('');
+
+        return `
+            <div class="shop-content">
+                <div class="shop-header">
+                    <div class="wealth-info">
+                        <span>💰 Dinheiro Disponível:</span>
+                        <span class="wealth-amount">${this.wizardData.startingWealth} po</span>
+                    </div>
+                    <div class="purchased-count">
+                        <span>Itens: ${this.wizardData.purchasedItems.length}</span>
+                    </div>
+                </div>
+                ${categoriesHtml}
+            </div>
+        `;
+    }
+
+    setupEquipmentListeners() {
+        // Toggle entre métodos
+        document.querySelectorAll('.toggle-option').forEach(option => {
+            option.addEventListener('click', () => {
+                const newMethod = option.dataset.method;
+                if (this.wizardData.equipmentMethod !== newMethod) {
+                    this.wizardData.equipmentMethod = newMethod;
+                    this.wizardData.equipmentChoices = {};
+                    this.wizardData.startingWealth = 0;
+                    this.wizardData.purchasedItems = [];
+                    this.wizardData.equipment = [];
+                    this.renderStep();
+                }
+            });
+        });
+
+        // Escolha de opções do pacote
+        document.querySelectorAll('.equipment-option').forEach(option => {
+            option.addEventListener('click', () => {
+                const choiceIndex = option.dataset.choiceIndex;
+                const choiceLetter = option.dataset.choiceLetter;
+                
+                this.wizardData.equipmentChoices[`choice_${choiceIndex}`] = choiceLetter;
+                
+                // Atualizar lista de equipamentos
+                this.updateEquipmentFromChoices();
+                
+                this.renderStep();
+                this.updateButtons();
+            });
+        });
+
+        // Rolar riqueza inicial
+        const rollWealthBtn = document.getElementById('rollWealthBtn');
+        if (rollWealthBtn) {
+            rollWealthBtn.addEventListener('click', () => {
+                const formula = this.wizardData.class.starting_wealth || '4d4 x 10 po';
+                const wealth = this.calculateStartingWealth(formula);
+                this.wizardData.startingWealth = wealth;
+                this.renderStep();
+            });
+        }
+
+        // Comprar/remover itens da loja
+        document.querySelectorAll('.shop-item-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const itemDiv = e.target.closest('.shop-item');
+                const itemId = itemDiv.dataset.itemId;
+                const category = itemDiv.dataset.itemCategory;
+                
+                const item = this.gameData[category].find(i => i.id === itemId);
+                if (!item) return;
+
+                const isPurchased = this.wizardData.purchasedItems.some(p => p.id === itemId);
+                
+                if (isPurchased) {
+                    // Remover item
+                    this.wizardData.purchasedItems = this.wizardData.purchasedItems.filter(p => p.id !== itemId);
+                    const custo = typeof item.custo === 'string' ? JSON.parse(item.custo) : item.custo;
+                    this.wizardData.startingWealth += this.convertToGold(custo);
+                } else {
+                    // Adicionar item
+                    const custo = typeof item.custo === 'string' ? JSON.parse(item.custo) : item.custo;
+                    const costInGold = this.convertToGold(custo);
+                    
+                    if (this.wizardData.startingWealth >= costInGold) {
+                        this.wizardData.purchasedItems.push({
+                            id: item.id,
+                            nome: item.nome,
+                            custo: custo
+                        });
+                        this.wizardData.startingWealth -= costInGold;
+                    } else {
+                        alert('💰 Dinheiro insuficiente!');
+                        return;
+                    }
+                }
+
+                this.updateEquipmentFromPurchases();
+                this.renderStep();
+                this.updateButtons();
+            });
+        });
+    }
+
+    calculateStartingWealth(formula) {
+        // Ex: "5d4 x 10 po" ou "5d4 po"
+        const match = formula.match(/(\d+)d(\d+)(?:\s*x\s*(\d+))?/i);
+        if (!match) return 100; // Fallback
+
+        const numDice = parseInt(match[1]);
+        const diceSize = parseInt(match[2]);
+        const multiplier = match[3] ? parseInt(match[3]) : 1;
+
+        let total = 0;
+        for (let i = 0; i < numDice; i++) {
+            total += Math.floor(Math.random() * diceSize) + 1;
+        }
+
+        return total * multiplier;
+    }
+
+    convertToGold(custo) {
+        // Converter diferentes moedas para ouro
+        const conversions = {
+            'po': 1,     // Peça de ouro
+            'pp': 0.1,   // Peça de prata = 0.1 po
+            'pc': 0.01,  // Peça de cobre = 0.01 po
+            'pe': 0.5,   // Peça de electro = 0.5 po
+            'pl': 10     // Peça de platina = 10 po
+        };
+
+        const moeda = custo.moeda.toLowerCase();
+        const quantidade = custo.quantidade;
+
+        return quantidade * (conversions[moeda] || 1);
+    }
+
+    updateEquipmentFromChoices() {
+        // Montar lista de equipamentos baseada nas escolhas
+        const equipment = [];
         
-        this.wizardData.equipment = suggestedEquipment;
+        // Adicionar escolhas do pacote da classe
+        Object.entries(this.wizardData.equipmentChoices).forEach(([key, choice]) => {
+            equipment.push(`Escolha ${key}: Opção (${choice})`);
+        });
+
+        // Adicionar equipamento do antecedente
+        if (this.wizardData.background) {
+            try {
+                const bgEquipment = typeof this.wizardData.background.equipamento === 'string'
+                    ? JSON.parse(this.wizardData.background.equipamento)
+                    : this.wizardData.background.equipamento || [];
+                
+                equipment.push(...bgEquipment);
+            } catch (error) {
+                console.error('Erro ao adicionar equipamento do antecedente:', error);
+            }
+        }
+
+        this.wizardData.equipment = equipment;
+    }
+
+    updateEquipmentFromPurchases() {
+        this.wizardData.equipment = this.wizardData.purchasedItems.map(item => item.nome);
     }
 
     // ETAPA 7: Nível + Imagem
