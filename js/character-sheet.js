@@ -1633,32 +1633,43 @@ class CharacterCreationWizard {
         const rollSingleBtn = document.getElementById('rollSingleBtn');
         if (rollSingleBtn) {
             rollSingleBtn.addEventListener('click', async () => {
+                console.log('🎲 Botão clicado! Dice3DRoller disponível?', typeof window.Dice3DRoller);
+                
                 if (this.isRolling) return; // Prevenir cliques duplos
                 
                 this.isRolling = true;
                 rollSingleBtn.disabled = true;
                 rollSingleBtn.textContent = '🎲 Rolando...';
                 
-                // Criar instância do roller de dados 3D
-                const diceRoller = new Dice3DRoller('diceContainer');
-                
-                // Rolar os dados e esperar o resultado
-                const value = await diceRoller.roll();
-                
-                // Adicionar valor aos rolados
-                this.wizardData.rolledValues.push(value);
-                
-                // Se completou os 6 valores, transferir para availableValues
-                if (this.wizardData.rolledValues.length === 6) {
-                    this.wizardData.availableValues = [...this.wizardData.rolledValues];
+                try {
+                    // Criar instância do roller de dados 3D
+                    const diceRoller = new window.Dice3DRoller('diceContainer');
+                    
+                    // Rolar os dados e esperar o resultado
+                    const value = await diceRoller.roll();
+                    
+                    console.log('✅ Valor rolado:', value);
+                    
+                    // Adicionar valor aos rolados
+                    this.wizardData.rolledValues.push(value);
+                    
+                    // Se completou os 6 valores, transferir para availableValues
+                    if (this.wizardData.rolledValues.length === 6) {
+                        this.wizardData.availableValues = [...this.wizardData.rolledValues];
+                    }
+                    
+                    this.isRolling = false;
+                    
+                    // Aguardar 1 segundo antes de re-renderizar
+                    await this.wait(1000);
+                    
+                    this.renderStep();
+                } catch (error) {
+                    console.error('❌ Erro ao rolar dados:', error);
+                    this.isRolling = false;
+                    rollSingleBtn.disabled = false;
+                    rollSingleBtn.textContent = '🎲 Rolar 4d6 (Soma dos 3 Maiores)';
                 }
-                
-                this.isRolling = false;
-                
-                // Aguardar 1 segundo antes de re-renderizar
-                await this.wait(1000);
-                
-                this.renderStep();
             });
         }
 

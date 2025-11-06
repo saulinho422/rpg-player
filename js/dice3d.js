@@ -163,3 +163,4 @@ class Dice3DRoller {
 
 // Expor globalmente para uso em módulos
 window.Dice3DRoller = Dice3DRoller;
+console.log('✅ Dice3DRoller carregado e disponível:', typeof Dice3DRoller);
