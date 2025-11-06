@@ -1695,6 +1695,9 @@ class CharacterCreationWizard {
                     const attr = attrBox.dataset.attr;
                     const oldValue = this.wizardData.attributes[attr];
                     
+                    console.log('📊 Alocando:', { attr, selectedValue, selectedIndex, oldValue });
+                    console.log('📊 availableValues antes:', [...this.wizardData.availableValues]);
+                    
                     // Se o atributo já tinha um valor alocado, devolver para availableValues
                     if (oldValue !== 10) {
                         this.wizardData.availableValues.push(oldValue);
@@ -1703,8 +1706,14 @@ class CharacterCreationWizard {
                     // Alocar novo valor
                     this.wizardData.attributes[attr] = selectedValue;
                     
-                    // Remover valor de availableValues
-                    this.wizardData.availableValues.splice(selectedIndex, 1);
+                    // Remover valor de availableValues pelo VALOR, não pelo índice
+                    const valueIndex = this.wizardData.availableValues.indexOf(selectedValue);
+                    if (valueIndex !== -1) {
+                        this.wizardData.availableValues.splice(valueIndex, 1);
+                    }
+                    
+                    console.log('📊 availableValues depois:', [...this.wizardData.availableValues]);
+                    console.log('📊 attributes:', {...this.wizardData.attributes});
                     
                     // Resetar seleção
                     selectedValue = null;
