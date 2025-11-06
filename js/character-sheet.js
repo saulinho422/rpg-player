@@ -856,6 +856,7 @@ class CharacterCreationWizard {
             armors: [],
             equipment: []
         };
+        this.isRolling = false;
         this.init();
     }
 
@@ -886,6 +887,11 @@ class CharacterCreationWizard {
         this.renderStep();
         
         console.log('✅ Wizard inicializado');
+    }
+
+    // Método auxiliar para delays
+    wait(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
     }
 
     async loadGameData() {
@@ -1500,7 +1506,7 @@ class CharacterCreationWizard {
                     🎲 4d6 (Rolar Dados)
                 </div>
                 <div class="toggle-option ${this.wizardData.attributeMethod === 'standard' ? 'active' : ''}" data-method="standard">
-                    📊 Array Padrão
+                    📊 Valores Padrão
                 </div>
             </div>
         `;
@@ -1508,7 +1514,7 @@ class CharacterCreationWizard {
         let methodContentHtml = '';
 
         if (this.wizardData.attributeMethod === 'roll') {
-            // Modo 4d6 - Rolar valores individuais
+            // Modo 4d6 - Rolar valores individuais com dados 3D
             const needsRolling = this.wizardData.rolledValues.length < 6;
             
             if (needsRolling) {
@@ -1520,8 +1526,12 @@ class CharacterCreationWizard {
                         <div class="rolled-values-display">
                             ${this.wizardData.rolledValues.map(v => `<div class="rolled-value">${v}</div>`).join('')}
                         </div>
-                        <button class="upload-button" id="rollSingleBtn" style="margin-top: 20px;">
-                            🎲 Rolar Próximo Valor (4d6)
+                        
+                        <!-- Container para os dados 3D -->
+                        <div id="diceContainer" class="dice-container"></div>
+                        
+                        <button class="upload-button" id="rollSingleBtn" style="margin-top: 20px;" ${this.isRolling ? 'disabled' : ''}>
+                            🎲 Rolar 4d6 (Soma dos 3 Maiores)
                         </button>
                     </div>
                 `;
@@ -1596,7 +1606,7 @@ class CharacterCreationWizard {
                 
                 ${toggleHtml}
                 ${methodContentHtml}
-                ${this.wizardData.availableValues.length === 6 || this.wizardData.rolledValues.length === 6 ? attributesHtml : ''}
+                ${this.wizardData.availableValues.length > 0 || this.wizardData.rolledValues.length === 6 ? attributesHtml : ''}
             </div>
         `;
         
@@ -1619,25 +1629,34 @@ class CharacterCreationWizard {
             });
         });
 
-        // Event listener para rolar valor individual (4d6)
+        // Event listener para rolar valor individual (4d6) com dados 3D
         const rollSingleBtn = document.getElementById('rollSingleBtn');
         if (rollSingleBtn) {
-            rollSingleBtn.addEventListener('click', () => {
-                // Rolar 4d6 e somar os 3 maiores
-                const rolls = [
-                    Math.floor(Math.random() * 6) + 1,
-                    Math.floor(Math.random() * 6) + 1,
-                    Math.floor(Math.random() * 6) + 1,
-                    Math.floor(Math.random() * 6) + 1
-                ].sort((a, b) => b - a);
+            rollSingleBtn.addEventListener('click', async () => {
+                if (this.isRolling) return; // Prevenir cliques duplos
                 
-                const value = rolls[0] + rolls[1] + rolls[2];
+                this.isRolling = true;
+                rollSingleBtn.disabled = true;
+                rollSingleBtn.textContent = '🎲 Rolando...';
+                
+                // Criar instância do roller de dados 3D
+                const diceRoller = new Dice3DRoller('diceContainer');
+                
+                // Rolar os dados e esperar o resultado
+                const value = await diceRoller.roll();
+                
+                // Adicionar valor aos rolados
                 this.wizardData.rolledValues.push(value);
                 
                 // Se completou os 6 valores, transferir para availableValues
                 if (this.wizardData.rolledValues.length === 6) {
                     this.wizardData.availableValues = [...this.wizardData.rolledValues];
                 }
+                
+                this.isRolling = false;
+                
+                // Aguardar 1 segundo antes de re-renderizar
+                await this.wait(1000);
                 
                 this.renderStep();
             });

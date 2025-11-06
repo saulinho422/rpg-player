@@ -1,0 +1,194 @@
+/* ========================================
+   SISTEMA DE DADOS 3D - 4d6
+======================================== */
+
+.dice-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    padding: 40px 20px;
+    min-height: 250px;
+    perspective: 1200px;
+    flex-wrap: wrap;
+}
+
+.dice-wrapper {
+    width: 80px;
+    height: 80px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    transition: all 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+.dice-cube {
+    width: 80px;
+    height: 80px;
+    position: relative;
+    transform-style: preserve-3d;
+    transition: transform 2s cubic-bezier(0.25, 0.1, 0.25, 1);
+}
+
+.dice-face {
+    position: absolute;
+    width: 80px;
+    height: 80px;
+    background: linear-gradient(135deg, #e74c3c, #c0392b);
+    border: 2px solid #922b21;
+    border-radius: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 36px;
+    font-weight: 700;
+    color: white;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.3);
+}
+
+/* Posicionamento das faces do cubo */
+.dice-face.front  { transform: translateZ(40px); }
+.dice-face.back   { transform: translateZ(-40px) rotateY(180deg); }
+.dice-face.top    { transform: translateY(-40px) rotateX(90deg); }
+.dice-face.bottom { transform: translateY(40px) rotateX(-90deg); }
+.dice-face.right  { transform: translateX(40px) rotateY(90deg); }
+.dice-face.left   { transform: translateX(-40px) rotateY(-90deg); }
+
+/* Valor exibido abaixo do dado */
+.dice-value-display {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--primary-color);
+    text-align: center;
+    margin-top: 10px;
+    animation: fadeInUp 0.5s ease-out;
+}
+
+/* Label "Menor" */
+.dice-label {
+    position: absolute;
+    top: -25px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #e74c3c;
+    text-transform: uppercase;
+    animation: fadeInDown 0.3s ease-out;
+}
+
+/* Animação de remoção do dado menor */
+.dice-wrapper.dice-removing {
+    opacity: 0.6;
+    filter: grayscale(100%) brightness(0.7);
+}
+
+.dice-wrapper.dice-removed {
+    transform: scale(0) translateY(-50px);
+    opacity: 0;
+}
+
+/* Resultado final */
+.dice-result {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%) scale(0);
+    background: linear-gradient(135deg, rgba(212, 175, 55, 0.3), rgba(212, 175, 55, 0.1));
+    border: 3px solid var(--primary-color);
+    border-radius: 15px;
+    padding: 20px 40px;
+    text-align: center;
+    opacity: 0;
+    transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+.dice-result.show {
+    transform: translateX(-50%) scale(1);
+    opacity: 1;
+}
+
+.result-value {
+    font-size: 48px;
+    font-weight: 700;
+    color: var(--primary-color);
+    font-family: 'Cinzel', serif;
+    line-height: 1;
+}
+
+.result-label {
+    font-size: 14px;
+    color: var(--text-color);
+    margin-top: 5px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* Animações */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Container para exibir os valores rolados */
+.rolled-values-display {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin: 20px 0;
+    min-height: 60px;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+    .dice-container {
+        gap: 15px;
+        padding: 30px 10px;
+    }
+    
+    .dice-wrapper {
+        width: 60px;
+        height: 60px;
+    }
+    
+    .dice-cube {
+        width: 60px;
+        height: 60px;
+    }
+    
+    .dice-face {
+        width: 60px;
+        height: 60px;
+        font-size: 28px;
+    }
+    
+    .dice-face.front  { transform: translateZ(30px); }
+    .dice-face.back   { transform: translateZ(-30px) rotateY(180deg); }
+    .dice-face.top    { transform: translateY(-30px) rotateX(90deg); }
+    .dice-face.bottom { transform: translateY(30px) rotateX(-90deg); }
+    .dice-face.right  { transform: translateX(30px) rotateY(90deg); }
+    .dice-face.left   { transform: translateX(-30px) rotateY(-90deg); }
+    
+    .result-value {
+        font-size: 36px;
+    }
+}
