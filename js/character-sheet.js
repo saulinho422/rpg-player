@@ -1301,6 +1301,11 @@ class CharacterCreationWizard {
             return;
         }
 
+        console.log('🔍 DEBUG: this.gameData:', this.gameData);
+        console.log('🔍 DEBUG: this.gameData.skills existe?', this.gameData.skills);
+        console.log('🔍 DEBUG: Tipo:', typeof this.gameData.skills);
+        console.log('🔍 DEBUG: Length:', this.gameData.skills?.length);
+
         // Parsear skills_available se for string JSON
         const classSkills = typeof this.wizardData.class.skills_available === 'string' 
             ? JSON.parse(this.wizardData.class.skills_available) 
@@ -1310,7 +1315,7 @@ class CharacterCreationWizard {
 
         console.log('🔍 Classe:', this.wizardData.class.name_pt);
         console.log('🔍 Perícias disponíveis da classe:', classSkills);
-        console.log('🔍 Perícias no banco:', this.gameData.skills.map(s => s.name));
+        console.log('🔍 Perícias no banco:', this.gameData.skills);
         console.log('🔍 Máximo de perícias:', maxSkills);
 
         const skillsHtml = this.gameData.skills
