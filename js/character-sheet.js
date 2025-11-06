@@ -1274,10 +1274,11 @@ class CharacterCreationWizard {
         
         document.querySelectorAll('[data-class-id]').forEach(card => {
             card.addEventListener('click', () => {
-                const classId = parseInt(card.dataset.classId);
+                const classId = card.dataset.classId; // UUID string
                 this.wizardData.class = this.gameData.classes.find(c => c.id === classId);
                 this.wizardData.subclass = null;
                 this.wizardData.skills = [];
+                console.log('✅ Classe selecionada:', this.wizardData.class?.name_pt);
                 this.renderStep();
             });
         });
