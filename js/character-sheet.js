@@ -930,16 +930,54 @@ class CharacterCreationWizard {
                 console.log(`✅ ${subclasses.length} subclasses carregadas`);
             }
 
-            // Carregar perícias (a tabela skills não tem name_pt, usar name)
-            const { data: skills, error: skillsError} = await supabase
-                .from('skills')
-                .select('*')
-                .order('name');
-            
-            if (!skillsError && skills) {
-                this.gameData.skills = skills;
-                console.log(`✅ ${skills.length} perícias carregadas`);
+            // Criar lista de perícias a partir das classes
+            // Como não temos tabela 'skills', vamos extrair das skills_available das classes
+            const allSkills = new Set();
+            if (this.gameData.classes && this.gameData.classes.length > 0) {
+                this.gameData.classes.forEach(cls => {
+                    try {
+                        const skillsAvailable = typeof cls.skills_available === 'string' 
+                            ? JSON.parse(cls.skills_available) 
+                            : cls.skills_available || [];
+                        
+                        if (Array.isArray(skillsAvailable)) {
+                            skillsAvailable.forEach(skill => allSkills.add(skill));
+                        }
+                    } catch (error) {
+                        console.warn(`⚠️ Erro ao processar perícias da classe ${cls.name_pt}:`, error);
+                    }
+                });
             }
+            
+            // Mapeamento de perícias para atributos (baseado em D&D 5e)
+            const skillAbilityMap = {
+                'Acrobacia': 'DES', 'Atletismo': 'FOR', 'Atuação': 'CAR',
+                'Enganação': 'CAR', 'Furtividade': 'DES', 'História': 'INT',
+                'Intimidação': 'CAR', 'Intuição': 'SAB', 'Investigação': 'INT',
+                'Lidar com Animais': 'SAB', 'Medicina': 'SAB', 'Natureza': 'INT',
+                'Percepção': 'SAB', 'Persuasão': 'CAR', 'Prestidigitação': 'DES',
+                'Religião': 'INT', 'Sobrevivência': 'SAB', 'Arcana': 'INT'
+            };
+            
+            // Se não conseguiu extrair perícias, usar lista padrão
+            if (allSkills.size === 0) {
+                console.warn('⚠️ Nenhuma perícia encontrada nas classes, usando lista padrão');
+                const defaultSkills = [
+                    'Acrobacia', 'Atletismo', 'Atuação', 'Enganação', 'Furtividade',
+                    'História', 'Intimidação', 'Intuição', 'Investigação', 'Lidar com Animais',
+                    'Medicina', 'Natureza', 'Percepção', 'Persuasão', 'Prestidigitação',
+                    'Religião', 'Sobrevivência', 'Arcana'
+                ];
+                defaultSkills.forEach(skill => allSkills.add(skill));
+            }
+            
+            this.gameData.skills = Array.from(allSkills).map(skillName => ({
+                name: skillName,
+                ability: skillAbilityMap[skillName] || 'INT'
+            })).sort((a, b) => a.name.localeCompare(b.name));
+            
+            console.log(`✅ ${this.gameData.skills.length} perícias criadas a partir das classes`);
+            console.log('📋 Perícias disponíveis:', this.gameData.skills.map(s => s.name).join(', '));
 
             // Carregar antecedentes do banco de dados (usar 'nome' ao invés de 'name')
             const { data: backgrounds, error: backgroundsError } = await supabase
@@ -1301,41 +1339,71 @@ class CharacterCreationWizard {
             return;
         }
 
-        console.log('🔍 DEBUG: this.gameData:', this.gameData);
-        console.log('🔍 DEBUG: this.gameData.skills existe?', this.gameData.skills);
-        console.log('🔍 DEBUG: Tipo:', typeof this.gameData.skills);
-        console.log('🔍 DEBUG: Length:', this.gameData.skills?.length);
+        console.log('🔍 DEBUG renderSkillsStep:');
+        console.log('  - this.gameData.skills:', this.gameData.skills);
+        console.log('  - Array?', Array.isArray(this.gameData.skills));
+        console.log('  - Length:', this.gameData.skills?.length);
+
+        // Garantir que skills existe e é um array
+        if (!this.gameData.skills || !Array.isArray(this.gameData.skills)) {
+            console.error('❌ gameData.skills não está disponível!');
+            this.contentArea.innerHTML = `
+                <div class="step-content">
+                    <h3 class="step-title">Erro ao Carregar Perícias</h3>
+                    <p style="color: red;">Não foi possível carregar as perícias. Tente voltar e selecionar a classe novamente.</p>
+                </div>
+            `;
+            return;
+        }
 
         // Parsear skills_available se for string JSON
-        const classSkills = typeof this.wizardData.class.skills_available === 'string' 
-            ? JSON.parse(this.wizardData.class.skills_available) 
-            : this.wizardData.class.skills_available || [];
+        let classSkills = [];
+        try {
+            classSkills = typeof this.wizardData.class.skills_available === 'string' 
+                ? JSON.parse(this.wizardData.class.skills_available) 
+                : this.wizardData.class.skills_available || [];
+        } catch (error) {
+            console.error('❌ Erro ao parsear skills_available:', error);
+            classSkills = [];
+        }
         
         const maxSkills = this.wizardData.class.skills_choose || 2;
 
-        console.log('🔍 Classe:', this.wizardData.class.name_pt);
-        console.log('🔍 Perícias disponíveis da classe:', classSkills);
-        console.log('🔍 Perícias no banco:', this.gameData.skills);
-        console.log('🔍 Máximo de perícias:', maxSkills);
+        console.log('  - Classe:', this.wizardData.class.name_pt);
+        console.log('  - Perícias disponíveis da classe:', classSkills);
+        console.log('  - Máximo de perícias:', maxSkills);
 
-        const skillsHtml = this.gameData.skills
-            .filter(skill => classSkills.includes(skill.name))
-            .map(skill => {
-                const isSelected = this.wizardData.skills.includes(skill.name);
-                const isDisabled = !isSelected && this.wizardData.skills.length >= maxSkills;
-                
-                return `
-                    <div class="checkbox-item ${isDisabled ? 'disabled' : ''}" data-skill="${skill.name}">
-                        <input 
-                            type="checkbox" 
-                            id="skill-${skill.name.replace(/\s+/g, '-')}" 
-                            ${isSelected ? 'checked' : ''}
-                            ${isDisabled ? 'disabled' : ''}
-                        >
-                        <label for="skill-${skill.name.replace(/\s+/g, '-')}">${skill.name} (${skill.ability})</label>
-                    </div>
-                `;
-            }).join('');
+        // Filtrar perícias disponíveis para esta classe
+        const availableSkills = this.gameData.skills.filter(skill => classSkills.includes(skill.name));
+        
+        console.log('  - Perícias filtradas:', availableSkills.length);
+
+        if (availableSkills.length === 0) {
+            this.contentArea.innerHTML = `
+                <div class="step-content">
+                    <h3 class="step-title">Perícias da Classe</h3>
+                    <p style="color: orange;">Nenhuma perícia disponível para esta classe. Clique em "Próximo" para continuar.</p>
+                </div>
+            `;
+            return;
+        }
+
+        const skillsHtml = availableSkills.map(skill => {
+            const isSelected = this.wizardData.skills.includes(skill.name);
+            const isDisabled = !isSelected && this.wizardData.skills.length >= maxSkills;
+            
+            return `
+                <div class="checkbox-item ${isDisabled ? 'disabled' : ''}" data-skill="${skill.name}">
+                    <input 
+                        type="checkbox" 
+                        id="skill-${skill.name.replace(/\s+/g, '-')}" 
+                        ${isSelected ? 'checked' : ''}
+                        ${isDisabled ? 'disabled' : ''}
+                    >
+                    <label for="skill-${skill.name.replace(/\s+/g, '-')}">${skill.name} (${skill.ability})</label>
+                </div>
+            `;
+        }).join('');
 
         this.contentArea.innerHTML = `
             <div class="step-content">
