@@ -161,7 +161,5 @@ class Dice3DRoller {
     }
 }
 
-// Export para uso no wizard
-if (typeof module !== 'undefined' && module.exports) {
-    module.exports = Dice3DRoller;
-}
+// Expor globalmente para uso em módulos
+window.Dice3DRoller = Dice3DRoller;
