@@ -1198,7 +1198,7 @@ class CharacterCreationWizard {
         
         document.querySelectorAll('[data-race-id]').forEach(card => {
             card.addEventListener('click', () => {
-                const raceId = parseInt(card.dataset.raceId);
+                const raceId = card.dataset.raceId; // UUID string
                 this.wizardData.race = this.gameData.races.find(r => r.id === raceId);
                 this.wizardData.subrace = null;
                 this.renderStep();
@@ -1207,7 +1207,7 @@ class CharacterCreationWizard {
 
         document.querySelectorAll('[data-subrace-id]').forEach(card => {
             card.addEventListener('click', () => {
-                const subraceId = parseInt(card.dataset.subraceId);
+                const subraceId = card.dataset.subraceId; // UUID string
                 this.wizardData.subrace = this.gameData.subraces.find(sr => sr.id === subraceId);
                 this.updateButtons();
                 document.querySelectorAll('[data-subrace-id]').forEach(c => c.classList.remove('selected'));
@@ -1285,7 +1285,7 @@ class CharacterCreationWizard {
 
         document.querySelectorAll('[data-subclass-id]').forEach(card => {
             card.addEventListener('click', () => {
-                const subclassId = parseInt(card.dataset.subclassId);
+                const subclassId = card.dataset.subclassId; // UUID string
                 this.wizardData.subclass = this.gameData.subclasses.find(sc => sc.id === subclassId);
                 this.updateButtons();
                 document.querySelectorAll('[data-subclass-id]').forEach(c => c.classList.remove('selected'));
@@ -1521,7 +1521,7 @@ class CharacterCreationWizard {
 
         document.querySelectorAll('[data-background-id]').forEach(card => {
             card.addEventListener('click', () => {
-                const bgId = parseInt(card.dataset.backgroundId);
+                const bgId = card.dataset.backgroundId; // String ou UUID
                 this.wizardData.background = this.gameData.backgrounds.find(bg => bg.id === bgId);
                 document.querySelectorAll('[data-background-id]').forEach(c => c.classList.remove('selected'));
                 card.classList.add('selected');
@@ -1754,3 +1754,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 500);
     }
 });
+
+
+
