@@ -2221,6 +2221,7 @@ class CharacterCreationWizard {
     async finalizeCharacter() {
         try {
             console.log('💾 Finalizando personagem...');
+            console.log('📊 Wizard Data:', this.wizardData);
             
             const hitDie = this.getHitDieValue(this.wizardData.class.hit_die);
             const conMod = Math.floor((this.wizardData.attributes.con - 10) / 2);
@@ -2261,15 +2262,24 @@ class CharacterCreationWizard {
                 updated_at: new Date().toISOString()
             };
 
+            console.log('📦 Character Data a ser salvo:', characterData);
+
             if (this.characterSheet.characterId) {
+                console.log('🔄 Atualizando personagem existente:', this.characterSheet.characterId);
                 const { error } = await supabase
                     .from('characters')
                     .update(characterData)
                     .eq('id', this.characterSheet.characterId);
 
-                if (error) throw error;
+                if (error) {
+                    console.error('❌ Erro ao atualizar:', error);
+                    throw error;
+                }
             } else {
+                console.log('➕ Criando novo personagem');
                 characterData.user_id = this.characterSheet.currentUser.id;
+                
+                console.log('📦 Data com user_id:', characterData);
                 
                 const { data, error } = await supabase
                     .from('characters')
@@ -2277,8 +2287,13 @@ class CharacterCreationWizard {
                     .select()
                     .single();
 
-                if (error) throw error;
+                if (error) {
+                    console.error('❌ Erro ao inserir:', error);
+                    console.error('❌ Detalhes do erro:', JSON.stringify(error, null, 2));
+                    throw error;
+                }
                 
+                console.log('✅ Personagem criado:', data);
                 this.characterSheet.characterId = data.id;
             }
 
@@ -2309,7 +2324,8 @@ class CharacterCreationWizard {
 
         } catch (error) {
             console.error('❌ Erro ao finalizar personagem:', error);
-            alert('Erro ao criar personagem. Tente novamente.');
+            console.error('❌ Stack:', error.stack);
+            alert(`Erro ao criar personagem: ${error.message || 'Tente novamente.'}`);
         }
     }
 
