@@ -561,7 +561,12 @@
         </div>
     </div>
 
-    <script src="js/dice3d.js?v=2.0"></script>
-    <script type="module" src="js/character-sheet.js?v=2.0"></script>
+    <script type="module">
+        // Importar e expor Dice3DRoller globalmente
+        import { Dice3DRoller } from './js/dice3d.js?v=2.1';
+        window.Dice3DRoller = Dice3DRoller;
+        console.log('✅ Dice3DRoller importado e exposto globalmente');
+    </script>
+    <script type="module" src="js/character-sheet.js?v=2.1"></script>
 </body>
 </html>

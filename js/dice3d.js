@@ -3,7 +3,7 @@
  * Rola 4 dados, remove o menor, retorna soma dos 3 maiores
  */
 
-class Dice3DRoller {
+export class Dice3DRoller {
     constructor(containerId) {
         this.container = document.getElementById(containerId);
         this.diceValues = [];
@@ -160,7 +160,3 @@ class Dice3DRoller {
         this.onComplete = callback;
     }
 }
-
-// Expor globalmente para uso em módulos
-window.Dice3DRoller = Dice3DRoller;
-console.log('✅ Dice3DRoller carregado e disponível:', typeof Dice3DRoller);

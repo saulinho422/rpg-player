@@ -1706,11 +1706,47 @@ class CharacterCreationWizard {
                     // Remover valor de availableValues
                     this.wizardData.availableValues.splice(selectedIndex, 1);
                     
+                    // Atualizar UI sem rerenderizar tudo
+                    attrBox.querySelector('.attribute-value').textContent = selectedValue;
+                    attrBox.querySelector('.modifier-value').textContent = 
+                        `+${Math.floor((selectedValue - 10) / 2)}`.replace('+-', '-');
+                    
+                    // Remover o valor alocado da lista visual
+                    const valueElement = document.querySelector(`.available-value[data-index="${selectedIndex}"]`);
+                    if (valueElement) {
+                        valueElement.remove();
+                    }
+                    
+                    // Se devolveu um valor antigo, adicionar de volta à lista visual
+                    if (oldValue !== 10) {
+                        const availableGrid = document.querySelector('.available-values-grid');
+                        const newValueDiv = document.createElement('div');
+                        newValueDiv.className = 'available-value';
+                        newValueDiv.dataset.value = oldValue;
+                        newValueDiv.dataset.index = this.wizardData.availableValues.length - 1;
+                        newValueDiv.textContent = oldValue;
+                        
+                        // Adicionar event listener
+                        newValueDiv.addEventListener('click', () => {
+                            document.querySelectorAll('.available-value').forEach(v => v.classList.remove('selected'));
+                            newValueDiv.classList.add('selected');
+                            selectedValue = oldValue;
+                            selectedIndex = this.wizardData.availableValues.length - 1;
+                        });
+                        
+                        availableGrid.appendChild(newValueDiv);
+                    }
+                    
+                    // Atualizar índices dos valores restantes
+                    document.querySelectorAll('.available-value').forEach((elem, idx) => {
+                        elem.dataset.index = idx;
+                    });
+                    
                     // Resetar seleção
                     selectedValue = null;
                     selectedIndex = null;
                     
-                    this.renderStep();
+                    // Atualizar apenas os botões
                     this.updateButtons();
                 }
             });
