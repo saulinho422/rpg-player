@@ -77,6 +77,31 @@
     transform: translateX(-40px) rotateY(-90deg); 
 }
 
+/* Badge de resultado */
+.dice-result-badge {
+    position: absolute;
+    top: 10px;
+    background: linear-gradient(135deg, #d4af37, #f4d03f);
+    color: #1a1a2e;
+    padding: 15px 30px;
+    border-radius: 10px;
+    font-size: 28px;
+    font-weight: 700;
+    box-shadow: 0 4px 15px rgba(212, 175, 55, 0.4);
+    animation: popIn 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+@keyframes popIn {
+    0% {
+        transform: scale(0);
+        opacity: 0;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
 /* Responsividade */
 @media (max-width: 768px) {
     .dice-container {
