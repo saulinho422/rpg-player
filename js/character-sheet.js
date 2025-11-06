@@ -1722,8 +1722,15 @@ class CharacterCreationWizard {
                         this.wizardData.availableValues.splice(valueIndex, 1);
                     }
                     
+                    // Se zerou availableValues, marcar como completo IMEDIATAMENTE
+                    if (this.wizardData.availableValues.length === 0) {
+                        this.wizardData.attributesAllocated = true;
+                        console.log('✅ Todos os valores foram alocados! Flag marcada.');
+                    }
+                    
                     console.log('📊 availableValues depois:', [...this.wizardData.availableValues]);
                     console.log('📊 attributes:', {...this.wizardData.attributes});
+                    console.log('📊 attributesAllocated:', this.wizardData.attributesAllocated);
                     
                     // Resetar seleção
                     selectedValue = null;
