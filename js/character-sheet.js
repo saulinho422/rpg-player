@@ -255,15 +255,15 @@ class CharacterSheet {
 
         console.log('📝 Preenchendo ficha com:', this.character);
 
-        // Informações básicas
-        this.setInputValue('charname', this.character.name);
-        this.setInputValue('classlevel', this.character.character_class ? `${this.character.character_class} ${this.character.level}` : '');
-        this.setInputValue('background', this.character.background);
-        this.setInputValue('race', this.character.race);
-        this.setInputValue('alignment', this.character.alignment);
-        this.setInputValue('experiencepoints', this.character.experience_points || 0);
+        // Informações básicas - Aba Identidade
+        this.setInputValue('character-name-2', this.character.name);
+        this.setInputValue('character-class-2', this.character.character_class);
+        this.setInputValue('character-race-2', this.character.race);
+        this.setInputValue('character-background-2', this.character.background);
+        this.setInputValue('character-alignment-2', this.character.alignment);
+        this.setInputValue('character-level-2', this.character.level);
 
-        // Atributos
+        // Atributos - Aba Atributos
         this.setInputValue('Strengthscore', this.character.strength);
         this.setInputValue('Dexterityscore', this.character.dexterity);
         this.setInputValue('Constitutionscore', this.character.constitution);
@@ -271,14 +271,25 @@ class CharacterSheet {
         this.setInputValue('Wisdomscore', this.character.wisdom);
         this.setInputValue('Charismascore', this.character.charisma);
 
-        // HP
+        // HP - Aba Combate
         this.setInputValue('maxhp', this.character.hit_points_max);
         this.setInputValue('currenthp', this.character.hit_points_current);
+        this.setInputValue('temphp', 0);
+
+        // AC e outros stats de combate
+        this.setInputValue('ac', this.character.armor_class);
+        this.setInputValue('speed', this.character.speed);
+        
+        // Bônus de proficiência (é um span, não input)
+        const profBonus = document.getElementById('proficiency-bonus');
+        if (profBonus) {
+            profBonus.textContent = `+${this.character.proficiency_bonus}`;
+        }
 
         // Hit Dice
         if (this.character.character_class) {
             const hitDie = this.getHitDieForClass(this.character.character_class);
-            this.setInputValue('totalhd', `${this.character.level}${hitDie}`);
+            this.setInputValue('hitdice', `${this.character.level}${hitDie}`);
         }
 
         // Perícias (marcar checkboxes de proficiência)
@@ -2503,8 +2514,7 @@ class CharacterCreationWizard {
             this.characterSheet.populateSheet();
             this.characterSheet.calculateAll();
 
-            // Mostrar mensagem de sucesso
-            alert('✅ Ficha preenchida com sucesso!');
+            console.log('✅ Ficha preenchida com sucesso!');
 
         } catch (error) {
             console.error('❌ Erro ao finalizar personagem:', error);
