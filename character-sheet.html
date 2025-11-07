@@ -1,27 +1,23 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ficha de Personagem D&D 5e</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Cinzel+Decorative:wght@400;700;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="styles/color-palette.css">
-    <link rel="stylesheet" href="styles/character-sheet-image.css">
-    <link rel="stylesheet" href="styles/character-sheet.css?v=2.0">
-    <link rel="stylesheet" href="styles/dice3d.css?v=3.1">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Ficha de Personagem - D&D 5e</title>
+    <link rel="stylesheet" href="styles/main.css" />
+    <link rel="stylesheet" href="styles/character-sheet.css?v=2.0" />
 </head>
-<body class="bg-theme">
-    <div class="sheet-container">
+<body class="bg-background min-h-screen">
+    <!-- Main Container -->
+    <div class="container mx-auto px-4 py-6 max-w-7xl">
         <!-- Header Controls -->
-        <div class="sheet-controls">
-            <div class="controls-left">
-                <button id="menuBtn" class="control-btn menu-btn" title="Menu">☰ Menu</button>
-                <button id="backBtn" class="control-btn">← Voltar</button>
+        <div class="flex justify-between items-center mb-6">
+            <div class="space-x-2">
+                <button id="menuBtn" class="btn-primary px-4 py-2 rounded-lg font-medium">☰ Menu</button>
+                <button id="backBtn" class="btn-primary px-4 py-2 rounded-lg font-medium">← Voltar</button>
             </div>
-            <div class="controls-right">
-                <button id="finishBtn" class="control-btn primary-btn" style="display: none;">💾 Salvar Personagem</button>
+            <div>
+                <button id="finishBtn" class="btn-primary px-4 py-2 rounded-lg font-medium hidden">💾 Salvar Personagem</button>
             </div>
         </div>
 
@@ -40,529 +36,316 @@
         </div>
         <div id="sidebarOverlay" class="sidebar-overlay"></div>
 
-        <form class="charsheet">
-            <header>
-                <section class="charname">
-                    <label for="charname">Nome do Personagem</label>
-                    <input name="charname" id="charname">
+        <!-- Header -->
+        <header class="mb-8">
+            <h1 class="font-heading text-4xl text-primary text-center mb-2">Ficha de Personagem D&D 5e</h1>
+            <p class="text-text-secondary text-center">Gerencie seu personagem de forma digital e interativa</p>
+        </header>
+
+        <!-- Two Column Layout -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <!-- Left Column - Character Stats -->
+            <div class="space-y-6">
+                <!-- Main Attributes -->
+                <section class="card p-6">
+                    <h2 class="font-heading text-xl text-primary mb-4">Atributos Principais</h2>
+                    <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                        <!-- Força -->
+                        <div class="text-center">
+                            <div class="bg-surface border border-default rounded-lg p-4 hover:shadow-lg transition-all cursor-pointer" onclick="editAttribute('forca')">
+                                <h3 class="font-heading text-sm text-text-secondary mb-2">FORÇA</h3>
+                                <div class="text-3xl font-bold text-primary mb-1" id="forca-value">10</div>
+                                <div class="text-sm text-text-secondary" id="forca-modifier">+0</div>
+                            </div>
+                        </div>
+                        <!-- Destreza -->
+                        <div class="text-center">
+                            <div class="bg-surface border border-default rounded-lg p-4 hover:shadow-lg transition-all cursor-pointer" onclick="editAttribute('destreza')">
+                                <h3 class="font-heading text-sm text-text-secondary mb-2">DESTREZA</h3>
+                                <div class="text-3xl font-bold text-primary mb-1" id="destreza-value">10</div>
+                                <div class="text-sm text-text-secondary" id="destreza-modifier">+0</div>
+                            </div>
+                        </div>
+                        <!-- Constituição -->
+                        <div class="text-center">
+                            <div class="bg-surface border border-default rounded-lg p-4 hover:shadow-lg transition-all cursor-pointer" onclick="editAttribute('constituicao')">
+                                <h3 class="font-heading text-sm text-text-secondary mb-2">CONSTITUIÇÃO</h3>
+                                <div class="text-3xl font-bold text-primary mb-1" id="constituicao-value">10</div>
+                                <div class="text-sm text-text-secondary" id="constituicao-modifier">+0</div>
+                            </div>
+                        </div>
+                        <!-- Inteligência -->
+                        <div class="text-center">
+                            <div class="bg-surface border border-default rounded-lg p-4 hover:shadow-lg transition-all cursor-pointer" onclick="editAttribute('inteligencia')">
+                                <h3 class="font-heading text-sm text-text-secondary mb-2">INTELIGÊNCIA</h3>
+                                <div class="text-3xl font-bold text-primary mb-1" id="inteligencia-value">10</div>
+                                <div class="text-sm text-text-secondary" id="inteligencia-modifier">+0</div>
+                            </div>
+                        </div>
+                        <!-- Sabedoria -->
+                        <div class="text-center">
+                            <div class="bg-surface border border-default rounded-lg p-4 hover:shadow-lg transition-all cursor-pointer" onclick="editAttribute('sabedoria')">
+                                <h3 class="font-heading text-sm text-text-secondary mb-2">SABEDORIA</h3>
+                                <div class="text-3xl font-bold text-primary mb-1" id="sabedoria-value">10</div>
+                                <div class="text-sm text-text-secondary" id="sabedoria-modifier">+0</div>
+                            </div>
+                        </div>
+                        <!-- Carisma -->
+                        <div class="text-center">
+                            <div class="bg-surface border border-default rounded-lg p-4 hover:shadow-lg transition-all cursor-pointer" onclick="editAttribute('carisma')">
+                                <h3 class="font-heading text-sm text-text-secondary mb-2">CARISMA</h3>
+                                <div class="text-3xl font-bold text-primary mb-1" id="carisma-value">10</div>
+                                <div class="text-sm text-text-secondary" id="carisma-modifier">+0</div>
+                            </div>
+                        </div>
+                    </div>
                 </section>
-                <section class="misc">
-                    <ul>
-                        <li>
-                            <label for="classlevel">Classe & Nível</label>
-                            <input name="classlevel" id="classlevel">
-                        </li>
-                        <li>
-                            <label for="background">Antecedente</label>
-                            <input name="background" id="background">
-                        </li>
-                        <li>
-                            <label for="playername">Nome do Jogador</label>
-                            <input name="playername" id="playername">
-                        </li>
-                        <li>
-                            <label for="race">Raça</label>
-                            <input name="race" id="race">
-                        </li>
-                        <li>
-                            <label for="alignment">Tendência</label>
-                            <input name="alignment" id="alignment">
-                        </li>
-                        <li>
-                            <label for="experiencepoints">Pontos de Experiência</label>
-                            <input name="experiencepoints" id="experiencepoints">
-                        </li>
-                    </ul>
+
+                <!-- Proficiency Bonus -->
+                <section class="card p-6">
+                    <h2 class="font-heading text-xl text-primary mb-4">Bônus de Proficiência</h2>
+                    <div class="text-center">
+                        <div class="inline-flex items-center justify-center w-16 h-16 bg-primary text-white rounded-full text-2xl font-bold">
+                            <span id="proficiency-bonus">+2</span>
+                        </div>
+                    </div>
                 </section>
-            </header>
 
-            <main>
-                <section>
-                    <section class="attributes">
-                        <div class="scores">
-                                <ul>
-                                    <li>
-                                        <div class="score">
-                                            <label for="Strengthscore">Força</label>
-                                            <input name="Strengthscore" id="Strengthscore" placeholder="10">
-                                        </div>
-                                        <div class="modifier">
-                                            <input name="Strengthmod" id="Strengthmod" placeholder="+0">
-                                        </div>
-                                    </li>
-                                    <li>
-                                        <div class="score">
-                                            <label for="Dexterityscore">Destreza</label>
-                                            <input name="Dexterityscore" id="Dexterityscore" placeholder="10">
-                                        </div>
-                                        <div class="modifier">
-                                            <input name="Dexteritymod" id="Dexteritymod" placeholder="+0">
-                                        </div>
-                                    </li>
-                                    <li>
-                                        <div class="score">
-                                            <label for="Constitutionscore">Constituição</label>
-                                            <input name="Constitutionscore" id="Constitutionscore" placeholder="10">
-                                        </div>
-                                        <div class="modifier">
-                                            <input name="Constitutionmod" id="Constitutionmod" placeholder="+0">
-                                        </div>
-                                    </li>
-                                    <li>
-                                        <div class="score">
-                                            <label for="Wisdomscore">Sabedoria</label>
-                                            <input name="Wisdomscore" id="Wisdomscore" placeholder="10">
-                                        </div>
-                                        <div class="modifier">
-                                            <input name="Wisdommod" id="Wisdommod" placeholder="+0">
-                                        </div>
-                                    </li>
-                                    <li>
-                                        <div class="score">
-                                            <label for="Intelligencescore">Inteligência</label>
-                                            <input name="Intelligencescore" id="Intelligencescore" placeholder="10">
-                                        </div>
-                                        <div class="modifier">
-                                            <input name="Intelligencemod" id="Intelligencemod" placeholder="+0">
-                                        </div>
-                                    </li>
-                                    <li>
-                                        <div class="score">
-                                            <label for="Charismascore">Carisma</label>
-                                            <input name="Charismascore" id="Charismascore" placeholder="10">
-                                        </div>
-                                        <div class="modifier">
-                                            <input name="Charismamod" id="Charismamod" placeholder="+0">
-                                        </div>
-                                    </li>
-                                </ul>
+                <!-- Saving Throws -->
+                <section class="card p-6">
+                    <h2 class="font-heading text-xl text-primary mb-4">Testes de Resistência</h2>
+                    <div class="space-y-2">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center">
+                                <input type="checkbox" id="save-forca" class="w-4 h-4 text-primary rounded mr-3" />
+                                <label for="save-forca" class="text-sm">Força</label>
+                            </div>
+                            <span class="text-sm font-mono" id="save-forca-value">+0</span>
                         </div>
-                        <div class="attr-applications">
-                            <div class="inspiration box">
-                                <div class="label-container">
-                                    <label for="inspiration">Inspiração</label>
-                                </div>
-                                <input name="inspiration" id="inspiration" type="checkbox">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center">
+                                <input type="checkbox" id="save-destreza" class="w-4 h-4 text-primary rounded mr-3" />
+                                <label for="save-destreza" class="text-sm">Destreza</label>
                             </div>
-
-                            <div class="proficiencybonus box">
-                                <div class="label-container">
-                                    <label for="proficiencybonus">Bônus de Proficiência</label>
-                                </div>
-                                <input name="proficiencybonus" id="proficiencybonus" placeholder="+2">
-                            </div>
-
-                            <div class="saves list-section box">
-                                <ul>
-                                    <li>
-                                        <label for="Strength-save">Força</label>
-                                        <input name="Strength-save" id="Strength-save" type="text" placeholder="+0">
-                                        <input name="Strength-save-prof" id="Strength-save-prof" type="checkbox">
-                                    </li>
-                                    <li>
-                                        <label for="Dexterity-save">Destreza</label>
-                                        <input name="Dexterity-save" id="Dexterity-save" type="text" placeholder="+0">
-                                        <input name="Dexterity-save-prof" id="Dexterity-save-prof" type="checkbox">
-                                    </li>
-                                    <li>
-                                        <label for="Constitution-save">Constituição</label>
-                                        <input name="Constitution-save" id="Constitution-save" type="text" placeholder="+0">
-                                        <input name="Constitution-save-prof" id="Constitution-save-prof" type="checkbox">
-                                    </li>
-                                    <li>
-                                        <label for="Wisdom-save">Sabedoria</label>
-                                        <input name="Wisdom-save" id="Wisdom-save" type="text" placeholder="+0">
-                                        <input name="Wisdom-save-prof" id="Wisdom-save-prof" type="checkbox">
-                                    </li>
-                                    <li>
-                                        <label for="Intelligence-save">Inteligência</label>
-                                        <input name="Intelligence-save" id="Intelligence-save" type="text" placeholder="+0">
-                                        <input name="Intelligence-save-prof" id="Intelligence-save-prof" type="checkbox">
-                                    </li>
-                                    <li>
-                                        <label for="Charisma-save">Carisma</label>
-                                        <input name="Charisma-save" id="Charisma-save" type="text" placeholder="+0">
-                                        <input name="Charisma-save-prof" id="Charisma-save-prof" type="checkbox">
-                                    </li>
-                                </ul>
-                                <div class="label">Testes de Resistência</div>
-                            </div>
-
-                            <div class="skills list-section box">
-                                <ul>
-                                    <li>
-                                        <label for="Acrobatics">Acrobacia <span class="skill">(Des)</span></label>
-                                        <input name="Acrobatics" id="Acrobatics" type="text" placeholder="+0">
-                                        <input name="Acrobatics-prof" id="Acrobatics-prof" type="checkbox">
-                                    </li>
-                                    <li>
-                                        <label for="Animal Handling">Lidar com Animais <span class="skill">(Sab)</span></label>
-                                        <input name="Animal Handling" id="Animal_Handling" type="text" placeholder="+0">
-                                        <input name="Animal Handling-prof" id="Animal_Handling-prof" type="checkbox">
-                                    </li>
-                                    <li>
-                                        <label for="Arcana">Arcana <span class="skill">(Int)</span></label>
-                                        <input name="Arcana" id="Arcana" type="text" placeholder="+0">
-                                        <input name="Arcana-prof" id="Arcana-prof" type="checkbox">
-                                    </li>
-                                    <li>
-                                        <label for="Athletics">Atletismo <span class="skill">(For)</span></label>
-                                        <input name="Athletics" id="Athletics" type="text" placeholder="+0">
-                                        <input name="Athletics-prof" id="Athletics-prof" type="checkbox">
-                                    </li>
-                                    <li>
-                                        <label for="Deception">Enganação <span class="skill">(Car)</span></label>
-                                        <input name="Deception" id="Deception" type="text" placeholder="+0">
-                                        <input name="Deception-prof" id="Deception-prof" type="checkbox">
-                                    </li>
-                                    <li>
-                                        <label for="History">História <span class="skill">(Int)</span></label>
-                                        <input name="History" id="History" type="text" placeholder="+0">
-                                        <input name="History-prof" id="History-prof" type="checkbox">
-                                    </li>
-                                    <li>
-                                        <label for="Insight">Intuição <span class="skill">(Sab)</span></label>
-                                        <input name="Insight" id="Insight" type="text" placeholder="+0">
-                                        <input name="Insight-prof" id="Insight-prof" type="checkbox">
-                                    </li>
-                                    <li>
-                                        <label for="Intimidation">Intimidação <span class="skill">(Car)</span></label>
-                                        <input name="Intimidation" id="Intimidation" type="text" placeholder="+0">
-                                        <input name="Intimidation-prof" id="Intimidation-prof" type="checkbox">
-                                    </li>
-                                    <li>
-                                        <label for="Investigation">Investigação <span class="skill">(Int)</span></label>
-                                        <input name="Investigation" id="Investigation" type="text" placeholder="+0">
-                                        <input name="Investigation-prof" id="Investigation-prof" type="checkbox">
-                                    </li>
-                                    <li>
-                                        <label for="Medicine">Medicina <span class="skill">(Sab)</span></label>
-                                        <input name="Medicine" id="Medicine" type="text" placeholder="+0">
-                                        <input name="Medicine-prof" id="Medicine-prof" type="checkbox">
-                                    </li>
-                                    <li>
-                                        <label for="Nature">Natureza <span class="skill">(Int)</span></label>
-                                        <input name="Nature" id="Nature" type="text" placeholder="+0">
-                                        <input name="Nature-prof" id="Nature-prof" type="checkbox">
-                                    </li>
-                                    <li>
-                                        <label for="Perception">Percepção <span class="skill">(Sab)</span></label>
-                                        <input name="Perception" id="Perception" type="text" placeholder="+0">
-                                        <input name="Perception-prof" id="Perception-prof" type="checkbox">
-                                    </li>
-                                    <li>
-                                        <label for="Performance">Atuação <span class="skill">(Car)</span></label>
-                                        <input name="Performance" id="Performance" type="text" placeholder="+0">
-                                        <input name="Performance-prof" id="Performance-prof" type="checkbox">
-                                    </li>
-                                    <li>
-                                        <label for="Persuasion">Persuasão <span class="skill">(Car)</span></label>
-                                        <input name="Persuasion" id="Persuasion" type="text" placeholder="+0">
-                                        <input name="Persuasion-prof" id="Persuasion-prof" type="checkbox">
-                                    </li>
-                                    <li>
-                                        <label for="Religion">Religião <span class="skill">(Int)</span></label>
-                                        <input name="Religion" id="Religion" type="text" placeholder="+0">
-                                        <input name="Religion-prof" id="Religion-prof" type="checkbox">
-                                    </li>
-                                    <li>
-                                        <label for="Sleight of Hand">Prestidigitação <span class="skill">(Des)</span></label>
-                                        <input name="Sleight of Hand" id="Sleight_of_Hand" type="text" placeholder="+0">
-                                        <input name="Sleight of Hand-prof" id="Sleight_of_Hand-prof" type="checkbox">
-                                    </li>
-                                    <li>
-                                        <label for="Stealth">Furtividade <span class="skill">(Des)</span></label>
-                                        <input name="Stealth" id="Stealth" type="text" placeholder="+0">
-                                        <input name="Stealth-prof" id="Stealth-prof" type="checkbox">
-                                    </li>
-                                    <li>
-                                        <label for="Survival">Sobrevivência <span class="skill">(Sab)</span></label>
-                                        <input name="Survival" id="Survival" type="text" placeholder="+0">
-                                        <input name="Survival-prof" id="Survival-prof" type="checkbox">
-                                    </li>
-                                </ul>
-                                <div class="label">Perícias</div>
-                            </div>
-                    </section>
-                    <div class="passive-perception box">
-                            <div class="label-container">
-                                    <label for="passiveperception">Sabedoria Passiva (Percepção)</label>
-                            </div>
-                            <input name="passiveperception" id="passiveperception" placeholder="10">
+                            <span class="text-sm font-mono" id="save-destreza-value">+0</span>
                         </div>
-
-                        <div class="otherprofs box textblock">
-                            <label for="otherprofs">Outras Proficiências e Idiomas</label>
-                            <textarea name="otherprofs" id="otherprofs"></textarea>
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center">
+                                <input type="checkbox" id="save-constituicao" class="w-4 h-4 text-primary rounded mr-3" />
+                                <label for="save-constituicao" class="text-sm">Constituição</label>
+                            </div>
+                            <span class="text-sm font-mono" id="save-constituicao-value">+0</span>
                         </div>
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center">
+                                <input type="checkbox" id="save-inteligencia" class="w-4 h-4 text-primary rounded mr-3" />
+                                <label for="save-inteligencia" class="text-sm">Inteligência</label>
+                            </div>
+                            <span class="text-sm font-mono" id="save-inteligencia-value">+0</span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center">
+                                <input type="checkbox" id="save-sabedoria" class="w-4 h-4 text-primary rounded mr-3" />
+                                <label for="save-sabedoria" class="text-sm">Sabedoria</label>
+                            </div>
+                            <span class="text-sm font-mono" id="save-sabedoria-value">+0</span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center">
+                                <input type="checkbox" id="save-carisma" class="w-4 h-4 text-primary rounded mr-3" />
+                                <label for="save-carisma" class="text-sm">Carisma</label>
+                            </div>
+                            <span class="text-sm font-mono" id="save-carisma-value">+0</span>
+                        </div>
+                    </div>
                 </section>
-                <section>
-                    <section class="combat">
-                        <div class="armorclass">
-                            <div>
-                                <label for="ac">Classe de Armadura</label>
-                                <input name="ac" id="ac" placeholder="10">
-                            </div>
-                        </div>
 
-                        <div class="initiative">
-                            <div>
-                                <label for="initiative">Iniciativa</label>
-                                <input name="initiative" id="initiative" placeholder="+0">
-                            </div>
-                        </div>
+                <!-- Skills -->
+                <section class="card p-6">
+                    <h2 class="font-heading text-xl text-primary mb-4">Perícias</h2>
+                    <div class="space-y-2 max-h-64 overflow-y-auto" id="skills-list">
+                        <!-- Skills will be populated by JavaScript -->
+                    </div>
+                </section>
+            </div>
 
-                        <div class="speed">
-                            <div>
-                                <label for="speed">Deslocamento</label>
-                                <input name="speed" id="speed" placeholder="9m">
-                            </div>
-                        </div>
-
-                        <div class="hp">
-                            <div class="regular">
-                                <div class="max">
-                                    <label for="maxhp">Pontos de Vida Máximos</label>
-                                    <input name="maxhp" id="maxhp" placeholder="10">
-                                </div>
-                                <div class="current">
-                                    <label for="currenthp">Pontos de Vida Atuais</label>
-                                    <input name="currenthp" id="currenthp">
-                                </div>
-                            </div>
-                            <div class="temporary">
-                                <label for="temphp">Pontos de Vida Temporários</label>
-                                <input name="temphp" id="temphp">
-                            </div>
-                        </div>
-
-                        <div class="hitdice">
-                            <div>
-                                <div class="total">
-                                    <label for="totalhd">Total</label>
-                                    <input name="totalhd" id="totalhd" placeholder="2d10">
-                                </div>
-                                <div class="remaining">
-                                    <label for="remaininghd">Hit Dice</label>
-                                    <input name="remaininghd" id="remaininghd">
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="deathsaves">
-                            <div>
-                                <div class="label">
-                                    <label>Death Saves</label>
-                                </div>
-                                <div class="marks">
-                                    <div class="deathsuccesses">
-                                        <label>Sucessos</label>
-                                        <div class="bubbles">
-                                            <input name="deathsuccess1" id="deathsuccess1" type="checkbox">
-                                            <input name="deathsuccess2" id="deathsuccess2" type="checkbox">
-                                            <input name="deathsuccess3" id="deathsuccess3" type="checkbox">
-                                        </div>
-                                    </div>
-                                    <div class="deathfails">
-                                        <label>Fracassos</label>
-                                        <div class="bubbles">
-                                            <input name="deathfail1" id="deathfail1" type="checkbox">
-                                            <input name="deathfail2" id="deathfail2" type="checkbox">
-                                            <input name="deathfail3" id="deathfail3" type="checkbox">
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </section>
-
-                    <section class="attacksandspellcasting">
+            <!-- Right Column - Character Info & Combat -->
+            <div class="space-y-6">
+                <!-- Character Info Header -->
+                <section class="card p-6">
+                    <h2 class="font-heading text-xl text-primary mb-4">Informações do Personagem</h2>
+                    <div class="space-y-4">
                         <div>
-                            <label>Ataques & Magias</label>
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th>Nome</th>
-                                        <th>Bônus Atq</th>
-                                        <th>Dano/Tipo</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td><input name="atkname1" id="atkname1"></td>
-                                        <td><input name="atkbonus1" id="atkbonus1"></td>
-                                        <td><input name="atkdamage1" id="atkdamage1"></td>
-                                    </tr>
-                                    <tr>
-                                        <td><input name="atkname2" id="atkname2"></td>
-                                        <td><input name="atkbonus2" id="atkbonus2"></td>
-                                        <td><input name="atkdamage2" id="atkdamage2"></td>
-                                    </tr>
-                                    <tr>
-                                        <td><input name="atkname3" id="atkname3"></td>
-                                        <td><input name="atkbonus3" id="atkbonus3"></td>
-                                        <td><input name="atkdamage3" id="atkdamage3"></td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                            <textarea></textarea>
+                            <label for="character-name" class="block text-sm font-medium text-text-secondary mb-1">Nome do Personagem</label>
+                            <input type="text" id="character-name" class="input-field w-full px-3 py-2" placeholder="Digite o nome do seu personagem" />
                         </div>
-                    </section>
-
-                    <section class="equipment">
-                        <div>
-                            <label>Equipamento</label>
-                            <div class="money">
-                                <ul>
-                                    <li>
-                                        <label for="cp">pc</label>
-                                        <input name="cp" id="cp">
-                                    </li>
-                                    <li>
-                                        <label for="sp">pp</label>
-                                        <input name="sp" id="sp">
-                                    </li>
-                                    <li>
-                                        <label for="ep">pe</label>
-                                        <input name="ep" id="ep">
-                                    </li>
-                                    <li>
-                                        <label for="gp">po</label>
-                                        <input name="gp" id="gp">
-                                    </li>
-                                    <li>
-                                        <label for="pp">pl</label>
-                                        <input name="pp" id="pp">
-                                    </li>
-                                </ul>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label for="character-class" class="block text-sm font-medium text-text-secondary mb-1">Classe</label>
+                                <select id="character-class" class="input-field w-full px-3 py-2">
+                                    <option value>Selecione uma classe</option>
+                                </select>
                             </div>
-                            <textarea placeholder="Lista de equipamento aqui"></textarea>
+                            <div>
+                                <label for="character-race" class="block text-sm font-medium text-text-secondary mb-1">Raça</label>
+                                <select id="character-race" class="input-field w-full px-3 py-2">
+                                    <option value>Selecione uma raça</option>
+                                </select>
+                            </div>
                         </div>
-                    </section>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label for="character-background" class="block text-sm font-medium text-text-secondary mb-1">Antecedente</label>
+                                <select id="character-background" class="input-field w-full px-3 py-2">
+                                    <option value>Selecione um antecedente</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label for="character-alignment" class="block text-sm font-medium text-text-secondary mb-1">Tendência</label>
+                                <select id="character-alignment" class="input-field w-full px-3 py-2">
+                                    <option value>Selecione uma tendência</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label for="character-subclass" class="block text-sm font-medium text-text-secondary mb-1">Subclasse</label>
+                                <select id="character-subclass" class="input-field w-full px-3 py-2">
+                                    <option value>Selecione uma subclasse</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label for="character-level" class="block text-sm font-medium text-text-secondary mb-1">Nível</label>
+                                <input type="number" id="character-level" class="input-field w-full px-3 py-2" min="1" max="20" value="1" />
+                            </div>
+                        </div>
+                    </div>
                 </section>
-                <section>
-                    <section class="flavor">
-                        <div class="personality">
-                            <label for="personality">Personalidade</label>
-                            <textarea name="personality" id="personality"></textarea>
-                        </div>
 
-                        <div class="ideals">
-                            <label for="ideals">Ideais</label>
-                            <textarea name="ideals" id="ideals"></textarea>
-                        </div>
-
-                        <div class="bonds">
-                            <label for="bonds">Vínculos</label>
-                            <textarea name="bonds" id="bonds"></textarea>
-                        </div>
-
-                        <div class="flaws">
-                            <label for="flaws">Defeitos</label>
-                            <textarea name="flaws" id="flaws"></textarea>
-                        </div>
-                    </section>
-
-                    <section class="features">
+                <!-- Combat Stats -->
+                <section class="card p-6">
+                    <h2 class="font-heading text-xl text-primary mb-4">Estatísticas de Combate</h2>
+                    <div class="grid grid-cols-3 gap-4 text-center">
                         <div>
-                            <label for="features">Características & Traços</label>
-                            <textarea name="features" id="features"></textarea>
+                            <h3 class="font-heading text-sm text-text-secondary mb-2">CLASSE DE ARMADURA</h3>
+                            <div class="text-2xl font-bold text-primary" id="armor-class">10</div>
                         </div>
-                    </section>
+                        <div>
+                            <h3 class="font-heading text-sm text-text-secondary mb-2">INICIATIVA</h3>
+                            <div class="text-2xl font-bold text-primary" id="initiative">+0</div>
+                        </div>
+                        <div>
+                            <h3 class="font-heading text-sm text-text-secondary mb-2">DESLOCAMENTO</h3>
+                            <div class="text-2xl font-bold text-primary" id="speed">9m</div>
+                        </div>
+                    </div>
                 </section>
-            </main>
-        </form>
 
-        <!-- Modal: Race Selection -->
-        <div id="raceModal" class="modal">
-            <div class="modal-content">
-                <span class="close">&times;</span>
-                <h2>🏰 Escolha sua Raça</h2>
-                <div class="modal-grid" id="raceGrid"></div>
+                <!-- Hit Points -->
+                <section class="card p-6">
+                    <h2 class="font-heading text-xl text-primary mb-4">Pontos de Vida</h2>
+                    <div class="grid grid-cols-3 gap-4">
+                        <div class="text-center">
+                            <label class="block text-sm font-medium text-text-secondary mb-2">Atual</label>
+                            <input type="number" id="current-hp" class="input-field w-full text-center text-lg font-bold" value="8" />
+                        </div>
+                        <div class="text-center">
+                            <label class="block text-sm font-medium text-text-secondary mb-2">Temporário</label>
+                            <input type="number" id="temp-hp" class="input-field w-full text-center text-lg font-bold" value="0" />
+                        </div>
+                        <div class="text-center">
+                            <label class="block text-sm font-medium text-text-secondary mb-2">Máximo</label>
+                            <input type="number" id="max-hp" class="input-field w-full text-center text-lg font-bold" value="8" />
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Hit Dice -->
+                <section class="card p-6">
+                    <h2 class="font-heading text-xl text-primary mb-4">Dados de Vida</h2>
+                    <div class="text-center">
+                        <div class="text-lg font-bold text-primary" id="hit-dice">1d8</div>
+                        <p class="text-sm text-text-secondary mt-1">Dados disponíveis para recuperação</p>
+                    </div>
+                </section>
+
+                <!-- Inventory Management -->
+                <section class="card p-6">
+                    <h2 class="font-heading text-xl text-primary mb-4">Inventário</h2>
+                    <div class="space-y-4">
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm text-text-secondary">Capacidade de Carga:</span>
+                            <span class="font-mono text-sm" id="carrying-capacity">75 kg</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm text-text-secondary">Carga Atual:</span>
+                            <span class="font-mono text-sm" id="current-load">0 kg</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div class="bg-primary h-2 rounded-full transition-all" id="load-bar" style="width: 0%"></div>
+                        </div>
+                        <button onclick="openInventoryModal()" class="btn-primary w-full px-4 py-2 rounded-lg font-medium">
+                            Gerenciar Inventário
+                        </button>
+                    </div>
+                </section>
             </div>
         </div>
+    </div>
 
-        <!-- Modal: Class Selection -->
-        <div id="classModal" class="modal">
-            <div class="modal-content">
-                <span class="close">&times;</span>
-                <h2>⚔️ Escolha sua Classe</h2>
-                <div class="modal-grid" id="classGrid"></div>
-            </div>
-        </div>
+    <!-- Inventory Modal -->
+    <div id="inventory-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-surface rounded-lg shadow-xl max-w-4xl w-full max-h-screen overflow-y-auto modal-enter">
+                <div class="p-6">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="font-heading text-2xl text-primary">Gerenciar Inventário</h2>
+                        <button onclick="closeInventoryModal()" class="text-text-secondary hover:text-primary text-2xl">&times;</button>
+                    </div>
+                    
+                    <!-- Add Item Section -->
+                    <div class="mb-6 p-4 bg-background rounded-lg">
+                        <h3 class="font-heading text-lg text-primary mb-4">Adicionar Item</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-text-secondary mb-1">Categoria</label>
+                                <select id="item-category" class="input-field w-full px-3 py-2">
+                                    <option value>Selecione categoria</option>
+                                    <option value="armor">Armadura</option>
+                                    <option value="weapons">Armas</option>
+                                    <option value="kits">Kits</option>
+                                    <option value="custom">Personalizado</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-text-secondary mb-1">Item</label>
+                                <select id="item-select" class="input-field w-full px-3 py-2" disabled>
+                                    <option value>Selecione um item</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-text-secondary mb-1">Quantidade</label>
+                                <input type="number" id="item-quantity" class="input-field w-full px-3 py-2" min="1" value="1" />
+                            </div>
+                            <div class="flex items-end">
+                                <button onclick="addInventoryItem()" class="btn-primary px-4 py-2 rounded-lg w-full">Adicionar</button>
+                            </div>
+                        </div>
+                    </div>
 
-        <!-- Modal: Background Selection -->
-        <div id="backgroundModal" class="modal">
-            <div class="modal-content">
-                <span class="close">&times;</span>
-                <h2>📜 Escolha seu Antecedente</h2>
-                <div class="modal-grid" id="backgroundGrid"></div>
-            </div>
-        </div>
-
-        <!-- Modal: Alignment Selection -->
-        <div id="alignmentModal" class="modal">
-            <div class="modal-content">
-                <span class="close">&times;</span>
-                <h2>⚖️ Escolha sua Tendência</h2>
-                <div class="alignment-grid" id="alignmentGrid"></div>
-            </div>
-        </div>
-
-        <!-- Modal: Character Creation Wizard -->
-        <div id="characterCreationModal" class="creation-modal">
-            <div class="creation-modal-content">
-                <div class="creation-header">
-                    <h2>🎭 Criar Novo Personagem</h2>
-                    <button class="close-creation" title="Fechar">✕</button>
-                </div>
-                
-                <div class="progress-bar">
-                    <div class="progress-step active">
-                        <div class="step-number">1</div>
-                        <span>Nome</span>
+                    <!-- Inventory List -->
+                    <div>
+                        <h3 class="font-heading text-lg text-primary mb-4">Itens no Inventário</h3>
+                        <div id="inventory-items" class="space-y-2">
+                            <p class="text-text-secondary text-center py-8">Nenhum item no inventário</p>
+                        </div>
                     </div>
-                    <div class="progress-step">
-                        <div class="step-number">2</div>
-                        <span>Raça</span>
-                    </div>
-                    <div class="progress-step">
-                        <div class="step-number">3</div>
-                        <span>Classe</span>
-                    </div>
-                    <div class="progress-step">
-                        <div class="step-number">4</div>
-                        <span>Perícias</span>
-                    </div>
-                    <div class="progress-step">
-                        <div class="step-number">5</div>
-                        <span>Atributos</span>
-                    </div>
-                    <div class="progress-step">
-                        <div class="step-number">6</div>
-                        <span>Detalhes</span>
-                    </div>
-                    <div class="progress-step">
-                        <div class="step-number">7</div>
-                        <span>Equipamento</span>
-                    </div>
-                    <div class="progress-step">
-                        <div class="step-number">8</div>
-                        <span>Finalizar</span>
-                    </div>
-                    <div class="progress-fill"></div>
-                </div>
-                
-                <div id="creationContent" class="creation-body"></div>
-                
-                <div class="creation-footer">
-                    <button id="prevBtn" class="wizard-btn secondary-btn hidden">← Anterior</button>
-                    <button id="nextBtn" class="wizard-btn primary-btn">Próximo →</button>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- Scripts -->
     <script type="module">
         // Importar e expor Dice3DRoller globalmente
         import { Dice3DRoller } from './js/dice3d.js?v=3.1';
