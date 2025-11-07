@@ -1752,6 +1752,31 @@ form.charsheet main section.features div textarea {
     display: none;
 }
 
+/* Botão de upload e ações do wizard */
+.upload-button {
+    padding: 12px 30px;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: 'Cinzel', serif;
+    background: var(--primary-color);
+    color: #1a1a2e;
+}
+
+.upload-button:hover:not(:disabled) {
+    background: var(--secondary-color);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(212, 175, 55, 0.4);
+}
+
+.upload-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
 /* Animations */
 @keyframes fadeIn {
     from {
