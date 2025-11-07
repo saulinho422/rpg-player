@@ -28,6 +28,10 @@
                 <button class="close-sidebar">✕</button>
             </div>
             <div class="sidebar-content">
+                <button class="sidebar-item" id="openWizardBtn">
+                    <span class="sidebar-icon">✨</span>
+                    <span class="sidebar-text">Preencher Ficha (Wizard)</span>
+                </button>
                 <button class="sidebar-item" data-action="attribute-method">
                     <span class="sidebar-icon">🎲</span>
                     <span class="sidebar-text">Valores de Atributo</span>
@@ -147,57 +151,6 @@
                     </section>
                 </div>
                 </div>
-            </div>
-        </div>
-
-        <!-- Modal de Adicionar Ataque -->
-        <div id="attackModal" class="fixed inset-0 bg-black bg-opacity-75 z-50 hidden flex items-center justify-center p-4">
-            <div class="bg-surface border-2 border-primary rounded-lg max-w-md w-full p-6 shadow-2xl">
-                <div class="flex justify-between items-center mb-6 border-b border-primary pb-3">
-                    <h3 class="font-heading text-2xl text-primary">Adicionar Ataque</h3>
-                    <button id="closeAttackModal" class="text-text-secondary hover:text-primary text-3xl leading-none">&times;</button>
-                </div>
-                
-                <form id="attackForm" class="space-y-4">
-                    <div>
-                        <label class="block text-sm font-medium text-text-secondary mb-2">Nome do Ataque</label>
-                        <input type="text" id="attackName" class="input-field w-full px-3 py-2 border-2 border-primary rounded-lg" placeholder="Ex: Espada Longa" required>
-                    </div>
-                    
-                    <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-sm font-medium text-text-secondary mb-2">Bônus de Ataque</label>
-                            <input type="text" id="attackBonus" class="input-field w-full px-3 py-2 border-2 border-primary rounded-lg text-center" placeholder="+5" required>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-text-secondary mb-2">Dano</label>
-                            <input type="text" id="attackDamage" class="input-field w-full px-3 py-2 border-2 border-primary rounded-lg text-center" placeholder="1d8+3" required>
-                        </div>
-                    </div>
-                    
-                    <div>
-                        <label class="block text-sm font-medium text-text-secondary mb-2">Tipo de Dano</label>
-                        <select id="attackType" class="input-field w-full px-3 py-2 border-2 border-primary rounded-lg">
-                            <option value="Cortante">Cortante</option>
-                            <option value="Perfurante">Perfurante</option>
-                            <option value="Contundente">Contundente</option>
-                            <option value="Ácido">Ácido</option>
-                            <option value="Elétrico">Elétrico</option>
-                            <option value="Fogo">Fogo</option>
-                            <option value="Frio">Frio</option>
-                            <option value="Necrótico">Necrótico</option>
-                            <option value="Radiante">Radiante</option>
-                            <option value="Veneno">Veneno</option>
-                            <option value="Psíquico">Psíquico</option>
-                            <option value="Trovejante">Trovejante</option>
-                        </select>
-                    </div>
-                    
-                    <div class="flex gap-3 pt-4">
-                        <button type="submit" class="btn-primary flex-1 py-3 rounded-lg font-medium">Adicionar</button>
-                        <button type="button" id="cancelAttackModal" class="bg-surface border-2 border-default hover:border-primary text-text-secondary flex-1 py-3 rounded-lg font-medium transition-colors">Cancelar</button>
-                    </div>
-                </form>
             </div>
         </div>
 
@@ -678,6 +631,57 @@
 
     </div>
 
+    <!-- Modal de Adicionar Ataque -->
+    <div id="attackModal" class="fixed inset-0 bg-black bg-opacity-75 z-50 hidden items-center justify-center p-4" style="display: none;">
+        <div class="bg-surface border-2 border-primary rounded-lg max-w-md w-full p-6 shadow-2xl">
+            <div class="flex justify-between items-center mb-6 border-b border-primary pb-3">
+                <h3 class="font-heading text-2xl text-primary">Adicionar Ataque</h3>
+                <button id="closeAttackModal" class="text-text-secondary hover:text-primary text-3xl leading-none">&times;</button>
+            </div>
+            
+            <form id="attackForm" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-text-secondary mb-2">Nome do Ataque</label>
+                    <input type="text" id="attackName" class="input-field w-full px-3 py-2 border-2 border-primary rounded-lg" placeholder="Ex: Espada Longa" required>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-text-secondary mb-2">Bônus de Ataque</label>
+                        <input type="text" id="attackBonus" class="input-field w-full px-3 py-2 border-2 border-primary rounded-lg text-center" placeholder="+5" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-text-secondary mb-2">Dano</label>
+                        <input type="text" id="attackDamage" class="input-field w-full px-3 py-2 border-2 border-primary rounded-lg text-center" placeholder="1d8+3" required>
+                    </div>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-text-secondary mb-2">Tipo de Dano</label>
+                    <select id="attackType" class="input-field w-full px-3 py-2 border-2 border-primary rounded-lg">
+                        <option value="Cortante">Cortante</option>
+                        <option value="Perfurante">Perfurante</option>
+                        <option value="Contundente">Contundente</option>
+                        <option value="Ácido">Ácido</option>
+                        <option value="Elétrico">Elétrico</option>
+                        <option value="Fogo">Fogo</option>
+                        <option value="Frio">Frio</option>
+                        <option value="Necrótico">Necrótico</option>
+                        <option value="Radiante">Radiante</option>
+                        <option value="Veneno">Veneno</option>
+                        <option value="Psíquico">Psíquico</option>
+                        <option value="Trovejante">Trovejante</option>
+                    </select>
+                </div>
+                
+                <div class="flex gap-3 pt-4">
+                    <button type="submit" class="btn-primary flex-1 py-3 rounded-lg font-medium">Adicionar</button>
+                    <button type="button" id="cancelAttackModal" class="bg-surface border-2 border-default hover:border-primary text-text-secondary flex-1 py-3 rounded-lg font-medium transition-colors">Cancelar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <!-- Inventory Modal -->
     <div id="inventory-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50">
         <div class="flex items-center justify-center min-h-screen p-4">
@@ -825,13 +829,12 @@
             
             // Abrir modal
             addBtn.addEventListener('click', () => {
-                modal.classList.remove('hidden');
-                form.reset();
+                modal.style.display = 'flex';
             });
             
             // Fechar modal
             const closeModal = () => {
-                modal.classList.add('hidden');
+                modal.style.display = 'none';
             };
             
             closeBtn.addEventListener('click', closeModal);

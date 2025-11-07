@@ -572,6 +572,15 @@ class CharacterSheet {
             });
         }
 
+        // Botão para abrir wizard de criação
+        const openWizardBtn = document.getElementById('openWizardBtn');
+        if (openWizardBtn) {
+            openWizardBtn.addEventListener('click', () => {
+                this.toggleSidebar(); // Fechar sidebar
+                this.openCreationWizard(); // Abrir wizard
+            });
+        }
+
         // Event listeners para atributos
         const attributes = ['Strength', 'Dexterity', 'Constitution', 'Intelligence', 'Wisdom', 'Charisma'];
         attributes.forEach(attr => {
@@ -943,6 +952,14 @@ class CharacterSheet {
             console.error('❌ Erro ao salvar personagem:', error);
             alert('Erro ao salvar personagem!');
         }
+    }
+
+    openCreationWizard() {
+        console.log('🧙 Abrindo wizard de criação...');
+        if (!this.wizard) {
+            this.wizard = new CharacterCreationWizard(this);
+        }
+        this.wizard.show();
     }
 
     toggleSidebar() {
