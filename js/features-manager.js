@@ -164,11 +164,15 @@ class FeaturesManager {
         }
         
         modal.style.display = 'flex';
+        modal.classList.add('active');
     }
 
     closeModal() {
         const modal = document.getElementById('featureModal');
-        modal.style.display = 'none';
+        modal.classList.remove('active');
+        setTimeout(() => {
+            modal.style.display = 'none';
+        }, 300); // Aguarda animação
         document.getElementById('featureForm').reset();
         this.editingFeatureId = null;
     }

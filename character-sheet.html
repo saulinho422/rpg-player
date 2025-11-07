@@ -960,24 +960,24 @@
     </div>
 
     <!-- Modal: Add/Edit Feature -->
-    <div id="featureModal" class="fixed inset-0 bg-black bg-opacity-75 z-50 hidden items-center justify-center p-4" style="display: none;">
-        <div class="bg-surface border-2 border-primary rounded-lg max-w-2xl w-full p-6">
-            <div class="flex justify-between items-center mb-6">
-                <h2 class="font-heading text-2xl text-primary">Adicionar Habilidade</h2>
-                <button id="closeFeatureModal" class="text-text-secondary hover:text-primary text-3xl leading-none">&times;</button>
+    <div id="featureModal" class="feature-modal" style="display: none;">
+        <div class="feature-modal-content">
+            <div class="feature-modal-header">
+                <h2>Adicionar Habilidade</h2>
+                <button id="closeFeatureModal" class="close-feature-modal">&times;</button>
             </div>
 
-            <form id="featureForm" class="space-y-4">
+            <form id="featureForm" class="feature-form">
                 <!-- Nome da Habilidade -->
-                <div>
-                    <label for="featureName" class="block text-sm font-medium text-text-secondary mb-2">Nome da Habilidade</label>
-                    <input type="text" id="featureName" class="input-field w-full px-3 py-2" placeholder="Ex: Visão no Escuro" required>
+                <div class="form-group">
+                    <label for="featureName">Nome da Habilidade</label>
+                    <input type="text" id="featureName" placeholder="Ex: Visão no Escuro" required>
                 </div>
 
                 <!-- Tipo da Habilidade -->
-                <div>
-                    <label for="featureType" class="block text-sm font-medium text-text-secondary mb-2">Tipo da Habilidade</label>
-                    <select id="featureType" class="input-field w-full px-3 py-2" required>
+                <div class="form-group">
+                    <label for="featureType">Tipo da Habilidade</label>
+                    <select id="featureType" required>
                         <option value="">Selecione o tipo</option>
                         <option value="class">Habilidade de Classe</option>
                         <option value="feat">Talento (Feat)</option>
@@ -987,23 +987,23 @@
                 </div>
 
                 <!-- Detalhe do Tipo -->
-                <div>
-                    <label for="featureSource" class="block text-sm font-medium text-text-secondary mb-2">Detalhe do Tipo</label>
-                    <input type="text" id="featureSource" class="input-field w-full px-3 py-2" placeholder="Ex: Elfo, Guerreiro, Nível 3">
+                <div class="form-group">
+                    <label for="featureSource">Detalhe do Tipo</label>
+                    <input type="text" id="featureSource" placeholder="Ex: Elfo, Guerreiro, Nível 3">
                 </div>
 
                 <!-- Descrição -->
-                <div>
-                    <label for="featureDescription" class="block text-sm font-medium text-text-secondary mb-2">Descrição</label>
-                    <textarea id="featureDescription" class="input-field w-full px-3 py-2 resize-none" rows="5" placeholder="O que esta habilidade faz?"></textarea>
+                <div class="form-group">
+                    <label for="featureDescription">Descrição</label>
+                    <textarea id="featureDescription" rows="5" placeholder="O que esta habilidade faz?"></textarea>
                 </div>
 
                 <!-- Botões -->
-                <div class="flex gap-3 justify-end">
-                    <button type="button" id="cancelFeatureBtn" class="bg-surface border-2 border-default hover:border-primary text-text-secondary px-6 py-3 rounded-lg font-medium transition-colors">
+                <div class="feature-modal-footer">
+                    <button type="button" id="cancelFeatureBtn" class="wizard-btn secondary-btn">
                         Cancelar
                     </button>
-                    <button type="submit" class="btn-primary px-6 py-3 rounded-lg font-medium">
+                    <button type="submit" class="wizard-btn primary-btn">
                         Adicionar Habilidade
                     </button>
                 </div>
