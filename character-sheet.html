@@ -74,32 +74,21 @@
                     <!-- Pontos de Vida -->
                     <section class="card p-6">
                         <h2 class="font-heading text-xl text-primary mb-4 border-b border-primary pb-2">Pontos de Vida</h2>
-                        <div class="flex flex-col items-center">
-                            <!-- Vida Atual - DESTAQUE -->
-                            <div class="text-center mb-6">
-                                <label class="block text-xs font-medium text-text-secondary mb-3 uppercase">Vida Atual</label>
-                                <input type="number" name="currenthp" id="currenthp" class="input-field w-32 text-center text-7xl font-bold border-4 border-primary rounded-lg py-6 shadow-lg" value="8">
-                            </div>
-                            <!-- Vida Máxima e Temporária - Menores -->
-                            <div class="grid grid-cols-2 gap-4 w-full">
-                                <div class="text-center">
-                                    <label class="block text-xs font-medium text-text-secondary mb-2 uppercase">Vida Máxima</label>
-                                    <input type="number" name="maxhp" id="maxhp" class="input-field w-full text-center text-2xl font-bold border-2 border-primary rounded-lg py-3" value="8">
-                                </div>
-                                <div class="text-center">
-                                    <label class="block text-xs font-medium text-text-secondary mb-2 uppercase">Vida Temporária</label>
-                                    <input type="number" name="temphp" id="temphp" class="input-field w-full text-center text-2xl font-bold border-2 border-primary rounded-lg py-3" value="0">
+                        <div class="grid grid-cols-2 gap-4">
+                            <!-- PV Atuais (grande, esquerda) -->
+                            <div class="text-center border-2 border-primary rounded-lg p-4 bg-surface">
+                                <label class="block text-xs font-medium text-text-secondary mb-2 uppercase">PV Totais</label>
+                                <input type="number" name="maxhp" id="maxhp" class="text-xl font-bold text-primary w-full text-center bg-transparent border-0 outline-none mb-2" value="0">
+                                <div class="border-t-2 border-primary pt-3 mt-2">
+                                    <input type="number" name="currenthp" id="currenthp" class="text-5xl font-bold text-primary w-full text-center bg-transparent border-0 outline-none" value="0">
+                                    <label class="block text-xs font-medium text-text-secondary mt-2 uppercase">PV Atuais</label>
                                 </div>
                             </div>
-                        </div>
-                    </section>
-
-                    <!-- Dados de Vida -->
-                    <section class="card p-6">
-                        <h2 class="font-heading text-xl text-primary mb-4 border-b border-primary pb-2">Dados de Vida</h2>
-                        <div class="text-center">
-                            <input type="text" name="hitdice" id="hitdice" class="text-3xl font-bold text-primary w-full text-center input-field border-2 border-primary rounded-lg py-3" value="1d8">
-                            <p class="text-xs text-text-secondary mt-3 uppercase">Dados disponíveis para recuperação</p>
+                            <!-- PV Temporários (menor, direita) -->
+                            <div class="text-center border-2 border-primary rounded-lg p-4 bg-surface flex flex-col justify-center">
+                                <input type="number" name="temphp" id="temphp" class="text-4xl font-bold text-primary w-full text-center bg-transparent border-0 outline-none mb-2" value="0">
+                                <label class="block text-xs font-medium text-text-secondary uppercase">PV Temporários</label>
+                            </div>
                         </div>
                     </section>
 
@@ -107,24 +96,27 @@
                     <section class="card p-6">
                         <h2 class="font-heading text-xl text-primary mb-4 border-b border-primary pb-2">Estatísticas de Combate</h2>
                         <div class="grid grid-cols-3 gap-4">
-                            <div class="text-center">
-                                <div class="border-2 border-primary rounded-lg py-4 px-2 bg-surface">
-                                    <input type="number" name="ac" id="ac" class="text-3xl font-bold text-primary w-full text-center bg-transparent border-0 outline-none mb-2" value="10">
-                                    <label class="block text-xs font-medium text-text-secondary uppercase">Classe<br>de Armadura</label>
-                                </div>
+                            <div class="text-center border-2 border-primary rounded-lg py-6 px-2 bg-surface">
+                                <input type="number" name="ac" id="ac" class="text-4xl font-bold text-primary w-full text-center bg-transparent border-0 outline-none mb-3" value="0">
+                                <label class="block text-xs font-medium text-text-secondary uppercase">Classe<br>de Armadura</label>
                             </div>
-                            <div class="text-center">
-                                <div class="border-2 border-primary rounded-lg py-4 px-2 bg-surface">
-                                    <input type="text" name="initiative" id="initiative" class="text-3xl font-bold text-primary w-full text-center bg-transparent border-0 outline-none mb-2" placeholder="+0" readonly>
-                                    <label class="block text-xs font-medium text-text-secondary uppercase">Iniciativa</label>
-                                </div>
+                            <div class="text-center border-2 border-primary rounded-lg py-6 px-2 bg-surface">
+                                <input type="text" name="initiative" id="initiative" class="text-4xl font-bold text-primary w-full text-center bg-transparent border-0 outline-none mb-3" placeholder="+0" readonly>
+                                <label class="block text-xs font-medium text-text-secondary uppercase">Iniciativa</label>
                             </div>
-                            <div class="text-center">
-                                <div class="border-2 border-primary rounded-lg py-4 px-2 bg-surface">
-                                    <input type="text" name="speed" id="speed" class="text-3xl font-bold text-primary w-full text-center bg-transparent border-0 outline-none mb-2" value="9m">
-                                    <label class="block text-xs font-medium text-text-secondary uppercase">Desloc.</label>
-                                </div>
+                            <div class="text-center border-2 border-primary rounded-lg py-6 px-2 bg-surface">
+                                <input type="text" name="speed" id="speed" class="text-4xl font-bold text-primary w-full text-center bg-transparent border-0 outline-none mb-3" value="9m">
+                                <label class="block text-xs font-medium text-text-secondary uppercase">Desloc.</label>
                             </div>
+                        </div>
+                    </section>
+
+                    <!-- Dados de Vida -->
+                    <section class="card p-6">
+                        <h2 class="font-heading text-xl text-primary mb-4 border-b border-primary pb-2">Dados de Vida</h2>
+                        <div class="text-center border-2 border-primary rounded-lg p-6 bg-surface">
+                            <p class="text-xs text-text-secondary mb-2 uppercase">Total: 1d8 + MOD de CON</p>
+                            <input type="text" name="hitdice" id="hitdice" class="text-5xl font-bold text-primary w-full text-center bg-transparent border-0 outline-none" value="1d8">
                         </div>
                     </section>
                 </div>
@@ -133,11 +125,25 @@
                 <div class="space-y-6">
                     <!-- Ataques -->
                     <section class="card p-6">
-                        <h2 class="font-heading text-xl text-primary mb-4 border-b border-primary pb-2">Ataques</h2>
-                        <div class="min-h-[400px]">
-                            <!-- Conteúdo vazio por enquanto -->
+                        <div class="flex justify-between items-center mb-4 border-b border-primary pb-2">
+                            <h2 class="font-heading text-xl text-primary">Ataques</h2>
+                            <button class="bg-primary hover:bg-secondary text-background rounded-full w-10 h-10 flex items-center justify-center font-bold text-2xl transition-colors">+</button>
+                        </div>
+                        <div class="space-y-3">
+                            <!-- Header da tabela -->
+                            <div class="grid grid-cols-12 gap-2 text-xs font-medium text-text-secondary uppercase border-b border-default pb-2">
+                                <div class="col-span-4">Nome</div>
+                                <div class="col-span-3 text-center">Bônus</div>
+                                <div class="col-span-5 text-center">Dano / Tipo</div>
+                            </div>
+                            <!-- Linhas vazias para adicionar ataques -->
+                            <div class="text-center text-text-secondary py-12 italic">
+                                Nenhum ataque cadastrado.<br>
+                                <span class="text-xs">Clique no botão + para adicionar</span>
+                            </div>
                         </div>
                     </section>
+                </div>
                 </div>
             </div>
         </div>
