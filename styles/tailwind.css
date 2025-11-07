@@ -8,27 +8,27 @@
 @tailwind utilities;
 
 :root {
-  /* Primary Colors */
-  --color-primary: #931a1d; /* D&D signature red */
-  --color-secondary: #8b4513; /* Rich brown */
-  --color-accent: #d4af37; /* Muted gold */
+  /* Primary Colors - Preto com Dourado */
+  --color-primary: #d4af37; /* Dourado */
+  --color-secondary: #1a1a1a; /* Preto */
+  --color-accent: #ffcc00; /* Dourado claro */
   
   /* Background Colors */
-  --color-background: #f4f1e9; /* Warm off-white parchment */
-  --color-surface: #faf8f3; /* Lighter surface for cards */
+  --color-background: #0a0a0a; /* Preto profundo */
+  --color-surface: #1a1a1a; /* Preto cards */
   
   /* Text Colors */
-  --color-text-primary: #2c211d; /* Deep brown-black */
-  --color-text-secondary: #5d4e47; /* Medium brown */
+  --color-text-primary: #d4af37; /* Dourado */
+  --color-text-secondary: #b8960f; /* Dourado escuro */
   
   /* Status Colors */
   --color-success: #2d5016; /* Forest green */
-  --color-warning: #8b4513; /* Brown warning */
-  --color-error: #6b1518; /* Darker red */
+  --color-warning: #ffcc00; /* Dourado warning */
+  --color-error: #d4af37; /* Dourado error */
   
   /* Shadow and Border */
-  --shadow-subtle: 0 2px 4px rgba(44, 33, 29, 0.1);
-  --border-color: rgba(44, 33, 29, 0.15);
+  --shadow-subtle: 0 2px 4px rgba(212, 175, 55, 0.3);
+  --border-color: rgba(212, 175, 55, 0.5);
 }
 
 @layer base {
@@ -59,7 +59,7 @@
   }
   
   .btn-primary:hover {
-    background-color: #7a1619;
+    background-color: #b8960f;
   }
   
   .input-field {

@@ -964,12 +964,12 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .border-default{
-  border-color: rgba(44, 33, 29, 0.15);
+  border-color: rgba(212, 175, 55, 0.5);
 }
 
 .border-primary{
   --tw-border-opacity: 1;
-  border-color: rgb(147 26 29 / var(--tw-border-opacity, 1));
+  border-color: rgb(212 175 55 / var(--tw-border-opacity, 1));
 }
 
 .border-transparent{
@@ -978,7 +978,7 @@ h1, h2, h3, h4, h5, h6 {
 
 .bg-background{
   --tw-bg-opacity: 1;
-  background-color: rgb(244 241 233 / var(--tw-bg-opacity, 1));
+  background-color: rgb(10 10 10 / var(--tw-bg-opacity, 1));
 }
 
 .bg-black{
@@ -988,17 +988,17 @@ h1, h2, h3, h4, h5, h6 {
 
 .bg-gray-200{
   --tw-bg-opacity: 1;
-  background-color: rgb(229 231 235 / var(--tw-bg-opacity, 1));
+  background-color: rgb(40 40 40 / var(--tw-bg-opacity, 1));
 }
 
 .bg-primary{
   --tw-bg-opacity: 1;
-  background-color: rgb(147 26 29 / var(--tw-bg-opacity, 1));
+  background-color: rgb(212 175 55 / var(--tw-bg-opacity, 1));
 }
 
 .bg-surface{
   --tw-bg-opacity: 1;
-  background-color: rgb(250 248 243 / var(--tw-bg-opacity, 1));
+  background-color: rgb(26 26 26 / var(--tw-bg-opacity, 1));
 }
 
 .bg-opacity-50{
@@ -1113,17 +1113,17 @@ h1, h2, h3, h4, h5, h6 {
 
 .text-error{
   --tw-text-opacity: 1;
-  color: rgb(107 21 24 / var(--tw-text-opacity, 1));
+  color: rgb(212 175 55 / var(--tw-text-opacity, 1));
 }
 
 .text-primary{
   --tw-text-opacity: 1;
-  color: rgb(147 26 29 / var(--tw-text-opacity, 1));
+  color: rgb(212 175 55 / var(--tw-text-opacity, 1));
 }
 
 .text-text-secondary{
   --tw-text-opacity: 1;
-  color: rgb(93 78 71 / var(--tw-text-opacity, 1));
+  color: rgb(184 150 15 / var(--tw-text-opacity, 1));
 }
 
 .text-white{
@@ -1154,53 +1154,53 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 :root {
-  /* Primary Colors */
-  --color-primary: #931a1d;
-  /* D&D signature red */
-  --color-secondary: #8b4513;
-  /* Rich brown */
-  --color-accent: #d4af37;
-  /* Muted gold */
+  /* Primary Colors - Preto com Dourado */
+  --color-primary: #d4af37;
+  /* Dourado */
+  --color-secondary: #1a1a1a;
+  /* Preto */
+  --color-accent: #ffcc00;
+  /* Dourado claro */
   /* Background Colors */
-  --color-background: #f4f1e9;
-  /* Warm off-white parchment */
-  --color-surface: #faf8f3;
-  /* Lighter surface for cards */
+  --color-background: #0a0a0a;
+  /* Preto profundo */
+  --color-surface: #1a1a1a;
+  /* Preto cards */
   /* Text Colors */
-  --color-text-primary: #2c211d;
-  /* Deep brown-black */
-  --color-text-secondary: #5d4e47;
-  /* Medium brown */
+  --color-text-primary: #d4af37;
+  /* Dourado */
+  --color-text-secondary: #b8960f;
+  /* Dourado escuro */
   /* Status Colors */
   --color-success: #2d5016;
   /* Forest green */
-  --color-warning: #8b4513;
-  /* Brown warning */
-  --color-error: #6b1518;
-  /* Darker red */
+  --color-warning: #ffcc00;
+  /* Dourado warning */
+  --color-error: #d4af37;
+  /* Dourado error */
   /* Shadow and Border */
-  --shadow-subtle: 0 2px 4px rgba(44, 33, 29, 0.1);
-  --border-color: rgba(44, 33, 29, 0.15);
+  --shadow-subtle: 0 2px 4px rgba(212, 175, 55, 0.3);
+  --border-color: rgba(212, 175, 55, 0.5);
 }
 
 .hover\:border-primary:hover{
   --tw-border-opacity: 1;
-  border-color: rgb(147 26 29 / var(--tw-border-opacity, 1));
+  border-color: rgb(212 175 55 / var(--tw-border-opacity, 1));
 }
 
 .hover\:bg-gray-300:hover{
   --tw-bg-opacity: 1;
-  background-color: rgb(209 213 219 / var(--tw-bg-opacity, 1));
+  background-color: rgb(30 30 30 / var(--tw-bg-opacity, 1));
 }
 
 .hover\:bg-gray-50:hover{
   --tw-bg-opacity: 1;
-  background-color: rgb(249 250 251 / var(--tw-bg-opacity, 1));
+  background-color: rgb(26 26 26 / var(--tw-bg-opacity, 1));
 }
 
 .hover\:text-primary:hover{
   --tw-text-opacity: 1;
-  color: rgb(147 26 29 / var(--tw-text-opacity, 1));
+  color: rgb(212 175 55 / var(--tw-text-opacity, 1));
 }
 
 .hover\:text-red-700:hover{
