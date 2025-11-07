@@ -333,9 +333,55 @@ class CharacterSheet {
         this.calculateModifiers();
         this.calculateProficiencyBonus();
         this.calculateSavingThrows();
+        this.populateSkillsList(); // Adicionar perícias na UI
         this.calculateSkills();
         this.calculatePassivePerception();
         this.calculateCombatStats();
+    }
+
+    populateSkillsList() {
+        const skillsList = document.getElementById('skills-list');
+        if (!skillsList) return;
+
+        const skills = [
+            { id: 'acrobatics', name: 'Acrobacia', attr: 'dex', attrName: 'Destreza' },
+            { id: 'animal-handling', name: 'Lidar com Animais', attr: 'wis', attrName: 'Sabedoria' },
+            { id: 'arcana', name: 'Arcanismo', attr: 'int', attrName: 'Inteligência' },
+            { id: 'athletics', name: 'Atletismo', attr: 'str', attrName: 'Força' },
+            { id: 'deception', name: 'Enganação', attr: 'cha', attrName: 'Carisma' },
+            { id: 'history', name: 'História', attr: 'int', attrName: 'Inteligência' },
+            { id: 'insight', name: 'Intuição', attr: 'wis', attrName: 'Sabedoria' },
+            { id: 'intimidation', name: 'Intimidação', attr: 'cha', attrName: 'Carisma' },
+            { id: 'investigation', name: 'Investigação', attr: 'int', attrName: 'Inteligência' },
+            { id: 'medicine', name: 'Medicina', attr: 'wis', attrName: 'Sabedoria' },
+            { id: 'nature', name: 'Natureza', attr: 'int', attrName: 'Inteligência' },
+            { id: 'perception', name: 'Percepção', attr: 'wis', attrName: 'Sabedoria' },
+            { id: 'performance', name: 'Performance', attr: 'cha', attrName: 'Carisma' },
+            { id: 'persuasion', name: 'Persuasão', attr: 'cha', attrName: 'Carisma' },
+            { id: 'religion', name: 'Religião', attr: 'int', attrName: 'Inteligência' },
+            { id: 'sleight-of-hand', name: 'Prestidigitação', attr: 'dex', attrName: 'Destreza' },
+            { id: 'stealth', name: 'Furtividade', attr: 'dex', attrName: 'Destreza' },
+            { id: 'survival', name: 'Sobrevivência', attr: 'wis', attrName: 'Sabedoria' }
+        ];
+
+        skillsList.innerHTML = skills.map(skill => `
+            <div class="flex items-center justify-between hover:bg-surface hover:bg-opacity-50 p-2 rounded transition-colors">
+                <div class="flex items-center flex-1">
+                    <input 
+                        type="checkbox" 
+                        id="skill-${skill.id}" 
+                        class="w-4 h-4 text-primary rounded mr-3 cursor-pointer" 
+                        onchange="characterSheet.calculateSkills(); characterSheet.calculatePassivePerception();"
+                    />
+                    <label for="skill-${skill.id}" class="text-sm cursor-pointer flex-1">
+                        ${skill.name} <span class="text-text-secondary text-xs">(${skill.attrName})</span>
+                    </label>
+                </div>
+                <span class="text-sm font-mono font-bold text-primary" id="skill-${skill.id}-value">+0</span>
+            </div>
+        `).join('');
+
+        console.log('✅ Lista de perícias populada (18 skills)');
     }
 
     calculateModifiers() {
@@ -391,51 +437,68 @@ class CharacterSheet {
 
     calculateSkills() {
         const skills = [
-            { name: 'Acrobatics', attr: 'Dexterity' },
-            { name: 'Animal Handling', attr: 'Wisdom' },
-            { name: 'Arcana', attr: 'Intelligence' },
-            { name: 'Athletics', attr: 'Strength' },
-            { name: 'Deception', attr: 'Charisma' },
-            { name: 'History', attr: 'Intelligence' },
-            { name: 'Insight', attr: 'Wisdom' },
-            { name: 'Intimidation', attr: 'Charisma' },
-            { name: 'Investigation', attr: 'Intelligence' },
-            { name: 'Medicine', attr: 'Wisdom' },
-            { name: 'Nature', attr: 'Intelligence' },
-            { name: 'Perception', attr: 'Wisdom' },
-            { name: 'Performance', attr: 'Charisma' },
-            { name: 'Persuasion', attr: 'Charisma' },
-            { name: 'Religion', attr: 'Intelligence' },
-            { name: 'Sleight of Hand', attr: 'Dexterity' },
-            { name: 'Stealth', attr: 'Dexterity' },
-            { name: 'Survival', attr: 'Wisdom' }
+            { id: 'acrobatics', attr: 'dex' },
+            { id: 'animal-handling', attr: 'wis' },
+            { id: 'arcana', attr: 'int' },
+            { id: 'athletics', attr: 'str' },
+            { id: 'deception', attr: 'cha' },
+            { id: 'history', attr: 'int' },
+            { id: 'insight', attr: 'wis' },
+            { id: 'intimidation', attr: 'cha' },
+            { id: 'investigation', attr: 'int' },
+            { id: 'medicine', attr: 'wis' },
+            { id: 'nature', attr: 'int' },
+            { id: 'perception', attr: 'wis' },
+            { id: 'performance', attr: 'cha' },
+            { id: 'persuasion', attr: 'cha' },
+            { id: 'religion', attr: 'int' },
+            { id: 'sleight-of-hand', attr: 'dex' },
+            { id: 'stealth', attr: 'dex' },
+            { id: 'survival', attr: 'wis' }
         ];
 
         const profBonus = this.calculateProficiencyBonus();
 
         skills.forEach(skill => {
-            const skillElement = document.getElementById(skill.name.replace(' ', '_'));
-            const profElement = document.getElementById(`${skill.name.replace(' ', '_')}-prof`);
-            const modElement = document.getElementById(`${skill.attr}mod`);
+            const checkbox = document.getElementById(`skill-${skill.id}`);
+            const valueElement = document.getElementById(`skill-${skill.id}-value`);
             
-            if (skillElement && modElement) {
-                const modifier = parseInt(modElement.value) || 0;
-                const isProficient = profElement?.checked || false;
+            if (valueElement) {
+                // Pegar o modificador do atributo correspondente
+                const attrValue = this.getAttributeValue(skill.attr);
+                const modifier = this.calculateModifier(attrValue);
+                const isProficient = checkbox?.checked || false;
                 const skillBonus = modifier + (isProficient ? profBonus : 0);
                 const skillString = skillBonus >= 0 ? `+${skillBonus}` : `${skillBonus}`;
-                skillElement.value = skillString;
+                valueElement.textContent = skillString;
             }
         });
     }
 
+    getAttributeValue(attr) {
+        const attrIds = {
+            'str': 'forca-value',
+            'dex': 'destreza-value',
+            'con': 'constituicao-value',
+            'int': 'inteligencia-value',
+            'wis': 'sabedoria-value',
+            'cha': 'carisma-value'
+        };
+
+        const element = document.getElementById(attrIds[attr]);
+        return element ? parseInt(element.textContent) || 10 : 10;
+    }
+
     calculatePassivePerception() {
-        const perceptionElement = document.getElementById('Perception');
-        const passiveElement = document.getElementById('passiveperception');
+        // Obter o valor da perícia de Percepção
+        const perceptionValueElement = document.getElementById('skill-perception-value');
+        const passiveElement = document.getElementById('passive-perception');
         
-        if (perceptionElement && passiveElement) {
-            const perceptionBonus = parseInt(perceptionElement.value) || 0;
+        if (perceptionValueElement && passiveElement) {
+            // Parse do bônus (ex: "+3" ou "-1")
+            const perceptionBonus = parseInt(perceptionValueElement.textContent) || 0;
             const passivePerception = 10 + perceptionBonus;
-            passiveElement.value = passivePerception;
+            passiveElement.textContent = passivePerception;
         }
     }
 
@@ -523,6 +586,47 @@ class CharacterSheet {
                 this.calculateAll();
             });
         });
+        
+        // Sincronização de campos duplicados entre abas
+        this.setupFieldSync();
+    }
+    
+    setupFieldSync() {
+        // Pares de campos que devem ser sincronizados entre abas
+        const syncPairs = [
+            { id1: 'character-name', id2: 'character-name-2' },
+            { id1: 'character-class', id2: 'character-class-2' },
+            { id1: 'character-race', id2: 'character-race-2' },
+            { id1: 'character-background', id2: 'character-background-2' },
+            { id1: 'character-alignment', id2: 'character-alignment-2' },
+            { id1: 'character-subclass', id2: 'character-subclass-2' },
+            { id1: 'character-level', id2: 'character-level-2' }
+        ];
+        
+        syncPairs.forEach(pair => {
+            const el1 = document.getElementById(pair.id1);
+            const el2 = document.getElementById(pair.id2);
+            
+            if (el1 && el2) {
+                // Sincronizar de 1 para 2
+                el1.addEventListener('input', (e) => {
+                    el2.value = e.target.value;
+                });
+                el1.addEventListener('change', (e) => {
+                    el2.value = e.target.value;
+                });
+                
+                // Sincronizar de 2 para 1
+                el2.addEventListener('input', (e) => {
+                    el1.value = e.target.value;
+                });
+                el2.addEventListener('change', (e) => {
+                    el1.value = e.target.value;
+                });
+            }
+        });
+        
+        console.log('✅ Sincronização de campos configurada');
     }
 
     setupCreationListeners() {
@@ -2417,8 +2521,11 @@ class CharacterCreationWizard {
 }
 
 // Inicializar quando o DOM estiver carregado
+let characterSheet = null; // Expor globalmente
+
 document.addEventListener('DOMContentLoaded', () => {
-    const characterSheet = new CharacterSheet();
+    characterSheet = new CharacterSheet();
+    window.characterSheet = characterSheet; // Expor no objeto window
     
     // Se está em modo de criação, iniciar wizard
     const params = new URLSearchParams(window.location.search);
@@ -2428,6 +2535,5 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 500);
     }
 });
-
 
 

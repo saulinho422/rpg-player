@@ -709,6 +709,36 @@
             }
         }
         
+        // Attribute Editor - Modal simples para editar atributos
+        function editAttribute(attrName) {
+            const valueElement = document.getElementById(`${attrName}-value`);
+            if (!valueElement) return;
+            
+            const currentValue = parseInt(valueElement.textContent) || 10;
+            const newValue = prompt(`Digite o novo valor para ${attrName.toUpperCase()}:`, currentValue);
+            
+            if (newValue !== null && !isNaN(newValue)) {
+                const parsedValue = parseInt(newValue);
+                if (parsedValue >= 1 && parsedValue <= 30) {
+                    valueElement.textContent = parsedValue;
+                    
+                    // Calcular modificador
+                    const modifier = Math.floor((parsedValue - 10) / 2);
+                    const modifierElement = document.getElementById(`${attrName}-modifier`);
+                    if (modifierElement) {
+                        modifierElement.textContent = modifier >= 0 ? `+${modifier}` : `${modifier}`;
+                    }
+                    
+                    // Recalcular tudo
+                    if (window.characterSheet) {
+                        window.characterSheet.calculateAll();
+                    }
+                } else {
+                    alert('Valor deve estar entre 1 e 30');
+                }
+            }
+        }
+        
         // Initialize first tab on page load
         document.addEventListener('DOMContentLoaded', () => {
             switchTab('combat');
