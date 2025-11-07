@@ -91,10 +91,78 @@ class CharacterSheet {
                 backgrounds: this.gameData.backgrounds.length,
                 alignments: this.gameData.alignments.length
             });
+            
+            // Popular dropdowns da ficha
+            this.populateSheetDropdowns();
         } catch (error) {
             console.error('❌ Erro ao carregar dados do jogo:', error);
             alert('Erro ao carregar dados do banco de dados: ' + error.message);
         }
+    }
+
+    populateSheetDropdowns() {
+        console.log('📋 Populando dropdowns da ficha...');
+        
+        // Popular dropdown de Classes
+        const classSelect = document.getElementById('character-class-2');
+        if (classSelect && this.gameData.classes) {
+            classSelect.innerHTML = '<option value="">Selecione uma classe</option>';
+            this.gameData.classes.forEach(cls => {
+                const option = document.createElement('option');
+                option.value = cls.name_pt || cls.name;
+                option.textContent = cls.name_pt || cls.name;
+                classSelect.appendChild(option);
+            });
+        }
+
+        // Popular dropdown de Raças
+        const raceSelect = document.getElementById('character-race-2');
+        if (raceSelect && this.gameData.races) {
+            raceSelect.innerHTML = '<option value="">Selecione uma raça</option>';
+            this.gameData.races.forEach(race => {
+                const option = document.createElement('option');
+                option.value = race.name_pt || race.name;
+                option.textContent = race.name_pt || race.name;
+                raceSelect.appendChild(option);
+            });
+        }
+
+        // Popular dropdown de Antecedentes
+        const backgroundSelect = document.getElementById('character-background-2');
+        if (backgroundSelect && this.gameData.backgrounds) {
+            backgroundSelect.innerHTML = '<option value="">Selecione um antecedente</option>';
+            this.gameData.backgrounds.forEach(bg => {
+                const option = document.createElement('option');
+                option.value = bg.nome || bg.name;
+                option.textContent = bg.nome || bg.name;
+                backgroundSelect.appendChild(option);
+            });
+        }
+
+        // Popular dropdown de Alinhamentos
+        const alignmentSelect = document.getElementById('character-alignment-2');
+        if (alignmentSelect) {
+            alignmentSelect.innerHTML = '<option value="">Selecione uma tendência</option>';
+            const alignments = [
+                { value: 'Lawful Good', label: 'Leal e Bom' },
+                { value: 'Neutral Good', label: 'Neutro e Bom' },
+                { value: 'Chaotic Good', label: 'Caótico e Bom' },
+                { value: 'Lawful Neutral', label: 'Leal e Neutro' },
+                { value: 'True Neutral', label: 'Neutro' },
+                { value: 'Chaotic Neutral', label: 'Caótico e Neutro' },
+                { value: 'Lawful Evil', label: 'Leal e Mau' },
+                { value: 'Neutral Evil', label: 'Neutro e Mau' },
+                { value: 'Chaotic Evil', label: 'Caótico e Mau' }
+            ];
+            alignments.forEach(align => {
+                const option = document.createElement('option');
+                option.value = align.value;
+                option.textContent = align.label;
+                alignmentSelect.appendChild(option);
+            });
+        }
+
+        console.log('✅ Dropdowns populados');
     }
 
     async initCreationMode() {
@@ -276,10 +344,10 @@ class CharacterSheet {
         this.setInputValue('Wisdomscore', this.character.wisdom);
         this.setInputValue('Charismascore', this.character.charisma);
 
-        // HP - Aba Combate
-        this.setInputValue('maxhp', this.character.hit_points_max);
-        this.setInputValue('currenthp', this.character.hit_points_current);
-        this.setInputValue('temphp', 0);
+        // HP - Aba Combate (IDs corretos do HTML)
+        this.setInputValue('max-hp', this.character.hit_points_max);
+        this.setInputValue('current-hp', this.character.hit_points_current);
+        this.setInputValue('temp-hp', 0);
 
         // AC e outros stats de combate
         this.setInputValue('ac', this.character.armor_class);
@@ -291,10 +359,13 @@ class CharacterSheet {
             profBonus.textContent = `+${this.character.proficiency_bonus}`;
         }
 
-        // Hit Dice
+        // Hit Dice (é uma div com texto, não input)
         if (this.character.character_class) {
             const hitDie = this.getHitDieForClass(this.character.character_class);
-            this.setInputValue('hitdice', `${this.character.level}${hitDie}`);
+            const hitDiceElement = document.getElementById('hit-dice');
+            if (hitDiceElement) {
+                hitDiceElement.textContent = `${this.character.level}${hitDie}`;
+            }
         }
 
         // Perícias (marcar checkboxes de proficiência)
