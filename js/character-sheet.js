@@ -41,11 +41,11 @@ class CharacterSheet {
             window.featuresManager = new window.FeaturesManager(this);
         }
         
-        // Inicializar wizard automaticamente após carregar
-        setTimeout(() => {
-            console.log('🧙 Inicializando wizard automaticamente...');
-            this.openCreationWizard();
-        }, 500);
+        // Wizard agora só abre pelo botão do menu
+        // setTimeout(() => {
+        //     console.log('🧙 Inicializando wizard automaticamente...');
+        //     this.openCreationWizard();
+        // }, 500);
     }
 
     async checkAuth() {
