@@ -42,9 +42,117 @@
             <p class="text-text-secondary text-center">Gerencie seu personagem de forma digital e interativa</p>
         </header>
 
-        <!-- Two Column Layout -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <!-- Left Column - Character Stats -->
+        <!-- Navegação por Abas -->
+        <div class="mb-6">
+            <div class="flex justify-center space-x-2 border-b-2 border-primary pb-2">
+                <button class="tab-btn active" data-tab="combat" onclick="switchTab('combat')">
+                    <span class="text-lg">⚔️</span>
+                    <span class="ml-2">Combate</span>
+                </button>
+                <button class="tab-btn" data-tab="attributes" onclick="switchTab('attributes')">
+                    <span class="text-lg">📊</span>
+                    <span class="ml-2">Atributos & Perícias</span>
+                </button>
+                <button class="tab-btn" data-tab="identity" onclick="switchTab('identity')">
+                    <span class="text-lg">🎭</span>
+                    <span class="ml-2">Identidade</span>
+                </button>
+                <button class="tab-btn" data-tab="resources" onclick="switchTab('resources')">
+                    <span class="text-lg">🎒</span>
+                    <span class="ml-2">Recursos</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Conteúdo das Abas -->
+        
+        <!-- ABA 1: COMBATE -->
+        <div id="tab-combat" class="tab-content active">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Coluna Esquerda - Stats de Combate -->
+                <div class="space-y-6">
+                    <!-- Combat Stats -->
+                    <section class="card p-6">
+                        <h2 class="font-heading text-xl text-primary mb-4">Estatísticas de Combate</h2>
+                        <div class="grid grid-cols-3 gap-4 text-center">
+                            <div>
+                                <h3 class="font-heading text-sm text-text-secondary mb-2">CLASSE DE ARMADURA</h3>
+                                <input type="number" name="ac" id="ac" class="text-2xl font-bold text-primary w-full text-center input-field" value="10">
+                            </div>
+                            <div>
+                                <h3 class="font-heading text-sm text-text-secondary mb-2">INICIATIVA</h3>
+                                <input type="text" name="initiative" id="initiative" class="text-2xl font-bold text-primary w-full text-center input-field" placeholder="+0" readonly>
+                            </div>
+                            <div>
+                                <h3 class="font-heading text-sm text-text-secondary mb-2">DESLOCAMENTO</h3>
+                                <input type="text" name="speed" id="speed" class="text-2xl font-bold text-primary w-full text-center input-field" value="9m">
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Hit Points -->
+                    <section class="card p-6">
+                        <h2 class="font-heading text-xl text-primary mb-4">Pontos de Vida</h2>
+                        <div class="grid grid-cols-3 gap-4">
+                            <div class="text-center">
+                                <label class="block text-sm font-medium text-text-secondary mb-2">Atual</label>
+                                <input type="number" name="currenthp" id="currenthp" class="input-field w-full text-center text-lg font-bold" value="8">
+                            </div>
+                            <div class="text-center">
+                                <label class="block text-sm font-medium text-text-secondary mb-2">Temporário</label>
+                                <input type="number" name="temphp" id="temphp" class="input-field w-full text-center text-lg font-bold" value="0">
+                            </div>
+                            <div class="text-center">
+                                <label class="block text-sm font-medium text-text-secondary mb-2">Máximo</label>
+                                <input type="number" name="maxhp" id="maxhp" class="input-field w-full text-center text-lg font-bold" value="8">
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Hit Dice -->
+                    <section class="card p-6">
+                        <h2 class="font-heading text-xl text-primary mb-4">Dados de Vida</h2>
+                        <div class="text-center">
+                            <input type="text" name="hitdice" id="hitdice" class="text-lg font-bold text-primary w-full text-center input-field" value="1d8">
+                            <p class="text-sm text-text-secondary mt-1">Dados disponíveis para recuperação</p>
+                        </div>
+                    </section>
+                </div>
+
+                <!-- Coluna Direita - Ataques e Conjuração -->
+                <div class="space-y-6">
+                    <!-- Ataques e Magias -->
+                    <section class="card p-6">
+                        <h2 class="font-heading text-xl text-primary mb-4">Ataques e Conjuração</h2>
+                        <div class="space-y-4">
+                            <div>
+                                <label for="attacks" class="block text-sm font-medium text-text-secondary mb-2">Ataques</label>
+                                <textarea name="attacks" id="attacks" class="input-field w-full px-3 py-2 resize-none" rows="8" placeholder="Nome | Bônus de Ataque | Dano/Tipo"></textarea>
+                            </div>
+                            <div class="grid grid-cols-3 gap-4">
+                                <div>
+                                    <label for="spell-slots" class="block text-sm font-medium text-text-secondary mb-2">Espaços de Magia</label>
+                                    <input type="text" name="spell-slots" id="spell-slots" class="input-field w-full px-3 py-2" placeholder="1º: 4">
+                                </div>
+                                <div>
+                                    <label for="spell-save-dc" class="block text-sm font-medium text-text-secondary mb-2">CD de Magia</label>
+                                    <input type="number" name="spell-save-dc" id="spell-save-dc" class="input-field w-full px-3 py-2" placeholder="13">
+                                </div>
+                                <div>
+                                    <label for="spell-attack" class="block text-sm font-medium text-text-secondary mb-2">Ataque Mágico</label>
+                                    <input type="text" name="spell-attack" id="spell-attack" class="input-field w-full px-3 py-2" placeholder="+5">
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </div>
+
+        <!-- ABA 2: ATRIBUTOS & PERÍCIAS -->
+        <div id="tab-attributes" class="tab-content" style="display: none;">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Coluna Esquerda - Atributos e Perícias -->
             <div class="space-y-6">
                 <!-- Main Attributes -->
                 <section class="card p-6">
@@ -167,79 +275,93 @@
                         <!-- Skills will be populated by JavaScript -->
                     </div>
                 </section>
+
+                <!-- Passive Perception -->
+                <section class="card p-6">
+                    <h2 class="font-heading text-xl text-primary mb-4">Percepção Passiva</h2>
+                    <div class="text-center">
+                        <div class="inline-flex items-center justify-center w-16 h-16 bg-primary text-white rounded-full text-2xl font-bold">
+                            <span id="passive-perception">10</span>
+                        </div>
+                    </div>
+                </section>
             </div>
 
-            <!-- Right Column - Character Info & Combat -->
+            <!-- Coluna Direita - Proficiências -->
             <div class="space-y-6">
-                <!-- Character Info Header -->
+                <!-- Proficiências e Idiomas -->
                 <section class="card p-6">
-                    <h2 class="font-heading text-xl text-primary mb-4">Informações do Personagem</h2>
+                    <h2 class="font-heading text-xl text-primary mb-4">Proficiências e Idiomas</h2>
                     <div class="space-y-4">
                         <div>
-                            <label for="character-name" class="block text-sm font-medium text-text-secondary mb-1">Nome do Personagem</label>
-                            <input type="text" id="character-name" class="input-field w-full px-3 py-2" placeholder="Digite o nome do seu personagem" />
+                            <label for="proficiencies" class="block text-sm font-medium text-text-secondary mb-2">Proficiências</label>
+                            <textarea name="proficiencies" id="proficiencies" class="input-field w-full px-3 py-2 resize-none" rows="6" placeholder="Armaduras, Armas, Ferramentas..."></textarea>
                         </div>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <label for="character-class" class="block text-sm font-medium text-text-secondary mb-1">Classe</label>
-                                <select id="character-class" class="input-field w-full px-3 py-2">
-                                    <option value>Selecione uma classe</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label for="character-race" class="block text-sm font-medium text-text-secondary mb-1">Raça</label>
-                                <select id="character-race" class="input-field w-full px-3 py-2">
-                                    <option value>Selecione uma raça</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <label for="character-background" class="block text-sm font-medium text-text-secondary mb-1">Antecedente</label>
-                                <select id="character-background" class="input-field w-full px-3 py-2">
-                                    <option value>Selecione um antecedente</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label for="character-alignment" class="block text-sm font-medium text-text-secondary mb-1">Tendência</label>
-                                <select id="character-alignment" class="input-field w-full px-3 py-2">
-                                    <option value>Selecione uma tendência</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <label for="character-subclass" class="block text-sm font-medium text-text-secondary mb-1">Subclasse</label>
-                                <select id="character-subclass" class="input-field w-full px-3 py-2">
-                                    <option value>Selecione uma subclasse</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label for="character-level" class="block text-sm font-medium text-text-secondary mb-1">Nível</label>
-                                <input type="number" id="character-level" class="input-field w-full px-3 py-2" min="1" max="20" value="1" />
-                            </div>
+                        <div>
+                            <label for="languages" class="block text-sm font-medium text-text-secondary mb-2">Idiomas</label>
+                            <textarea name="languages" id="languages" class="input-field w-full px-3 py-2 resize-none" rows="3" placeholder="Comum, Élfico..."></textarea>
                         </div>
                     </div>
                 </section>
+            </div>
+            </div>
+        </div>
 
-                <!-- Combat Stats -->
-                <section class="card p-6">
-                    <h2 class="font-heading text-xl text-primary mb-4">Estatísticas de Combate</h2>
-                    <div class="grid grid-cols-3 gap-4 text-center">
-                        <div>
-                            <h3 class="font-heading text-sm text-text-secondary mb-2">CLASSE DE ARMADURA</h3>
-                            <div class="text-2xl font-bold text-primary" id="armor-class">10</div>
+        <!-- ABA 3: IDENTIDADE & INTERPRETAÇÃO -->
+        <div id="tab-identity" class="tab-content" style="display: none;">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Coluna Esquerda - Info do Personagem -->
+                <div class="space-y-6">
+                    <!-- Character Info Header -->
+                    <section class="card p-6">
+                        <h2 class="font-heading text-xl text-primary mb-4">Informações do Personagem</h2>
+                        <div class="space-y-4">
+                            <div>
+                                <label for="character-name-2" class="block text-sm font-medium text-text-secondary mb-1">Nome do Personagem</label>
+                                <input type="text" id="character-name-2" class="input-field w-full px-3 py-2" placeholder="Digite o nome do seu personagem" />
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label for="character-class-2" class="block text-sm font-medium text-text-secondary mb-1">Classe</label>
+                                    <select id="character-class-2" class="input-field w-full px-3 py-2">
+                                        <option value>Selecione uma classe</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label for="character-race-2" class="block text-sm font-medium text-text-secondary mb-1">Raça</label>
+                                    <select id="character-race-2" class="input-field w-full px-3 py-2">
+                                        <option value>Selecione uma raça</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label for="character-background-2" class="block text-sm font-medium text-text-secondary mb-1">Antecedente</label>
+                                    <select id="character-background-2" class="input-field w-full px-3 py-2">
+                                        <option value>Selecione um antecedente</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label for="character-alignment-2" class="block text-sm font-medium text-text-secondary mb-1">Tendência</label>
+                                    <select id="character-alignment-2" class="input-field w-full px-3 py-2">
+                                        <option value>Selecione uma tendência</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label for="character-subclass-2" class="block text-sm font-medium text-text-secondary mb-1">Subclasse</label>
+                                    <select id="character-subclass-2" class="input-field w-full px-3 py-2">
+                                        <option value>Selecione uma subclasse</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label for="character-level-2" class="block text-sm font-medium text-text-secondary mb-1">Nível</label>
+                                    <input type="number" id="character-level-2" class="input-field w-full px-3 py-2" min="1" max="20" value="1" />
+                                </div>
+                            </div>
                         </div>
-                        <div>
-                            <h3 class="font-heading text-sm text-text-secondary mb-2">INICIATIVA</h3>
-                            <div class="text-2xl font-bold text-primary" id="initiative">+0</div>
-                        </div>
-                        <div>
-                            <h3 class="font-heading text-sm text-text-secondary mb-2">DESLOCAMENTO</h3>
-                            <div class="text-2xl font-bold text-primary" id="speed">9m</div>
-                        </div>
-                    </div>
-                </section>
+                    </section>
 
                 <!-- Hit Points -->
                 <section class="card p-6">
@@ -341,114 +463,167 @@
                     </div>
                 </section>
 
-                <!-- Personalidade -->
-                <section class="card p-6">
-                    <h2 class="font-heading text-xl text-primary mb-4">Personalidade</h2>
-                    <div class="space-y-3">
-                        <div>
-                            <label for="personality-traits" class="block text-sm font-medium text-text-secondary mb-1">Traços de Personalidade</label>
-                            <textarea name="personality-traits" id="personality-traits" class="input-field w-full px-3 py-2 resize-none" rows="2" placeholder="Como seu personagem age?"></textarea>
-                        </div>
-                        <div>
-                            <label for="ideals" class="block text-sm font-medium text-text-secondary mb-1">Ideais</label>
-                            <textarea name="ideals" id="ideals" class="input-field w-full px-3 py-2 resize-none" rows="2" placeholder="No que seu personagem acredita?"></textarea>
-                        </div>
-                        <div>
-                            <label for="bonds" class="block text-sm font-medium text-text-secondary mb-1">Vínculos</label>
-                            <textarea name="bonds" id="bonds" class="input-field w-full px-3 py-2 resize-none" rows="2" placeholder="O que é importante para seu personagem?"></textarea>
-                        </div>
-                        <div>
-                            <label for="flaws" class="block text-sm font-medium text-text-secondary mb-1">Defeitos</label>
-                            <textarea name="flaws" id="flaws" class="input-field w-full px-3 py-2 resize-none" rows="2" placeholder="Quais são as fraquezas do seu personagem?"></textarea>
-                        </div>
-                    </div>
-                </section>
+                    </section>
 
-                <!-- Aparência -->
-                <section class="card p-6">
-                    <h2 class="font-heading text-xl text-primary mb-4">Aparência</h2>
-                    <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            <label for="age" class="block text-sm font-medium text-text-secondary mb-1">Idade</label>
-                            <input type="text" name="age" id="age" class="input-field w-full px-3 py-2" placeholder="25">
+                    <!-- Personalidade -->
+                    <section class="card p-6">
+                        <h2 class="font-heading text-xl text-primary mb-4">Personalidade</h2>
+                        <div class="space-y-3">
+                            <div>
+                                <label for="personality-traits" class="block text-sm font-medium text-text-secondary mb-1">Traços de Personalidade</label>
+                                <textarea name="personality-traits" id="personality-traits" class="input-field w-full px-3 py-2 resize-none" rows="2" placeholder="Como seu personagem age?"></textarea>
+                            </div>
+                            <div>
+                                <label for="ideals" class="block text-sm font-medium text-text-secondary mb-1">Ideais</label>
+                                <textarea name="ideals" id="ideals" class="input-field w-full px-3 py-2 resize-none" rows="2" placeholder="No que seu personagem acredita?"></textarea>
+                            </div>
+                            <div>
+                                <label for="bonds" class="block text-sm font-medium text-text-secondary mb-1">Vínculos</label>
+                                <textarea name="bonds" id="bonds" class="input-field w-full px-3 py-2 resize-none" rows="2" placeholder="O que é importante para seu personagem?"></textarea>
+                            </div>
+                            <div>
+                                <label for="flaws" class="block text-sm font-medium text-text-secondary mb-1">Defeitos</label>
+                                <textarea name="flaws" id="flaws" class="input-field w-full px-3 py-2 resize-none" rows="2" placeholder="Quais são as fraquezas do seu personagem?"></textarea>
+                            </div>
                         </div>
-                        <div>
-                            <label for="height" class="block text-sm font-medium text-text-secondary mb-1">Altura</label>
-                            <input type="text" name="height" id="height" class="input-field w-full px-3 py-2" placeholder="1,75m">
-                        </div>
-                        <div>
-                            <label for="weight" class="block text-sm font-medium text-text-secondary mb-1">Peso</label>
-                            <input type="text" name="weight" id="weight" class="input-field w-full px-3 py-2" placeholder="70kg">
-                        </div>
-                        <div>
-                            <label for="eyes" class="block text-sm font-medium text-text-secondary mb-1">Olhos</label>
-                            <input type="text" name="eyes" id="eyes" class="input-field w-full px-3 py-2" placeholder="Azuis">
-                        </div>
-                        <div>
-                            <label for="skin" class="block text-sm font-medium text-text-secondary mb-1">Pele</label>
-                            <input type="text" name="skin" id="skin" class="input-field w-full px-3 py-2" placeholder="Clara">
-                        </div>
-                        <div>
-                            <label for="hair" class="block text-sm font-medium text-text-secondary mb-1">Cabelo</label>
-                            <input type="text" name="hair" id="hair" class="input-field w-full px-3 py-2" placeholder="Castanho">
-                        </div>
-                    </div>
-                    <div class="mt-4">
-                        <label for="appearance" class="block text-sm font-medium text-text-secondary mb-1">Descrição da Aparência</label>
-                        <textarea name="appearance" id="appearance" class="input-field w-full px-3 py-2 resize-none" rows="4" placeholder="Descreva a aparência do seu personagem..."></textarea>
-                    </div>
-                </section>
+                    </section>
+                </div>
 
-                <!-- História -->
-                <section class="card p-6">
-                    <h2 class="font-heading text-xl text-primary mb-4">História do Personagem</h2>
-                    <div class="space-y-4">
-                        <textarea name="backstory" id="backstory" class="input-field w-full px-3 py-2 resize-none" rows="8" placeholder="Conte a história do seu personagem..."></textarea>
-                    </div>
-                </section>
-
-                <!-- Aliados e Organizações -->
-                <section class="card p-6">
-                    <h2 class="font-heading text-xl text-primary mb-4">Aliados e Organizações</h2>
-                    <div class="space-y-4">
-                        <textarea name="allies" id="allies" class="input-field w-full px-3 py-2 resize-none" rows="5" placeholder="Liste aliados, contatos e organizações..."></textarea>
-                    </div>
-                </section>
-
-                <!-- Tesouro -->
-                <section class="card p-6">
-                    <h2 class="font-heading text-xl text-primary mb-4">Tesouro</h2>
-                    <div class="space-y-4">
-                        <div class="grid grid-cols-5 gap-3">
+                <!-- Coluna Direita - Aparência e História -->
+                <div class="space-y-6">
+                    <!-- Aparência -->
+                    <section class="card p-6">
+                        <h2 class="font-heading text-xl text-primary mb-4">Aparência</h2>
+                        <div class="grid grid-cols-2 gap-4">
                             <div>
-                                <label for="cp" class="block text-sm font-medium text-text-secondary mb-1">PC</label>
-                                <input type="number" name="cp" id="cp" class="input-field w-full px-2 py-2 text-center" value="0" min="0">
+                                <label for="age" class="block text-sm font-medium text-text-secondary mb-1">Idade</label>
+                                <input type="text" name="age" id="age" class="input-field w-full px-3 py-2" placeholder="25">
                             </div>
                             <div>
-                                <label for="sp" class="block text-sm font-medium text-text-secondary mb-1">PP</label>
-                                <input type="number" name="sp" id="sp" class="input-field w-full px-2 py-2 text-center" value="0" min="0">
+                                <label for="height" class="block text-sm font-medium text-text-secondary mb-1">Altura</label>
+                                <input type="text" name="height" id="height" class="input-field w-full px-3 py-2" placeholder="1,75m">
                             </div>
                             <div>
-                                <label for="ep" class="block text-sm font-medium text-text-secondary mb-1">PE</label>
-                                <input type="number" name="ep" id="ep" class="input-field w-full px-2 py-2 text-center" value="0" min="0">
+                                <label for="weight" class="block text-sm font-medium text-text-secondary mb-1">Peso</label>
+                                <input type="text" name="weight" id="weight" class="input-field w-full px-3 py-2" placeholder="70kg">
                             </div>
                             <div>
-                                <label for="gp" class="block text-sm font-medium text-text-secondary mb-1">PO</label>
-                                <input type="number" name="gp" id="gp" class="input-field w-full px-2 py-2 text-center" value="0" min="0">
+                                <label for="eyes" class="block text-sm font-medium text-text-secondary mb-1">Olhos</label>
+                                <input type="text" name="eyes" id="eyes" class="input-field w-full px-3 py-2" placeholder="Azuis">
                             </div>
                             <div>
-                                <label for="pp" class="block text-sm font-medium text-text-secondary mb-1">PL</label>
-                                <input type="number" name="pp" id="pp" class="input-field w-full px-2 py-2 text-center" value="0" min="0">
+                                <label for="skin" class="block text-sm font-medium text-text-secondary mb-1">Pele</label>
+                                <input type="text" name="skin" id="skin" class="input-field w-full px-3 py-2" placeholder="Clara">
+                            </div>
+                            <div>
+                                <label for="hair" class="block text-sm font-medium text-text-secondary mb-1">Cabelo</label>
+                                <input type="text" name="hair" id="hair" class="input-field w-full px-3 py-2" placeholder="Castanho">
                             </div>
                         </div>
-                        <div>
-                            <label for="treasure" class="block text-sm font-medium text-text-secondary mb-2">Outros Tesouros</label>
-                            <textarea name="treasure" id="treasure" class="input-field w-full px-3 py-2 resize-none" rows="4" placeholder="Gemas, joias, itens mágicos..."></textarea>
+                        <div class="mt-4">
+                            <label for="appearance" class="block text-sm font-medium text-text-secondary mb-1">Descrição da Aparência</label>
+                            <textarea name="appearance" id="appearance" class="input-field w-full px-3 py-2 resize-none" rows="4" placeholder="Descreva a aparência do seu personagem..."></textarea>
                         </div>
-                    </div>
-                </section>
+                    </section>
+
+                    <!-- História -->
+                    <section class="card p-6">
+                        <h2 class="font-heading text-xl text-primary mb-4">História do Personagem</h2>
+                        <div class="space-y-4">
+                            <textarea name="backstory" id="backstory" class="input-field w-full px-3 py-2 resize-none" rows="8" placeholder="Conte a história do seu personagem..."></textarea>
+                        </div>
+                    </section>
+                </div>
             </div>
         </div>
+
+        <!-- ABA 4: RECURSOS & HABILIDADES -->
+        <div id="tab-resources" class="tab-content" style="display: none;">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Coluna Esquerda - Características e Inventário -->
+                <div class="space-y-6">
+                    <!-- Características e Habilidades -->
+                    <section class="card p-6">
+                        <h2 class="font-heading text-xl text-primary mb-4">Características e Habilidades</h2>
+                        <div class="space-y-4">
+                            <div>
+                                <label for="features-traits-2" class="block text-sm font-medium text-text-secondary mb-2">Características & Traços</label>
+                                <textarea name="features-traits-2" id="features-traits-2" class="input-field w-full px-3 py-2 resize-none" rows="8" placeholder="Características raciais, traços de antecedente, habilidades de classe..."></textarea>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Inventory Management -->
+                    <section class="card p-6">
+                        <h2 class="font-heading text-xl text-primary mb-4">Inventário</h2>
+                        <div class="space-y-4">
+                            <div class="flex justify-between items-center">
+                                <span class="text-sm text-text-secondary">Capacidade de Carga:</span>
+                                <span class="font-mono text-sm" id="carrying-capacity-2">75 kg</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-sm text-text-secondary">Carga Atual:</span>
+                                <span class="font-mono text-sm" id="current-load-2">0 kg</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-2">
+                                <div class="bg-primary h-2 rounded-full transition-all" id="load-bar-2" style="width: 0%"></div>
+                            </div>
+                            <button onclick="openInventoryModal()" class="btn-primary w-full px-4 py-2 rounded-lg font-medium">
+                                Gerenciar Inventário
+                            </button>
+                        </div>
+                    </section>
+                </div>
+
+                <!-- Coluna Direita - Tesouro e Aliados -->
+                <div class="space-y-6">
+                    <!-- Tesouro -->
+                    <section class="card p-6">
+                        <h2 class="font-heading text-xl text-primary mb-4">Tesouro</h2>
+                        <div class="space-y-4">
+                            <div class="grid grid-cols-5 gap-3">
+                                <div>
+                                    <label for="cp-2" class="block text-sm font-medium text-text-secondary mb-1">PC</label>
+                                    <input type="number" name="cp-2" id="cp-2" class="input-field w-full px-2 py-2 text-center" value="0" min="0">
+                                </div>
+                                <div>
+                                    <label for="sp-2" class="block text-sm font-medium text-text-secondary mb-1">PP</label>
+                                    <input type="number" name="sp-2" id="sp-2" class="input-field w-full px-2 py-2 text-center" value="0" min="0">
+                                </div>
+                                <div>
+                                    <label for="ep-2" class="block text-sm font-medium text-text-secondary mb-1">PE</label>
+                                    <input type="number" name="ep-2" id="ep-2" class="input-field w-full px-2 py-2 text-center" value="0" min="0">
+                                </div>
+                                <div>
+                                    <label for="gp-2" class="block text-sm font-medium text-text-secondary mb-1">PO</label>
+                                    <input type="number" name="gp-2" id="gp-2" class="input-field w-full px-2 py-2 text-center" value="0" min="0">
+                                </div>
+                                <div>
+                                    <label for="pp-2" class="block text-sm font-medium text-text-secondary mb-1">PL</label>
+                                    <input type="number" name="pp-2" id="pp-2" class="input-field w-full px-2 py-2 text-center" value="0" min="0">
+                                </div>
+                            </div>
+                            <div>
+                                <label for="treasure-2" class="block text-sm font-medium text-text-secondary mb-2">Outros Tesouros</label>
+                                <textarea name="treasure-2" id="treasure-2" class="input-field w-full px-3 py-2 resize-none" rows="4" placeholder="Gemas, joias, itens valiosos..."></textarea>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Aliados e Organizações -->
+                    <section class="card p-6">
+                        <h2 class="font-heading text-xl text-primary mb-4">Aliados e Organizações</h2>
+                        <div class="space-y-4">
+                            <textarea name="allies-2" id="allies-2" class="input-field w-full px-3 py-2 resize-none" rows="6" placeholder="Liste aliados, contatos e organizações..."></textarea>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </div>
+
+        <!-- Fim das Abas -->
+    </div>
+
     </div>
 
     <!-- Inventory Modal -->
@@ -504,6 +679,41 @@
     </div>
 
     <!-- Scripts -->
+    <script>
+        // Tab Switching System
+        function switchTab(tabName) {
+            // Hide all tab contents
+            const tabContents = document.querySelectorAll('.tab-content');
+            tabContents.forEach(content => {
+                content.style.display = 'none';
+                content.classList.remove('active');
+            });
+            
+            // Remove active class from all tab buttons
+            const tabButtons = document.querySelectorAll('.tab-btn');
+            tabButtons.forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // Show selected tab content
+            const selectedTab = document.getElementById(`tab-${tabName}`);
+            if (selectedTab) {
+                selectedTab.style.display = 'block';
+                selectedTab.classList.add('active');
+            }
+            
+            // Add active class to selected button
+            const selectedButton = document.querySelector(`[data-tab="${tabName}"]`);
+            if (selectedButton) {
+                selectedButton.classList.add('active');
+            }
+        }
+        
+        // Initialize first tab on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            switchTab('combat');
+        });
+    </script>
     <script type="module">
         // Importar e expor Dice3DRoller globalmente
         import { Dice3DRoller } from './js/dice3d.js?v=3.1';
@@ -511,5 +721,6 @@
         console.log('✅ Dice3DRoller v3.1 carregado');
     </script>
     <script type="module" src="js/character-sheet.js?v=3.1"></script>
+
 </body>
 </html>
