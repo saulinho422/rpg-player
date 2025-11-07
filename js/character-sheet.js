@@ -406,6 +406,10 @@ class CharacterSheet {
         });
     }
 
+    calculateModifier(score) {
+        return Math.floor((score - 10) / 2);
+    }
+
     calculateProficiencyBonus() {
         const level = this.character?.level || 1;
         const profBonus = Math.ceil(level / 4) + 1;
