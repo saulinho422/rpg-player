@@ -289,6 +289,164 @@
                         </button>
                     </div>
                 </section>
+
+                <!-- Proficiências e Idiomas -->
+                <section class="card p-6">
+                    <h2 class="font-heading text-xl text-primary mb-4">Outras Proficiências e Idiomas</h2>
+                    <div class="space-y-4">
+                        <div>
+                            <label for="proficiencies" class="block text-sm font-medium text-text-secondary mb-2">Proficiências</label>
+                            <textarea name="proficiencies" id="proficiencies" class="input-field w-full px-3 py-2 resize-none" rows="4" placeholder="Armaduras, armas, ferramentas..."></textarea>
+                        </div>
+                        <div>
+                            <label for="languages" class="block text-sm font-medium text-text-secondary mb-2">Idiomas</label>
+                            <textarea name="languages" id="languages" class="input-field w-full px-3 py-2 resize-none" rows="3" placeholder="Comum, Élfico, Anão..."></textarea>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Características e Habilidades -->
+                <section class="card p-6">
+                    <h2 class="font-heading text-xl text-primary mb-4">Características e Habilidades</h2>
+                    <div class="space-y-4">
+                        <div>
+                            <label for="features-traits" class="block text-sm font-medium text-text-secondary mb-2">Características & Traços</label>
+                            <textarea name="features-traits" id="features-traits" class="input-field w-full px-3 py-2 resize-none" rows="6" placeholder="Características raciais, traços de antecedente..."></textarea>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Ataques e Magias -->
+                <section class="card p-6">
+                    <h2 class="font-heading text-xl text-primary mb-4">Ataques e Conjuração</h2>
+                    <div class="space-y-4">
+                        <div>
+                            <label for="attacks" class="block text-sm font-medium text-text-secondary mb-2">Ataques</label>
+                            <textarea name="attacks" id="attacks" class="input-field w-full px-3 py-2 resize-none" rows="5" placeholder="Nome | Bônus de Ataque | Dano/Tipo"></textarea>
+                        </div>
+                        <div class="grid grid-cols-3 gap-4">
+                            <div>
+                                <label for="spell-slots" class="block text-sm font-medium text-text-secondary mb-2">Espaços de Magia</label>
+                                <input type="text" name="spell-slots" id="spell-slots" class="input-field w-full px-3 py-2" placeholder="1º: 4">
+                            </div>
+                            <div>
+                                <label for="spell-save-dc" class="block text-sm font-medium text-text-secondary mb-2">CD de Magia</label>
+                                <input type="number" name="spell-save-dc" id="spell-save-dc" class="input-field w-full px-3 py-2" placeholder="13">
+                            </div>
+                            <div>
+                                <label for="spell-attack" class="block text-sm font-medium text-text-secondary mb-2">Ataque Mágico</label>
+                                <input type="text" name="spell-attack" id="spell-attack" class="input-field w-full px-3 py-2" placeholder="+5">
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Personalidade -->
+                <section class="card p-6">
+                    <h2 class="font-heading text-xl text-primary mb-4">Personalidade</h2>
+                    <div class="space-y-3">
+                        <div>
+                            <label for="personality-traits" class="block text-sm font-medium text-text-secondary mb-1">Traços de Personalidade</label>
+                            <textarea name="personality-traits" id="personality-traits" class="input-field w-full px-3 py-2 resize-none" rows="2" placeholder="Como seu personagem age?"></textarea>
+                        </div>
+                        <div>
+                            <label for="ideals" class="block text-sm font-medium text-text-secondary mb-1">Ideais</label>
+                            <textarea name="ideals" id="ideals" class="input-field w-full px-3 py-2 resize-none" rows="2" placeholder="No que seu personagem acredita?"></textarea>
+                        </div>
+                        <div>
+                            <label for="bonds" class="block text-sm font-medium text-text-secondary mb-1">Vínculos</label>
+                            <textarea name="bonds" id="bonds" class="input-field w-full px-3 py-2 resize-none" rows="2" placeholder="O que é importante para seu personagem?"></textarea>
+                        </div>
+                        <div>
+                            <label for="flaws" class="block text-sm font-medium text-text-secondary mb-1">Defeitos</label>
+                            <textarea name="flaws" id="flaws" class="input-field w-full px-3 py-2 resize-none" rows="2" placeholder="Quais são as fraquezas do seu personagem?"></textarea>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Aparência -->
+                <section class="card p-6">
+                    <h2 class="font-heading text-xl text-primary mb-4">Aparência</h2>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label for="age" class="block text-sm font-medium text-text-secondary mb-1">Idade</label>
+                            <input type="text" name="age" id="age" class="input-field w-full px-3 py-2" placeholder="25">
+                        </div>
+                        <div>
+                            <label for="height" class="block text-sm font-medium text-text-secondary mb-1">Altura</label>
+                            <input type="text" name="height" id="height" class="input-field w-full px-3 py-2" placeholder="1,75m">
+                        </div>
+                        <div>
+                            <label for="weight" class="block text-sm font-medium text-text-secondary mb-1">Peso</label>
+                            <input type="text" name="weight" id="weight" class="input-field w-full px-3 py-2" placeholder="70kg">
+                        </div>
+                        <div>
+                            <label for="eyes" class="block text-sm font-medium text-text-secondary mb-1">Olhos</label>
+                            <input type="text" name="eyes" id="eyes" class="input-field w-full px-3 py-2" placeholder="Azuis">
+                        </div>
+                        <div>
+                            <label for="skin" class="block text-sm font-medium text-text-secondary mb-1">Pele</label>
+                            <input type="text" name="skin" id="skin" class="input-field w-full px-3 py-2" placeholder="Clara">
+                        </div>
+                        <div>
+                            <label for="hair" class="block text-sm font-medium text-text-secondary mb-1">Cabelo</label>
+                            <input type="text" name="hair" id="hair" class="input-field w-full px-3 py-2" placeholder="Castanho">
+                        </div>
+                    </div>
+                    <div class="mt-4">
+                        <label for="appearance" class="block text-sm font-medium text-text-secondary mb-1">Descrição da Aparência</label>
+                        <textarea name="appearance" id="appearance" class="input-field w-full px-3 py-2 resize-none" rows="4" placeholder="Descreva a aparência do seu personagem..."></textarea>
+                    </div>
+                </section>
+
+                <!-- História -->
+                <section class="card p-6">
+                    <h2 class="font-heading text-xl text-primary mb-4">História do Personagem</h2>
+                    <div class="space-y-4">
+                        <textarea name="backstory" id="backstory" class="input-field w-full px-3 py-2 resize-none" rows="8" placeholder="Conte a história do seu personagem..."></textarea>
+                    </div>
+                </section>
+
+                <!-- Aliados e Organizações -->
+                <section class="card p-6">
+                    <h2 class="font-heading text-xl text-primary mb-4">Aliados e Organizações</h2>
+                    <div class="space-y-4">
+                        <textarea name="allies" id="allies" class="input-field w-full px-3 py-2 resize-none" rows="5" placeholder="Liste aliados, contatos e organizações..."></textarea>
+                    </div>
+                </section>
+
+                <!-- Tesouro -->
+                <section class="card p-6">
+                    <h2 class="font-heading text-xl text-primary mb-4">Tesouro</h2>
+                    <div class="space-y-4">
+                        <div class="grid grid-cols-5 gap-3">
+                            <div>
+                                <label for="cp" class="block text-sm font-medium text-text-secondary mb-1">PC</label>
+                                <input type="number" name="cp" id="cp" class="input-field w-full px-2 py-2 text-center" value="0" min="0">
+                            </div>
+                            <div>
+                                <label for="sp" class="block text-sm font-medium text-text-secondary mb-1">PP</label>
+                                <input type="number" name="sp" id="sp" class="input-field w-full px-2 py-2 text-center" value="0" min="0">
+                            </div>
+                            <div>
+                                <label for="ep" class="block text-sm font-medium text-text-secondary mb-1">PE</label>
+                                <input type="number" name="ep" id="ep" class="input-field w-full px-2 py-2 text-center" value="0" min="0">
+                            </div>
+                            <div>
+                                <label for="gp" class="block text-sm font-medium text-text-secondary mb-1">PO</label>
+                                <input type="number" name="gp" id="gp" class="input-field w-full px-2 py-2 text-center" value="0" min="0">
+                            </div>
+                            <div>
+                                <label for="pp" class="block text-sm font-medium text-text-secondary mb-1">PL</label>
+                                <input type="number" name="pp" id="pp" class="input-field w-full px-2 py-2 text-center" value="0" min="0">
+                            </div>
+                        </div>
+                        <div>
+                            <label for="treasure" class="block text-sm font-medium text-text-secondary mb-2">Outros Tesouros</label>
+                            <textarea name="treasure" id="treasure" class="input-field w-full px-3 py-2 resize-none" rows="4" placeholder="Gemas, joias, itens mágicos..."></textarea>
+                        </div>
+                    </div>
+                </section>
             </div>
         </div>
     </div>
