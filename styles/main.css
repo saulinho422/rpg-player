@@ -565,7 +565,9 @@ video {
 body {
   font-family: 'Libre Baskerville', serif;
   background-color: var(--color-background);
-  background-image: url('../img/plano_de_fundo1.png');
+  background-image: 
+    linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)),
+    url('../img/plano_de_fundo1.png');
   background-size: cover;
   background-position: center;
   background-attachment: fixed;
@@ -984,7 +986,9 @@ h1, h2, h3, h4, h5, h6 {
 .bg-background{
   --tw-bg-opacity: 1;
   background-color: rgb(10 10 10 / var(--tw-bg-opacity, 1));
-  background-image: url('../img/plano_de_fundo1.png');
+  background-image: 
+    linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)),
+    url('../img/plano_de_fundo1.png');
   background-size: cover;
   background-position: center;
   background-attachment: fixed;
