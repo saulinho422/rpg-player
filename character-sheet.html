@@ -71,78 +71,67 @@
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 <!-- Coluna Esquerda - Stats de Combate -->
                 <div class="space-y-6">
-                    <!-- Combat Stats -->
+                    <!-- Pontos de Vida -->
                     <section class="card p-6">
-                        <h2 class="font-heading text-xl text-primary mb-4">Estatísticas de Combate</h2>
-                        <div class="grid grid-cols-3 gap-4 text-center">
-                            <div>
-                                <h3 class="font-heading text-sm text-text-secondary mb-2">CLASSE DE ARMADURA</h3>
-                                <input type="number" name="ac" id="ac" class="text-2xl font-bold text-primary w-full text-center input-field" value="10">
-                            </div>
-                            <div>
-                                <h3 class="font-heading text-sm text-text-secondary mb-2">INICIATIVA</h3>
-                                <input type="text" name="initiative" id="initiative" class="text-2xl font-bold text-primary w-full text-center input-field" placeholder="+0" readonly>
-                            </div>
-                            <div>
-                                <h3 class="font-heading text-sm text-text-secondary mb-2">DESLOCAMENTO</h3>
-                                <input type="text" name="speed" id="speed" class="text-2xl font-bold text-primary w-full text-center input-field" value="9m">
-                            </div>
-                        </div>
-                    </section>
-
-                    <!-- Hit Points -->
-                    <section class="card p-6">
-                        <h2 class="font-heading text-xl text-primary mb-4">Pontos de Vida</h2>
+                        <h2 class="font-heading text-xl text-primary mb-4 border-b border-primary pb-2">Pontos de Vida</h2>
                         <div class="grid grid-cols-3 gap-4">
                             <div class="text-center">
-                                <label class="block text-sm font-medium text-text-secondary mb-2">Atual</label>
-                                <input type="number" name="currenthp" id="currenthp" class="input-field w-full text-center text-lg font-bold" value="8">
+                                <label class="block text-xs font-medium text-text-secondary mb-2 uppercase">Atual</label>
+                                <input type="number" name="currenthp" id="currenthp" class="input-field w-full text-center text-3xl font-bold border-2 border-primary rounded-lg py-3" value="8">
                             </div>
                             <div class="text-center">
-                                <label class="block text-sm font-medium text-text-secondary mb-2">Temporário</label>
-                                <input type="number" name="temphp" id="temphp" class="input-field w-full text-center text-lg font-bold" value="0">
+                                <label class="block text-xs font-medium text-text-secondary mb-2 uppercase">Temporário</label>
+                                <input type="number" name="temphp" id="temphp" class="input-field w-full text-center text-3xl font-bold border-2 border-primary rounded-lg py-3" value="0">
                             </div>
                             <div class="text-center">
-                                <label class="block text-sm font-medium text-text-secondary mb-2">Máximo</label>
-                                <input type="number" name="maxhp" id="maxhp" class="input-field w-full text-center text-lg font-bold" value="8">
+                                <label class="block text-xs font-medium text-text-secondary mb-2 uppercase">Máximo</label>
+                                <input type="number" name="maxhp" id="maxhp" class="input-field w-full text-center text-3xl font-bold border-2 border-primary rounded-lg py-3" value="8">
                             </div>
                         </div>
                     </section>
 
-                    <!-- Hit Dice -->
+                    <!-- Dados de Vida -->
                     <section class="card p-6">
-                        <h2 class="font-heading text-xl text-primary mb-4">Dados de Vida</h2>
+                        <h2 class="font-heading text-xl text-primary mb-4 border-b border-primary pb-2">Dados de Vida</h2>
                         <div class="text-center">
-                            <input type="text" name="hitdice" id="hitdice" class="text-lg font-bold text-primary w-full text-center input-field" value="1d8">
-                            <p class="text-sm text-text-secondary mt-1">Dados disponíveis para recuperação</p>
+                            <input type="text" name="hitdice" id="hitdice" class="text-3xl font-bold text-primary w-full text-center input-field border-2 border-primary rounded-lg py-3" value="1d8">
+                            <p class="text-xs text-text-secondary mt-3 uppercase">Dados disponíveis para recuperação</p>
+                        </div>
+                    </section>
+
+                    <!-- Estatísticas de Combate -->
+                    <section class="card p-6">
+                        <h2 class="font-heading text-xl text-primary mb-4 border-b border-primary pb-2">Estatísticas de Combate</h2>
+                        <div class="flex justify-around items-center">
+                            <div class="text-center">
+                                <div class="w-20 h-20 rounded-full border-4 border-primary flex items-center justify-center mx-auto mb-2">
+                                    <input type="number" name="ac" id="ac" class="text-2xl font-bold text-primary w-full text-center bg-transparent border-0 outline-none" value="10">
+                                </div>
+                                <label class="block text-xs font-medium text-text-secondary uppercase">Classe<br>de Armadura</label>
+                            </div>
+                            <div class="text-center">
+                                <div class="w-20 h-20 rounded-full border-4 border-primary flex items-center justify-center mx-auto mb-2">
+                                    <input type="text" name="initiative" id="initiative" class="text-2xl font-bold text-primary w-full text-center bg-transparent border-0 outline-none" placeholder="+0" readonly>
+                                </div>
+                                <label class="block text-xs font-medium text-text-secondary uppercase">Iniciativa</label>
+                            </div>
+                            <div class="text-center">
+                                <div class="w-20 h-20 rounded-full border-4 border-primary flex items-center justify-center mx-auto mb-2">
+                                    <input type="text" name="speed" id="speed" class="text-xl font-bold text-primary w-full text-center bg-transparent border-0 outline-none" value="9m">
+                                </div>
+                                <label class="block text-xs font-medium text-text-secondary uppercase">Desloc.</label>
+                            </div>
                         </div>
                     </section>
                 </div>
 
-                <!-- Coluna Direita - Ataques e Conjuração -->
+                <!-- Coluna Direita - Ataques -->
                 <div class="space-y-6">
-                    <!-- Ataques e Magias -->
+                    <!-- Ataques -->
                     <section class="card p-6">
-                        <h2 class="font-heading text-xl text-primary mb-4">Ataques e Conjuração</h2>
-                        <div class="space-y-4">
-                            <div>
-                                <label for="attacks" class="block text-sm font-medium text-text-secondary mb-2">Ataques</label>
-                                <textarea name="attacks" id="attacks" class="input-field w-full px-3 py-2 resize-none" rows="8" placeholder="Nome | Bônus de Ataque | Dano/Tipo"></textarea>
-                            </div>
-                            <div class="grid grid-cols-3 gap-4">
-                                <div>
-                                    <label for="spell-slots" class="block text-sm font-medium text-text-secondary mb-2">Espaços de Magia</label>
-                                    <input type="text" name="spell-slots" id="spell-slots" class="input-field w-full px-3 py-2" placeholder="1º: 4">
-                                </div>
-                                <div>
-                                    <label for="spell-save-dc" class="block text-sm font-medium text-text-secondary mb-2">CD de Magia</label>
-                                    <input type="number" name="spell-save-dc" id="spell-save-dc" class="input-field w-full px-3 py-2" placeholder="13">
-                                </div>
-                                <div>
-                                    <label for="spell-attack" class="block text-sm font-medium text-text-secondary mb-2">Ataque Mágico</label>
-                                    <input type="text" name="spell-attack" id="spell-attack" class="input-field w-full px-3 py-2" placeholder="+5">
-                                </div>
-                            </div>
+                        <h2 class="font-heading text-xl text-primary mb-4 border-b border-primary pb-2">Ataques</h2>
+                        <div class="min-h-[400px]">
+                            <!-- Conteúdo vazio por enquanto -->
                         </div>
                     </section>
                 </div>
