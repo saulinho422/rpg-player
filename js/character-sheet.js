@@ -247,32 +247,60 @@ class CharacterSheet {
     populateSheet() {
         if (!this.character) return;
 
+        console.log('📝 Preenchendo ficha com:', this.character);
+
         // Informações básicas
         this.setInputValue('charname', this.character.name);
-        this.setInputValue('classlevel', this.character.class ? `${this.character.class} ${this.character.level}` : '');
+        this.setInputValue('classlevel', this.character.character_class ? `${this.character.character_class} ${this.character.level}` : '');
         this.setInputValue('background', this.character.background);
         this.setInputValue('race', this.character.race);
         this.setInputValue('alignment', this.character.alignment);
-        this.setInputValue('experiencepoints', '0');
+        this.setInputValue('experiencepoints', this.character.experience_points || 0);
 
         // Atributos
-        if (this.character.attributes) {
-            this.setInputValue('Strengthscore', this.character.attributes.str);
-            this.setInputValue('Dexterityscore', this.character.attributes.dex);
-            this.setInputValue('Constitutionscore', this.character.attributes.con);
-            this.setInputValue('Intelligencescore', this.character.attributes.int);
-            this.setInputValue('Wisdomscore', this.character.attributes.wis);
-            this.setInputValue('Charismascore', this.character.attributes.cha);
-        }
+        this.setInputValue('Strengthscore', this.character.strength);
+        this.setInputValue('Dexterityscore', this.character.dexterity);
+        this.setInputValue('Constitutionscore', this.character.constitution);
+        this.setInputValue('Intelligencescore', this.character.intelligence);
+        this.setInputValue('Wisdomscore', this.character.wisdom);
+        this.setInputValue('Charismascore', this.character.charisma);
 
         // HP
-        this.setInputValue('maxhp', this.character.hp);
-        this.setInputValue('currenthp', this.character.hpCurrent);
+        this.setInputValue('maxhp', this.character.hit_points_max);
+        this.setInputValue('currenthp', this.character.hit_points_current);
 
         // Hit Dice
-        if (this.character.class) {
-            const hitDie = this.getHitDieForClass(this.character.class);
+        if (this.character.character_class) {
+            const hitDie = this.getHitDieForClass(this.character.character_class);
             this.setInputValue('totalhd', `${this.character.level}${hitDie}`);
+        }
+
+        // Perícias (marcar checkboxes de proficiência)
+        if (this.character.skills && Array.isArray(this.character.skills)) {
+            console.log('🎯 Marcando perícias:', this.character.skills);
+            this.character.skills.forEach(skill => {
+                const checkbox = document.getElementById(`${skill}-prof`);
+                if (checkbox) {
+                    checkbox.checked = true;
+                    console.log(`✅ Perícia marcada: ${skill}`);
+                } else {
+                    console.warn(`⚠️ Checkbox não encontrado para: ${skill}`);
+                }
+            });
+        }
+
+        // Salvaguardas (marcar checkboxes de proficiência)
+        if (this.character.saving_throws && Array.isArray(this.character.saving_throws)) {
+            console.log('🛡️ Marcando salvaguardas:', this.character.saving_throws);
+            this.character.saving_throws.forEach(save => {
+                const checkbox = document.getElementById(`${save}-save-prof`);
+                if (checkbox) {
+                    checkbox.checked = true;
+                    console.log(`✅ Salvaguarda marcada: ${save}`);
+                } else {
+                    console.warn(`⚠️ Checkbox não encontrado para: ${save}`);
+                }
+            });
         }
     }
 
@@ -2255,6 +2283,20 @@ class CharacterCreationWizard {
             const savingThrows = typeof this.wizardData.class?.saving_throws === 'string' 
                 ? JSON.parse(this.wizardData.class.saving_throws) 
                 : this.wizardData.class?.saving_throws || [];
+
+            console.log('🔍 DEBUG - Salvaguardas:', {
+                raw: this.wizardData.class?.saving_throws,
+                parsed: savingThrows
+            });
+
+            console.log('🔍 DEBUG - Perícias:', {
+                skills: this.wizardData.skills
+            });
+
+            console.log('🔍 DEBUG - Dado de Vida:', {
+                hitDie: this.wizardData.class?.hit_die,
+                calculated: this.getHitDieValue(this.wizardData.class.hit_die)
+            });
 
             const characterData = {
                 name: this.wizardData.name,

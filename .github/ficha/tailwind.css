@@ -1,0 +1,91 @@
+@import url('https://fonts.googleapis.com/css2?family=Marcellus+SC:wght@400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Primary Colors */
+  --color-primary: #931a1d; /* D&D signature red */
+  --color-secondary: #8b4513; /* Rich brown */
+  --color-accent: #d4af37; /* Muted gold */
+  
+  /* Background Colors */
+  --color-background: #f4f1e9; /* Warm off-white parchment */
+  --color-surface: #faf8f3; /* Lighter surface for cards */
+  
+  /* Text Colors */
+  --color-text-primary: #2c211d; /* Deep brown-black */
+  --color-text-secondary: #5d4e47; /* Medium brown */
+  
+  /* Status Colors */
+  --color-success: #2d5016; /* Forest green */
+  --color-warning: #8b4513; /* Brown warning */
+  --color-error: #6b1518; /* Darker red */
+  
+  /* Shadow and Border */
+  --shadow-subtle: 0 2px 4px rgba(44, 33, 29, 0.1);
+  --border-color: rgba(44, 33, 29, 0.15);
+}
+
+@layer base {
+  body {
+    font-family: 'Libre Baskerville', serif;
+    background-color: var(--color-background);
+    color: var(--color-text-primary);
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Marcellus SC', serif;
+    font-weight: 400;
+  }
+}
+
+@layer components {
+  .card {
+    background-color: var(--color-surface);
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    box-shadow: var(--shadow-subtle);
+  }
+  
+  .btn-primary {
+    background-color: var(--color-primary);
+    color: white;
+    transition: all 150ms ease-out;
+  }
+  
+  .btn-primary:hover {
+    background-color: #7a1619;
+  }
+  
+  .input-field {
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    background-color: var(--color-surface);
+    transition: border-color 150ms ease-out;
+  }
+  
+  .input-field:focus {
+    border-color: var(--color-primary);
+    outline: none;
+  }
+  
+  .modal-enter {
+    animation: modalEnter 250ms ease-out;
+  }
+  
+  @keyframes modalEnter {
+    from {
+      opacity: 0;
+      transform: scale(0.95);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+}

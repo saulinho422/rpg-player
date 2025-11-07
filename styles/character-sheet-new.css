@@ -1,0 +1,651 @@
+/* =====================================
+   FICHA DE PERSONAGEM - NOVO VISUAL
+   Baseado no modelo antigo com paleta preta/dourada
+   ===================================== */
+
+/* Reset e Base */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Cinzel', serif;
+    background: var(--bg-image) center/cover no-repeat fixed;
+    color: var(--color-text-cream);
+    min-height: 100vh;
+    position: relative;
+}
+
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: var(--color-black-overlay);
+    z-index: -1;
+}
+
+/* Header da Ficha */
+.sheet-header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: var(--gradient-navy-strong);
+    border-bottom: 2px solid var(--color-gold);
+    padding: 1rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: var(--shadow-medium);
+}
+
+.header-btn {
+    background: var(--bg-navy-semi);
+    border: 1px solid var(--border-gold);
+    color: var(--color-text-cream);
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-family: 'Cinzel', serif;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.3s ease;
+}
+
+.header-btn:hover {
+    background: var(--bg-navy-strong);
+    border-color: var(--color-gold-light);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-gold);
+}
+
+.header-btn.btn-gold {
+    background: var(--gradient-gold);
+    color: var(--color-text-brown);
+    font-weight: 600;
+}
+
+.header-btn.btn-gold:hover {
+    background: var(--gradient-gold-light);
+}
+
+.title-medieval {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: 1.8rem;
+    color: var(--color-gold);
+    text-shadow: var(--shadow-text);
+    letter-spacing: 3px;
+    margin: 0;
+}
+
+/* Container Principal */
+.container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+/* Grid de 2 Colunas */
+.character-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+}
+
+@media (max-width: 1024px) {
+    .character-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Cards/Sections */
+.card {
+    background: var(--bg-navy-strong);
+    border: 2px solid var(--border-gold);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: var(--shadow-large);
+    transition: all 0.3s ease;
+}
+
+.card:hover {
+    border-color: var(--color-gold-light);
+    box-shadow: var(--shadow-gold);
+}
+
+.section-title {
+    font-family: 'Cinzel Decorative', serif;
+    color: var(--color-gold);
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border-gold);
+    letter-spacing: 2px;
+}
+
+/* Atributos Grid (6 colunas) */
+.attributes-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+}
+
+@media (max-width: 768px) {
+    .attributes-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+.attribute-box {
+    background: var(--bg-dark-semi);
+    border: 2px solid var(--border-gold);
+    border-radius: 12px;
+    padding: 1rem;
+    text-align: center;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.attribute-box:hover {
+    background: var(--bg-dark-transparent);
+    border-color: var(--color-gold-light);
+    transform: translateY(-3px);
+    box-shadow: 0 0 20px rgba(212, 175, 55, 0.4);
+}
+
+.attribute-label {
+    font-size: 0.75rem;
+    color: var(--color-text-cream);
+    margin-bottom: 0.5rem;
+    letter-spacing: 1px;
+    font-weight: 600;
+}
+
+.attribute-value {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: var(--color-gold);
+    margin-bottom: 0.25rem;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.attribute-modifier {
+    font-size: 1rem;
+    color: var(--color-text-cream);
+}
+
+/* Bônus de Proficiência */
+.proficiency-bonus-display {
+    text-align: center;
+    padding: 1rem 0;
+}
+
+.proficiency-circle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 80px;
+    height: 80px;
+    background: var(--gradient-gold);
+    border-radius: 50%;
+    border: 3px solid var(--color-gold-dark);
+    box-shadow: 0 0 20px rgba(212, 175, 55, 0.5);
+}
+
+.proficiency-circle span {
+    font-size: 2rem;
+    font-weight: bold;
+    color: var(--color-text-brown);
+}
+
+/* Testes de Resistência e Perícias */
+.saves-list,
+.skills-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    max-height: 400px;
+    overflow-y: auto;
+    padding-right: 0.5rem;
+}
+
+/* Scrollbar customizada */
+.saves-list::-webkit-scrollbar,
+.skills-list::-webkit-scrollbar {
+    width: 8px;
+}
+
+.saves-list::-webkit-scrollbar-track,
+.skills-list::-webkit-scrollbar-track {
+    background: var(--bg-dark-semi);
+    border-radius: 4px;
+}
+
+.saves-list::-webkit-scrollbar-thumb,
+.skills-list::-webkit-scrollbar-thumb {
+    background: var(--color-gold-dark);
+    border-radius: 4px;
+}
+
+.saves-list::-webkit-scrollbar-thumb:hover,
+.skills-list::-webkit-scrollbar-thumb:hover {
+    background: var(--color-gold);
+}
+
+.skill-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.5rem;
+    background: var(--bg-dark-transparent);
+    border: 1px solid var(--border-gold);
+    border-radius: 6px;
+    transition: all 0.2s ease;
+}
+
+.skill-item:hover {
+    background: var(--bg-navy-transparent);
+    border-color: var(--color-gold-light);
+}
+
+.skill-checkbox {
+    width: 18px;
+    height: 18px;
+    margin-right: 0.75rem;
+    cursor: pointer;
+    accent-color: var(--color-gold);
+}
+
+.skill-item label {
+    flex: 1;
+    font-size: 0.9rem;
+    color: var(--color-text-cream);
+    cursor: pointer;
+}
+
+.skill-value {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.9rem;
+    font-weight: bold;
+    color: var(--color-gold);
+    min-width: 40px;
+    text-align: right;
+}
+
+/* Percepção Passiva */
+.passive-perception-display {
+    text-align: center;
+    padding: 1rem 0;
+}
+
+.passive-circle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 70px;
+    height: 70px;
+    background: var(--bg-navy-semi);
+    border: 3px solid var(--color-gold);
+    border-radius: 50%;
+    box-shadow: 0 0 15px rgba(212, 175, 55, 0.3);
+}
+
+.passive-circle span {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: var(--color-gold);
+}
+
+/* Informações do Personagem */
+.info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+.info-field {
+    display: flex;
+    flex-direction: column;
+}
+
+.info-field.full-width {
+    grid-column: 1 / -1;
+}
+
+.info-field label {
+    font-size: 0.85rem;
+    color: var(--color-gold);
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+}
+
+.info-field input {
+    background: var(--bg-dark-semi);
+    border: 1px solid var(--border-gold);
+    border-radius: 6px;
+    padding: 0.75rem;
+    color: var(--color-text-cream);
+    font-family: 'Cinzel', serif;
+    font-size: 1rem;
+    transition: all 0.2s ease;
+}
+
+.info-field input:focus {
+    outline: none;
+    border-color: var(--color-gold-light);
+    background: var(--bg-dark-transparent);
+    box-shadow: 0 0 10px rgba(212, 175, 55, 0.3);
+}
+
+.info-field input[readonly] {
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+/* Estatísticas de Combate */
+.combat-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    text-align: center;
+}
+
+.combat-stat h3 {
+    font-size: 0.85rem;
+    color: var(--color-text-cream);
+    margin-bottom: 0.5rem;
+    letter-spacing: 1px;
+}
+
+.combat-stat-value {
+    font-size: 2rem;
+    font-weight: bold;
+    color: var(--color-gold);
+    margin-bottom: 0.25rem;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.combat-stat p {
+    font-size: 0.75rem;
+    color: var(--color-text-cream);
+    opacity: 0.8;
+}
+
+/* Pontos de Vida */
+.hp-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.hp-field {
+    text-align: center;
+}
+
+.hp-field label {
+    display: block;
+    font-size: 0.85rem;
+    color: var(--color-gold);
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+}
+
+.hp-field input {
+    width: 100%;
+    background: var(--bg-dark-semi);
+    border: 2px solid var(--border-gold);
+    border-radius: 8px;
+    padding: 0.75rem;
+    color: var(--color-text-cream);
+    font-size: 1.2rem;
+    font-weight: bold;
+    text-align: center;
+    font-family: 'JetBrains Mono', monospace;
+}
+
+.hp-field input:focus {
+    outline: none;
+    border-color: var(--color-gold-light);
+    box-shadow: 0 0 15px rgba(212, 175, 55, 0.4);
+}
+
+/* Barra de HP */
+.hp-bar {
+    width: 100%;
+    height: 12px;
+    background: var(--bg-dark-semi);
+    border: 1px solid var(--border-gold);
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.hp-bar-fill {
+    height: 100%;
+    background: var(--gradient-success);
+    transition: width 0.3s ease;
+}
+
+/* Dados de Vida */
+.hit-dice-display {
+    text-align: center;
+    padding: 1rem 0;
+}
+
+.hit-dice-value {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: var(--color-gold);
+    margin-bottom: 0.5rem;
+}
+
+.hit-dice-label {
+    font-size: 0.85rem;
+    color: var(--color-text-cream);
+    opacity: 0.8;
+}
+
+/* Ataques e Magias */
+.attacks-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.attack-header {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    gap: 0.5rem;
+    padding: 0.5rem;
+    background: var(--bg-dark-semi);
+    border-radius: 6px;
+    font-weight: 600;
+    color: var(--color-gold);
+    font-size: 0.9rem;
+}
+
+.attacks-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.empty-message {
+    text-align: center;
+    padding: 2rem;
+    color: var(--color-text-cream);
+    opacity: 0.6;
+    font-style: italic;
+}
+
+.btn-add-attack,
+.btn-add-equipment {
+    width: 100%;
+    background: var(--gradient-gold);
+    border: 2px solid var(--color-gold-dark);
+    border-radius: 8px;
+    padding: 0.75rem;
+    color: var(--color-text-brown);
+    font-family: 'Cinzel', serif;
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-add-attack:hover,
+.btn-add-equipment:hover {
+    background: var(--gradient-gold-light);
+    transform: translateY(-2px);
+    box-shadow: 0 0 20px rgba(212, 175, 55, 0.5);
+}
+
+/* Equipamentos */
+.equipment-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.equipment-weight {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.75rem;
+    background: var(--bg-dark-semi);
+    border-radius: 6px;
+    font-size: 0.9rem;
+}
+
+.equipment-weight strong {
+    color: var(--color-gold);
+}
+
+.equipment-bar {
+    width: 100%;
+    height: 10px;
+    background: var(--bg-dark-semi);
+    border: 1px solid var(--border-gold);
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+.equipment-bar-fill {
+    height: 100%;
+    background: var(--gradient-gold);
+    transition: width 0.3s ease;
+}
+
+.equipment-list {
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+/* Características e Traços */
+.traits-container textarea {
+    width: 100%;
+    min-height: 150px;
+    background: var(--bg-dark-semi);
+    border: 1px solid var(--border-gold);
+    border-radius: 8px;
+    padding: 1rem;
+    color: var(--color-text-cream);
+    font-family: 'Cinzel', serif;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    resize: vertical;
+}
+
+.traits-container textarea:focus {
+    outline: none;
+    border-color: var(--color-gold-light);
+    box-shadow: 0 0 15px rgba(212, 175, 55, 0.3);
+}
+
+.traits-container textarea::placeholder {
+    color: var(--color-text-cream);
+    opacity: 0.5;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+    .sheet-header {
+        padding: 0.75rem 1rem;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .title-medieval {
+        font-size: 1.3rem;
+    }
+
+    .container {
+        padding: 1rem;
+    }
+
+    .info-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .combat-stats-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .hp-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .attack-header {
+        font-size: 0.8rem;
+    }
+}
+
+/* Ajustes para manter compatibilidade com o HTML existente */
+input[type="text"],
+input[type="number"],
+textarea,
+select {
+    background: var(--bg-dark-semi);
+    border: 1px solid var(--border-gold);
+    color: var(--color-text-cream);
+    font-family: 'Cinzel', serif;
+}
+
+input[type="text"]:focus,
+input[type="number"]:focus,
+textarea:focus,
+select:focus {
+    outline: none;
+    border-color: var(--color-gold-light);
+    box-shadow: 0 0 10px rgba(212, 175, 55, 0.3);
+}
+
+input::placeholder,
+textarea::placeholder {
+    color: var(--color-text-cream);
+    opacity: 0.5;
+}
+
+/* Animações */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.card {
+    animation: fadeIn 0.3s ease;
+}

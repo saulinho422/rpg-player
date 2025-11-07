@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Ficha de Personagem - D&D 5e</title>
+    <link rel="stylesheet" href="../css/main.css" />
+  <script type="module" async src="https://static.rocket.new/rocket-web.js?_cfg=https%3A%2F%2Fddcharact9458back.builtwithrocket.new&_be=https%3A%2F%2Fapplication.rocket.new&_v=0.1.9"></script>
+  <script type="module" defer src="https://static.rocket.new/rocket-shot.js?v=0.0.1"></script>
+  </head>
+<body class="bg-background min-h-screen">
+    <!-- Main Container -->
+    <div class="container mx-auto px-4 py-6 max-w-7xl">
+        <!-- Header -->
+        <header class="mb-8">
+            <h1 class="font-heading text-4xl text-primary text-center mb-2">Ficha de Personagem D&D 5e</h1>
+            <p class="text-text-secondary text-center">Gerencie seu personagem de forma digital e interativa</p>
+        </header>
+
+        <!-- Two Column Layout -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <!-- Left Column - Character Stats -->
+            <div class="space-y-6">
+                <!-- Main Attributes -->
+                <section class="card p-6">
+                    <h2 class="font-heading text-xl text-primary mb-4">Atributos Principais</h2>
+                    <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                        <!-- Força -->
+                        <div class="text-center">
+                            <div class="bg-surface border border-default rounded-lg p-4 hover:shadow-lg transition-all cursor-pointer" onclick="editAttribute('forca')">
+                                <h3 class="font-heading text-sm text-text-secondary mb-2">FORÇA</h3>
+                                <div class="text-3xl font-bold text-primary mb-1" id="forca-value">10</div>
+                                <div class="text-sm text-text-secondary" id="forca-modifier">+0</div>
+                            </div>
+                        </div>
+                        <!-- Destreza -->
+                        <div class="text-center">
+                            <div class="bg-surface border border-default rounded-lg p-4 hover:shadow-lg transition-all cursor-pointer" onclick="editAttribute('destreza')">
+                                <h3 class="font-heading text-sm text-text-secondary mb-2">DESTREZA</h3>
+                                <div class="text-3xl font-bold text-primary mb-1" id="destreza-value">10</div>
+                                <div class="text-sm text-text-secondary" id="destreza-modifier">+0</div>
+                            </div>
+                        </div>
+                        <!-- Constituição -->
+                        <div class="text-center">
+                            <div class="bg-surface border border-default rounded-lg p-4 hover:shadow-lg transition-all cursor-pointer" onclick="editAttribute('constituicao')">
+                                <h3 class="font-heading text-sm text-text-secondary mb-2">CONSTITUIÇÃO</h3>
+                                <div class="text-3xl font-bold text-primary mb-1" id="constituicao-value">10</div>
+                                <div class="text-sm text-text-secondary" id="constituicao-modifier">+0</div>
+                            </div>
+                        </div>
+                        <!-- Inteligência -->
+                        <div class="text-center">
+                            <div class="bg-surface border border-default rounded-lg p-4 hover:shadow-lg transition-all cursor-pointer" onclick="editAttribute('inteligencia')">
+                                <h3 class="font-heading text-sm text-text-secondary mb-2">INTELIGÊNCIA</h3>
+                                <div class="text-3xl font-bold text-primary mb-1" id="inteligencia-value">10</div>
+                                <div class="text-sm text-text-secondary" id="inteligencia-modifier">+0</div>
+                            </div>
+                        </div>
+                        <!-- Sabedoria -->
+                        <div class="text-center">
+                            <div class="bg-surface border border-default rounded-lg p-4 hover:shadow-lg transition-all cursor-pointer" onclick="editAttribute('sabedoria')">
+                                <h3 class="font-heading text-sm text-text-secondary mb-2">SABEDORIA</h3>
+                                <div class="text-3xl font-bold text-primary mb-1" id="sabedoria-value">10</div>
+                                <div class="text-sm text-text-secondary" id="sabedoria-modifier">+0</div>
+                            </div>
+                        </div>
+                        <!-- Carisma -->
+                        <div class="text-center">
+                            <div class="bg-surface border border-default rounded-lg p-4 hover:shadow-lg transition-all cursor-pointer" onclick="editAttribute('carisma')">
+                                <h3 class="font-heading text-sm text-text-secondary mb-2">CARISMA</h3>
+                                <div class="text-3xl font-bold text-primary mb-1" id="carisma-value">10</div>
+                                <div class="text-sm text-text-secondary" id="carisma-modifier">+0</div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Proficiency Bonus -->
+                <section class="card p-6">
+                    <h2 class="font-heading text-xl text-primary mb-4">Bônus de Proficiência</h2>
+                    <div class="text-center">
+                        <div class="inline-flex items-center justify-center w-16 h-16 bg-primary text-white rounded-full text-2xl font-bold">
+                            <span id="proficiency-bonus">+2</span>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Saving Throws -->
+                <section class="card p-6">
+                    <h2 class="font-heading text-xl text-primary mb-4">Testes de Resistência</h2>
+                    <div class="space-y-2">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center">
+                                <input type="checkbox" id="save-forca" class="w-4 h-4 text-primary rounded mr-3" />
+                                <label for="save-forca" class="text-sm">Força</label>
+                            </div>
+                            <span class="text-sm font-mono" id="save-forca-value">+0</span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center">
+                                <input type="checkbox" id="save-destreza" class="w-4 h-4 text-primary rounded mr-3" />
+                                <label for="save-destreza" class="text-sm">Destreza</label>
+                            </div>
+                            <span class="text-sm font-mono" id="save-destreza-value">+0</span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center">
+                                <input type="checkbox" id="save-constituicao" class="w-4 h-4 text-primary rounded mr-3" />
+                                <label for="save-constituicao" class="text-sm">Constituição</label>
+                            </div>
+                            <span class="text-sm font-mono" id="save-constituicao-value">+0</span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center">
+                                <input type="checkbox" id="save-inteligencia" class="w-4 h-4 text-primary rounded mr-3" />
+                                <label for="save-inteligencia" class="text-sm">Inteligência</label>
+                            </div>
+                            <span class="text-sm font-mono" id="save-inteligencia-value">+0</span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center">
+                                <input type="checkbox" id="save-sabedoria" class="w-4 h-4 text-primary rounded mr-3" />
+                                <label for="save-sabedoria" class="text-sm">Sabedoria</label>
+                            </div>
+                            <span class="text-sm font-mono" id="save-sabedoria-value">+0</span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center">
+                                <input type="checkbox" id="save-carisma" class="w-4 h-4 text-primary rounded mr-3" />
+                                <label for="save-carisma" class="text-sm">Carisma</label>
+                            </div>
+                            <span class="text-sm font-mono" id="save-carisma-value">+0</span>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Skills -->
+                <section class="card p-6">
+                    <h2 class="font-heading text-xl text-primary mb-4">Perícias</h2>
+                    <div class="space-y-2 max-h-64 overflow-y-auto" id="skills-list">
+                        <!-- Skills will be populated by JavaScript -->
+                    </div>
+                </section>
+            </div>
+
+            <!-- Right Column - Character Info & Combat -->
+            <div class="space-y-6">
+                <!-- Character Info Header -->
+                <section class="card p-6">
+                    <h2 class="font-heading text-xl text-primary mb-4">Informações do Personagem</h2>
+                    <div class="space-y-4">
+                        <div>
+                            <label for="character-name" class="block text-sm font-medium text-text-secondary mb-1">Nome do Personagem</label>
+                            <input type="text" id="character-name" class="input-field w-full px-3 py-2" placeholder="Digite o nome do seu personagem" />
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label for="character-class" class="block text-sm font-medium text-text-secondary mb-1">Classe</label>
+                                <select id="character-class" class="input-field w-full px-3 py-2">
+                                    <option value>Selecione uma classe</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label for="character-race" class="block text-sm font-medium text-text-secondary mb-1">Raça</label>
+                                <select id="character-race" class="input-field w-full px-3 py-2">
+                                    <option value>Selecione uma raça</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label for="character-background" class="block text-sm font-medium text-text-secondary mb-1">Antecedente</label>
+                                <select id="character-background" class="input-field w-full px-3 py-2">
+                                    <option value>Selecione um antecedente</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label for="character-alignment" class="block text-sm font-medium text-text-secondary mb-1">Tendência</label>
+                                <select id="character-alignment" class="input-field w-full px-3 py-2">
+                                    <option value>Selecione uma tendência</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label for="character-subclass" class="block text-sm font-medium text-text-secondary mb-1">Subclasse</label>
+                                <select id="character-subclass" class="input-field w-full px-3 py-2">
+                                    <option value>Selecione uma subclasse</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label for="character-level" class="block text-sm font-medium text-text-secondary mb-1">Nível</label>
+                                <input type="number" id="character-level" class="input-field w-full px-3 py-2" min="1" max="20" value="1" />
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Combat Stats -->
+                <section class="card p-6">
+                    <h2 class="font-heading text-xl text-primary mb-4">Estatísticas de Combate</h2>
+                    <div class="grid grid-cols-3 gap-4 text-center">
+                        <div>
+                            <h3 class="font-heading text-sm text-text-secondary mb-2">CLASSE DE ARMADURA</h3>
+                            <div class="text-2xl font-bold text-primary" id="armor-class">10</div>
+                        </div>
+                        <div>
+                            <h3 class="font-heading text-sm text-text-secondary mb-2">INICIATIVA</h3>
+                            <div class="text-2xl font-bold text-primary" id="initiative">+0</div>
+                        </div>
+                        <div>
+                            <h3 class="font-heading text-sm text-text-secondary mb-2">DESLOCAMENTO</h3>
+                            <div class="text-2xl font-bold text-primary" id="speed">9m</div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Hit Points -->
+                <section class="card p-6">
+                    <h2 class="font-heading text-xl text-primary mb-4">Pontos de Vida</h2>
+                    <div class="grid grid-cols-3 gap-4">
+                        <div class="text-center">
+                            <label class="block text-sm font-medium text-text-secondary mb-2">Atual</label>
+                            <input type="number" id="current-hp" class="input-field w-full text-center text-lg font-bold" value="8" />
+                        </div>
+                        <div class="text-center">
+                            <label class="block text-sm font-medium text-text-secondary mb-2">Temporário</label>
+                            <input type="number" id="temp-hp" class="input-field w-full text-center text-lg font-bold" value="0" />
+                        </div>
+                        <div class="text-center">
+                            <label class="block text-sm font-medium text-text-secondary mb-2">Máximo</label>
+                            <input type="number" id="max-hp" class="input-field w-full text-center text-lg font-bold" value="8" />
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Hit Dice -->
+                <section class="card p-6">
+                    <h2 class="font-heading text-xl text-primary mb-4">Dados de Vida</h2>
+                    <div class="text-center">
+                        <div class="text-lg font-bold text-primary" id="hit-dice">1d8</div>
+                        <p class="text-sm text-text-secondary mt-1">Dados disponíveis para recuperação</p>
+                    </div>
+                </section>
+
+                <!-- Inventory Management -->
+                <section class="card p-6">
+                    <h2 class="font-heading text-xl text-primary mb-4">Inventário</h2>
+                    <div class="space-y-4">
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm text-text-secondary">Capacidade de Carga:</span>
+                            <span class="font-mono text-sm" id="carrying-capacity">75 kg</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm text-text-secondary">Carga Atual:</span>
+                            <span class="font-mono text-sm" id="current-load">0 kg</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div class="bg-primary h-2 rounded-full transition-all" id="load-bar" style="width: 0%"></div>
+                        </div>
+                        <button onclick="openInventoryModal()" class="btn-primary w-full px-4 py-2 rounded-lg font-medium">
+                            Gerenciar Inventário
+                        </button>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+
+    <!-- Inventory Modal -->
+    <div id="inventory-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-surface rounded-lg shadow-xl max-w-4xl w-full max-h-screen overflow-y-auto modal-enter">
+                <div class="p-6">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="font-heading text-2xl text-primary">Gerenciar Inventário</h2>
+                        <button onclick="closeInventoryModal()" class="text-text-secondary hover:text-primary text-2xl">&times;</button>
+                    </div>
+                    
+                    <!-- Add Item Section -->
+                    <div class="mb-6 p-4 bg-background rounded-lg">
+                        <h3 class="font-heading text-lg text-primary mb-4">Adicionar Item</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-text-secondary mb-1">Categoria</label>
+                                <select id="item-category" class="input-field w-full px-3 py-2">
+                                    <option value>Selecione categoria</option>
+                                    <option value="armor">Armadura</option>
+                                    <option value="weapons">Armas</option>
+                                    <option value="kits">Kits</option>
+                                    <option value="custom">Personalizado</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-text-secondary mb-1">Item</label>
+                                <select id="item-select" class="input-field w-full px-3 py-2" disabled>
+                                    <option value>Selecione um item</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-text-secondary mb-1">Quantidade</label>
+                                <input type="number" id="item-quantity" class="input-field w-full px-3 py-2" min="1" value="1" />
+                            </div>
+                            <div class="flex items-end">
+                                <button onclick="addInventoryItem()" class="btn-primary px-4 py-2 rounded-lg w-full">Adicionar</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Inventory List -->
+                    <div>
+                        <h3 class="font-heading text-lg text-primary mb-4">Itens no Inventário</h3>
+                        <div id="inventory-items" class="space-y-2">
+                            <p class="text-text-secondary text-center py-8">Nenhum item no inventário</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="../js/dados.js"></script>
+    <script src="../js/script.js"></script>
+<script id="dhws-dataInjector" src="../public/dhws-data-injector.js"></script>
+</body>
+</html>
