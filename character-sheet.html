@@ -127,7 +127,7 @@
                     <section class="card p-6">
                         <div class="flex justify-between items-center mb-4 border-b border-primary pb-2">
                             <h2 class="font-heading text-xl text-primary">Ataques</h2>
-                            <button class="bg-primary hover:bg-secondary text-background rounded-full w-10 h-10 flex items-center justify-center font-bold text-2xl transition-colors">+</button>
+                            <button id="addAttackBtn" class="bg-primary hover:bg-secondary text-background rounded-full w-10 h-10 flex items-center justify-center font-bold text-2xl transition-colors">+</button>
                         </div>
                         <div class="space-y-3">
                             <!-- Header da tabela -->
@@ -136,15 +136,68 @@
                                 <div class="col-span-3 text-center">Bônus</div>
                                 <div class="col-span-5 text-center">Dano / Tipo</div>
                             </div>
-                            <!-- Linhas vazias para adicionar ataques -->
-                            <div class="text-center text-text-secondary py-12 italic">
-                                Nenhum ataque cadastrado.<br>
-                                <span class="text-xs">Clique no botão + para adicionar</span>
+                            <!-- Lista de ataques -->
+                            <div id="attacksList" class="space-y-2">
+                                <div class="text-center text-text-secondary py-12 italic">
+                                    Nenhum ataque cadastrado.<br>
+                                    <span class="text-xs">Clique no botão + para adicionar</span>
+                                </div>
                             </div>
                         </div>
                     </section>
                 </div>
                 </div>
+            </div>
+        </div>
+
+        <!-- Modal de Adicionar Ataque -->
+        <div id="attackModal" class="fixed inset-0 bg-black bg-opacity-75 z-50 hidden flex items-center justify-center p-4">
+            <div class="bg-surface border-2 border-primary rounded-lg max-w-md w-full p-6 shadow-2xl">
+                <div class="flex justify-between items-center mb-6 border-b border-primary pb-3">
+                    <h3 class="font-heading text-2xl text-primary">Adicionar Ataque</h3>
+                    <button id="closeAttackModal" class="text-text-secondary hover:text-primary text-3xl leading-none">&times;</button>
+                </div>
+                
+                <form id="attackForm" class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-text-secondary mb-2">Nome do Ataque</label>
+                        <input type="text" id="attackName" class="input-field w-full px-3 py-2 border-2 border-primary rounded-lg" placeholder="Ex: Espada Longa" required>
+                    </div>
+                    
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-text-secondary mb-2">Bônus de Ataque</label>
+                            <input type="text" id="attackBonus" class="input-field w-full px-3 py-2 border-2 border-primary rounded-lg text-center" placeholder="+5" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-text-secondary mb-2">Dano</label>
+                            <input type="text" id="attackDamage" class="input-field w-full px-3 py-2 border-2 border-primary rounded-lg text-center" placeholder="1d8+3" required>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-text-secondary mb-2">Tipo de Dano</label>
+                        <select id="attackType" class="input-field w-full px-3 py-2 border-2 border-primary rounded-lg">
+                            <option value="Cortante">Cortante</option>
+                            <option value="Perfurante">Perfurante</option>
+                            <option value="Contundente">Contundente</option>
+                            <option value="Ácido">Ácido</option>
+                            <option value="Elétrico">Elétrico</option>
+                            <option value="Fogo">Fogo</option>
+                            <option value="Frio">Frio</option>
+                            <option value="Necrótico">Necrótico</option>
+                            <option value="Radiante">Radiante</option>
+                            <option value="Veneno">Veneno</option>
+                            <option value="Psíquico">Psíquico</option>
+                            <option value="Trovejante">Trovejante</option>
+                        </select>
+                    </div>
+                    
+                    <div class="flex gap-3 pt-4">
+                        <button type="submit" class="btn-primary flex-1 py-3 rounded-lg font-medium">Adicionar</button>
+                        <button type="button" id="cancelAttackModal" class="bg-surface border-2 border-default hover:border-primary text-text-secondary flex-1 py-3 rounded-lg font-medium transition-colors">Cancelar</button>
+                    </div>
+                </form>
             </div>
         </div>
 
@@ -741,7 +794,89 @@
         // Initialize first tab on page load
         document.addEventListener('DOMContentLoaded', () => {
             switchTab('combat');
+            initializeAttackModal();
         });
+
+        // Sistema de Ataques
+        function initializeAttackModal() {
+            const modal = document.getElementById('attackModal');
+            const addBtn = document.getElementById('addAttackBtn');
+            const closeBtn = document.getElementById('closeAttackModal');
+            const cancelBtn = document.getElementById('cancelAttackModal');
+            const form = document.getElementById('attackForm');
+            const attacksList = document.getElementById('attacksList');
+            
+            let attacks = [];
+            
+            // Abrir modal
+            addBtn.addEventListener('click', () => {
+                modal.classList.remove('hidden');
+                form.reset();
+            });
+            
+            // Fechar modal
+            const closeModal = () => {
+                modal.classList.add('hidden');
+            };
+            
+            closeBtn.addEventListener('click', closeModal);
+            cancelBtn.addEventListener('click', closeModal);
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) closeModal();
+            });
+            
+            // Adicionar ataque
+            form.addEventListener('submit', (e) => {
+                e.preventDefault();
+                
+                const attack = {
+                    id: Date.now(),
+                    name: document.getElementById('attackName').value,
+                    bonus: document.getElementById('attackBonus').value,
+                    damage: document.getElementById('attackDamage').value,
+                    type: document.getElementById('attackType').value
+                };
+                
+                attacks.push(attack);
+                renderAttacks();
+                closeModal();
+            });
+            
+            // Renderizar lista de ataques
+            function renderAttacks() {
+                if (attacks.length === 0) {
+                    attacksList.innerHTML = `
+                        <div class="text-center text-text-secondary py-12 italic">
+                            Nenhum ataque cadastrado.<br>
+                            <span class="text-xs">Clique no botão + para adicionar</span>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                attacksList.innerHTML = attacks.map(attack => `
+                    <div class="grid grid-cols-12 gap-2 items-center bg-surface border border-default hover:border-primary rounded-lg p-3 transition-colors group">
+                        <div class="col-span-4 font-medium text-primary">${attack.name}</div>
+                        <div class="col-span-3 text-center text-lg font-bold text-primary">${attack.bonus}</div>
+                        <div class="col-span-4 text-center">
+                            <span class="text-lg font-bold text-primary">${attack.damage}</span>
+                            <span class="text-xs text-text-secondary ml-1">${attack.type}</span>
+                        </div>
+                        <div class="col-span-1 text-right">
+                            <button onclick="deleteAttack(${attack.id})" class="text-text-secondary hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity">✕</button>
+                        </div>
+                    </div>
+                `).join('');
+            }
+            
+            // Deletar ataque
+            window.deleteAttack = (id) => {
+                if (confirm('Deseja remover este ataque?')) {
+                    attacks = attacks.filter(a => a.id !== id);
+                    renderAttacks();
+                }
+            };
+        }
     </script>
     <script type="module">
         // Importar e expor Dice3DRoller globalmente
