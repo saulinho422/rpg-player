@@ -806,6 +806,21 @@
             const form = document.getElementById('attackForm');
             const attacksList = document.getElementById('attacksList');
             
+            // Verificar se todos os elementos existem
+            if (!modal || !addBtn || !closeBtn || !cancelBtn || !form || !attacksList) {
+                console.error('❌ Elementos do modal não encontrados:', {
+                    modal: !!modal,
+                    addBtn: !!addBtn,
+                    closeBtn: !!closeBtn,
+                    cancelBtn: !!cancelBtn,
+                    form: !!form,
+                    attacksList: !!attacksList
+                });
+                return;
+            }
+            
+            console.log('✅ Modal de ataques inicializado');
+            
             let attacks = [];
             
             // Abrir modal
