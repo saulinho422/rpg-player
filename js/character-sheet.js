@@ -35,6 +35,12 @@ class CharacterSheet {
         this.populateSheet();
         this.calculateAll();
         this.setupEventListeners();
+        
+        // Inicializar wizard automaticamente após carregar
+        setTimeout(() => {
+            console.log('🧙 Inicializando wizard automaticamente...');
+            this.openCreationWizard();
+        }, 500);
     }
 
     async checkAuth() {
@@ -958,8 +964,11 @@ class CharacterSheet {
         console.log('🧙 Abrindo wizard de criação...');
         if (!this.wizard) {
             this.wizard = new CharacterCreationWizard(this);
+        } else {
+            // Se já existe, apenas mostrar o modal
+            this.wizard.showModal();
+            this.wizard.renderStep();
         }
-        this.wizard.show();
     }
 
     toggleSidebar() {
