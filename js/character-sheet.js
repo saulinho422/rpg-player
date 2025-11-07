@@ -36,6 +36,11 @@ class CharacterSheet {
         this.calculateAll();
         this.setupEventListeners();
         
+        // Inicializar Features Manager
+        if (window.FeaturesManager) {
+            window.featuresManager = new window.FeaturesManager(this);
+        }
+        
         // Inicializar wizard automaticamente após carregar
         setTimeout(() => {
             console.log('🧙 Inicializando wizard automaticamente...');

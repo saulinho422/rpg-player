@@ -2268,3 +2268,199 @@ form.charsheet main section.features div textarea {
     color: white;
 }
 
+
+/* ========================================
+   FEATURES & TRAITS SYSTEM
+   ======================================== */
+
+/* Lock/Unlock Button */
+.btn-icon {
+    background: transparent;
+    border: 2px solid var(--primary-color);
+    color: var(--primary-color);
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+}
+
+.btn-icon:hover {
+    background: var(--primary-color);
+    color: #1a1a2e;
+}
+
+.btn-icon.unlocked {
+    border-color: #28a745;
+    color: #28a745;
+}
+
+.btn-icon.unlocked:hover {
+    background: #28a745;
+    color: white;
+}
+
+/* Feature Card */
+.feature-card {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    border: 2px solid var(--default-color);
+    border-radius: 8px;
+    padding: 12px 16px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.feature-card:hover {
+    border-color: var(--primary-color);
+    box-shadow: 0 4px 12px rgba(212, 175, 55, 0.2);
+    transform: translateY(-2px);
+}
+
+.feature-card.expanded {
+    background: linear-gradient(135deg, #252a48 0%, #1e2a47 100%);
+    border-color: var(--secondary-color);
+}
+
+.feature-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.feature-card-content {
+    flex: 1;
+}
+
+.feature-card-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--primary-color);
+    margin-bottom: 4px;
+    font-family: 'Cinzel', serif;
+}
+
+.feature-card-meta {
+    font-size: 13px;
+    color: var(--text-secondary);
+}
+
+.feature-card-meta strong {
+    color: var(--primary-color);
+}
+
+.feature-card-actions {
+    display: flex;
+    gap: 8px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.feature-card:hover .feature-card-actions {
+    opacity: 1;
+}
+
+.feature-action-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    font-size: 18px;
+    padding: 4px;
+    transition: all 0.2s ease;
+}
+
+.feature-action-btn:hover {
+    color: var(--primary-color);
+    transform: scale(1.2);
+}
+
+.feature-action-btn.delete:hover {
+    color: #dc3545;
+}
+
+/* Feature Description */
+.feature-card-description {
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid var(--default-color);
+    color: var(--text-color);
+    font-size: 14px;
+    line-height: 1.6;
+    display: none;
+}
+
+.feature-card.expanded .feature-card-description {
+    display: block;
+}
+
+/* Drag Handle (only visible when unlocked) */
+.feature-drag-handle {
+    display: none;
+    cursor: grab;
+    color: var(--text-secondary);
+    font-size: 20px;
+}
+
+.features-unlocked .feature-drag-handle {
+    display: block;
+}
+
+.feature-drag-handle:active {
+    cursor: grabbing;
+}
+
+/* Dragging State */
+.feature-card.dragging {
+    opacity: 0.5;
+    cursor: grabbing;
+}
+
+.feature-card.drag-over {
+    border-color: var(--secondary-color);
+    border-style: dashed;
+}
+
+/* Empty State */
+.features-empty {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--text-secondary);
+}
+
+/* Modal Adjustments for Feature Modal */
+#featureModal .input-field {
+    background: rgba(16, 20, 41, 0.6);
+    border: 2px solid var(--default-color);
+    color: var(--text-color);
+    border-radius: 6px;
+    transition: all 0.3s ease;
+}
+
+#featureModal .input-field:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.1);
+}
+
+#featureModal .input-field::placeholder {
+    color: var(--text-secondary);
+    opacity: 0.6;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .feature-card-actions {
+        opacity: 1;
+    }
+    
+    .btn-icon {
+        width: 36px;
+        height: 36px;
+        font-size: 16px;
+    }
+}

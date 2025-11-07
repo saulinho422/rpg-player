@@ -550,12 +550,20 @@
                 <div class="space-y-6">
                     <!-- Características e Habilidades -->
                     <section class="card p-6">
-                        <h2 class="font-heading text-xl text-primary mb-4">Características e Habilidades</h2>
-                        <div class="space-y-4">
-                            <div>
-                                <label for="features-traits-2" class="block text-sm font-medium text-text-secondary mb-2">Características & Traços</label>
-                                <textarea name="features-traits-2" id="features-traits-2" class="input-field w-full px-3 py-2 resize-none" rows="8" placeholder="Características raciais, traços de antecedente, habilidades de classe..."></textarea>
+                        <div class="flex justify-between items-center mb-4">
+                            <h2 class="font-heading text-xl text-primary">Características e Habilidades</h2>
+                            <div class="flex gap-2">
+                                <button id="toggleLockFeatures" class="btn-icon" title="Travar/Destravar habilidades">
+                                    <span class="lock-icon">🔒</span>
+                                </button>
+                                <button id="addFeatureBtn" class="btn-primary px-4 py-2 rounded-lg font-medium">
+                                    + Adicionar Habilidade
+                                </button>
                             </div>
+                        </div>
+                        <div id="featuresList" class="space-y-2">
+                            <!-- Cards de habilidades serão inseridos aqui -->
+                            <p class="text-text-secondary text-center py-8">Nenhuma habilidade adicionada ainda.</p>
                         </div>
                     </section>
 
@@ -951,12 +959,65 @@
         </div>
     </div>
 
+    <!-- Modal: Add/Edit Feature -->
+    <div id="featureModal" class="fixed inset-0 bg-black bg-opacity-75 z-50 hidden items-center justify-center p-4" style="display: none;">
+        <div class="bg-surface border-2 border-primary rounded-lg max-w-2xl w-full p-6">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="font-heading text-2xl text-primary">Adicionar Habilidade</h2>
+                <button id="closeFeatureModal" class="text-text-secondary hover:text-primary text-3xl leading-none">&times;</button>
+            </div>
+
+            <form id="featureForm" class="space-y-4">
+                <!-- Nome da Habilidade -->
+                <div>
+                    <label for="featureName" class="block text-sm font-medium text-text-secondary mb-2">Nome da Habilidade</label>
+                    <input type="text" id="featureName" class="input-field w-full px-3 py-2" placeholder="Ex: Visão no Escuro" required>
+                </div>
+
+                <!-- Tipo da Habilidade -->
+                <div>
+                    <label for="featureType" class="block text-sm font-medium text-text-secondary mb-2">Tipo da Habilidade</label>
+                    <select id="featureType" class="input-field w-full px-3 py-2" required>
+                        <option value="">Selecione o tipo</option>
+                        <option value="class">Habilidade de Classe</option>
+                        <option value="feat">Talento (Feat)</option>
+                        <option value="racial">Habilidade Racial</option>
+                        <option value="background">Habilidade de Background</option>
+                    </select>
+                </div>
+
+                <!-- Detalhe do Tipo -->
+                <div>
+                    <label for="featureSource" class="block text-sm font-medium text-text-secondary mb-2">Detalhe do Tipo</label>
+                    <input type="text" id="featureSource" class="input-field w-full px-3 py-2" placeholder="Ex: Elfo, Guerreiro, Nível 3">
+                </div>
+
+                <!-- Descrição -->
+                <div>
+                    <label for="featureDescription" class="block text-sm font-medium text-text-secondary mb-2">Descrição</label>
+                    <textarea id="featureDescription" class="input-field w-full px-3 py-2 resize-none" rows="5" placeholder="O que esta habilidade faz?"></textarea>
+                </div>
+
+                <!-- Botões -->
+                <div class="flex gap-3 justify-end">
+                    <button type="button" id="cancelFeatureBtn" class="bg-surface border-2 border-default hover:border-primary text-text-secondary px-6 py-3 rounded-lg font-medium transition-colors">
+                        Cancelar
+                    </button>
+                    <button type="submit" class="btn-primary px-6 py-3 rounded-lg font-medium">
+                        Adicionar Habilidade
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <script type="module">
         // Importar e expor Dice3DRoller globalmente
         import { Dice3DRoller } from './js/dice3d.js?v=3.1';
         window.Dice3DRoller = Dice3DRoller;
         console.log('✅ Dice3DRoller v3.1 carregado');
     </script>
+    <script type="module" src="js/features-manager.js"></script>
     <script type="module" src="js/character-sheet.js?v=3.1"></script>
 
 </body>
