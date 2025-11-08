@@ -284,21 +284,40 @@ class CharacterSheet {
             id: draft.id,
             name: draft.name || '',
             race: draft.race,
-            class: draft.character_class,
+            character_class: draft.character_class,
             background: draft.background,
             alignment: draft.alignment,
             level: draft.level || 1,
-            attributes: {
-                str: draft.strength || 10,
-                dex: draft.dexterity || 10,
-                con: draft.constitution || 10,
-                int: draft.intelligence || 10,
-                wis: draft.wisdom || 10,
-                cha: draft.charisma || 10
-            },
-            hp: draft.hit_points_max || 8,
-            hpCurrent: draft.hit_points_current || 8,
-            image: draft.avatar_url
+            // Atributos no nível raiz (não aninhados)
+            strength: draft.strength || 10,
+            dexterity: draft.dexterity || 10,
+            constitution: draft.constitution || 10,
+            intelligence: draft.intelligence || 10,
+            wisdom: draft.wisdom || 10,
+            charisma: draft.charisma || 10,
+            // HP
+            hit_points_max: draft.hit_points_max || 8,
+            hit_points_current: draft.hit_points_current || 8,
+            temp_hp: draft.temp_hp || 0,
+            // Combate
+            armor_class: draft.armor_class || 10,
+            speed: draft.speed || 30,
+            proficiency_bonus: draft.proficiency_bonus || 2,
+            // Salvaguardas e Perícias
+            saving_throws: draft.saving_throws || [],
+            skills: draft.skills || [],
+            // Equipamento
+            equipment: draft.equipment || [],
+            // Outros
+            avatar_url: draft.avatar_url,
+            proficiencies: draft.proficiencies,
+            languages: draft.languages,
+            backstory: draft.backstory,
+            appearance: draft.appearance,
+            personality_traits: draft.personality_traits,
+            ideals: draft.ideals,
+            bonds: draft.bonds,
+            flaws: draft.flaws
         };
         
         console.log('✅ Personagem convertido:', character);
@@ -324,9 +343,20 @@ class CharacterSheet {
     }
 
     populateSheet() {
-        if (!this.character) return;
+        if (!this.character) {
+            console.error('❌ populateSheet(): this.character está undefined!');
+            return;
+        }
 
         console.log('📝 Preenchendo ficha com:', this.character);
+        console.log('📊 Atributos específicos:', {
+            str: this.character.strength,
+            dex: this.character.dexterity,
+            con: this.character.constitution,
+            int: this.character.intelligence,
+            wis: this.character.wisdom,
+            cha: this.character.charisma
+        });
 
         // === ABA IDENTIDADE ===
         this.setInputValue('character-name-2', this.character.name);
@@ -2655,35 +2685,15 @@ class CharacterCreationWizard {
 
             console.log('✅ Personagem atualizado com sucesso!');
 
-            // Atualizar objeto character na memória
-            this.characterSheet.character = {
-                ...this.characterSheet.character,
-                name: this.wizardData.name,
-                race: this.wizardData.race?.name_pt || this.wizardData.race?.name,
-                character_class: this.wizardData.class?.name_pt || this.wizardData.class?.name,
-                background: this.wizardData.background?.nome || this.wizardData.background?.name,
-                alignment: this.wizardData.alignment,
-                level: this.wizardData.level,
-                strength: this.wizardData.attributes.str,
-                dexterity: this.wizardData.attributes.dex,
-                constitution: this.wizardData.attributes.con,
-                intelligence: this.wizardData.attributes.int,
-                wisdom: this.wizardData.attributes.wis,
-                charisma: this.wizardData.attributes.cha,
-                hit_points_max: maxHP,
-                hit_points_current: maxHP,
-                armor_class: baseAC,
-                speed: parseInt(this.wizardData.race?.speed) || 30,
-                skills: this.wizardData.skills || [],
-                saving_throws: savingThrows,
-                equipment: this.wizardData.equipment || []
-            };
-
             // Fechar modal
             this.hideModal();
 
-            // Recarregar e preencher a ficha com os dados atualizados
+            // Recarregar personagem do banco para garantir dados completos
             await this.characterSheet.loadCharacter();
+            
+            console.log('🔍 Personagem carregado do banco:', this.characterSheet.character);
+            
+            // Preencher ficha com dados do banco
             this.characterSheet.populateSheet();
             this.characterSheet.calculateAll();
 
