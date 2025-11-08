@@ -1136,41 +1136,60 @@ class CharacterSheet {
     }
 
     async saveCharacter() {
-        if (!this.character) return;
+        if (!this.character) {
+            console.error('❌ Nenhum personagem para salvar!');
+            alert('❌ Nenhum personagem para salvar!');
+            return;
+        }
 
         try {
+            console.log('💾 Salvando personagem final...', this.character);
+
             const updateData = {
                 name: this.character.name || 'Personagem Sem Nome',
                 race: this.character.race,
-                character_class: this.character.class,
+                character_class: this.character.character_class,
                 background: this.character.background,
                 alignment: this.character.alignment,
                 level: this.character.level || 1,
-                strength: this.character.attributes?.str || 10,
-                dexterity: this.character.attributes?.dex || 10,
-                constitution: this.character.attributes?.con || 10,
-                intelligence: this.character.attributes?.int || 10,
-                wisdom: this.character.attributes?.wis || 10,
-                charisma: this.character.attributes?.cha || 10,
-                hit_points_max: this.character.hp || 8,
-                hit_points_current: this.character.hpCurrent || 8,
-                is_draft: false,
+                strength: this.character.strength || 10,
+                dexterity: this.character.dexterity || 10,
+                constitution: this.character.constitution || 10,
+                intelligence: this.character.intelligence || 10,
+                wisdom: this.character.wisdom || 10,
+                charisma: this.character.charisma || 10,
+                hit_points_max: this.character.hit_points_max || 8,
+                hit_points_current: this.character.hit_points_current || 8,
+                armor_class: this.character.armor_class || 10,
+                speed: this.character.speed || 30,
+                proficiency_bonus: this.character.proficiency_bonus || 2,
+                saving_throws: this.character.saving_throws || [],
+                skills: this.character.skills || [],
+                equipment: this.character.equipment || [],
+                is_draft: false, // MARCA COMO NÃO-RASCUNHO
                 updated_at: new Date().toISOString()
             };
+
+            console.log('📦 Dados para salvar:', updateData);
 
             const { error } = await supabase
                 .from('characters')
                 .update(updateData)
                 .eq('id', this.characterId);
 
-            if (error) throw error;
+            if (error) {
+                console.error('❌ Erro do Supabase:', error);
+                throw error;
+            }
             
-            alert('✅ Personagem salvo com sucesso!');
-            window.location.href = '/dashboard.html';
+            console.log('✅ Personagem salvo com sucesso!');
+            
+            // Redirecionar para dashboard SEM alert (evita duplo alert)
+            window.location.href = 'dashboard.html';
             
         } catch (error) {
             console.error('❌ Erro ao salvar personagem:', error);
-            alert('Erro ao salvar personagem!');
+            alert(`❌ Erro ao salvar personagem: ${error.message || 'Tente novamente'}`);
         }
     }
 
