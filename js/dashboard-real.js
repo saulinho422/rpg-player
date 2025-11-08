@@ -60,6 +60,9 @@ export class DashboardService {
             }
             
             console.log('🔍 Dashboard: Carregando personagens para userId:', userId)
+            console.log('🔍 Dashboard: userId COMPLETO:', userId)
+            console.log('🔍 Dashboard: Tipo do userId:', typeof userId)
+            console.log('🔍 Dashboard: Tamanho do userId:', userId?.length)
             
             if (!userId) {
                 console.warn('⚠️ Dashboard: Nenhum userId encontrado (nem auth nem localStorage)')
@@ -68,6 +71,7 @@ export class DashboardService {
             
             const characters = await CharacterService.getUserCharacters(userId)
             console.log('👥 Dashboard: Personagens carregados:', characters)
+            console.log('👥 Dashboard: Total de personagens retornados:', characters.length)
             
             // Mostra TODOS os personagens que têm nome (rascunho ou finalizado)
             const validCharacters = characters.filter(char => {
