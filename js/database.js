@@ -281,6 +281,19 @@ export class CharacterService {
         try {
             console.log('🔍 Buscando personagens para userId:', userId);
             
+            // DEBUG: Busca TODOS os personagens para comparar user_ids
+            const { data: allChars, error: debugError } = await supabase
+                .from('characters')
+                .select('id, name, user_id')
+                .limit(10);
+            
+            if (!debugError && allChars) {
+                console.log('🐛 DEBUG: Todos os personagens na tabela:', allChars);
+                allChars.forEach(char => {
+                    console.log(`🐛 Personagem "${char.name}": user_id = "${char.user_id}" (match: ${char.user_id === userId})`);
+                });
+            }
+            
             const { data, error } = await supabase
                 .from('characters')
                 .select('*')
