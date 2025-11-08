@@ -73,16 +73,18 @@ export class DashboardService {
             console.log('👥 Dashboard: Personagens carregados:', characters)
             console.log('👥 Dashboard: Total de personagens retornados:', characters.length)
             
-            // Mostra TODOS os personagens que têm nome (rascunho ou finalizado)
+            // Mostra APENAS personagens finalizados (is_draft = false) que têm nome
             const validCharacters = characters.filter(char => {
                 const hasName = char.name && char.name.trim() !== '';
+                const isFinished = char.is_draft === false;
+                const shouldShow = hasName && isFinished;
                 
-                console.log(`👤 Personagem "${char.name || '(sem nome)'}": is_draft=${char.is_draft}, hasName=${hasName}, showing=${hasName}`);
+                console.log(`👤 Personagem "${char.name || '(sem nome)'}": is_draft=${char.is_draft}, hasName=${hasName}, isFinished=${isFinished}, showing=${shouldShow}`);
                 
-                return hasName;
+                return shouldShow;
             });
             
-            console.log('👥 Dashboard: Personagens com nome:', validCharacters.length, 'de', characters.length, 'total');
+            console.log('👥 Dashboard: Personagens finalizados com nome:', validCharacters.length, 'de', characters.length, 'total');
             
             // Atualiza a seção de personagens
             this.updateCharactersSection(validCharacters)
