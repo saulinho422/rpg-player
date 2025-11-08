@@ -13,6 +13,8 @@ class CharacterSheet {
         this.characterId = this.getCharacterIdFromURL();
         this.currentUser = null;
         this.gameData = {};
+        this.isDraft = true;
+        this._listenersSetup = false;
         this.init();
     }
 
@@ -334,6 +336,9 @@ class CharacterSheet {
                 .single();
 
             if (error) throw error;
+
+            this.isDraft = data.is_draft === true;
+            console.log(`📋 Personagem carregado - isDraft: ${this.isDraft}`);
 
             this.character = this.convertDraftToCharacter(data);
         } catch (error) {
@@ -795,10 +800,15 @@ class CharacterSheet {
         // Botão para abrir wizard de criação
         const openWizardBtn = document.getElementById('openWizardBtn');
         if (openWizardBtn) {
-            openWizardBtn.addEventListener('click', () => {
-                this.toggleSidebar(); // Fechar sidebar
-                this.openCreationWizard(); // Abrir wizard
-            });
+            if (this.isDraft === false) {
+                openWizardBtn.style.display = 'none';
+                console.log('🚫 Wizard desabilitado - personagem já foi finalizado');
+            } else {
+                openWizardBtn.addEventListener('click', () => {
+                    this.toggleSidebar(); // Fechar sidebar
+                    this.openCreationWizard(); // Abrir wizard
+                });
+            }
         }
 
         // Event listeners para atributos
@@ -1194,6 +1204,12 @@ class CharacterSheet {
     }
 
     openCreationWizard() {
+        if (this.isDraft === false) {
+            console.log('🚫 Wizard bloqueado - personagem já foi finalizado');
+            alert('⚠️ Este personagem já foi finalizado! Não é possível usar o wizard de criação.');
+            return;
+        }
+        
         console.log('🧙 Abrindo wizard de criação...');
         if (!this.wizard) {
             this.wizard = new CharacterCreationWizard(this);
