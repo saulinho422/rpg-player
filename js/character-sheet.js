@@ -328,7 +328,7 @@ class CharacterSheet {
 
         console.log('📝 Preenchendo ficha com:', this.character);
 
-        // Informações básicas - Aba Identidade
+        // === ABA IDENTIDADE ===
         this.setInputValue('character-name-2', this.character.name);
         this.setInputValue('character-class-2', this.character.character_class);
         this.setInputValue('character-race-2', this.character.race);
@@ -336,65 +336,162 @@ class CharacterSheet {
         this.setInputValue('character-alignment-2', this.character.alignment);
         this.setInputValue('character-level-2', this.character.level);
 
-        // Atributos - Aba Atributos
-        this.setInputValue('Strengthscore', this.character.strength);
-        this.setInputValue('Dexterityscore', this.character.dexterity);
-        this.setInputValue('Constitutionscore', this.character.constitution);
-        this.setInputValue('Intelligencescore', this.character.intelligence);
-        this.setInputValue('Wisdomscore', this.character.wisdom);
-        this.setInputValue('Charismascore', this.character.charisma);
-
-        // HP - Aba Combate (IDs corretos do HTML)
+        // HP (aba Identidade - IDs diferentes da aba Combate)
         this.setInputValue('max-hp', this.character.hit_points_max);
         this.setInputValue('current-hp', this.character.hit_points_current);
         this.setInputValue('temp-hp', 0);
 
-        // AC e outros stats de combate
+        // Hit Dice (div, não input)
+        const hitDiceDiv = document.getElementById('hit-dice');
+        if (hitDiceDiv && this.character.character_class) {
+            const hitDie = this.getHitDieForClass(this.character.character_class);
+            hitDiceDiv.textContent = `${this.character.level}${hitDie}`;
+        }
+
+        // === ABA COMBATE ===
+        this.setInputValue('maxhp', this.character.hit_points_max);
+        this.setInputValue('currenthp', this.character.hit_points_current);
+        this.setInputValue('temphp', 0);
         this.setInputValue('ac', this.character.armor_class);
-        this.setInputValue('speed', this.character.speed);
+        this.setInputValue('speed', `${this.character.speed}m`);
         
-        // Bônus de proficiência (é um span, não input)
+        if (this.character.character_class) {
+            const hitDie = this.getHitDieForClass(this.character.character_class);
+            this.setInputValue('hitdice', `${this.character.level}${hitDie}`);
+        }
+
+        // Iniciativa (DEX mod)
+        const dexMod = Math.floor((this.character.dexterity - 10) / 2);
+        this.setInputValue('initiative', dexMod >= 0 ? `+${dexMod}` : `${dexMod}`);
+
+        // === ABA ATRIBUTOS ===
+        // Preencher divs de exibição (não há inputs editáveis)
+        const attrs = [
+            { id: 'forca', value: this.character.strength },
+            { id: 'destreza', value: this.character.dexterity },
+            { id: 'constituicao', value: this.character.constitution },
+            { id: 'inteligencia', value: this.character.intelligence },
+            { id: 'sabedoria', value: this.character.wisdom },
+            { id: 'carisma', value: this.character.charisma }
+        ];
+
+        attrs.forEach(attr => {
+            const valueDiv = document.getElementById(`${attr.id}-value`);
+            const modDiv = document.getElementById(`${attr.id}-modifier`);
+
+            if (valueDiv) {
+                valueDiv.textContent = attr.value;
+                console.log(`✅ Atributo ${attr.id}: ${attr.value}`);
+            }
+
+            if (modDiv) {
+                const mod = Math.floor((attr.value - 10) / 2);
+                modDiv.textContent = mod >= 0 ? `+${mod}` : `${mod}`;
+            }
+        });
+
+        // Bônus de proficiência (span)
         const profBonus = document.getElementById('proficiency-bonus');
         if (profBonus) {
             profBonus.textContent = `+${this.character.proficiency_bonus}`;
         }
 
-        // Hit Dice (é uma div com texto, não input)
-        if (this.character.character_class) {
-            const hitDie = this.getHitDieForClass(this.character.character_class);
-            const hitDiceElement = document.getElementById('hit-dice');
-            if (hitDiceElement) {
-                hitDiceElement.textContent = `${this.character.level}${hitDie}`;
-            }
-        }
+        // Salvaguardas (marcar checkboxes) - TRADUZIR inglês → português
+        const saveMap = {
+            'Strength': 'forca',
+            'Dexterity': 'destreza',
+            'Constitution': 'constituicao',
+            'Intelligence': 'inteligencia',
+            'Wisdom': 'sabedoria',
+            'Charisma': 'carisma'
+        };
 
-        // Perícias (marcar checkboxes de proficiência)
-        if (this.character.skills && Array.isArray(this.character.skills)) {
-            console.log('🎯 Marcando perícias:', this.character.skills);
-            this.character.skills.forEach(skill => {
-                const checkbox = document.getElementById(`${skill}-prof`);
-                if (checkbox) {
-                    checkbox.checked = true;
-                    console.log(`✅ Perícia marcada: ${skill}`);
-                } else {
-                    console.warn(`⚠️ Checkbox não encontrado para: ${skill}`);
-                }
-            });
-        }
-
-        // Salvaguardas (marcar checkboxes de proficiência)
         if (this.character.saving_throws && Array.isArray(this.character.saving_throws)) {
             console.log('🛡️ Marcando salvaguardas:', this.character.saving_throws);
             this.character.saving_throws.forEach(save => {
-                const checkbox = document.getElementById(`${save}-save-prof`);
+                const ptName = saveMap[save] || save.toLowerCase();
+                const checkbox = document.getElementById(`save-${ptName}`);
                 if (checkbox) {
                     checkbox.checked = true;
-                    console.log(`✅ Salvaguarda marcada: ${save}`);
+                    console.log(`✅ Salvaguarda marcada: save-${ptName}`);
                 } else {
-                    console.warn(`⚠️ Checkbox não encontrado para: ${save}`);
+                    console.warn(`⚠️ Checkbox não encontrado: save-${ptName}`);
                 }
             });
         }
+
+        // Perícias (marcar checkboxes de proficiência) - TRADUZIR português → ID
+        const skillIdMap = {
+            'Acrobacia': 'acrobatics',
+            'Lidar com Animais': 'animal-handling',
+            'Arcanismo': 'arcana',
+            'Arcana': 'arcana',
+            'Atletismo': 'athletics',
+            'Enganação': 'deception',
+            'História': 'history',
+            'Intuição': 'insight',
+            'Intimidação': 'intimidation',
+            'Investigação': 'investigation',
+            'Medicina': 'medicine',
+            'Natureza': 'nature',
+            'Percepção': 'perception',
+            'Performance': 'performance',
+            'Persuasão': 'persuasion',
+            'Religião': 'religion',
+            'Prestidigitação': 'sleight-of-hand',
+            'Furtividade': 'stealth',
+            'Sobrevivência': 'survival'
+        };
+
+        if (this.character.skills && Array.isArray(this.character.skills)) {
+            console.log('🎯 Marcando perícias:', this.character.skills);
+            this.character.skills.forEach(skill => {
+                const skillId = skillIdMap[skill] || skill.toLowerCase().replace(/\s+/g, '-');
+                const checkbox = document.getElementById(`skill-${skillId}`);
+                if (checkbox) {
+                    checkbox.checked = true;
+                    console.log(`✅ Perícia marcada: skill-${skillId}`);
+                } else {
+                    console.warn(`⚠️ Checkbox não encontrado para: skill-${skillId} (original: ${skill})`);
+                }
+            });
+        }
+
+        // Proficiências (textarea na aba Identidade)
+        if (this.character.proficiencies) {
+            const profText = Array.isArray(this.character.proficiencies) 
+                ? this.character.proficiencies.join(', ') 
+                : this.character.proficiencies;
+            this.setInputValue('proficiencies', profText);
+        }
+
+        // Idiomas (textarea na aba Identidade)
+        if (this.character.languages) {
+            const langText = Array.isArray(this.character.languages) 
+                ? this.character.languages.join(', ') 
+                : this.character.languages;
+            this.setInputValue('languages', langText);
+        }
+
+        // Histórico (backstory textarea na aba Identidade)
+        this.setInputValue('backstory', this.character.backstory);
+        
+        // Aparência (appearance textarea na aba Identidade)  
+        this.setInputValue('appearance', this.character.appearance);
+
+        // Personalidade (personality-traits textarea na aba Identidade)
+        this.setInputValue('personality-traits', this.character.personality_traits);
+
+        // Ideais (ideals textarea na aba Identidade)
+        this.setInputValue('ideals', this.character.ideals);
+
+        // Vínculos (bonds textarea na aba Identidade)
+        this.setInputValue('bonds', this.character.bonds);
+
+        // Defeitos (flaws textarea na aba Identidade)
+        this.setInputValue('flaws', this.character.flaws);
+
+        console.log('✅ populateSheet() completo');
     }
 
     setInputValue(id, value) {
