@@ -280,6 +280,8 @@ export class CharacterService {
     static async getUserCharacters(userId) {
         try {
             console.log('🔍 Buscando personagens para userId:', userId);
+            console.log('🔍 Tipo do userId:', typeof userId);
+            console.log('🔍 Tamanho do userId:', userId?.length);
             
             const { data, error } = await supabase
                 .from('characters')
@@ -292,7 +294,25 @@ export class CharacterService {
                 throw error;
             }
             
-            console.log('📊 Personagens encontrados:', data?.length || 0, data);
+            console.log('📊 Personagens encontrados:', data?.length || 0);
+            console.log('📊 Dados retornados:', data);
+            
+            if (data && data.length > 0) {
+                data.forEach((char, index) => {
+                    console.log(`  ${index + 1}. "${char.name}": is_draft=${char.is_draft}, user_id=${char.user_id}`);
+                });
+            } else {
+                console.warn('⚠️ Nenhum personagem retornado pela query!');
+                
+                // DEBUG: Buscar sem filtro para ver o que tem
+                const { data: allData } = await supabase
+                    .from('characters')
+                    .select('*')
+                    .limit(5);
+                    
+                console.log('🔍 DEBUG: Primeiros 5 personagens SEM filtro:', allData);
+            }
+            
             return data || []
         } catch (error) {
             console.error('❌ Erro ao buscar personagens:', error)
