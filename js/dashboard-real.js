@@ -82,7 +82,24 @@ export class DashboardService {
                 });
             }
             
-            const characters = await CharacterService.getUserCharacters(userId)
+            // QUERY DIRETA - não usar CharacterService
+            const { data: characters, error: charError } = await supabase
+                .from('characters')
+                .select(`
+                    id, name, race, character_class, background, alignment, level,
+                    strength, dexterity, constitution, intelligence, wisdom, charisma,
+                    hit_points_max, hit_points_current, armor_class, speed, proficiency_bonus,
+                    saving_throws, skills, equipment, avatar_url, is_draft, draft_step,
+                    created_at, updated_at, user_id
+                `)
+                .eq('user_id', userId)
+                .order('created_at', { ascending: false });
+            
+            if (charError) {
+                console.error('❌ Erro ao buscar personagens:', charError);
+                return [];
+            }
+            
             console.log('👥 Dashboard: Personagens carregados:', characters)
             console.log('👥 Dashboard: Total de personagens retornados:', characters.length)
             
