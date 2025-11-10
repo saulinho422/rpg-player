@@ -73,18 +73,16 @@ export class DashboardService {
             console.log('👥 Dashboard: Personagens carregados:', characters)
             console.log('👥 Dashboard: Total de personagens retornados:', characters.length)
             
-            // Mostra APENAS personagens finalizados (is_draft = false) que têm nome
+            // Mostra TODOS os personagens finalizados (is_draft = false), mesmo sem nome
             const validCharacters = characters.filter(char => {
-                const hasName = char.name && char.name.trim() !== '';
                 const isFinished = char.is_draft === false;
-                const shouldShow = hasName && isFinished;
                 
-                console.log(`👤 Personagem "${char.name || '(sem nome)'}": is_draft=${char.is_draft}, hasName=${hasName}, isFinished=${isFinished}, showing=${shouldShow}`);
+                console.log(`👤 Personagem "${char.name || '(sem nome)'}": is_draft=${char.is_draft}, mostrando=${isFinished}`);
                 
-                return shouldShow;
+                return isFinished;
             });
             
-            console.log('👥 Dashboard: Personagens finalizados com nome:', validCharacters.length, 'de', characters.length, 'total');
+            console.log('👥 Dashboard: Personagens finalizados:', validCharacters.length, 'de', characters.length, 'total');
             
             // Atualiza a seção de personagens
             this.updateCharactersSection(validCharacters)
@@ -238,12 +236,12 @@ export class DashboardService {
         const charactersHTML = characters.map(character => `
             <div class="character-card" data-character-id="${character.id}">
                 <div class="character-avatar">
-                    <img src="${character.avatar_url || 'https://via.placeholder.com/400x200'}" alt="${character.name}">
+                    <img src="${character.avatar_url || 'https://via.placeholder.com/400x200'}" alt="${character.name || 'Personagem'}">
                 </div>
                 <div class="character-overlay">
                     <div class="character-level">Nível ${character.level || 1}</div>
                     <div class="character-info">
-                        <h3>${character.name}</h3>
+                        <h3>${character.name || 'Sem Nome'}</h3>
                         <div class="character-details">
                             <div class="character-class">${character.character_class || 'Aventureiro'}</div>
                             <div class="character-race">${character.race || 'Humano'}</div>
