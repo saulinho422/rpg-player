@@ -69,6 +69,19 @@ export class DashboardService {
                 return []
             }
             
+            // DEBUG: Buscar TODOS os personagens para ver o que tem no banco
+            const { data: allChars, error: debugError } = await supabase
+                .from('characters')
+                .select('id, name, user_id, is_draft');
+            
+            console.log('🔍 TODOS os personagens no banco:', allChars);
+            if (allChars && allChars.length > 0) {
+                allChars.forEach(char => {
+                    console.log(`  - Personagem: name="${char.name}", user_id="${char.user_id}", is_draft=${char.is_draft}`);
+                    console.log(`    Match com userId logado: ${char.user_id === userId}`);
+                });
+            }
+            
             const characters = await CharacterService.getUserCharacters(userId)
             console.log('👥 Dashboard: Personagens carregados:', characters)
             console.log('👥 Dashboard: Total de personagens retornados:', characters.length)
