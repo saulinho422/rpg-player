@@ -1,68 +1,15 @@
 // =====================================
-// AUTENTICAÇÃO - LOGIN E REGISTRO
+// NOVA AUTENTICAÇÃO - SÓ SUPABASE
 // =====================================
 
-// Firebase v9+ imports
-import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.5.0/firebase-app.js'
-import { 
-    getAuth, 
-    GoogleAuthProvider, 
-    signInWithPopup,
-    createUserWithEmailAndPassword,
-    signInWithEmailAndPassword,
-    signOut, 
-    onAuthStateChanged 
-} from 'https://www.gstatic.com/firebasejs/10.5.0/firebase-auth.js'
-
-// Supabase
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.38.0/+esm'
 import { UserService } from './database.js'
 
-// Firebase config
-const firebaseConfig = {
-    apiKey: "AIzaSyDBQ7WocaMQ-f3NMEDZjUM0ro4seE0RyFk",
-    authDomain: "player-7a871.firebaseapp.com",
-    projectId: "player-7a871",
-    storageBucket: "player-7a871.firebasestorage.app",
-    messagingSenderId: "526885048287",
-    appId: "1:526885048287:web:229cd7035138439a60be6a",
-    measurementId: "G-T7P89TVQWK"
-}
-
-// Supabase config
+// Configuração do Supabase
 const SUPABASE_URL = 'https://bifiatkpfmrrnfhvgrpb.supabase.co'
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpZmlhdGtwZm1ycm5maHZncnBiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA0ODM2NTMsImV4cCI6MjA3NjA1OTY1M30.g5S4aT-ml_cgGoJHWudB36EWz-3bonFZW3DEIWNOUAM'
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig)
-const auth = getAuth(app)
-const googleProvider = new GoogleAuthProvider()
-
-// Initialize Supabase
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
-
-// =====================================
-// CONTROLE DE ABAS
-// =====================================
-
-function initTabs() {
-    const tabBtns = document.querySelectorAll('.tab-btn')
-    const tabContents = document.querySelectorAll('.tab-content')
-    
-    tabBtns.forEach(btn => {
-        btn.addEventListener('click', () => {
-            const targetTab = btn.dataset.tab
-            
-            // Remove active de todas as abas
-            tabBtns.forEach(b => b.classList.remove('active'))
-            tabContents.forEach(content => content.classList.remove('active'))
-            
-            // Ativa a aba clicada
-            btn.classList.add('active')
-            document.getElementById(`${targetTab}-tab`).classList.add('active')
-        })
-    })
-}
 
 // =====================================
 // SISTEMA DE MENSAGENS
@@ -70,14 +17,14 @@ function initTabs() {
 
 function showMessage(message, type = 'info') {
     const messagesContainer = document.getElementById('messages')
-    
+    if (!messagesContainer) return
+
     const messageElement = document.createElement('div')
     messageElement.className = `message ${type}`
     messageElement.textContent = message
-    
+
     messagesContainer.appendChild(messageElement)
-    
-    // Remove a mensagem após 5 segundos
+
     setTimeout(() => {
         if (messageElement.parentNode) {
             messageElement.parentNode.removeChild(messageElement)
@@ -86,153 +33,179 @@ function showMessage(message, type = 'info') {
 }
 
 // =====================================
-// AUTENTICAÇÃO - GOOGLE (FIREBASE)
+// AUTENTICAÇÃO COM GOOGLE (SUPABASE)
 // =====================================
 
 async function signInWithGoogle() {
     try {
-        showMessage('Conectando...', 'info')
-        
-        const result = await signInWithPopup(auth, googleProvider)
-        const user = result.user
-        
-        showMessage('Login realizado com sucesso!', 'success')
-        
-        // Redireciona para onboarding ou dashboard
-        checkUserProfile(user)
-        
+        showMessage('Conectando com Google...', 'info')
+
+        const { data, error } = await supabase.auth.signInWithOAuth({
+            provider: 'google',
+            options: {
+                // Redireciona para a página atual para processar o callback
+                redirectTo: `${window.location.origin}/login.html`
+            }
+        })
+
+        if (error) throw error
+
+        showMessage('Redirecionando para Google...', 'info')
+
+        // O Supabase vai redirecionar automaticamente
+
     } catch (error) {
-        console.error('Erro no login:', error)
-        
+        console.error('Erro no login com Google:', error)
+
         let errorMessage = 'Erro no login com Google'
-        
-        switch (error.code) {
-            case 'auth/popup-blocked':
-                errorMessage = 'Pop-up bloqueado! Permita pop-ups e tente novamente.'
-                break
-            case 'auth/popup-closed-by-user':
-                errorMessage = 'Login cancelado pelo usuário.'
-                break
-            case 'auth/cancelled-popup-request':
-                errorMessage = 'Apenas um pop-up por vez.'
-                break
-            default:
-                errorMessage = error.message
+
+        if (error.message.includes('popup')) {
+            errorMessage = 'Pop-up bloqueado! Permita pop-ups e tente novamente.'
+        } else if (error.message.includes('OAuth')) {
+            errorMessage = 'Erro na configuração do Google. Tente novamente mais tarde.'
+        } else {
+            errorMessage = error.message
         }
-        
+
         showMessage(errorMessage, 'error')
     }
 }
 
 // =====================================
-// AUTENTICAÇÃO - EMAIL (SUPABASE)
+// AUTENTICAÇÃO COM EMAIL (SUPABASE)
 // =====================================
 
 async function signInWithEmail(email, password) {
     try {
         showMessage('Conectando...', 'info')
-        
+
         const { data, error } = await supabase.auth.signInWithPassword({
             email: email,
             password: password
         })
-        
+
         if (error) throw error
-        
-        // Define localStorage imediatamente
+
         if (data.user) {
             localStorage.setItem('isLoggedIn', 'true')
             localStorage.setItem('currentUserId', data.user.id)
-            
+
             console.log('✅ Usuário logado com ID:', data.user.id)
         }
-        
+
         showMessage('Login realizado com sucesso!', 'success')
-        
-        // Redireciona para onboarding ou dashboard
-        checkUserProfile(data.user)
-        
+
+        // Verifica perfil e redireciona
+        await checkUserProfile(data.user)
+
     } catch (error) {
         console.error('Erro no login:', error)
         showMessage(error.message || 'Erro no login', 'error')
     }
 }
 
+// =====================================
+// REGISTRO COM EMAIL (SUPABASE)
+// =====================================
+
 async function registerWithEmail(email, password) {
     try {
-        showMessage('Verificando disponibilidade do email...', 'info')
-        
-        // 1. VERIFICAÇÃO CRÍTICA: Verifica se email já existe no banco
-        const { data: existingUsers, error: searchError } = await supabase.rpc('check_email_exists', {
+        showMessage('Verificando disponibilidade...', 'info')
+
+        // Verifica se email já existe
+        const { data: existingUsers } = await supabase.rpc('check_email_exists', {
             search_email: email
         })
-        
+
         if (existingUsers && existingUsers > 0) {
             showMessage('❌ Este email já possui uma conta! Use "Entrar" para fazer login.', 'error')
             return
         }
-        
+
         showMessage('Criando conta...', 'info')
-        
-        // 2. Só tenta registrar se email não existe
+
         const { data, error } = await supabase.auth.signUp({
             email: email,
-            password: password
+            password: password,
+            options: {
+                // Redireciona para onboarding após confirmar email
+                emailRedirectTo: `${window.location.origin}/onboarding.html`,
+                data: {
+                    email: email
+                }
+            }
         })
-        
+
         if (error) {
-            // Trata erros específicos do Supabase
-            if (error.message.includes('User already registered') || 
-                error.message.includes('already been registered') ||
-                error.message.includes('Email address is already registered')) {
-                showMessage('❌ Este email já possui uma conta! Use "Entrar" ao invés de "Registrar".', 'error')
+            if (error.message.includes('User already registered')) {
+                showMessage('❌ Este email já possui uma conta! Use "Entrar" para fazer login.', 'error')
                 return
             }
             throw error
         }
-        
-        // 3. Verifica se o usuário foi realmente criado
+
         if (!data.user) {
             showMessage('Erro: Não foi possível criar a conta.', 'error')
             return
         }
-        
-        // 4. Dupla verificação: se já está confirmado, significa que existia
-        if (data.user.email_confirmed_at) {
-            showMessage('❌ Esta conta já existe e está ativa! Use "Entrar" para fazer login.', 'warning')
-            return
+
+        console.log('🔍 Dados do registro:', {
+            user: data.user.id,
+            session: data.session ? 'Sessão ativa' : 'Sem sessão',
+            email: email,
+            identities: data.user.identities?.length || 0
+        })
+
+        // ⚠️ Com CONFIRMAÇÃO DE EMAIL HABILITADA:
+        // - Usuário recebe email de confirmação
+        // - Não há sessão até confirmar
+        // - Precisa clicar no link do email
+
+        if (data.session) {
+            // Sessão criada imediatamente (confirmação desabilitada no Supabase) ✅
+            console.log('✅ Sessão criada imediatamente - Email já confirmado ou confirmação desabilitada')
+
+            localStorage.setItem('isLoggedIn', 'true')
+            localStorage.setItem('currentUserId', data.user.id)
+            localStorage.setItem('userEmail', email)
+            localStorage.setItem('onboardingCompleted', 'false')
+
+            showMessage('✅ Conta criada com sucesso! Redirecionando...', 'success')
+
+            setTimeout(() => {
+                window.location.href = 'onboarding.html'
+            }, 1500)
+
+        } else {
+            // Sem sessão = precisa confirmar email 📧
+            console.log('📧 Email de confirmação enviado para:', email)
+
+            // Salva email temporariamente para a página de espera
+            localStorage.setItem('pendingEmail', email)
+            localStorage.setItem('registrationTime', new Date().toISOString())
+
+            showMessage('📧 Conta criada! Verifique seu email para confirmar.', 'success')
+
+            setTimeout(() => {
+                window.location.href = 'aguarde-confirmacao.html'
+            }, 2000)
         }
-        
-        // Define localStorage imediatamente após registro
-        localStorage.setItem('isLoggedIn', 'true')
-        localStorage.setItem('currentUserId', data.user.id)
-        localStorage.setItem('onboardingCompleted', 'false')
-        
-        console.log('✅ Usuário registrado com ID:', data.user.id)
-        
-        showMessage('✅ Conta criada com sucesso! Redirecionando...', 'success')
-        
-        // Redireciona para onboarding
-        setTimeout(() => {
-            window.location.href = 'onboarding.html'
-        }, 1500)
-        
+
     } catch (error) {
         console.error('Erro no registro:', error)
-        
-        // Mensagens de erro específicas
+
         let errorMessage = 'Erro ao criar conta'
-        
-        if (error.message.includes('already registered') || error.message.includes('User already registered')) {
-            errorMessage = '❌ Este email já tem uma conta! Clique em "Entrar" para fazer login.'
-        } else if (error.message.includes('invalid email') || error.message.includes('Invalid email')) {
-            errorMessage = '❌ Email inválido. Verifique o formato (exemplo@email.com).'
-        } else if (error.message.includes('weak password') || error.message.includes('Password')) {
-            errorMessage = '❌ Senha muito fraca. Use pelo menos 6 caracteres com números e letras.'
+
+        if (error.message.includes('already registered')) {
+            errorMessage = '❌ Este email já tem uma conta! Use "Entrar" para fazer login.'
+        } else if (error.message.includes('invalid email')) {
+            errorMessage = '❌ Email inválido. Verifique o formato.'
+        } else if (error.message.includes('weak password')) {
+            errorMessage = '❌ Senha muito fraca. Use pelo menos 6 caracteres.'
         } else if (error.message) {
             errorMessage = `❌ ${error.message}`
         }
-        
+
         showMessage(errorMessage, 'error')
     }
 }
@@ -243,41 +216,70 @@ async function registerWithEmail(email, password) {
 
 async function checkUserProfile(user) {
     try {
-        // Busca perfil real do banco de dados
-        const profile = await UserService.getProfile(user.id || user.uid)
-        
-        // Marca usuário como logado
+        console.log('🔍 Verificando perfil do usuário:', user.id)
+
+        const profile = await UserService.getProfile(user.id)
+        console.log('📋 Perfil encontrado:', profile)
+
         localStorage.setItem('isLoggedIn', 'true')
-        localStorage.setItem('currentUserId', user.id || user.uid)
-        
-        // Atualiza último login
-        await UserService.updateLastLogin(user.id || user.uid)
-        
-        if (profile && profile.onboarding_completed) {
-            // Usuário já tem perfil completo, vai para dashboard
-            localStorage.setItem('userName', profile.display_name)
+        localStorage.setItem('currentUserId', user.id)
+
+        await UserService.updateLastLogin(user.id)
+
+        // DEBUG: Verificações detalhadas
+        console.log('🔍 profile existe:', !!profile)
+        console.log('🔍 onboarding_completed:', profile?.onboarding_completed)
+        console.log('🔍 display_name:', profile?.display_name)
+        console.log('🔍 is_owner:', profile?.is_owner)
+        console.log('🔍 is_admin:', profile?.is_admin)
+
+        // ⚡ VERIFICAÇÃO DE PERMISSÕES ADMIN/OWNER
+        if (profile && (profile.is_owner || profile.is_admin)) {
+            console.log('👑 Usuário é ADMIN/OWNER - redirecionando para admin dashboard')
+
+            localStorage.setItem('userName', profile.display_name || profile.email || 'Admin')
+            localStorage.setItem('userAvatar', profile.avatar_url || '')
+            localStorage.setItem('isAdmin', 'true')
+            localStorage.setItem('isOwner', profile.is_owner ? 'true' : 'false')
+
+            showMessage('🛡️ Bem-vindo, Administrador!', 'success')
+
+            setTimeout(() => {
+                window.location.href = 'admin-dashboard.html'
+            }, 1500)
+            return
+        }
+
+        if (profile && profile.onboarding_completed === true) {
+            console.log('✅ Usuário já completou onboarding, indo para dashboard')
+
+            localStorage.setItem('userName', profile.display_name || profile.email || 'Usuário')
             localStorage.setItem('userAvatar', profile.avatar_url || '')
             localStorage.setItem('onboardingCompleted', 'true')
-            
+
+            showMessage('Bem-vindo de volta! Carregando dashboard...', 'success')
+
             setTimeout(() => {
                 window.location.href = 'dashboard.html'
             }, 1500)
         } else {
-            // Usuário novo ou onboarding incompleto
+            console.log('⚠️ Usuário precisa completar onboarding')
+
             localStorage.setItem('onboardingCompleted', 'false')
-            
+
+            showMessage('Vamos configurar seu perfil!', 'info')
+
             setTimeout(() => {
                 window.location.href = 'onboarding.html'
             }, 1500)
         }
     } catch (error) {
         console.error('Erro ao verificar perfil:', error)
-        
-        // Fallback: vai para onboarding em caso de erro
+
         localStorage.setItem('isLoggedIn', 'true')
-        localStorage.setItem('currentUserId', user.id || user.uid)
+        localStorage.setItem('currentUserId', user.id)
         localStorage.setItem('onboardingCompleted', 'false')
-        
+
         setTimeout(() => {
             window.location.href = 'onboarding.html'
         }, 1500)
@@ -285,113 +287,214 @@ async function checkUserProfile(user) {
 }
 
 // =====================================
-// EVENT LISTENERS
-// =====================================
-
-document.addEventListener('DOMContentLoaded', () => {
-    initTabs()
-    
-    // Google Login
-    document.getElementById('googleLogin')?.addEventListener('click', signInWithGoogle)
-    document.getElementById('googleRegister')?.addEventListener('click', signInWithGoogle)
-    
-    // Email Login
-    document.getElementById('login')?.addEventListener('submit', async (e) => {
-        e.preventDefault()
-        
-        const email = document.getElementById('loginEmail').value
-        const password = document.getElementById('loginPassword').value
-        
-        if (email && password) {
-            await signInWithEmail(email, password)
-        }
-    })
-    
-    // Email Register
-    document.getElementById('register')?.addEventListener('submit', async (e) => {
-        e.preventDefault()
-        
-        const email = document.getElementById('registerEmail').value
-        const password = document.getElementById('registerPassword').value
-        const confirmPassword = document.getElementById('confirmPassword').value
-        
-        if (password !== confirmPassword) {
-            showMessage('As senhas não coincidem!', 'error')
-            return
-        }
-        
-        if (password.length < 6) {
-            showMessage('A senha deve ter pelo menos 6 caracteres!', 'error')
-            return
-        }
-        
-        if (email && password) {
-            await registerWithEmail(email, password)
-        }
-    })
-})
-
-// =====================================
 // VERIFICAÇÃO DE AUTENTICAÇÃO
 // =====================================
 
-// Variável para controlar se o usuário está fazendo logout
-let isLoggingOut = false
-
-// Verifica se o usuário já está logado (apenas na página de login)
-onAuthStateChanged(auth, (user) => {
-    // Só redireciona se estiver na página de login e não estiver fazendo logout
-    if (user && !isLoggingOut && window.location.pathname.includes('login.html')) {
-        checkUserProfile(user)
-    }
-})
-
-// Verifica autenticação Supabase (apenas na página de login)
-supabase.auth.onAuthStateChange((event, session) => {
-    if (event === 'SIGNED_IN' && session?.user && !isLoggingOut && window.location.pathname.includes('login.html')) {
-        checkUserProfile(session.user)
-    }
-})
-
-// Função para realizar logout completo
-window.performLogout = async function() {
-    isLoggingOut = true
-    
+export async function checkAuth() {
     try {
-        // Logout do Firebase
-        await signOut(auth)
-        
-        // Logout do Supabase  
-        await supabase.auth.signOut()
-        
-        // Limpa todos os dados locais
-        localStorage.removeItem('isLoggedIn')
-        localStorage.removeItem('userName')
-        localStorage.removeItem('userLevel')
-        localStorage.removeItem('userAge')
-        localStorage.removeItem('userExperience')
-        localStorage.removeItem('userRole')
-        localStorage.removeItem('userAvatar')
-        localStorage.removeItem('userAvatarType')
-        localStorage.removeItem('onboardingCompleted')
-        localStorage.removeItem('activeTab')
-        
-        // Limpa dados de perfil
-        for (let i = 0; i < localStorage.length; i++) {
-            const key = localStorage.key(i)
-            if (key && key.startsWith('profile_')) {
-                localStorage.removeItem(key)
-            }
+        console.log('🔐 checkAuth() - Verificando sessão...')
+
+        const { data: { session }, error } = await supabase.auth.getSession()
+
+        if (error) {
+            console.error('❌ Erro ao obter sessão:', error)
+            throw error
         }
-        
-        // Redireciona para login após 500ms
+
+        console.log('📊 Sessão obtida:', session ? {
+            user_id: session.user.id,
+            email: session.user.email,
+            confirmed_at: session.user.confirmed_at
+        } : 'Nenhuma sessão')
+
+        if (session && session.user) {
+            // Verifica se o email foi confirmado
+            if (!session.user.confirmed_at && !session.user.email_confirmed_at) {
+                console.log('⚠️ Email ainda não confirmado')
+                // Mesmo assim permite acesso (para desenvolvimento)
+            }
+
+            localStorage.setItem('isLoggedIn', 'true')
+            localStorage.setItem('currentUserId', session.user.id)
+            console.log('✅ Usuário autenticado:', session.user.id)
+            return session.user
+        }
+
+        // Se não há sessão, limpa localStorage
+        console.log('❌ Nenhuma sessão ativa, limpando localStorage')
+        localStorage.removeItem('isLoggedIn')
+        localStorage.removeItem('currentUserId')
+        return null
+
+    } catch (error) {
+        console.error('❌ Erro ao verificar autenticação:', error)
+        return null
+    }
+}
+
+// =====================================
+// LOGOUT
+// =====================================
+
+async function logout() {
+    try {
+        showMessage('Fazendo logout...', 'info')
+
+        const { error } = await supabase.auth.signOut()
+
+        if (error) throw error
+
+        // Limpa localStorage
+        localStorage.clear()
+
+        showMessage('Logout realizado com sucesso!', 'success')
+
         setTimeout(() => {
-            isLoggingOut = false
             window.location.href = 'login.html'
-        }, 500)
-        
+        }, 1000)
+
     } catch (error) {
         console.error('Erro no logout:', error)
-        isLoggingOut = false
+        showMessage('Erro no logout', 'error')
     }
+}
+
+// =====================================
+// INICIALIZAÇÃO
+// =====================================
+
+document.addEventListener('DOMContentLoaded', async () => {
+    console.log('🚀 Iniciando auth.js')
+
+    // CORREÇÃO: Verifica se há hash de callback do OAuth/confirmação de email na URL
+    const hashParams = new URLSearchParams(window.location.hash.substring(1))
+    const accessToken = hashParams.get('access_token')
+    const type = hashParams.get('type')
+
+    if (accessToken) {
+        console.log('� Callback de autenticação detectado!', { type })
+
+        // Aguarda o Supabase processar a sessão
+        setTimeout(async () => {
+            const { data: { session } } = await supabase.auth.getSession()
+            if (session) {
+                console.log('✅ Sessão criada após callback:', session.user.id)
+
+                localStorage.setItem('isLoggedIn', 'true')
+                localStorage.setItem('currentUserId', session.user.id)
+
+                // Verifica se é login com Google (signup) ou confirmação de email
+                if (type === 'signup') {
+                    console.log('📧 Confirmação de email detectada')
+                    showMessage('✅ Email confirmado! Configurando sua conta...', 'success')
+                } else {
+                    console.log('🔐 Login com Google detectado')
+                    showMessage('✅ Autenticado com Google! Verificando perfil...', 'success')
+                }
+
+                // Verifica o perfil e redireciona adequadamente
+                await checkUserProfile(session.user)
+            }
+        }, 1000)
+
+        return
+    }
+
+    // Inicializa sistema de abas se existir
+    initTabs()
+
+    // Event listeners para botões
+    const googleBtns = document.querySelectorAll('[data-action="google-login"]')
+    googleBtns.forEach(btn => {
+        btn.addEventListener('click', signInWithGoogle)
+    })
+
+    // Forms de login/registro
+    const loginForm = document.getElementById('loginForm')
+    if (loginForm) {
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault()
+            const formData = new FormData(e.target)
+            const email = formData.get('email')
+            const password = formData.get('password')
+            await signInWithEmail(email, password)
+        })
+    }
+
+    const registerForm = document.getElementById('registerForm')
+    if (registerForm) {
+        registerForm.addEventListener('submit', async (e) => {
+            e.preventDefault()
+            const formData = new FormData(e.target)
+            const email = formData.get('email')
+            const password = formData.get('password')
+            await registerWithEmail(email, password)
+        })
+    }
+
+    // Botões de logout
+    const logoutBtns = document.querySelectorAll('#logoutBtn, [data-action="logout"]')
+    logoutBtns.forEach(btn => {
+        btn.addEventListener('click', logout)
+    })
+
+    // Verifica sessão ao carregar
+    const { data: { session } } = await supabase.auth.getSession()
+    if (session) {
+        console.log('🔐 Sessão encontrada ao carregar página:', session.user.email)
+
+        if (window.location.pathname.includes('login.html')) {
+            // NÃO redireciona automaticamente - deixa usuário fazer logout se quiser
+            console.log('ℹ️ Usuário já está logado, mas permanece na página de login')
+            // Notificação removida - silencioso
+        } else if (window.location.pathname.includes('onboarding.html')) {
+            // Se está no onboarding, verifica se realmente precisa estar aqui
+            console.log('🔍 Verificando se usuário precisa mesmo do onboarding')
+            const profile = await UserService.getProfile(session.user.id)
+
+            if (profile && profile.onboarding_completed === true) {
+                console.log('⚠️ Usuário já completou onboarding mas está na página de onboarding!')
+                showMessage('Você já completou o onboarding! Redirecionando...', 'info')
+
+                setTimeout(() => {
+                    window.location.href = 'dashboard.html'
+                }, 2000)
+            }
+        }
+    }
+})
+
+// =====================================
+// FUNÇÕES AUXILIARES
+// =====================================
+
+function initTabs() {
+    const tabBtns = document.querySelectorAll('.tab-btn')
+    const tabContents = document.querySelectorAll('.tab-content')
+
+    if (tabBtns.length === 0) return
+
+    tabBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const targetTab = btn.dataset.tab
+
+            tabBtns.forEach(b => b.classList.remove('active'))
+            tabContents.forEach(content => content.classList.remove('active'))
+
+            btn.classList.add('active')
+            const targetContent = document.getElementById(`${targetTab}-tab`)
+            if (targetContent) {
+                targetContent.classList.add('active')
+            }
+        })
+    })
+}
+
+// Exporta funções principais
+window.supabaseAuth = {
+    signInWithGoogle,
+    signInWithEmail,
+    registerWithEmail,
+    logout,
+    checkAuth
 }

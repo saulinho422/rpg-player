@@ -4,18 +4,15 @@ Sistema completo de autenticação para jogadores de RPG com suporte a Google OA
 
 ## ✨ Funcionalidades
 
-- **🔐 Autenticação Google** - Login rápido e seguro via Firebase
-- **📧 Login por Email** - Sistema tradicional via Supabase  
+- **📧 Login por Email** - Sistema via Supabase  
 - **🔒 Verificação de Email** - Ativação de conta obrigatória
 - **🔑 Recuperação de Senha** - Reset seguro por email
 - **📱 Interface Responsiva** - Design moderno e mobile-friendly
-- **⚡ Arquitetura Híbrida** - Firebase + Supabase para máxima flexibilidade
 
 ## 🚀 Como executar
 
 ### Pré-requisitos
 - Node.js 18+
-- Conta Firebase (configurada)
 - Projeto Supabase (configurado)
 
 ### Instalação
@@ -33,14 +30,12 @@ npm run dev
 
 ## 🏗️ Arquitetura
 
-- **Login Google** → Firebase Auth → Dashboard Firebase
 - **Login Email** → Supabase Auth → Dashboard Supabase
 
 ## 🛠️ Tecnologias
 
 - **Frontend:** HTML5, CSS3, JavaScript ES6+
 - **Build:** Vite
-- **Auth Google:** Firebase v9+
 - **Auth Email:** Supabase
 - **Styling:** CSS Moderno com Flexbox/Grid
 
