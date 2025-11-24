@@ -31,19 +31,19 @@ const supabase = getSupabaseClient();
 async function getAuthenticatedSupabaseClient() {
     // Pega a sessão atual
     const { data: { session } } = await supabase.auth.getSession()
-    
+
     if (session) {
         console.log('✅ Sessão encontrada:', session.user.id)
         return supabase
     }
-    
+
     // Se não há sessão, tenta verificar localStorage
     const userId = localStorage.getItem('currentUserId')
     if (userId) {
         console.log('⚠️ Usando localStorage userId:', userId)
         return supabase
     }
-    
+
     throw new Error('Usuário não autenticado')
 }
 
@@ -60,48 +60,48 @@ export class UserService {
                 .select('*')
                 .eq('id', userId)
                 .single()
-            
+
             if (error && error.code !== 'PGRST116') { // PGRST116 = não encontrado
                 throw error
             }
-            
+
             return data
         } catch (error) {
             console.error('Erro ao buscar perfil:', error)
             return null
         }
     }
-    
+
     // Cria ou atualiza perfil do usuário
     static async saveProfile(userId, profileData) {
         try {
             console.log('💾 Salvando perfil no Supabase...')
             console.log('🔑 UserId:', userId)
             console.log('📋 ProfileData:', profileData)
-            
+
             // Verifica se há sessão ativa
             const { data: { session } } = await supabase.auth.getSession()
             console.log('🔐 Sessão atual:', session ? session.user.id : 'Nenhuma sessão')
-            
+
             const dataToSave = {
                 id: userId,
                 ...profileData,
                 updated_at: new Date().toISOString()
             }
-            
+
             console.log('📦 Dados finais para salvar:', dataToSave)
-            
+
             // CORREÇÃO: NUNCA USAR UPSERT - Pode substituir dados existentes!
-            
+
             // 1. Primeiro verifica se o perfil já existe
             const { data: existingProfile } = await supabase
                 .from('profiles')
                 .select('id, display_name, email')
                 .eq('id', userId)
                 .single()
-            
+
             let data, error
-            
+
             if (existingProfile) {
                 console.log('⚠️ Perfil já existe:', existingProfile)
                 // Se já existe, apenas atualiza campos específicos
@@ -114,7 +114,7 @@ export class UserService {
                     .eq('id', userId)
                     .select()
                     .single()
-                
+
                 data = result.data
                 error = result.error
             } else {
@@ -125,11 +125,11 @@ export class UserService {
                     .insert(dataToSave)
                     .select()
                     .single()
-                
+
                 data = result.data
                 error = result.error
             }
-            
+
             if (error) {
                 console.error('❌ Erro do Supabase:', error)
                 console.error('❌ Código do erro:', error.code)
@@ -137,30 +137,30 @@ export class UserService {
                 console.error('❌ Mensagem:', error.message)
                 throw error
             }
-            
+
             console.log('✅ Dados salvos com sucesso:', data)
-            
+
             // Log da atividade
             await ActivityService.logActivity(userId, {
                 activity_type: 'profile_updated',
                 title: 'Perfil atualizado',
                 description: 'O usuário atualizou suas informações de perfil'
             })
-            
+
             return data
         } catch (error) {
             console.error('Erro ao salvar perfil:', error)
             throw error
         }
     }
-    
+
     // Completa o onboarding
     static async completeOnboarding(userId, onboardingData) {
         try {
             console.log('🚀 UserService.completeOnboarding chamado')
             console.log('📝 UserId:', userId)
             console.log('📝 OnboardingData:', onboardingData)
-            
+
             const profileData = {
                 display_name: onboardingData.name,
                 age: parseInt(onboardingData.age),
@@ -171,12 +171,12 @@ export class UserService {
                 onboarding_completed: true,
                 updated_at: new Date().toISOString()
             }
-            
+
             console.log('📊 Dados do perfil preparados:', profileData)
-            
+
             const result = await this.saveProfile(userId, profileData)
             console.log('✅ Perfil salvo:', result)
-            
+
             // Log da atividade (se der erro, não falha o onboarding)
             try {
                 await ActivityService.logActivity(userId, {
@@ -188,14 +188,14 @@ export class UserService {
             } catch (activityError) {
                 console.warn('⚠️ Erro ao logar atividade (não crítico):', activityError)
             }
-            
+
             return result
         } catch (error) {
             console.error('❌ Erro ao completar onboarding:', error)
             throw error
         }
     }
-    
+
     // Atualiza último login
     static async updateLastLogin(userId) {
         try {
@@ -203,27 +203,27 @@ export class UserService {
                 .from('profiles')
                 .update({ last_login: new Date().toISOString() })
                 .eq('id', userId)
-            
+
             if (error) throw error
         } catch (error) {
             console.error('Erro ao atualizar último login:', error)
         }
     }
-    
+
     // Busca estatísticas do usuário
     static async getUserStats(userId) {
         try {
             // Busca perfil
             const profile = await this.getProfile(userId)
             if (!profile) return null
-            
+
             // Busca contadores reais
             const [charactersCount, campaignsCount, sessionsCount] = await Promise.all([
                 this.getCharactersCount(userId),
                 this.getCampaignsCount(userId),
                 this.getSessionsCount(userId)
             ])
-            
+
             return {
                 ...profile,
                 total_characters: charactersCount,
@@ -235,28 +235,28 @@ export class UserService {
             return null
         }
     }
-    
+
     // Contadores auxiliares
     static async getCharactersCount(userId) {
         const { count, error } = await supabase
             .from('characters')
             .select('*', { count: 'exact', head: true })
             .eq('user_id', userId)
-            .eq('is_active', true)
-        
+            .eq('is_draft', false)
+
         return error ? 0 : count
     }
-    
+
     static async getCampaignsCount(userId) {
         const { count, error } = await supabase
             .from('campaign_players')
             .select('*', { count: 'exact', head: true })
             .eq('user_id', userId)
             .eq('status', 'active')
-        
+
         return error ? 0 : count
     }
-    
+
     static async getSessionsCount(userId) {
         const { count, error } = await supabase
             .from('sessions')
@@ -266,7 +266,7 @@ export class UserService {
             `, { count: 'exact', head: true })
             .eq('campaigns.campaign_players.user_id', userId)
             .eq('status', 'completed')
-        
+
         return error ? 0 : count
     }
 }
@@ -280,7 +280,7 @@ export class CharacterService {
     static async getUserCharacters(userId) {
         try {
             console.log('🔍 Buscando personagens para userId:', userId);
-            
+
             const { data, error } = await supabase
                 .from('characters')
                 .select(`
@@ -292,21 +292,21 @@ export class CharacterService {
                 `)
                 .eq('user_id', userId)
                 .order('created_at', { ascending: false })
-            
+
             if (error) {
                 console.error('❌ Erro na query de personagens:', error);
                 throw error;
             }
-            
+
             console.log('� Personagens encontrados:', data?.length || 0);
-            
+
             return data || []
         } catch (error) {
             console.error('❌ Erro ao buscar personagens:', error)
             return []
         }
     }
-    
+
     // Busca personagem específico
     static async getCharacter(characterId, userId) {
         try {
@@ -316,16 +316,16 @@ export class CharacterService {
                 .eq('id', characterId)
                 .eq('user_id', userId)
                 .single()
-            
+
             if (error) throw error
-            
+
             return data
         } catch (error) {
             console.error('Erro ao buscar personagem:', error)
             return null
         }
     }
-    
+
     // Cria novo personagem
     static async createCharacter(userId, characterData) {
         try {
@@ -337,9 +337,9 @@ export class CharacterService {
                 })
                 .select()
                 .single()
-            
+
             if (error) throw error
-            
+
             // Log da atividade
             await ActivityService.logActivity(userId, {
                 activity_type: 'character_created',
@@ -347,14 +347,14 @@ export class CharacterService {
                 description: `Personagem "${characterData.name}" foi criado`,
                 character_id: data.id
             })
-            
+
             return data
         } catch (error) {
             console.error('Erro ao criar personagem:', error)
             throw error
         }
     }
-    
+
     // Atualiza personagem
     static async updateCharacter(characterId, userId, updateData) {
         try {
@@ -368,16 +368,16 @@ export class CharacterService {
                 .eq('user_id', userId)
                 .select()
                 .single()
-            
+
             if (error) throw error
-            
+
             return data
         } catch (error) {
             console.error('Erro ao atualizar personagem:', error)
             throw error
         }
     }
-    
+
     // Remove personagem (soft delete)
     static async deleteCharacter(characterId, userId) {
         try {
@@ -386,9 +386,9 @@ export class CharacterService {
                 .update({ is_active: false })
                 .eq('id', characterId)
                 .eq('user_id', userId)
-            
+
             if (error) throw error
-            
+
             return true
         } catch (error) {
             console.error('Erro ao deletar personagem:', error)
@@ -416,16 +416,16 @@ export class CampaignService {
                 .in('status', ['recruiting', 'active'])
                 .order('created_at', { ascending: false })
                 .range(offset, offset + limit - 1)
-            
+
             if (error) throw error
-            
+
             return data || []
         } catch (error) {
             console.error('Erro ao buscar campanhas públicas:', error)
             return []
         }
     }
-    
+
     // Lista campanhas do usuário
     static async getUserCampaigns(userId) {
         try {
@@ -441,9 +441,9 @@ export class CampaignService {
                 .eq('user_id', userId)
                 .in('status', ['approved', 'active'])
                 .order('created_at', { ascending: false })
-            
+
             if (error) throw error
-            
+
             return data?.map(cp => ({
                 ...cp.campaigns,
                 player_status: cp.status,
@@ -454,7 +454,7 @@ export class CampaignService {
             return []
         }
     }
-    
+
     // Cria nova campanha
     static async createCampaign(userId, campaignData) {
         try {
@@ -466,9 +466,9 @@ export class CampaignService {
                 })
                 .select()
                 .single()
-            
+
             if (error) throw error
-            
+
             // Log da atividade
             await ActivityService.logActivity(userId, {
                 activity_type: 'campaign_created',
@@ -476,14 +476,14 @@ export class CampaignService {
                 description: `Campanha "${campaignData.name}" foi criada`,
                 campaign_id: data.id
             })
-            
+
             return data
         } catch (error) {
             console.error('Erro ao criar campanha:', error)
             throw error
         }
     }
-    
+
     // Solicita participação em campanha
     static async joinCampaign(campaignId, userId, message = '') {
         try {
@@ -497,9 +497,9 @@ export class CampaignService {
                 })
                 .select()
                 .single()
-            
+
             if (error) throw error
-            
+
             return data
         } catch (error) {
             console.error('Erro ao solicitar participação:', error)
@@ -523,13 +523,13 @@ export class ActivityService {
                     ...activityData,
                     created_at: new Date().toISOString()
                 })
-            
+
             if (error) throw error
         } catch (error) {
             console.error('Erro ao registrar atividade:', error)
         }
     }
-    
+
     // Busca atividades do usuário
     static async getUserActivities(userId, limit = 10) {
         try {
@@ -539,16 +539,16 @@ export class ActivityService {
                 .eq('user_id', userId)
                 .order('created_at', { ascending: false })
                 .limit(limit)
-            
+
             if (error) throw error
-            
+
             return data || []
         } catch (error) {
             console.error('Erro ao buscar atividades:', error)
             return []
         }
     }
-    
+
     // Busca atividades públicas recentes
     static async getPublicActivities(limit = 20) {
         try {
@@ -561,9 +561,9 @@ export class ActivityService {
                 .eq('is_public', true)
                 .order('created_at', { ascending: false })
                 .limit(limit)
-            
+
             if (error) throw error
-            
+
             return data || []
         } catch (error) {
             console.error('Erro ao buscar atividades públicas:', error)
@@ -583,20 +583,20 @@ export class DatabaseUtils {
             const { data, error } = await supabase
                 .from('profiles')
                 .select('count', { count: 'exact', head: true })
-            
+
             if (error) throw error
-            
+
             return true
         } catch (error) {
             console.error('Erro na conexão:', error)
             return false
         }
     }
-    
+
     // Inicializa dados de teste (apenas desenvolvimento)
     static async initTestData() {
         console.warn('Iniciando dados de teste - apenas para desenvolvimento!')
-        
+
         // Esta função seria usada apenas em desenvolvimento
         // para popular o banco com dados de exemplo
     }
