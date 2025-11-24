@@ -1,34 +1,29 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RPG Player - Dashboard</title>
-
+    
     <!-- Favicons -->
     <link rel="apple-touch-icon" sizes="180x180" href="img/apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="32x32" href="img/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="img/favicon-16x16.png">
     <link rel="manifest" href="img/site.webmanifest">
     <link rel="shortcut icon" href="img/favicon.ico">
-
+    
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Cinzel+Decorative:wght@400;700;900&display=swap"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Cinzel+Decorative:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles/dashboard.css">
 </head>
-
 <body>
     <div class="dashboard-container">
         <!-- Header -->
         <header class="dashboard-header">
             <div class="header-content">
                 <div class="logo">
-                    <img src="img/logo_vetorizada.png" alt="RPG Player"
-                        style="height: 50px; margin-right: 10px; vertical-align: middle;">
+                    <img src="img/logo_vetorizada.png" alt="RPG Player" style="height: 50px; margin-right: 10px; vertical-align: middle;">
                     <h1 style="display: inline-block; vertical-align: middle;">RPG Player</h1>
                 </div>
                 <div class="user-info">
@@ -157,8 +152,7 @@
                                 <h3>A Lenda dos Dragões Antigos</h3>
                                 <div class="table-system">D&D 5e</div>
                                 <div class="table-description">
-                                    Uma épica jornada através das terras místicas em busca dos últimos dragões
-                                    ancestrais...
+                                    Uma épica jornada através das terras místicas em busca dos últimos dragões ancestrais...
                                 </div>
                             </div>
                             <div class="table-actions">
@@ -219,31 +213,43 @@
             </button>
             <button class="nav-item" data-tab="mesas">
                 <span class="nav-icon">🎲</span>
-                document.addEventListener('DOMContentLoaded', function() {
-                const createBtn = document.getElementById('createCharacterBtn');
-                if (createBtn) {
+                <span class="nav-text">Mesas</span>
+            </button>
+        </nav>
+    </div>
+
+    <script type="module" src="js/auth-supabase-only.js?v=3"></script>
+    <script type="module" src="js/database.js?v=3"></script>
+    <script type="module" src="js/dashboard-real.js?v=3"></script>
+    <script type="module" src="js/dashboard.js?v=3"></script>
+    
+    <script>
+        // Adiciona evento ao botão de criar personagem
+        document.addEventListener('DOMContentLoaded', function() {
+            const createBtn = document.getElementById('createCharacterBtn');
+            if (createBtn) {
                 createBtn.addEventListener('click', function(e) {
-                e.preventDefault();
-                window.location.href = 'character-sheet.html?new=true';
+                    e.preventDefault();
+                    window.location.href = 'character-sheet.html?new=true';
                 });
-                }
-                });
-
-                // Função para mostrar notificações
-                function showNotification(message, type = 'info') {
-                // Remove notificação anterior se existir
-                const existingNotification = document.querySelector('.notification-toast');
-                if (existingNotification) {
+            }
+        });
+        
+        // Função para mostrar notificações
+        function showNotification(message, type = 'info') {
+            // Remove notificação anterior se existir
+            const existingNotification = document.querySelector('.notification-toast');
+            if (existingNotification) {
                 existingNotification.remove();
-                }
-
-                // Cria nova notificação
-                const notification = document.createElement('div');
-                notification.className = `notification-toast ${type}`;
-                notification.textContent = message;
-
-                // Estilos inline
-                notification.style.cssText = `
+            }
+            
+            // Cria nova notificação
+            const notification = document.createElement('div');
+            notification.className = `notification-toast ${type}`;
+            notification.textContent = message;
+            
+            // Estilos inline
+            notification.style.cssText = `
                 position: fixed;
                 top: 20px;
                 right: 20px;
@@ -257,44 +263,44 @@
                 font-size: 14px;
                 animation: slideInRight 0.3s ease-out;
                 max-width: 300px;
-                `;
-
-                document.body.appendChild(notification);
-
-                // Remove após 3 segundos
-                setTimeout(() => {
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // Remove após 3 segundos
+            setTimeout(() => {
                 notification.style.animation = 'slideOutRight 0.3s ease-out';
                 setTimeout(() => notification.remove(), 300);
-                }, 3000);
-                }
-
-                // Adiciona animações CSS
-                const style = document.createElement('style');
-                style.textContent = `
-                @keyframes slideInRight {
+            }, 3000);
+        }
+        
+        // Adiciona animações CSS
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideInRight {
                 from {
-                transform: translateX(400px);
-                opacity: 0;
+                    transform: translateX(400px);
+                    opacity: 0;
                 }
                 to {
-                transform: translateX(0);
-                opacity: 1;
+                    transform: translateX(0);
+                    opacity: 1;
                 }
-                }
-
-                @keyframes slideOutRight {
+            }
+            
+            @keyframes slideOutRight {
                 from {
-                transform: translateX(0);
-                opacity: 1;
+                    transform: translateX(0);
+                    opacity: 1;
                 }
                 to {
-                transform: translateX(400px);
-                opacity: 0;
+                    transform: translateX(400px);
+                    opacity: 0;
                 }
-                }
-                `;
-                document.head.appendChild(style);
-                </script>
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
 </body>
-
 </html>
+
