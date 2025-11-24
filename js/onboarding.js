@@ -800,7 +800,7 @@ window.debugUserState = async function () {
     // 2. Sessão Supabase
     console.log('\n🔐 SESSÃO SUPABASE:')
     try {
-        const { checkAuth } = await import('./auth-supabase-only.js')
+        const { checkAuth } = await import('./auth.js')
         const user = await checkAuth()
 
         if (user) {
