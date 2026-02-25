@@ -1,388 +1,199 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard - RPG Player</title>
-    <link rel="stylesheet" href="styles/dashboard.css">
-    <style>
-        .admin-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            padding: 2rem;
-            color: white;
-            text-align: center;
-            margin-bottom: 2rem;
-        }
-
-        .admin-header h1 {
-            margin: 0;
-            font-size: 2.5rem;
-        }
-
-        .admin-header .badge {
-            display: inline-block;
-            background: rgba(255, 255, 255, 0.2);
-            padding: 0.5rem 1rem;
-            border-radius: 20px;
-            margin-top: 0.5rem;
-            font-size: 0.9rem;
-        }
-
-        .admin-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 2rem;
-            padding: 2rem;
-            max-width: 1400px;
-            margin: 0 auto;
-        }
-
-        .admin-card {
-            background: white;
-            border-radius: 12px;
-            padding: 2rem;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-
-        .admin-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 12px rgba(0, 0, 0, 0.15);
-        }
-
-        .admin-card h3 {
-            margin-top: 0;
-            color: #667eea;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .admin-card .count {
-            font-size: 3rem;
-            font-weight: bold;
-            color: #2c3e50;
-            margin: 1rem 0;
-        }
-
-        .admin-card .actions {
-            display: flex;
-            gap: 0.5rem;
-            margin-top: 1rem;
-        }
-
-        .btn {
-            padding: 0.75rem 1.5rem;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.2s;
-            text-decoration: none;
-            display: inline-block;
-            text-align: center;
-        }
-
-        .btn-primary {
-            background: #667eea;
-            color: white;
-        }
-
-        .btn-primary:hover {
-            background: #5568d3;
-        }
-
-        .btn-secondary {
-            background: #95a5a6;
-            color: white;
-        }
-
-        .btn-secondary:hover {
-            background: #7f8c8d;
-        }
-
-        .btn-danger {
-            background: #e74c3c;
-            color: white;
-        }
-
-        .btn-danger:hover {
-            background: #c0392b;
-        }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1rem;
-            margin-top: 2rem;
-        }
-
-        .stat-box {
-            background: #f8f9fa;
-            padding: 1rem;
-            border-radius: 8px;
-            text-align: center;
-        }
-
-        .stat-box .label {
-            font-size: 0.9rem;
-            color: #7f8c8d;
-            margin-bottom: 0.5rem;
-        }
-
-        .stat-box .value {
-            font-size: 2rem;
-            font-weight: bold;
-            color: #2c3e50;
-        }
-
-        .logout-btn {
-            position: fixed;
-            top: 1rem;
-            right: 1rem;
-            background: rgba(0, 0, 0, 0.2);
-            color: white;
-            padding: 0.75rem 1.5rem;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 600;
-        }
-
-        .logout-btn:hover {
-            background: rgba(0, 0, 0, 0.4);
-        }
-
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.7);
-            z-index: 1000;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .modal.active {
-            display: flex;
-        }
-
-        .modal-content {
-            background: white;
-            padding: 2rem;
-            border-radius: 12px;
-            max-width: 600px;
-            width: 90%;
-            max-height: 80vh;
-            overflow-y: auto;
-        }
-
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1.5rem;
-        }
-
-        .modal-close {
-            background: none;
-            border: none;
-            font-size: 1.5rem;
-            cursor: pointer;
-            color: #95a5a6;
-        }
-
-        .form-group {
-            margin-bottom: 1.5rem;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 0.5rem;
-            font-weight: 600;
-            color: #2c3e50;
-        }
-
-        .form-group input,
-        .form-group select,
-        .form-group textarea {
-            width: 100%;
-            padding: 0.75rem;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            font-size: 1rem;
-        }
-
-        .form-group textarea {
-            min-height: 100px;
-            resize: vertical;
-        }
-
-        .notification {
-            position: fixed;
-            top: 2rem;
-            right: 2rem;
-            background: white;
-            padding: 1rem 1.5rem;
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-            z-index: 2000;
-            animation: slideInRight 0.3s ease;
-        }
-
-        .notification.success {
-            border-left: 4px solid #27ae60;
-        }
-
-        .notification.error {
-            border-left: 4px solid #e74c3c;
-        }
-
-        @keyframes slideInRight {
-            from {
-                transform: translateX(100%);
-                opacity: 0;
-            }
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
-        }
-    </style>
+    <link rel="stylesheet" href="styles/admin.css">
 </head>
+
 <body>
-    <button class="logout-btn" onclick="logout()">Sair</button>
 
-    <div class="admin-header">
-        <h1>🛡️ Admin Dashboard</h1>
-        <div class="badge" id="userBadge">Carregando...</div>
+    <!-- HEADER -->
+    <header class="admin-header">
+        <div class="header-left">
+            <a href="/dashboard.html" class="header-back">
+                ← <span>Voltar</span>
+            </a>
+            <div class="header-title">
+                <span class="shield-icon">🛡️</span>
+                <h1>Painel Admin</h1>
+            </div>
+        </div>
+        <div class="header-right">
+            <div class="user-badge" id="userBadge">Carregando...</div>
+            <button class="logout-btn" onclick="logout()">Sair</button>
+        </div>
+    </header>
+
+    <!-- LAYOUT -->
+    <div class="admin-layout">
+
+        <!-- SIDEBAR -->
+        <nav class="admin-sidebar">
+            <div class="sidebar-section">
+                <div class="sidebar-title">Dados do Jogo</div>
+                <button class="sidebar-item active" data-section="game-data">
+                    <span class="item-icon">⚔️</span> Game Data
+                </button>
+            </div>
+            <div class="sidebar-section">
+                <div class="sidebar-title">Comunidade</div>
+                <button class="sidebar-item" data-section="users">
+                    <span class="item-icon">👥</span> Usuários
+                    <span class="item-count" id="sideUsersCount">-</span>
+                </button>
+                <button class="sidebar-item" data-section="characters">
+                    <span class="item-icon">🎭</span> Personagens
+                    <span class="item-count" id="sideCharsCount">-</span>
+                </button>
+                <button class="sidebar-item" data-section="campaigns">
+                    <span class="item-icon">🎲</span> Campanhas
+                    <span class="item-count" id="sideCampsCount">-</span>
+                </button>
+            </div>
+        </nav>
+
+        <!-- CONTENT -->
+        <main class="admin-content">
+
+            <!-- KPI ROW -->
+            <div class="kpi-row">
+                <div class="kpi-card">
+                    <div class="kpi-icon">📊</div>
+                    <div class="kpi-value" id="totalGameData">-</div>
+                    <div class="kpi-label">Itens no Jogo</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-icon">👥</div>
+                    <div class="kpi-value" id="usersCount">-</div>
+                    <div class="kpi-label">Usuários</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-icon">🎭</div>
+                    <div class="kpi-value" id="charactersCount">-</div>
+                    <div class="kpi-label">Personagens</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-icon">🎲</div>
+                    <div class="kpi-value" id="campaignsCount">-</div>
+                    <div class="kpi-label">Campanhas</div>
+                </div>
+            </div>
+
+            <!-- GAME DATA CARDS -->
+            <div class="section-bar">
+                <h2>⚔️ Dados do Jogo</h2>
+            </div>
+
+            <div class="cards-grid">
+                <div class="admin-card">
+                    <div class="card-header">
+                        <div class="card-title"><span class="card-emoji">⚔️</span> Classes</div>
+                    </div>
+                    <div class="card-count" id="classesCount">-</div>
+                    <div class="card-actions">
+                        <button class="btn btn-gold" onclick="openModal('classes')">+ Adicionar</button>
+                        <button class="btn btn-outline" onclick="viewTable('classes')">Ver Todos</button>
+                    </div>
+                </div>
+
+                <div class="admin-card">
+                    <div class="card-header">
+                        <div class="card-title"><span class="card-emoji">🧝</span> Raças</div>
+                    </div>
+                    <div class="card-count" id="racesCount">-</div>
+                    <div class="card-actions">
+                        <button class="btn btn-gold" onclick="openModal('races')">+ Adicionar</button>
+                        <button class="btn btn-outline" onclick="viewTable('races')">Ver Todos</button>
+                    </div>
+                </div>
+
+                <div class="admin-card">
+                    <div class="card-header">
+                        <div class="card-title"><span class="card-emoji">📜</span> Antecedentes</div>
+                    </div>
+                    <div class="card-count" id="backgroundsCount">-</div>
+                    <div class="card-actions">
+                        <button class="btn btn-gold" onclick="openModal('backgrounds')">+ Adicionar</button>
+                        <button class="btn btn-outline" onclick="viewTable('game_backgrounds')">Ver Todos</button>
+                    </div>
+                </div>
+
+                <div class="admin-card">
+                    <div class="card-header">
+                        <div class="card-title"><span class="card-emoji">🗣️</span> Idiomas</div>
+                    </div>
+                    <div class="card-count" id="languagesCount">-</div>
+                    <div class="card-actions">
+                        <button class="btn btn-gold" onclick="openModal('languages')">+ Adicionar</button>
+                        <button class="btn btn-outline" onclick="viewTable('languages')">Ver Todos</button>
+                    </div>
+                </div>
+
+                <div class="admin-card">
+                    <div class="card-header">
+                        <div class="card-title"><span class="card-emoji">🗡️</span> Armas</div>
+                    </div>
+                    <div class="card-count" id="weaponsCount">-</div>
+                    <div class="card-actions">
+                        <button class="btn btn-gold" onclick="openModal('weapons')">+ Adicionar</button>
+                        <button class="btn btn-outline" onclick="viewTable('game_weapons')">Ver Todos</button>
+                    </div>
+                </div>
+
+                <div class="admin-card">
+                    <div class="card-header">
+                        <div class="card-title"><span class="card-emoji">🛡️</span> Armaduras</div>
+                    </div>
+                    <div class="card-count" id="armorCount">-</div>
+                    <div class="card-actions">
+                        <button class="btn btn-gold" onclick="openModal('armor')">+ Adicionar</button>
+                        <button class="btn btn-outline" onclick="viewTable('game_armor')">Ver Todos</button>
+                    </div>
+                </div>
+
+                <div class="admin-card">
+                    <div class="card-header">
+                        <div class="card-title"><span class="card-emoji">🎒</span> Equipamentos</div>
+                    </div>
+                    <div class="card-count" id="equipmentCount">-</div>
+                    <div class="card-actions">
+                        <button class="btn btn-gold" onclick="openModal('equipment')">+ Adicionar</button>
+                        <button class="btn btn-outline" onclick="viewTable('game_equipment')">Ver Todos</button>
+                    </div>
+                </div>
+
+                <div class="admin-card">
+                    <div class="card-header">
+                        <div class="card-title"><span class="card-emoji">✨</span> Talentos</div>
+                    </div>
+                    <div class="card-count" id="featsCount">-</div>
+                    <div class="card-actions">
+                        <button class="btn btn-gold" onclick="openModal('feats')">+ Adicionar</button>
+                        <button class="btn btn-outline" onclick="viewTable('game_feats')">Ver Todos</button>
+                    </div>
+                </div>
+            </div>
+
+        </main>
     </div>
 
-    <div class="admin-grid">
-        <!-- Card: Classes -->
-        <div class="admin-card">
-            <h3>⚔️ Classes</h3>
-            <div class="count" id="classesCount">-</div>
-            <div class="actions">
-                <button class="btn btn-primary" onclick="openModal('classes')">Adicionar</button>
-                <button class="btn btn-secondary" onclick="viewTable('classes')">Ver Todas</button>
-            </div>
-        </div>
-
-        <!-- Card: Raças -->
-        <div class="admin-card">
-            <h3>🧝 Raças</h3>
-            <div class="count" id="racesCount">-</div>
-            <div class="actions">
-                <button class="btn btn-primary" onclick="openModal('races')">Adicionar</button>
-                <button class="btn btn-secondary" onclick="viewTable('races')">Ver Todas</button>
-            </div>
-        </div>
-
-        <!-- Card: Antecedentes -->
-        <div class="admin-card">
-            <h3>📜 Antecedentes</h3>
-            <div class="count" id="backgroundsCount">-</div>
-            <div class="actions">
-                <button class="btn btn-primary" onclick="openModal('backgrounds')">Adicionar</button>
-                <button class="btn btn-secondary" onclick="viewTable('game_backgrounds')">Ver Todos</button>
-            </div>
-        </div>
-
-        <!-- Card: Idiomas -->
-        <div class="admin-card">
-            <h3>🗣️ Idiomas</h3>
-            <div class="count" id="languagesCount">-</div>
-            <div class="actions">
-                <button class="btn btn-primary" onclick="openModal('languages')">Adicionar</button>
-                <button class="btn btn-secondary" onclick="viewTable('languages')">Ver Todos</button>
-            </div>
-        </div>
-
-        <!-- Card: Armas -->
-        <div class="admin-card">
-            <h3>🗡️ Armas</h3>
-            <div class="count" id="weaponsCount">-</div>
-            <div class="actions">
-                <button class="btn btn-primary" onclick="openModal('weapons')">Adicionar</button>
-                <button class="btn btn-secondary" onclick="viewTable('game_weapons')">Ver Todas</button>
-            </div>
-        </div>
-
-        <!-- Card: Armaduras -->
-        <div class="admin-card">
-            <h3>🛡️ Armaduras</h3>
-            <div class="count" id="armorCount">-</div>
-            <div class="actions">
-                <button class="btn btn-primary" onclick="openModal('armor')">Adicionar</button>
-                <button class="btn btn-secondary" onclick="viewTable('game_armor')">Ver Todas</button>
-            </div>
-        </div>
-
-        <!-- Card: Equipamentos -->
-        <div class="admin-card">
-            <h3>🎒 Equipamentos</h3>
-            <div class="count" id="equipmentCount">-</div>
-            <div class="actions">
-                <button class="btn btn-primary" onclick="openModal('equipment')">Adicionar</button>
-                <button class="btn btn-secondary" onclick="viewTable('game_equipment')">Ver Todos</button>
-            </div>
-        </div>
-
-        <!-- Card: Talentos -->
-        <div class="admin-card">
-            <h3>✨ Talentos</h3>
-            <div class="count" id="featsCount">-</div>
-            <div class="actions">
-                <button class="btn btn-primary" onclick="openModal('feats')">Adicionar</button>
-                <button class="btn btn-secondary" onclick="viewTable('game_feats')">Ver Todos</button>
-            </div>
-        </div>
-
-        <!-- Card: Usuários -->
-        <div class="admin-card">
-            <h3>👥 Usuários</h3>
-            <div class="count" id="usersCount">-</div>
-            <div class="actions">
-                <button class="btn btn-secondary" onclick="viewTable('profiles')">Gerenciar</button>
-            </div>
-        </div>
-
-        <!-- Card: Personagens -->
-        <div class="admin-card">
-            <h3>🎭 Personagens</h3>
-            <div class="count" id="charactersCount">-</div>
-            <div class="actions">
-                <button class="btn btn-secondary" onclick="viewTable('characters')">Ver Todos</button>
-            </div>
-        </div>
-
-        <!-- Card: Campanhas -->
-        <div class="admin-card">
-            <h3>🎲 Campanhas</h3>
-            <div class="count" id="campaignsCount">-</div>
-            <div class="actions">
-                <button class="btn btn-secondary" onclick="viewTable('campaigns')">Ver Todas</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal Genérico -->
-    <div class="modal" id="genericModal">
+    <!-- MODAL -->
+    <div class="modal-overlay" id="genericModal">
         <div class="modal-content">
             <div class="modal-header">
                 <h2 id="modalTitle">Adicionar Item</h2>
                 <button class="modal-close" onclick="closeModal()">&times;</button>
             </div>
-            <div id="modalBody">
-                <!-- Conteúdo dinâmico será inserido aqui -->
+            <div class="modal-body" id="modalBody">
+                <!-- Dynamic content -->
             </div>
         </div>
     </div>
 
     <script type="module" src="js/admin-dashboard.js"></script>
 </body>
+
 </html>

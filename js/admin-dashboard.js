@@ -1,8 +1,11 @@
-import { auth, db } from './firebase-config.js';
+import { auth } from './firebase-config.js';
 import { UserService, GameDataService } from './database.js';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
 
-// Verificar autenticação e permissões de admin
+// =====================================
+// VERIFICAÇÃO DE ADMIN
+// =====================================
+
 async function checkAdminAccess() {
     return new Promise((resolve) => {
         const unsubscribe = onAuthStateChanged(auth, async (user) => {
@@ -16,25 +19,16 @@ async function checkAdminAccess() {
 
             const profile = await UserService.getProfile(user.uid);
 
-            console.log('🔍 Admin Check - User:', user.uid);
-            console.log('🔍 Admin Check - Profile:', profile);
-
             if (!profile) {
-                console.error('❌ Perfil não encontrado');
                 showNotification('❌ Erro ao verificar permissões', 'error');
-                setTimeout(() => {
-                    window.location.href = '/dashboard.html';
-                }, 2000);
+                setTimeout(() => { window.location.href = '/dashboard.html'; }, 2000);
                 resolve(null);
                 return;
             }
 
             if (!profile.is_owner && !profile.is_admin) {
-                console.warn('⚠️ Usuário não tem permissões de admin');
                 showNotification('❌ Você não tem permissão para acessar esta página', 'error');
-                setTimeout(() => {
-                    window.location.href = '/dashboard.html';
-                }, 2000);
+                setTimeout(() => { window.location.href = '/dashboard.html'; }, 2000);
                 resolve(null);
                 return;
             }
@@ -45,7 +39,10 @@ async function checkAdminAccess() {
     });
 }
 
-// Exibir informações do usuário admin
+// =====================================
+// UI: BADGE DO USUÁRIO
+// =====================================
+
 function displayUserBadge(profile) {
     const badge = document.getElementById('userBadge');
     let roleText = '';
@@ -57,40 +54,222 @@ function displayUserBadge(profile) {
     }
 
     if (profile.is_beta_tester) {
-        roleText += ' | 🧪 BETA TESTER';
+        roleText += ' | 🧪 BETA';
     }
 
-    badge.textContent = `${profile.display_name || 'Admin'} - ${roleText}`;
+    badge.textContent = `${profile.display_name || 'Admin'} — ${roleText}`;
 }
 
-// Carregar contadores de todas as tabelas
-async function loadAllCounts() {
-    const tables = [
-        { id: 'classesCount', table: 'classes' },
-        { id: 'racesCount', table: 'races' },
-        { id: 'backgroundsCount', table: 'game_backgrounds' },
-        { id: 'languagesCount', table: 'languages' },
-        { id: 'weaponsCount', table: 'game_weapons' },
-        { id: 'armorCount', table: 'game_armor' },
-        { id: 'equipmentCount', table: 'game_equipment' },
-        { id: 'featsCount', table: 'game_feats' },
-        { id: 'usersCount', table: 'users' },
-        { id: 'charactersCount', table: 'characters' },
-        { id: 'campaignsCount', table: 'campaigns' }
-    ];
+// =====================================
+// CONTADORES
+// =====================================
 
-    for (const item of tables) {
+const GAME_TABLES = [
+    { id: 'classesCount', table: 'classes', label: 'Classes' },
+    { id: 'racesCount', table: 'races', label: 'Raças' },
+    { id: 'backgroundsCount', table: 'game_backgrounds', label: 'Antecedentes' },
+    { id: 'languagesCount', table: 'languages', label: 'Idiomas' },
+    { id: 'weaponsCount', table: 'game_weapons', label: 'Armas' },
+    { id: 'armorCount', table: 'game_armor', label: 'Armaduras' },
+    { id: 'equipmentCount', table: 'game_equipment', label: 'Equipamentos' },
+    { id: 'featsCount', table: 'game_feats', label: 'Talentos' }
+];
+
+const COMMUNITY_TABLES = [
+    { id: 'usersCount', sideId: 'sideUsersCount', table: 'users', label: 'Usuários' },
+    { id: 'charactersCount', sideId: 'sideCharsCount', table: 'characters', label: 'Personagens' },
+    { id: 'campaignsCount', sideId: 'sideCampsCount', table: 'campaigns', label: 'Campanhas' }
+];
+
+async function loadAllCounts() {
+    let totalGameData = 0;
+
+    for (const item of GAME_TABLES) {
         try {
             const count = await GameDataService.getCount(item.table);
-            document.getElementById(item.id).textContent = count;
+            const el = document.getElementById(item.id);
+            if (el) el.textContent = count;
+            totalGameData += count;
         } catch (error) {
-            console.error(`Erro ao contar ${item.table}:`, error);
-            document.getElementById(item.id).textContent = '?';
+            const el = document.getElementById(item.id);
+            if (el) el.textContent = '?';
+        }
+    }
+
+    const totalEl = document.getElementById('totalGameData');
+    if (totalEl) totalEl.textContent = totalGameData;
+
+    for (const item of COMMUNITY_TABLES) {
+        try {
+            const count = await GameDataService.getCount(item.table);
+            const el = document.getElementById(item.id);
+            if (el) el.textContent = count;
+            const sideEl = document.getElementById(item.sideId);
+            if (sideEl) sideEl.textContent = count;
+        } catch (error) {
+            const el = document.getElementById(item.id);
+            if (el) el.textContent = '?';
         }
     }
 }
 
-// Funções de Modal
+// =====================================
+// VER TODOS (TABELA)
+// =====================================
+
+// Configuração de colunas por tabela
+const TABLE_COLUMNS = {
+    classes: [
+        { key: 'id', label: 'ID' },
+        { key: 'name_pt', label: 'Nome' },
+        { key: 'hit_die', label: 'Dado de Vida' },
+        { key: 'spellcaster', label: 'Conjurador', format: v => v ? '✅' : '❌' },
+        { key: 'skills_choose', label: 'Perícias' }
+    ],
+    races: [
+        { key: 'id', label: 'ID' },
+        { key: 'name_pt', label: 'Nome' },
+        { key: 'ability_score_increase', label: 'Atributos' },
+        { key: 'speed', label: 'Velocidade' },
+        { key: 'size', label: 'Tamanho' }
+    ],
+    game_backgrounds: [
+        { key: 'id', label: 'ID' },
+        { key: 'name_pt', label: 'Nome' },
+        { key: 'description', label: 'Descrição' },
+        { key: 'language_count', label: 'Idiomas' }
+    ],
+    languages: [
+        { key: 'id', label: 'Código' },
+        { key: 'name_pt', label: 'Nome' },
+        { key: 'category', label: 'Categoria' },
+        { key: 'description', label: 'Descrição' }
+    ],
+    game_weapons: [
+        { key: 'id', label: 'ID' },
+        { key: 'nome', label: 'Nome' },
+        { key: 'categoria', label: 'Categoria' },
+        { key: 'dano', label: 'Dano' },
+        { key: 'tipo_dano', label: 'Tipo' }
+    ],
+    game_armor: [
+        { key: 'id', label: 'ID' },
+        { key: 'nome', label: 'Nome' },
+        { key: 'categoria', label: 'Categoria' },
+        { key: 'ca', label: 'CA' }
+    ],
+    game_equipment: [
+        { key: 'id', label: 'ID' },
+        { key: 'nome', label: 'Nome' },
+        { key: 'categoria', label: 'Categoria' },
+        { key: 'descricao', label: 'Descrição' }
+    ],
+    game_feats: [
+        { key: 'id', label: 'ID' },
+        { key: 'nome', label: 'Nome', fallback: 'name' },
+        { key: 'descricao', label: 'Descrição', fallback: 'description' }
+    ],
+    users: [
+        { key: 'id', label: 'UID' },
+        { key: 'display_name', label: 'Nome' },
+        { key: 'experience_level', label: 'Experiência' },
+        { key: 'onboarding_completed', label: 'Onboarding', format: v => v ? '✅' : '❌' }
+    ],
+    characters: [
+        { key: 'id', label: 'ID' },
+        { key: 'name', label: 'Nome' },
+        { key: 'race', label: 'Raça' },
+        { key: 'class', label: 'Classe' },
+        { key: 'is_draft', label: 'Rascunho', format: v => v ? '📝' : '✅' }
+    ],
+    campaigns: [
+        { key: 'id', label: 'ID' },
+        { key: 'name', label: 'Nome' },
+        { key: 'is_public', label: 'Pública', format: v => v ? '🌐' : '🔒' }
+    ]
+};
+
+// Tabelas de game data que permitem exclusão
+const DELETABLE_TABLES = ['classes', 'races', 'game_backgrounds', 'languages', 'game_weapons', 'game_armor', 'game_equipment', 'game_feats'];
+
+window.viewTable = async function (tableName) {
+    const modal = document.getElementById('genericModal');
+    const modalTitle = document.getElementById('modalTitle');
+    const modalBody = document.getElementById('modalBody');
+
+    const label = GAME_TABLES.find(t => t.table === tableName)?.label
+        || COMMUNITY_TABLES.find(t => t.table === tableName)?.label
+        || tableName;
+
+    modalTitle.textContent = `📋 ${label}`;
+    modalBody.innerHTML = '<div class="table-empty">⏳ Carregando dados...</div>';
+    modal.classList.add('active');
+
+    try {
+        const items = await GameDataService.getAll(tableName);
+        const columns = TABLE_COLUMNS[tableName] || [{ key: 'id', label: 'ID' }];
+        const canDelete = DELETABLE_TABLES.includes(tableName);
+
+        if (items.length === 0) {
+            modalBody.innerHTML = '<div class="table-empty">📭 Nenhum item encontrado</div>';
+            return;
+        }
+
+        const headerCells = columns.map(c => `<th>${c.label}</th>`).join('');
+        const actionHeader = canDelete ? '<th>Ações</th>' : '';
+
+        const rows = items.map(item => {
+            const cells = columns.map(col => {
+                let value = item[col.key];
+                if (value === undefined && col.fallback) value = item[col.fallback];
+                if (col.format) value = col.format(value);
+                if (value === undefined || value === null) value = '-';
+                if (typeof value === 'object') value = JSON.stringify(value);
+                return `<td title="${String(value)}">${value}</td>`;
+            }).join('');
+
+            const actionCell = canDelete
+                ? `<td><button class="btn btn-danger btn-sm" onclick="deleteItem('${tableName}', '${item.id}')">Excluir</button></td>`
+                : '';
+
+            return `<tr>${cells}${actionCell}</tr>`;
+        }).join('');
+
+        modalBody.innerHTML = `
+            <div class="table-container">
+                <table class="data-table">
+                    <thead><tr>${headerCells}${actionHeader}</tr></thead>
+                    <tbody>${rows}</tbody>
+                </table>
+            </div>
+        `;
+    } catch (error) {
+        console.error('Erro ao carregar tabela:', error);
+        modalBody.innerHTML = `<div class="table-empty">❌ Erro ao carregar: ${error.message}</div>`;
+    }
+};
+
+// =====================================
+// EXCLUIR ITEM
+// =====================================
+
+window.deleteItem = async function (tableName, itemId) {
+    if (!confirm(`Tem certeza que deseja excluir o item "${itemId}"?`)) return;
+
+    try {
+        await GameDataService.deleteItem(tableName, itemId);
+        showNotification(`✅ Item "${itemId}" excluído com sucesso!`, 'success');
+        loadAllCounts();
+        viewTable(tableName);
+    } catch (error) {
+        showNotification(`❌ Erro ao excluir: ${error.message}`, 'error');
+    }
+};
+
+// =====================================
+// MODAIS DE ADIÇÃO
+// =====================================
+
 window.openModal = function (type) {
     const modal = document.getElementById('genericModal');
     const modalTitle = document.getElementById('modalTitle');
@@ -101,7 +280,7 @@ window.openModal = function (type) {
 
     switch (type) {
         case 'classes':
-            title = 'Adicionar Nova Classe';
+            title = '⚔️ Adicionar Nova Classe';
             form = `
                 <form id="addForm" onsubmit="submitClass(event)">
                     <div class="form-group">
@@ -127,7 +306,7 @@ window.openModal = function (type) {
                     </div>
                     <div class="form-group">
                         <label>Descrição</label>
-                        <textarea name="description" rows="4" placeholder="Descrição da classe..."></textarea>
+                        <textarea name="description" rows="3" placeholder="Descrição da classe..."></textarea>
                     </div>
                     <div class="form-group">
                         <label>Lançador de Magia?</label>
@@ -141,16 +320,19 @@ window.openModal = function (type) {
                         <input type="text" name="skills_available" placeholder="Atletismo, Intimidação, Natureza">
                     </div>
                     <div class="form-group">
-                        <label>Número de Perícias para Escolher</label>
+                        <label>Nº de Perícias para Escolher</label>
                         <input type="number" name="skills_choose" value="2" min="0">
                     </div>
-                    <button type="submit" class="btn btn-primary">Adicionar Classe</button>
+                    <div class="form-submit">
+                        <button type="button" class="btn btn-outline" onclick="closeModal()">Cancelar</button>
+                        <button type="submit" class="btn btn-gold">Adicionar Classe</button>
+                    </div>
                 </form>
             `;
             break;
 
         case 'races':
-            title = 'Adicionar Nova Raça';
+            title = '🧝 Adicionar Nova Raça';
             form = `
                 <form id="addForm" onsubmit="submitRace(event)">
                     <div class="form-group">
@@ -163,27 +345,18 @@ window.openModal = function (type) {
                     </div>
                     <div class="form-group">
                         <label>Descrição *</label>
-                        <textarea name="description" rows="4" required placeholder="Descrição da raça..."></textarea>
+                        <textarea name="description" rows="3" required placeholder="Descrição da raça..."></textarea>
                     </div>
                     <div class="form-group">
                         <label>Aumento de Atributo *</label>
-                        <input type="text" name="ability_score_increase" required placeholder="Constituição +2">
-                    </div>
-                    <div class="form-group">
-                        <label>Idade</label>
-                        <input type="text" name="age" placeholder="Até 350 anos">
-                    </div>
-                    <div class="form-group">
-                        <label>Alinhamento</label>
-                        <input type="text" name="alignment" placeholder="Tende ao bem">
+                        <input type="text" name="ability_score_increase" required placeholder="+2 Constituição">
                     </div>
                     <div class="form-group">
                         <label>Tamanho *</label>
                         <select name="size" required>
-                            <option value="Tiny">Miúdo</option>
-                            <option value="Small">Pequeno</option>
-                            <option value="Medium">Médio</option>
-                            <option value="Large">Grande</option>
+                            <option value="Pequeno">Pequeno</option>
+                            <option value="Médio" selected>Médio</option>
+                            <option value="Grande">Grande</option>
                         </select>
                     </div>
                     <div class="form-group">
@@ -198,13 +371,16 @@ window.openModal = function (type) {
                         <label>Idiomas (separados por vírgula) *</label>
                         <input type="text" name="languages" required placeholder="Comum, Anão">
                     </div>
-                    <button type="submit" class="btn btn-primary">Adicionar Raça</button>
+                    <div class="form-submit">
+                        <button type="button" class="btn btn-outline" onclick="closeModal()">Cancelar</button>
+                        <button type="submit" class="btn btn-gold">Adicionar Raça</button>
+                    </div>
                 </form>
             `;
             break;
 
         case 'backgrounds':
-            title = 'Adicionar Novo Antecedente';
+            title = '📜 Adicionar Antecedente';
             form = `
                 <form id="addForm" onsubmit="submitBackground(event)">
                     <div class="form-group">
@@ -221,7 +397,7 @@ window.openModal = function (type) {
                     </div>
                     <div class="form-group">
                         <label>Descrição *</label>
-                        <textarea name="description" rows="4" required placeholder="Descrição do antecedente..."></textarea>
+                        <textarea name="description" rows="3" required placeholder="Descrição do antecedente..."></textarea>
                     </div>
                     <div class="form-group">
                         <label>Perícias (separadas por vírgula) *</label>
@@ -232,16 +408,19 @@ window.openModal = function (type) {
                         <input type="text" name="tool_proficiencies" placeholder="Nenhuma">
                     </div>
                     <div class="form-group">
-                        <label>Número de Idiomas</label>
+                        <label>Nº de Idiomas</label>
                         <input type="number" name="language_count" value="2" min="0">
                     </div>
-                    <button type="submit" class="btn btn-primary">Adicionar Antecedente</button>
+                    <div class="form-submit">
+                        <button type="button" class="btn btn-outline" onclick="closeModal()">Cancelar</button>
+                        <button type="submit" class="btn btn-gold">Adicionar Antecedente</button>
+                    </div>
                 </form>
             `;
             break;
 
         case 'languages':
-            title = 'Adicionar Novo Idioma';
+            title = '🗣️ Adicionar Idioma';
             form = `
                 <form id="addForm" onsubmit="submitLanguage(event)">
                     <div class="form-group">
@@ -259,159 +438,197 @@ window.openModal = function (type) {
                     <div class="form-group">
                         <label>Categoria *</label>
                         <select name="category" required>
-                            <option value="standard">Padrão</option>
-                            <option value="exotic">Exótico</option>
-                            <option value="secret">Secreto</option>
+                            <option value="Padrão">Padrão</option>
+                            <option value="Exótico">Exótico</option>
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>Falantes Típicos (separados por vírgula)</label>
-                        <input type="text" name="typical_speakers" placeholder="Humanos, halflings">
-                    </div>
-                    <div class="form-group">
-                        <label>Escrita</label>
-                        <input type="text" name="script" placeholder="Comum">
-                    </div>
-                    <div class="form-group">
                         <label>Descrição</label>
-                        <textarea name="description" rows="3" placeholder="Descrição do idioma..."></textarea>
+                        <textarea name="description" rows="2" placeholder="Descrição do idioma..."></textarea>
                     </div>
-                    <button type="submit" class="btn btn-primary">Adicionar Idioma</button>
+                    <div class="form-submit">
+                        <button type="button" class="btn btn-outline" onclick="closeModal()">Cancelar</button>
+                        <button type="submit" class="btn btn-gold">Adicionar Idioma</button>
+                    </div>
                 </form>
             `;
             break;
 
         case 'weapons':
-            title = 'Adicionar Nova Arma';
+            title = '🗡️ Adicionar Arma';
             form = `
                 <form id="addForm" onsubmit="submitWeapon(event)">
                     <div class="form-group">
-                        <label>Nome *</label>
-                        <input type="text" name="name" required placeholder="Espada Longa">
+                        <label>Nome (PT-BR) *</label>
+                        <input type="text" name="nome" required placeholder="Espada Longa">
+                    </div>
+                    <div class="form-group">
+                        <label>Nome (Inglês)</label>
+                        <input type="text" name="name" placeholder="Longsword">
                     </div>
                     <div class="form-group">
                         <label>Categoria *</label>
-                        <select name="category" required>
-                            <option value="simple_melee">Corpo a Corpo Simples</option>
-                            <option value="simple_ranged">À Distância Simples</option>
-                            <option value="martial_melee">Corpo a Corpo Marcial</option>
-                            <option value="martial_ranged">À Distância Marcial</option>
+                        <select name="categoria" required>
+                            <option value="Arma Simples Corpo a Corpo">Simples Corpo a Corpo</option>
+                            <option value="Arma Simples à Distância">Simples à Distância</option>
+                            <option value="Arma Marcial Corpo a Corpo">Marcial Corpo a Corpo</option>
+                            <option value="Arma Marcial à Distância">Marcial à Distância</option>
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>Custo (PO) *</label>
-                        <input type="number" name="cost" required step="0.01">
+                        <label>Custo (quantidade) *</label>
+                        <input type="number" name="custo_qtd" required step="0.01">
+                    </div>
+                    <div class="form-group">
+                        <label>Moeda *</label>
+                        <select name="custo_moeda" required>
+                            <option value="po">Peça de Ouro (po)</option>
+                            <option value="pp">Peça de Prata (pp)</option>
+                            <option value="pc">Peça de Cobre (pc)</option>
+                        </select>
                     </div>
                     <div class="form-group">
                         <label>Dano *</label>
-                        <input type="text" name="damage" required placeholder="1d8">
+                        <input type="text" name="dano" required placeholder="1d8">
                     </div>
                     <div class="form-group">
                         <label>Tipo de Dano *</label>
-                        <select name="damage_type" required>
-                            <option value="slashing">Cortante</option>
-                            <option value="piercing">Perfurante</option>
-                            <option value="bludgeoning">Concussão</option>
+                        <select name="tipo_dano" required>
+                            <option value="cortante">Cortante</option>
+                            <option value="perfurante">Perfurante</option>
+                            <option value="concussão">Concussão</option>
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>Peso (lb) *</label>
-                        <input type="number" name="weight" required step="0.1">
+                        <label>Peso (kg)</label>
+                        <input type="number" name="peso" step="0.1" value="0">
                     </div>
                     <div class="form-group">
                         <label>Propriedades (separadas por vírgula)</label>
-                        <input type="text" name="properties" placeholder="Versátil (1d10)">
+                        <input type="text" name="propriedades" placeholder="Versátil (1d10), Leve">
                     </div>
-                    <button type="submit" class="btn btn-primary">Adicionar Arma</button>
+                    <div class="form-submit">
+                        <button type="button" class="btn btn-outline" onclick="closeModal()">Cancelar</button>
+                        <button type="submit" class="btn btn-gold">Adicionar Arma</button>
+                    </div>
                 </form>
             `;
             break;
 
         case 'armor':
-            title = 'Adicionar Nova Armadura';
+            title = '🛡️ Adicionar Armadura';
             form = `
                 <form id="addForm" onsubmit="submitArmor(event)">
                     <div class="form-group">
-                        <label>Nome *</label>
-                        <input type="text" name="name" required placeholder="Cota de Malha">
+                        <label>Nome (PT-BR) *</label>
+                        <input type="text" name="nome" required placeholder="Cota de Malha">
+                    </div>
+                    <div class="form-group">
+                        <label>Nome (Inglês)</label>
+                        <input type="text" name="name" placeholder="Chain Mail">
                     </div>
                     <div class="form-group">
                         <label>Categoria *</label>
-                        <select name="category" required>
-                            <option value="light">Leve</option>
-                            <option value="medium">Média</option>
-                            <option value="heavy">Pesada</option>
-                            <option value="shield">Escudo</option>
+                        <select name="categoria" required>
+                            <option value="Leve">Leve</option>
+                            <option value="Média">Média</option>
+                            <option value="Pesada">Pesada</option>
+                            <option value="Escudo">Escudo</option>
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>CA Base *</label>
-                        <input type="number" name="armor_class" required>
+                        <label>CA *</label>
+                        <input type="text" name="ca" required placeholder="16">
                     </div>
                     <div class="form-group">
-                        <label>Modificador de Destreza</label>
-                        <input type="text" name="dex_modifier" placeholder="max 2">
+                        <label>Custo (quantidade) *</label>
+                        <input type="number" name="custo_qtd" required step="0.01">
                     </div>
                     <div class="form-group">
-                        <label>Custo (PO) *</label>
-                        <input type="number" name="cost" required step="0.01">
+                        <label>Moeda *</label>
+                        <select name="custo_moeda" required>
+                            <option value="po">Peça de Ouro (po)</option>
+                            <option value="pp">Peça de Prata (pp)</option>
+                        </select>
                     </div>
                     <div class="form-group">
-                        <label>Peso (lb) *</label>
-                        <input type="number" name="weight" required step="0.1">
+                        <label>Peso (kg)</label>
+                        <input type="number" name="peso" step="0.1" value="0">
                     </div>
                     <div class="form-group">
-                        <label>Requer Força Mínima?</label>
-                        <input type="number" name="strength_requirement" placeholder="0" value="0">
+                        <label>Requisito de Força</label>
+                        <input type="number" name="requisito_forca" value="0">
                     </div>
                     <div class="form-group">
                         <label>Desvantagem em Furtividade?</label>
-                        <select name="stealth_disadvantage">
+                        <select name="desvantagem_furtividade">
                             <option value="false">Não</option>
                             <option value="true">Sim</option>
                         </select>
                     </div>
-                    <button type="submit" class="btn btn-primary">Adicionar Armadura</button>
+                    <div class="form-submit">
+                        <button type="button" class="btn btn-outline" onclick="closeModal()">Cancelar</button>
+                        <button type="submit" class="btn btn-gold">Adicionar Armadura</button>
+                    </div>
                 </form>
             `;
             break;
 
         case 'equipment':
-            title = 'Adicionar Novo Equipamento';
+            title = '🎒 Adicionar Equipamento';
             form = `
                 <form id="addForm" onsubmit="submitEquipment(event)">
                     <div class="form-group">
-                        <label>Nome *</label>
-                        <input type="text" name="name" required placeholder="Corda de Cânhamo">
+                        <label>Nome (PT-BR) *</label>
+                        <input type="text" name="nome" required placeholder="Corda de Cânhamo">
+                    </div>
+                    <div class="form-group">
+                        <label>Nome (Inglês)</label>
+                        <input type="text" name="name" placeholder="Hemp Rope">
                     </div>
                     <div class="form-group">
                         <label>Categoria *</label>
-                        <input type="text" name="category" required placeholder="Equipamento de Aventura">
+                        <input type="text" name="categoria" required placeholder="Aventura">
                     </div>
                     <div class="form-group">
-                        <label>Custo (PO) *</label>
-                        <input type="number" name="cost" required step="0.01">
+                        <label>Custo (quantidade) *</label>
+                        <input type="number" name="custo_qtd" required step="0.01">
                     </div>
                     <div class="form-group">
-                        <label>Peso (lb)</label>
-                        <input type="number" name="weight" step="0.1" value="0">
+                        <label>Moeda *</label>
+                        <select name="custo_moeda" required>
+                            <option value="po">Peça de Ouro (po)</option>
+                            <option value="pp">Peça de Prata (pp)</option>
+                            <option value="pc">Peça de Cobre (pc)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Peso (kg)</label>
+                        <input type="number" name="peso" step="0.1" value="0">
                     </div>
                     <div class="form-group">
                         <label>Descrição</label>
-                        <textarea name="description" rows="3" placeholder="Descrição do item..."></textarea>
+                        <textarea name="descricao" rows="2" placeholder="Descrição do item..."></textarea>
                     </div>
-                    <button type="submit" class="btn btn-primary">Adicionar Equipamento</button>
+                    <div class="form-submit">
+                        <button type="button" class="btn btn-outline" onclick="closeModal()">Cancelar</button>
+                        <button type="submit" class="btn btn-gold">Adicionar Equipamento</button>
+                    </div>
                 </form>
             `;
             break;
 
         case 'feats':
-            title = 'Adicionar Novo Talento';
+            title = '✨ Adicionar Talento';
             form = `
                 <form id="addForm" onsubmit="submitFeat(event)">
                     <div class="form-group">
-                        <label>Nome *</label>
-                        <input type="text" name="name" required placeholder="Mestre em Combate">
+                        <label>Nome (PT-BR) *</label>
+                        <input type="text" name="nome" required placeholder="Mestre em Combate">
+                    </div>
+                    <div class="form-group">
+                        <label>Nome (Inglês)</label>
+                        <input type="text" name="name" placeholder="Combat Master">
                     </div>
                     <div class="form-group">
                         <label>Pré-requisitos</label>
@@ -419,218 +636,220 @@ window.openModal = function (type) {
                     </div>
                     <div class="form-group">
                         <label>Descrição *</label>
-                        <textarea name="description" rows="5" required placeholder="Descrição completa do talento..."></textarea>
+                        <textarea name="descricao" rows="4" required placeholder="Descrição completa do talento..."></textarea>
                     </div>
-                    <button type="submit" class="btn btn-primary">Adicionar Talento</button>
+                    <div class="form-submit">
+                        <button type="button" class="btn btn-outline" onclick="closeModal()">Cancelar</button>
+                        <button type="submit" class="btn btn-gold">Adicionar Talento</button>
+                    </div>
                 </form>
             `;
             break;
 
         default:
-            title = 'Funcionalidade em Desenvolvimento';
-            form = '<p>Esta funcionalidade está em desenvolvimento.</p>';
+            title = 'Em Desenvolvimento';
+            form = '<p style="color:rgba(232,220,198,0.5);">Esta funcionalidade está em desenvolvimento.</p>';
     }
 
     modalTitle.textContent = title;
     modalBody.innerHTML = form;
     modal.classList.add('active');
-}
+};
 
 window.closeModal = function () {
     document.getElementById('genericModal').classList.remove('active');
-}
+};
 
-// Funções de submissão de formulários
+// =====================================
+// SUBMISSÕES DE FORMULÁRIO
+// =====================================
+
 window.submitClass = async function (event) {
     event.preventDefault();
-    const formData = new FormData(event.target);
+    const fd = new FormData(event.target);
     const data = {
-        id: formData.get('id'),
-        name: formData.get('name'),
-        name_pt: formData.get('name_pt'),
-        hit_die: formData.get('hit_die'),
-        description: formData.get('description'),
-        spellcaster: formData.get('spellcaster') === 'true',
-        skills_available: formData.get('skills_available') ? formData.get('skills_available').split(',').map(s => s.trim()) : [],
-        skills_choose: parseInt(formData.get('skills_choose')) || 2
+        id: fd.get('id'),
+        name: fd.get('name'),
+        name_pt: fd.get('name_pt'),
+        hit_die: fd.get('hit_die'),
+        description: fd.get('description'),
+        spellcaster: fd.get('spellcaster') === 'true',
+        skills_available: fd.get('skills_available') ? JSON.stringify(fd.get('skills_available').split(',').map(s => s.trim())) : '[]',
+        skills_choose: parseInt(fd.get('skills_choose')) || 2
     };
 
     try {
         await GameDataService.addItem('classes', data);
-        showNotification('✅ Classe adicionada com sucesso!', 'success');
+        showNotification('✅ Classe adicionada!', 'success');
         closeModal();
         loadAllCounts();
     } catch (error) {
-        showNotification('❌ Erro ao adicionar classe: ' + error.message, 'error');
+        showNotification('❌ Erro: ' + error.message, 'error');
     }
-}
+};
 
 window.submitRace = async function (event) {
     event.preventDefault();
-    const formData = new FormData(event.target);
+    const fd = new FormData(event.target);
     const data = {
-        name: formData.get('name'),
-        name_pt: formData.get('name_pt'),
-        description: formData.get('description'),
-        ability_score_increase: formData.get('ability_score_increase'),
-        age: formData.get('age'),
-        alignment: formData.get('alignment'),
-        size: formData.get('size'),
-        speed: parseInt(formData.get('speed')),
-        traits: formData.get('traits') ? formData.get('traits').split(',').map(s => s.trim()) : [],
-        languages: formData.get('languages').split(',').map(s => s.trim())
+        name: fd.get('name'),
+        name_pt: fd.get('name_pt'),
+        description: fd.get('description'),
+        ability_score_increase: fd.get('ability_score_increase'),
+        size: fd.get('size'),
+        speed: parseInt(fd.get('speed')),
+        traits: fd.get('traits') ? JSON.stringify(fd.get('traits').split(',').map(s => s.trim())) : '[]',
+        languages: fd.get('languages') ? JSON.stringify(fd.get('languages').split(',').map(s => s.trim())) : '[]'
     };
 
     try {
         await GameDataService.addItem('races', data);
-        showNotification('✅ Raça adicionada com sucesso!', 'success');
+        showNotification('✅ Raça adicionada!', 'success');
         closeModal();
         loadAllCounts();
     } catch (error) {
-        showNotification('❌ Erro ao adicionar raça: ' + error.message, 'error');
+        showNotification('❌ Erro: ' + error.message, 'error');
     }
-}
+};
 
 window.submitBackground = async function (event) {
     event.preventDefault();
-    const formData = new FormData(event.target);
+    const fd = new FormData(event.target);
     const data = {
-        id: formData.get('id'),
-        name: formData.get('name'),
-        name_pt: formData.get('name_pt'),
-        description: formData.get('description'),
-        skill_proficiencies: formData.get('skill_proficiencies').split(',').map(s => s.trim()),
-        tool_proficiencies: formData.get('tool_proficiencies') ? formData.get('tool_proficiencies').split(',').map(s => s.trim()) : [],
-        language_count: parseInt(formData.get('language_count')) || 0
+        id: fd.get('id'),
+        name: fd.get('name'),
+        name_pt: fd.get('name_pt'),
+        description: fd.get('description'),
+        skill_proficiencies: fd.get('skill_proficiencies') ? JSON.stringify(fd.get('skill_proficiencies').split(',').map(s => s.trim())) : '[]',
+        tool_proficiencies: fd.get('tool_proficiencies') ? JSON.stringify(fd.get('tool_proficiencies').split(',').map(s => s.trim())) : '[]',
+        language_count: parseInt(fd.get('language_count')) || 0
     };
 
     try {
         await GameDataService.addItem('game_backgrounds', data);
-        showNotification('✅ Antecedente adicionado com sucesso!', 'success');
+        showNotification('✅ Antecedente adicionado!', 'success');
         closeModal();
         loadAllCounts();
     } catch (error) {
-        showNotification('❌ Erro ao adicionar antecedente: ' + error.message, 'error');
+        showNotification('❌ Erro: ' + error.message, 'error');
     }
-}
+};
 
 window.submitLanguage = async function (event) {
     event.preventDefault();
-    const formData = new FormData(event.target);
+    const fd = new FormData(event.target);
     const data = {
-        code: formData.get('code'),
-        name: formData.get('name'),
-        name_pt: formData.get('name_pt'),
-        category: formData.get('category'),
-        typical_speakers: formData.get('typical_speakers') ? formData.get('typical_speakers').split(',').map(s => s.trim()) : [],
-        script: formData.get('script'),
-        description: formData.get('description')
+        code: fd.get('code'),
+        name: fd.get('name'),
+        name_pt: fd.get('name_pt'),
+        category: fd.get('category'),
+        description: fd.get('description')
     };
 
     try {
         await GameDataService.addItem('languages', data);
-        showNotification('✅ Idioma adicionado com sucesso!', 'success');
+        showNotification('✅ Idioma adicionado!', 'success');
         closeModal();
         loadAllCounts();
     } catch (error) {
-        showNotification('❌ Erro ao adicionar idioma: ' + error.message, 'error');
+        showNotification('❌ Erro: ' + error.message, 'error');
     }
-}
+};
 
 window.submitWeapon = async function (event) {
     event.preventDefault();
-    const formData = new FormData(event.target);
+    const fd = new FormData(event.target);
     const data = {
-        name: formData.get('name'),
-        category: formData.get('category'),
-        cost: parseFloat(formData.get('cost')),
-        damage: formData.get('damage'),
-        damage_type: formData.get('damage_type'),
-        weight: parseFloat(formData.get('weight')),
-        properties: formData.get('properties') ? formData.get('properties').split(',').map(s => s.trim()) : []
+        nome: fd.get('nome'),
+        name: fd.get('name') || '',
+        categoria: fd.get('categoria'),
+        custo: JSON.stringify({ quantidade: parseFloat(fd.get('custo_qtd')), moeda: fd.get('custo_moeda') }),
+        dano: fd.get('dano'),
+        tipo_dano: fd.get('tipo_dano'),
+        peso: parseFloat(fd.get('peso')) || 0,
+        propriedades: fd.get('propriedades') ? JSON.stringify(fd.get('propriedades').split(',').map(s => s.trim())) : '[]'
     };
 
     try {
         await GameDataService.addItem('game_weapons', data);
-        showNotification('✅ Arma adicionada com sucesso!', 'success');
+        showNotification('✅ Arma adicionada!', 'success');
         closeModal();
         loadAllCounts();
     } catch (error) {
-        showNotification('❌ Erro ao adicionar arma: ' + error.message, 'error');
+        showNotification('❌ Erro: ' + error.message, 'error');
     }
-}
+};
 
 window.submitArmor = async function (event) {
     event.preventDefault();
-    const formData = new FormData(event.target);
+    const fd = new FormData(event.target);
     const data = {
-        name: formData.get('name'),
-        category: formData.get('category'),
-        armor_class: parseInt(formData.get('armor_class')),
-        dex_modifier: formData.get('dex_modifier') || null,
-        cost: parseFloat(formData.get('cost')),
-        weight: parseFloat(formData.get('weight')),
-        strength_requirement: parseInt(formData.get('strength_requirement')) || 0,
-        stealth_disadvantage: formData.get('stealth_disadvantage') === 'true'
+        nome: fd.get('nome'),
+        name: fd.get('name') || '',
+        categoria: fd.get('categoria'),
+        ca: fd.get('ca'),
+        custo: JSON.stringify({ quantidade: parseFloat(fd.get('custo_qtd')), moeda: fd.get('custo_moeda') }),
+        peso: parseFloat(fd.get('peso')) || 0,
+        requisito_forca: parseInt(fd.get('requisito_forca')) || 0,
+        desvantagem_furtividade: fd.get('desvantagem_furtividade') === 'true'
     };
 
     try {
         await GameDataService.addItem('game_armor', data);
-        showNotification('✅ Armadura adicionada com sucesso!', 'success');
+        showNotification('✅ Armadura adicionada!', 'success');
         closeModal();
         loadAllCounts();
     } catch (error) {
-        showNotification('❌ Erro ao adicionar armadura: ' + error.message, 'error');
+        showNotification('❌ Erro: ' + error.message, 'error');
     }
-}
+};
 
 window.submitEquipment = async function (event) {
     event.preventDefault();
-    const formData = new FormData(event.target);
+    const fd = new FormData(event.target);
     const data = {
-        name: formData.get('name'),
-        category: formData.get('category'),
-        cost: parseFloat(formData.get('cost')),
-        weight: parseFloat(formData.get('weight')) || 0,
-        description: formData.get('description')
+        nome: fd.get('nome'),
+        name: fd.get('name') || '',
+        categoria: fd.get('categoria'),
+        custo: JSON.stringify({ quantidade: parseFloat(fd.get('custo_qtd')), moeda: fd.get('custo_moeda') }),
+        peso: parseFloat(fd.get('peso')) || 0,
+        descricao: fd.get('descricao') || ''
     };
 
     try {
         await GameDataService.addItem('game_equipment', data);
-        showNotification('✅ Equipamento adicionado com sucesso!', 'success');
+        showNotification('✅ Equipamento adicionado!', 'success');
         closeModal();
         loadAllCounts();
     } catch (error) {
-        showNotification('❌ Erro ao adicionar equipamento: ' + error.message, 'error');
+        showNotification('❌ Erro: ' + error.message, 'error');
     }
-}
+};
 
 window.submitFeat = async function (event) {
     event.preventDefault();
-    const formData = new FormData(event.target);
+    const fd = new FormData(event.target);
     const data = {
-        name: formData.get('name'),
-        prerequisites: formData.get('prerequisites') || null,
-        description: formData.get('description')
+        nome: fd.get('nome'),
+        name: fd.get('name') || '',
+        prerequisites: fd.get('prerequisites') || null,
+        descricao: fd.get('descricao')
     };
 
     try {
         await GameDataService.addItem('game_feats', data);
-        showNotification('✅ Talento adicionado com sucesso!', 'success');
+        showNotification('✅ Talento adicionado!', 'success');
         closeModal();
         loadAllCounts();
     } catch (error) {
-        showNotification('❌ Erro ao adicionar talento: ' + error.message, 'error');
+        showNotification('❌ Erro: ' + error.message, 'error');
     }
-}
+};
 
-// Função para visualizar tabelas (simplificada - pode ser expandida)
-window.viewTable = function (table) {
-    showNotification(`📊 Visualização de tabelas será implementada em breve`, 'info');
-    // TODO: Implementar listagem completa com edição/exclusão
-}
+// =====================================
+// NOTIFICAÇÕES
+// =====================================
 
-// Função de notificação
 function showNotification(message, type = 'info') {
     const notification = document.createElement('div');
     notification.className = `notification ${type}`;
@@ -638,18 +857,27 @@ function showNotification(message, type = 'info') {
     document.body.appendChild(notification);
 
     setTimeout(() => {
-        notification.remove();
+        notification.style.opacity = '0';
+        notification.style.transform = 'translateX(100%)';
+        notification.style.transition = 'all 0.3s';
+        setTimeout(() => notification.remove(), 300);
     }, 3000);
 }
 
-// Logout
+// =====================================
+// LOGOUT
+// =====================================
+
 window.logout = async function () {
     await signOut(auth);
     localStorage.clear();
     window.location.href = '/login.html';
-}
+};
 
-// Inicialização
+// =====================================
+// INICIALIZAÇÃO
+// =====================================
+
 document.addEventListener('DOMContentLoaded', async () => {
     const profile = await checkAdminAccess();
 
@@ -657,4 +885,17 @@ document.addEventListener('DOMContentLoaded', async () => {
         displayUserBadge(profile);
         loadAllCounts();
     }
+
+    // Sidebar navigation
+    document.querySelectorAll('.sidebar-item').forEach(item => {
+        item.addEventListener('click', () => {
+            document.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'));
+            item.classList.add('active');
+
+            const section = item.dataset.section;
+            if (section === 'users') viewTable('users');
+            else if (section === 'characters') viewTable('characters');
+            else if (section === 'campaigns') viewTable('campaigns');
+        });
+    });
 });
