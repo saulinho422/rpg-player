@@ -1506,8 +1506,8 @@ class CharacterCreationWizard {
                 return allAllocated;
             case 5: // Detalhes (alinhamento + antecedente)
                 return this.wizardData.alignment !== null && this.wizardData.background !== null;
-            case 6: // Equipamentos
-                return this.wizardData.equipment.length > 0;
+            case 6: // Equipamentos (opcional - pode pular se não há dados)
+                return true;
             case 7: // Final
                 return true;
             default:
@@ -1883,7 +1883,21 @@ class CharacterCreationWizard {
 
         let methodContentHtml = '';
 
-        if (this.wizardData.attributeMethod === 'roll') {
+        // Verificar se todos os valores já foram alocados
+        const allDone = this.wizardData.attributesAllocated ||
+            (this.wizardData.availableValues && this.wizardData.availableValues.length === 0 &&
+                (this.wizardData.attributeMethod === 'roll' ? this.wizardData.rolledValues.length === 6 : true));
+
+        if (allDone) {
+            // ✅ Mensagem de conclusão
+            methodContentHtml = `
+                <div style="text-align: center; margin: 24px 0; padding: 20px; background: rgba(39, 174, 96, 0.1); border: 1px solid rgba(39, 174, 96, 0.3); border-radius: 12px;">
+                    <div style="font-size: 2rem; margin-bottom: 8px;">✅</div>
+                    <h4 style="color: #2ecc71; margin-bottom: 6px;">Atributos Distribuídos!</h4>
+                    <p style="color: var(--cs-text-muted); font-size: 0.85rem;">Todos os valores foram alocados com sucesso.</p>
+                </div>
+            `;
+        } else if (this.wizardData.attributeMethod === 'roll') {
             // Modo 4d6 - Rolar valores individuais com dados 3D
             const needsRolling = this.wizardData.rolledValues.length < 6;
 
@@ -2213,7 +2227,12 @@ class CharacterCreationWizard {
         }
 
         if (equipmentOptions.length === 0) {
-            return `<p style="color: orange; text-align: center; margin: 20px;">Nenhuma opção de equipamento disponível para esta classe.</p>`;
+            return `
+                <div style="text-align: center; margin: 20px; padding: 20px; background: rgba(10, 10, 20, 0.4); border: 1px solid var(--cs-gold-border); border-radius: 12px;">
+                    <p style="color: var(--cs-gold); margin-bottom: 10px;">📦 Classe sem pacote de equipamento definido.</p>
+                    <p style="color: var(--cs-text-muted); font-size: 0.85rem;">Use o método "Riqueza Inicial" para comprar equipamentos, ou clique em "Próximo" para pular esta etapa.</p>
+                </div>
+            `;
         }
 
         // Renderizar cada opção como um grupo de escolha
@@ -2295,18 +2314,18 @@ class CharacterCreationWizard {
     renderWealthMethod() {
         // Verificar se já rolou a riqueza inicial
         if (this.wizardData.startingWealth === 0) {
-            const wealthFormula = this.wizardData.class.starting_wealth || '4d4 x 10 po';
+            const wealthFormula = this.wizardData.class?.starting_wealth || '4d4 x 10 po';
 
             return `
                 <div style="text-align: center; margin: 30px 0;">
-                    <h4 style="color: var(--primary-color); margin-bottom: 15px;">Riqueza Inicial da Classe</h4>
+                    <h4 style="color: var(--cs-gold); margin-bottom: 15px;">Riqueza Inicial da Classe</h4>
                     <div class="wealth-display">
                         <div class="wealth-formula">${wealthFormula}</div>
                     </div>
-                    <button class="upload-button" id="rollWealthBtn" style="margin-top: 20px;">
+                    <button type="button" class="upload-button" id="rollWealthBtn" style="margin-top: 20px;">
                         🎲 Rolar Riqueza Inicial
                     </button>
-                    <p style="color: var(--text-color); font-size: 14px; margin-top: 15px;">
+                    <p style="color: var(--cs-text-muted); font-size: 14px; margin-top: 15px;">
                         Você usará este dinheiro para comprar seus equipamentos
                     </p>
                 </div>
