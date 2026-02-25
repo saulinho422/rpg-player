@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RPG Player - Configure seu Perfil</title>
+    <meta name="description" content="Configure seu perfil de aventureiro no RPG Player — escolha avatar, nome e preferências para sua jornada épica.">
 
     <!-- Favicons -->
     <link rel="apple-touch-icon" sizes="180x180" href="img/apple-touch-icon.png">
@@ -199,7 +200,8 @@
 
         <!-- Navigation Buttons -->
         <footer class="onboarding-footer">
-            <button id="prevBtn" class="nav-btn secondary" disabled>
+            <!-- FIX #27 — ocultar "← Anterior" no passo 1 em vez de mostrar desabilitado -->
+            <button id="prevBtn" class="nav-btn secondary" style="visibility:hidden;">
                 ← Anterior
             </button>
             <div class="step-dots">

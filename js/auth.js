@@ -44,8 +44,6 @@ async function signInWithGoogle() {
         const result = await signInWithPopup(auth, googleProvider)
         const user = result.user
 
-        console.log('✅ Login com Google realizado:', user.uid)
-
         localStorage.setItem('isLoggedIn', 'true')
         localStorage.setItem('currentUserId', user.uid)
 
@@ -88,7 +86,6 @@ async function signInWithEmail(email, password) {
             localStorage.setItem('isLoggedIn', 'true')
             localStorage.setItem('currentUserId', user.uid)
 
-            console.log('✅ Usuário logado com ID:', user.uid)
         }
 
         showMessage('Login realizado com sucesso!', 'success')
@@ -133,11 +130,6 @@ async function registerWithEmail(email, password) {
             return
         }
 
-        console.log('🔍 Dados do registro:', {
-            user: user.uid,
-            email: email
-        })
-
         // Firebase cria sessão imediatamente ✅
         localStorage.setItem('isLoggedIn', 'true')
         localStorage.setItem('currentUserId', user.uid)
@@ -175,26 +167,15 @@ async function registerWithEmail(email, password) {
 
 async function checkUserProfile(user) {
     try {
-        console.log('🔍 Verificando perfil do usuário:', user.uid)
-
         const profile = await UserService.getProfile(user.uid)
-        console.log('📋 Perfil encontrado:', profile)
 
         localStorage.setItem('isLoggedIn', 'true')
         localStorage.setItem('currentUserId', user.uid)
 
         await UserService.updateLastLogin(user.uid)
 
-        // DEBUG: Verificações detalhadas
-        console.log('🔍 profile existe:', !!profile)
-        console.log('🔍 onboarding_completed:', profile?.onboarding_completed)
-        console.log('🔍 display_name:', profile?.display_name)
-        console.log('🔍 is_owner:', profile?.is_owner)
-        console.log('🔍 is_admin:', profile?.is_admin)
-
-        // ⚡ VERIFICAÇÃO DE PERMISSÕES ADMIN/OWNER
+        // Verificação de permissões admin/owner
         if (profile && (profile.is_owner || profile.is_admin)) {
-            console.log('👑 Usuário é ADMIN/OWNER - redirecionando para admin dashboard')
 
             localStorage.setItem('userName', profile.display_name || profile.email || 'Admin')
             localStorage.setItem('userAvatar', profile.avatar_url || '')
@@ -210,8 +191,6 @@ async function checkUserProfile(user) {
         }
 
         if (profile && profile.onboarding_completed === true) {
-            console.log('✅ Usuário já completou onboarding, indo para dashboard')
-
             localStorage.setItem('userName', profile.display_name || profile.email || 'Usuário')
             localStorage.setItem('userAvatar', profile.avatar_url || '')
             localStorage.setItem('onboardingCompleted', 'true')
@@ -222,8 +201,6 @@ async function checkUserProfile(user) {
                 window.location.href = 'dashboard.html'
             }, 1500)
         } else {
-            console.log('⚠️ Usuário precisa completar onboarding')
-
             localStorage.setItem('onboardingCompleted', 'false')
 
             showMessage('Vamos configurar seu perfil!', 'info')
@@ -257,10 +234,8 @@ export function checkAuth() {
             if (user) {
                 localStorage.setItem('isLoggedIn', 'true')
                 localStorage.setItem('currentUserId', user.uid)
-                console.log('✅ Usuário autenticado:', user.uid)
                 resolve(user)
             } else {
-                console.log('❌ Nenhuma sessão ativa, limpando localStorage')
                 localStorage.removeItem('isLoggedIn')
                 localStorage.removeItem('currentUserId')
                 resolve(null)
@@ -299,7 +274,6 @@ async function logout() {
 // =====================================
 
 document.addEventListener('DOMContentLoaded', async () => {
-    console.log('🚀 Iniciando auth.js')
 
     // Inicializa sistema de abas se existir
     initTabs()
@@ -342,18 +316,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Verifica sessão ao carregar via Firebase onAuthStateChanged
     const user = await checkAuth()
     if (user) {
-        console.log('🔐 Sessão encontrada ao carregar página:', user.email)
-
-        if (window.location.pathname.includes('login.html')) {
-            console.log('ℹ️ Usuário já está logado, mas permanece na página de login')
-        } else if (window.location.pathname.includes('onboarding.html')) {
-            console.log('🔍 Verificando se usuário precisa mesmo do onboarding')
+        if (window.location.pathname.includes('onboarding.html')) {
             const profile = await UserService.getProfile(user.uid)
-
             if (profile && profile.onboarding_completed === true) {
-                console.log('⚠️ Usuário já completou onboarding mas está na página de onboarding!')
                 showMessage('Você já completou o onboarding! Redirecionando...', 'info')
-
                 setTimeout(() => {
                     window.location.href = 'dashboard.html'
                 }, 2000)

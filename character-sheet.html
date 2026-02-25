@@ -5,620 +5,570 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Ficha de Personagem - D&D 5e</title>
     <link rel="stylesheet" href="styles/main.css" />
-    <link rel="stylesheet" href="styles/character-sheet.css?v=2.0" />
+    <link rel="stylesheet" href="styles/character-sheet.css?v=3.0" />
     <link rel="stylesheet" href="styles/dice3d.css" />
 </head>
 <body class="bg-background min-h-screen">
-    <!-- Main Container -->
+
+    <!-- ══════════════════════════════════════
+         STICKY TOP BAR
+    ══════════════════════════════════════ -->
+    <div class="cs-top-bar">
+        <div class="cs-top-bar__left">
+            <button id="menuBtn" class="cs-icon-btn" title="Menu">☰</button>
+            <button id="backBtn" class="cs-icon-btn" title="Voltar">←</button>
+        </div>
+        <div class="cs-top-bar__center">
+            <div class="cs-top-bar__char-name" id="topbar-char-name">Personagem</div>
+            <div class="cs-top-bar__char-subtitle" id="topbar-char-sub">D&amp;D 5ª Edição</div>
+        </div>
+        <div class="cs-top-bar__right">
+            <button id="finishBtn" class="cs-save-btn hidden">💾 Salvar</button>
+        </div>
+    </div>
+
+    <!-- ══════════════════════════════════════
+         SIDEBAR MENU
+    ══════════════════════════════════════ -->
+    <div id="sidebarMenu" class="sidebar-menu">
+        <div class="sidebar-header">
+            <h3>Menu</h3>
+            <button class="close-sidebar">✕</button>
+        </div>
+        <div class="sidebar-content">
+            <button class="sidebar-item" id="openWizardBtn">
+                <span class="sidebar-icon">✨</span>
+                <span class="sidebar-text">Preencher Ficha (Wizard)</span>
+            </button>
+            <button class="sidebar-item" data-action="attribute-method">
+                <span class="sidebar-icon">🎲</span>
+                <span class="sidebar-text">Valores de Atributo</span>
+            </button>
+        </div>
+    </div>
+    <div id="sidebarOverlay" class="sidebar-overlay"></div>
+
+    <!-- ══════════════════════════════════════
+         MAIN CONTAINER
+    ══════════════════════════════════════ -->
     <div class="container mx-auto px-4 py-6 max-w-7xl">
-        <!-- Header Controls -->
-        <div class="flex justify-between items-center mb-6">
-            <div class="space-x-2">
-                <button id="menuBtn" class="btn-primary px-4 py-2 rounded-lg font-medium">☰ Menu</button>
-                <button id="backBtn" class="btn-primary px-4 py-2 rounded-lg font-medium">← Voltar</button>
-            </div>
-            <div>
-                <button id="finishBtn" class="btn-primary px-4 py-2 rounded-lg font-medium hidden">💾 Salvar Personagem</button>
-            </div>
-        </div>
 
-        <!-- Sidebar Menu -->
-        <div id="sidebarMenu" class="sidebar-menu">
-            <div class="sidebar-header">
-                <h3>Menu</h3>
-                <button class="close-sidebar">✕</button>
-            </div>
-            <div class="sidebar-content">
-                <button class="sidebar-item" id="openWizardBtn">
-                    <span class="sidebar-icon">✨</span>
-                    <span class="sidebar-text">Preencher Ficha (Wizard)</span>
-                </button>
-                <button class="sidebar-item" data-action="attribute-method">
-                    <span class="sidebar-icon">🎲</span>
-                    <span class="sidebar-text">Valores de Atributo</span>
-                </button>
-            </div>
-        </div>
-        <div id="sidebarOverlay" class="sidebar-overlay"></div>
-
-        <!-- Header -->
-        <header class="mb-8">
-            <h1 class="font-heading text-4xl text-primary text-center mb-2">Ficha de Personagem D&D 5e</h1>
-            <p class="text-text-secondary text-center">Gerencie seu personagem de forma digital e interativa</p>
+        <!-- Page Title (desktop) -->
+        <header class="mb-6 hidden" id="page-header" style="display:none;">
+            <h1 class="font-heading text-4xl text-primary text-center mb-2">Ficha de Personagem D&amp;D 5e</h1>
+            <p class="text-text-secondary text-center text-sm">Gerencie seu personagem de forma digital e interativa</p>
         </header>
 
-        <!-- Navegação por Abas -->
-        <div class="mb-6">
-            <div class="flex justify-center space-x-2 border-b-2 border-primary pb-2">
-                <button class="tab-btn active" data-tab="combat" onclick="switchTab('combat')">
-                    <span class="text-lg">⚔️</span>
-                    <span class="ml-2">Combate</span>
-                </button>
-                <button class="tab-btn" data-tab="attributes" onclick="switchTab('attributes')">
-                    <span class="text-lg">📊</span>
-                    <span class="ml-2">Atributos & Perícias</span>
-                </button>
-                <button class="tab-btn" data-tab="identity" onclick="switchTab('identity')">
-                    <span class="text-lg">🎭</span>
-                    <span class="ml-2">Identidade</span>
-                </button>
-                <button class="tab-btn" data-tab="resources" onclick="switchTab('resources')">
-                    <span class="text-lg">🎒</span>
-                    <span class="ml-2">Recursos</span>
-                </button>
-            </div>
+        <!-- ── TAB NAV — Desktop ── -->
+        <div class="cs-tab-nav-desktop mb-6">
+            <button class="tab-btn active" data-tab="combat" onclick="switchTab('combat')">
+                <span class="tab-icon">⚔️</span>
+                <span>Combate</span>
+            </button>
+            <button class="tab-btn" data-tab="attributes" onclick="switchTab('attributes')">
+                <span class="tab-icon">📊</span>
+                <span>Atributos &amp; Perícias</span>
+            </button>
+            <button class="tab-btn" data-tab="identity" onclick="switchTab('identity')">
+                <span class="tab-icon">🎭</span>
+                <span>Identidade</span>
+            </button>
+            <button class="tab-btn" data-tab="resources" onclick="switchTab('resources')">
+                <span class="tab-icon">🎒</span>
+                <span>Recursos</span>
+            </button>
         </div>
 
-        <!-- Conteúdo das Abas -->
-        
-        <!-- ABA 1: COMBATE -->
+        <!-- ══════════════════════════════════════
+             ABA 1: COMBATE
+        ══════════════════════════════════════ -->
         <div id="tab-combat" class="tab-content active">
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                <!-- Coluna Esquerda - Stats de Combate -->
+
+                <!-- Coluna Esquerda -->
                 <div class="space-y-6">
+
                     <!-- Pontos de Vida -->
                     <section class="card p-6">
-                        <h2 class="font-heading text-xl text-primary mb-4 border-b border-primary pb-2">Pontos de Vida</h2>
+                        <h2>❤️ Pontos de Vida</h2>
+
+                        <!-- HP Bar -->
+                        <div class="hp-bar-wrap mb-4">
+                            <div class="hp-bar" id="hp-bar-visual"></div>
+                        </div>
+
                         <div class="grid grid-cols-2 gap-4">
-                            <!-- PV Atuais (grande, esquerda) -->
-                            <div class="text-center border-2 border-primary rounded-lg p-4 bg-surface">
-                                <label class="block text-xs font-medium text-text-secondary mb-2 uppercase">PV Totais</label>
-                                <input type="number" name="maxhp" id="maxhp" class="text-xl font-bold text-primary w-full text-center bg-transparent border-0 outline-none mb-2" value="0">
-                                <div class="border-t-2 border-primary pt-3 mt-2">
-                                    <input type="number" name="currenthp" id="currenthp" class="text-5xl font-bold text-primary w-full text-center bg-transparent border-0 outline-none" value="0">
-                                    <label class="block text-xs font-medium text-text-secondary mt-2 uppercase">PV Atuais</label>
+                            <!-- PV Atuais -->
+                            <div class="stat-box hp-main-box" style="grid-column: span 1;">
+                                <div class="hp-total-row">
+                                    <span style="font-size:0.65rem;color:var(--cs-text-muted);text-transform:uppercase;letter-spacing:0.08em;">Máx</span>
+                                    <input type="number" name="maxhp" id="maxhp" class="hp-total-input" value="0" placeholder="0">
                                 </div>
+                                <input type="number" name="currenthp" id="currenthp" class="stat-box__value" value="0" style="font-size:clamp(2.4rem,8vw,3.6rem);">
+                                <span class="stat-box__label">PV Atuais</span>
                             </div>
-                            <!-- PV Temporários (menor, direita) -->
-                            <div class="text-center border-2 border-primary rounded-lg p-4 bg-surface flex flex-col justify-center">
-                                <input type="number" name="temphp" id="temphp" class="text-4xl font-bold text-primary w-full text-center bg-transparent border-0 outline-none mb-2" value="0">
-                                <label class="block text-xs font-medium text-text-secondary uppercase">PV Temporários</label>
+
+                            <!-- PV Temporários -->
+                            <div class="stat-box">
+                                <input type="number" name="temphp" id="temphp" class="stat-box__value" value="0">
+                                <span class="stat-box__label">PV Temp.</span>
                             </div>
                         </div>
                     </section>
 
                     <!-- Estatísticas de Combate -->
                     <section class="card p-6">
-                        <h2 class="font-heading text-xl text-primary mb-4 border-b border-primary pb-2">Estatísticas de Combate</h2>
-                        <div class="grid grid-cols-3 gap-4">
-                            <div class="text-center border-2 border-primary rounded-lg py-6 px-2 bg-surface">
-                                <input type="number" name="ac" id="ac" class="text-4xl font-bold text-primary w-full text-center bg-transparent border-0 outline-none mb-3" value="0">
-                                <label class="block text-xs font-medium text-text-secondary uppercase">Classe<br>de Armadura</label>
+                        <h2>🛡️ Estatísticas de Combate</h2>
+                        <div class="grid grid-cols-3 gap-3">
+                            <div class="stat-box">
+                                <input type="number" name="ac" id="ac" class="stat-box__value" value="10">
+                                <span class="stat-box__label">Classe<br>de Armadura</span>
                             </div>
-                            <div class="text-center border-2 border-primary rounded-lg py-6 px-2 bg-surface">
-                                <input type="text" name="initiative" id="initiative" class="text-4xl font-bold text-primary w-full text-center bg-transparent border-0 outline-none mb-3" placeholder="+0" readonly>
-                                <label class="block text-xs font-medium text-text-secondary uppercase">Iniciativa</label>
+                            <div class="stat-box">
+                                <input type="text" name="initiative" id="initiative" class="stat-box__value" placeholder="+0" readonly style="cursor:default;">
+                                <span class="stat-box__label">Iniciativa</span>
                             </div>
-                            <div class="text-center border-2 border-primary rounded-lg py-6 px-2 bg-surface">
-                                <input type="text" name="speed" id="speed" class="text-4xl font-bold text-primary w-full text-center bg-transparent border-0 outline-none mb-3" value="9m">
-                                <label class="block text-xs font-medium text-text-secondary uppercase">Desloc.</label>
+                            <div class="stat-box">
+                                <input type="text" name="speed" id="speed" class="stat-box__value" value="9m">
+                                <span class="stat-box__label">Deslocamento</span>
                             </div>
                         </div>
                     </section>
 
                     <!-- Dados de Vida -->
                     <section class="card p-6">
-                        <h2 class="font-heading text-xl text-primary mb-4 border-b border-primary pb-2">Dados de Vida</h2>
-                        <div class="text-center border-2 border-primary rounded-lg p-6 bg-surface">
-                            <p class="text-xs text-text-secondary mb-2 uppercase">Total: 1d8 + MOD de CON</p>
-                            <input type="text" name="hitdice" id="hitdice" class="text-5xl font-bold text-primary w-full text-center bg-transparent border-0 outline-none" value="1d8">
+                        <h2>🎲 Dados de Vida</h2>
+                        <div class="stat-box" style="padding:24px 14px;">
+                            <p style="font-size:0.65rem;color:var(--cs-text-muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px;">Total: 1d8 + MOD de CON</p>
+                            <input type="text" name="hitdice" id="hitdice" class="stat-box__value" value="1d8">
+                            <span class="stat-box__label">Dados de Vida</span>
                         </div>
                     </section>
                 </div>
 
-                <!-- Coluna Direita - Ataques -->
+                <!-- Coluna Direita — Ataques -->
                 <div class="space-y-6">
-                    <!-- Ataques -->
                     <section class="card p-6">
-                        <div class="flex justify-between items-center mb-4 border-b border-primary pb-2">
-                            <h2 class="font-heading text-xl text-primary">Ataques</h2>
-                            <button id="addAttackBtn" class="bg-primary hover:bg-secondary text-background rounded-full w-10 h-10 flex items-center justify-center font-bold text-2xl transition-colors">+</button>
+                        <div class="flex justify-between items-center mb-4" style="border-bottom:1px solid var(--cs-gold-border);padding-bottom:10px;">
+                            <h2 style="border:none;padding:0;margin:0;">⚔️ Ataques</h2>
+                            <button id="addAttackBtn" class="cs-add-btn">+</button>
                         </div>
-                        <div class="space-y-3">
-                            <!-- Header da tabela -->
-                            <div class="grid grid-cols-12 gap-2 text-xs font-medium text-text-secondary uppercase border-b border-default pb-2">
-                                <div class="col-span-4">Nome</div>
-                                <div class="col-span-3 text-center">Bônus</div>
-                                <div class="col-span-5 text-center">Dano / Tipo</div>
+
+                        <!-- Header -->
+                        <div class="grid gap-2 mb-2" style="grid-template-columns:1fr 60px 100px 32px;font-size:0.65rem;color:var(--cs-text-muted);text-transform:uppercase;letter-spacing:0.08em;padding:0 4px;">
+                            <div>Nome</div>
+                            <div style="text-align:center;">Bônus</div>
+                            <div style="text-align:center;">Dano / Tipo</div>
+                            <div></div>
+                        </div>
+
+                        <!-- Attacks list -->
+                        <div id="attacksList" class="space-y-2">
+                            <div class="text-center py-12" style="color:var(--cs-text-dim);font-style:italic;">
+                                <div style="font-size:2rem;margin-bottom:8px;">⚔️</div>
+                                Nenhum ataque cadastrado.<br>
+                                <span style="font-size:0.78rem;">Toque em + para adicionar</span>
                             </div>
-                            <!-- Lista de ataques -->
-                            <div id="attacksList" class="space-y-2">
-                                <div class="text-center text-text-secondary py-12 italic">
-                                    Nenhum ataque cadastrado.<br>
-                                    <span class="text-xs">Clique no botão + para adicionar</span>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </div>
+
+        <!-- ══════════════════════════════════════
+             ABA 2: ATRIBUTOS & PERÍCIAS
+        ══════════════════════════════════════ -->
+        <div id="tab-attributes" class="tab-content" style="display:none;">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+
+                <!-- Coluna Esquerda -->
+                <div class="space-y-6">
+
+                    <!-- Atributos Principais -->
+                    <section class="card p-6">
+                        <h2>📊 Atributos Principais</h2>
+                        <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                            <div class="attr-block" onclick="editAttribute('forca')">
+                                <div class="attr-block__inner">
+                                    <div class="attr-block__name">FORÇA</div>
+                                    <div class="attr-block__value" id="forca-value">10</div>
+                                    <div class="attr-block__mod" id="forca-modifier">+0</div>
+                                </div>
+                            </div>
+                            <div class="attr-block" onclick="editAttribute('destreza')">
+                                <div class="attr-block__inner">
+                                    <div class="attr-block__name">DESTREZA</div>
+                                    <div class="attr-block__value" id="destreza-value">10</div>
+                                    <div class="attr-block__mod" id="destreza-modifier">+0</div>
+                                </div>
+                            </div>
+                            <div class="attr-block" onclick="editAttribute('constituicao')">
+                                <div class="attr-block__inner">
+                                    <div class="attr-block__name">CONST.</div>
+                                    <div class="attr-block__value" id="constituicao-value">10</div>
+                                    <div class="attr-block__mod" id="constituicao-modifier">+0</div>
+                                </div>
+                            </div>
+                            <div class="attr-block" onclick="editAttribute('inteligencia')">
+                                <div class="attr-block__inner">
+                                    <div class="attr-block__name">INTELIG.</div>
+                                    <div class="attr-block__value" id="inteligencia-value">10</div>
+                                    <div class="attr-block__mod" id="inteligencia-modifier">+0</div>
+                                </div>
+                            </div>
+                            <div class="attr-block" onclick="editAttribute('sabedoria')">
+                                <div class="attr-block__inner">
+                                    <div class="attr-block__name">SABEDORIA</div>
+                                    <div class="attr-block__value" id="sabedoria-value">10</div>
+                                    <div class="attr-block__mod" id="sabedoria-modifier">+0</div>
+                                </div>
+                            </div>
+                            <div class="attr-block" onclick="editAttribute('carisma')">
+                                <div class="attr-block__inner">
+                                    <div class="attr-block__name">CARISMA</div>
+                                    <div class="attr-block__value" id="carisma-value">10</div>
+                                    <div class="attr-block__mod" id="carisma-modifier">+0</div>
                                 </div>
                             </div>
                         </div>
                     </section>
-                </div>
-                </div>
-            </div>
-        </div>
 
-        <!-- ABA 2: ATRIBUTOS & PERÍCIAS -->
-        <div id="tab-attributes" class="tab-content" style="display: none;">
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                <!-- Coluna Esquerda - Atributos e Perícias -->
-            <div class="space-y-6">
-                <!-- Main Attributes -->
-                <section class="card p-6">
-                    <h2 class="font-heading text-xl text-primary mb-4">Atributos Principais</h2>
-                    <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
-                        <!-- Força -->
-                        <div class="text-center">
-                            <div class="bg-surface border border-default rounded-lg p-4 hover:shadow-lg transition-all cursor-pointer" onclick="editAttribute('forca')">
-                                <h3 class="font-heading text-sm text-text-secondary mb-2">FORÇA</h3>
-                                <div class="text-3xl font-bold text-primary mb-1" id="forca-value">10</div>
-                                <div class="text-sm text-text-secondary" id="forca-modifier">+0</div>
-                            </div>
-                        </div>
-                        <!-- Destreza -->
-                        <div class="text-center">
-                            <div class="bg-surface border border-default rounded-lg p-4 hover:shadow-lg transition-all cursor-pointer" onclick="editAttribute('destreza')">
-                                <h3 class="font-heading text-sm text-text-secondary mb-2">DESTREZA</h3>
-                                <div class="text-3xl font-bold text-primary mb-1" id="destreza-value">10</div>
-                                <div class="text-sm text-text-secondary" id="destreza-modifier">+0</div>
-                            </div>
-                        </div>
-                        <!-- Constituição -->
-                        <div class="text-center">
-                            <div class="bg-surface border border-default rounded-lg p-4 hover:shadow-lg transition-all cursor-pointer" onclick="editAttribute('constituicao')">
-                                <h3 class="font-heading text-sm text-text-secondary mb-2">CONSTITUIÇÃO</h3>
-                                <div class="text-3xl font-bold text-primary mb-1" id="constituicao-value">10</div>
-                                <div class="text-sm text-text-secondary" id="constituicao-modifier">+0</div>
-                            </div>
-                        </div>
-                        <!-- Inteligência -->
-                        <div class="text-center">
-                            <div class="bg-surface border border-default rounded-lg p-4 hover:shadow-lg transition-all cursor-pointer" onclick="editAttribute('inteligencia')">
-                                <h3 class="font-heading text-sm text-text-secondary mb-2">INTELIGÊNCIA</h3>
-                                <div class="text-3xl font-bold text-primary mb-1" id="inteligencia-value">10</div>
-                                <div class="text-sm text-text-secondary" id="inteligencia-modifier">+0</div>
-                            </div>
-                        </div>
-                        <!-- Sabedoria -->
-                        <div class="text-center">
-                            <div class="bg-surface border border-default rounded-lg p-4 hover:shadow-lg transition-all cursor-pointer" onclick="editAttribute('sabedoria')">
-                                <h3 class="font-heading text-sm text-text-secondary mb-2">SABEDORIA</h3>
-                                <div class="text-3xl font-bold text-primary mb-1" id="sabedoria-value">10</div>
-                                <div class="text-sm text-text-secondary" id="sabedoria-modifier">+0</div>
-                            </div>
-                        </div>
-                        <!-- Carisma -->
-                        <div class="text-center">
-                            <div class="bg-surface border border-default rounded-lg p-4 hover:shadow-lg transition-all cursor-pointer" onclick="editAttribute('carisma')">
-                                <h3 class="font-heading text-sm text-text-secondary mb-2">CARISMA</h3>
-                                <div class="text-3xl font-bold text-primary mb-1" id="carisma-value">10</div>
-                                <div class="text-sm text-text-secondary" id="carisma-modifier">+0</div>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- Proficiency Bonus -->
-                <section class="card p-6">
-                    <h2 class="font-heading text-xl text-primary mb-4">Bônus de Proficiência</h2>
-                    <div class="text-center">
-                        <div class="inline-flex items-center justify-center w-16 h-16 bg-primary text-white rounded-full text-2xl font-bold">
-                            <span id="proficiency-bonus">+2</span>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- Saving Throws -->
-                <section class="card p-6">
-                    <h2 class="font-heading text-xl text-primary mb-4">Testes de Resistência</h2>
-                    <div class="space-y-2">
-                        <div class="flex items-center justify-between">
-                            <div class="flex items-center">
-                                <input type="checkbox" id="save-forca" class="w-4 h-4 text-primary rounded mr-3" />
-                                <label for="save-forca" class="text-sm">Força</label>
-                            </div>
-                            <span class="text-sm font-mono" id="save-forca-value">+0</span>
-                        </div>
-                        <div class="flex items-center justify-between">
-                            <div class="flex items-center">
-                                <input type="checkbox" id="save-destreza" class="w-4 h-4 text-primary rounded mr-3" />
-                                <label for="save-destreza" class="text-sm">Destreza</label>
-                            </div>
-                            <span class="text-sm font-mono" id="save-destreza-value">+0</span>
-                        </div>
-                        <div class="flex items-center justify-between">
-                            <div class="flex items-center">
-                                <input type="checkbox" id="save-constituicao" class="w-4 h-4 text-primary rounded mr-3" />
-                                <label for="save-constituicao" class="text-sm">Constituição</label>
-                            </div>
-                            <span class="text-sm font-mono" id="save-constituicao-value">+0</span>
-                        </div>
-                        <div class="flex items-center justify-between">
-                            <div class="flex items-center">
-                                <input type="checkbox" id="save-inteligencia" class="w-4 h-4 text-primary rounded mr-3" />
-                                <label for="save-inteligencia" class="text-sm">Inteligência</label>
-                            </div>
-                            <span class="text-sm font-mono" id="save-inteligencia-value">+0</span>
-                        </div>
-                        <div class="flex items-center justify-between">
-                            <div class="flex items-center">
-                                <input type="checkbox" id="save-sabedoria" class="w-4 h-4 text-primary rounded mr-3" />
-                                <label for="save-sabedoria" class="text-sm">Sabedoria</label>
-                            </div>
-                            <span class="text-sm font-mono" id="save-sabedoria-value">+0</span>
-                        </div>
-                        <div class="flex items-center justify-between">
-                            <div class="flex items-center">
-                                <input type="checkbox" id="save-carisma" class="w-4 h-4 text-primary rounded mr-3" />
-                                <label for="save-carisma" class="text-sm">Carisma</label>
-                            </div>
-                            <span class="text-sm font-mono" id="save-carisma-value">+0</span>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- Skills -->
-                <section class="card p-6">
-                    <h2 class="font-heading text-xl text-primary mb-4">Perícias</h2>
-                    <div class="space-y-2 max-h-64 overflow-y-auto" id="skills-list">
-                        <!-- Skills will be populated by JavaScript -->
-                    </div>
-                </section>
-
-                <!-- Passive Perception -->
-                <section class="card p-6">
-                    <h2 class="font-heading text-xl text-primary mb-4">Percepção Passiva</h2>
-                    <div class="text-center">
-                        <div class="inline-flex items-center justify-center w-16 h-16 bg-primary text-white rounded-full text-2xl font-bold">
-                            <span id="passive-perception">10</span>
-                        </div>
-                    </div>
-                </section>
-            </div>
-
-            <!-- Coluna Direita - Proficiências -->
-            <div class="space-y-6">
-                <!-- Proficiências e Idiomas -->
-                <section class="card p-6">
-                    <h2 class="font-heading text-xl text-primary mb-4">Proficiências e Idiomas</h2>
-                    <div class="space-y-4">
-                        <div>
-                            <label for="proficiencies" class="block text-sm font-medium text-text-secondary mb-2">Proficiências</label>
-                            <textarea name="proficiencies" id="proficiencies" class="input-field w-full px-3 py-2 resize-none" rows="6" placeholder="Armaduras, Armas, Ferramentas..."></textarea>
-                        </div>
-                        <div>
-                            <label for="languages" class="block text-sm font-medium text-text-secondary mb-2">Idiomas</label>
-                            <textarea name="languages" id="languages" class="input-field w-full px-3 py-2 resize-none" rows="3" placeholder="Comum, Élfico..."></textarea>
-                        </div>
-                    </div>
-                </section>
-            </div>
-            </div>
-        </div>
-
-        <!-- ABA 3: IDENTIDADE & INTERPRETAÇÃO -->
-        <div id="tab-identity" class="tab-content" style="display: none;">
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                <!-- Coluna Esquerda - Info do Personagem -->
-                <div class="space-y-6">
-                    <!-- Character Info Header -->
+                    <!-- Bônus de Proficiência -->
                     <section class="card p-6">
-                        <h2 class="font-heading text-xl text-primary mb-4">Informações do Personagem</h2>
+                        <h2>⭐ Bônus de Proficiência</h2>
+                        <div class="text-center">
+                            <div class="cs-badge-circle">
+                                <span id="proficiency-bonus">+2</span>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Testes de Resistência -->
+                    <section class="card p-6">
+                        <h2>🛡️ Testes de Resistência</h2>
+                        <div class="space-y-1">
+                            <div class="save-row">
+                                <div class="flex items-center gap-3">
+                                    <input type="checkbox" id="save-forca" />
+                                    <label for="save-forca">Força</label>
+                                </div>
+                                <span class="save-val" id="save-forca-value">+0</span>
+                            </div>
+                            <div class="save-row">
+                                <div class="flex items-center gap-3">
+                                    <input type="checkbox" id="save-destreza" />
+                                    <label for="save-destreza">Destreza</label>
+                                </div>
+                                <span class="save-val" id="save-destreza-value">+0</span>
+                            </div>
+                            <div class="save-row">
+                                <div class="flex items-center gap-3">
+                                    <input type="checkbox" id="save-constituicao" />
+                                    <label for="save-constituicao">Constituição</label>
+                                </div>
+                                <span class="save-val" id="save-constituicao-value">+0</span>
+                            </div>
+                            <div class="save-row">
+                                <div class="flex items-center gap-3">
+                                    <input type="checkbox" id="save-inteligencia" />
+                                    <label for="save-inteligencia">Inteligência</label>
+                                </div>
+                                <span class="save-val" id="save-inteligencia-value">+0</span>
+                            </div>
+                            <div class="save-row">
+                                <div class="flex items-center gap-3">
+                                    <input type="checkbox" id="save-sabedoria" />
+                                    <label for="save-sabedoria">Sabedoria</label>
+                                </div>
+                                <span class="save-val" id="save-sabedoria-value">+0</span>
+                            </div>
+                            <div class="save-row">
+                                <div class="flex items-center gap-3">
+                                    <input type="checkbox" id="save-carisma" />
+                                    <label for="save-carisma">Carisma</label>
+                                </div>
+                                <span class="save-val" id="save-carisma-value">+0</span>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Perícias -->
+                    <section class="card p-6">
+                        <h2>🎯 Perícias</h2>
+                        <div class="space-y-1 max-h-64 overflow-y-auto" id="skills-list" style="padding-right:4px;">
+                            <!-- Populated by JS -->
+                        </div>
+                    </section>
+
+                    <!-- Percepção Passiva -->
+                    <section class="card p-6">
+                        <h2>👁️ Percepção Passiva</h2>
+                        <div class="text-center">
+                            <div class="cs-badge-circle">
+                                <span id="passive-perception">10</span>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+
+                <!-- Coluna Direita -->
+                <div class="space-y-6">
+                    <section class="card p-6">
+                        <h2>📜 Proficiências e Idiomas</h2>
                         <div class="space-y-4">
                             <div>
-                                <label for="character-name-2" class="block text-sm font-medium text-text-secondary mb-1">Nome do Personagem</label>
-                                <input type="text" id="character-name-2" class="input-field w-full px-3 py-2" placeholder="Digite o nome do seu personagem" />
+                                <label for="proficiencies" class="block text-sm mb-2" style="color:var(--cs-text-muted);">Proficiências</label>
+                                <textarea name="proficiencies" id="proficiencies" class="input-field w-full px-3 py-2 resize-none" rows="6" placeholder="Armaduras, Armas, Ferramentas..."></textarea>
+                            </div>
+                            <div>
+                                <label for="languages" class="block text-sm mb-2" style="color:var(--cs-text-muted);">Idiomas</label>
+                                <textarea name="languages" id="languages" class="input-field w-full px-3 py-2 resize-none" rows="3" placeholder="Comum, Élfico..."></textarea>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </div>
+
+        <!-- ══════════════════════════════════════
+             ABA 3: IDENTIDADE
+        ══════════════════════════════════════ -->
+        <div id="tab-identity" class="tab-content" style="display:none;">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+
+                <!-- Coluna Esquerda -->
+                <div class="space-y-6">
+
+                    <!-- Informações do Personagem -->
+                    <section class="card p-6">
+                        <h2>🎭 Informações do Personagem</h2>
+                        <div class="space-y-4">
+                            <div>
+                                <label for="character-name-2" class="block text-sm mb-1" style="color:var(--cs-text-muted);">Nome do Personagem</label>
+                                <input type="text" id="character-name-2" class="input-field w-full px-3 py-2" placeholder="Digite o nome do personagem" />
                             </div>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
-                                    <label for="character-class-2" class="block text-sm font-medium text-text-secondary mb-1">Classe</label>
+                                    <label for="character-class-2" class="block text-sm mb-1" style="color:var(--cs-text-muted);">Classe</label>
                                     <select id="character-class-2" class="input-field w-full px-3 py-2">
-                                        <option value>Selecione uma classe</option>
+                                        <option value="">Selecione uma classe</option>
                                     </select>
                                 </div>
                                 <div>
-                                    <label for="character-race-2" class="block text-sm font-medium text-text-secondary mb-1">Raça</label>
+                                    <label for="character-race-2" class="block text-sm mb-1" style="color:var(--cs-text-muted);">Raça</label>
                                     <select id="character-race-2" class="input-field w-full px-3 py-2">
-                                        <option value>Selecione uma raça</option>
+                                        <option value="">Selecione uma raça</option>
                                     </select>
                                 </div>
                             </div>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
-                                    <label for="character-background-2" class="block text-sm font-medium text-text-secondary mb-1">Antecedente</label>
+                                    <label for="character-background-2" class="block text-sm mb-1" style="color:var(--cs-text-muted);">Antecedente</label>
                                     <select id="character-background-2" class="input-field w-full px-3 py-2">
-                                        <option value>Selecione um antecedente</option>
+                                        <option value="">Selecione um antecedente</option>
                                     </select>
                                 </div>
                                 <div>
-                                    <label for="character-alignment-2" class="block text-sm font-medium text-text-secondary mb-1">Tendência</label>
+                                    <label for="character-alignment-2" class="block text-sm mb-1" style="color:var(--cs-text-muted);">Tendência</label>
                                     <select id="character-alignment-2" class="input-field w-full px-3 py-2">
-                                        <option value>Selecione uma tendência</option>
+                                        <option value="">Selecione uma tendência</option>
                                     </select>
                                 </div>
                             </div>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
-                                    <label for="character-subclass-2" class="block text-sm font-medium text-text-secondary mb-1">Subclasse</label>
+                                    <label for="character-subclass-2" class="block text-sm mb-1" style="color:var(--cs-text-muted);">Subclasse</label>
                                     <select id="character-subclass-2" class="input-field w-full px-3 py-2">
-                                        <option value>Selecione uma subclasse</option>
+                                        <option value="">Selecione uma subclasse</option>
                                     </select>
                                 </div>
                                 <div>
-                                    <label for="character-level-2" class="block text-sm font-medium text-text-secondary mb-1">Nível</label>
+                                    <label for="character-level-2" class="block text-sm mb-1" style="color:var(--cs-text-muted);">Nível</label>
                                     <input type="number" id="character-level-2" class="input-field w-full px-3 py-2" min="1" max="20" value="1" />
                                 </div>
                             </div>
                         </div>
                     </section>
 
-                <!-- Hit Points -->
-                <section class="card p-6">
-                    <h2 class="font-heading text-xl text-primary mb-4">Pontos de Vida</h2>
-                    <div class="grid grid-cols-3 gap-4">
-                        <div class="text-center">
-                            <label class="block text-sm font-medium text-text-secondary mb-2">Atual</label>
-                            <input type="number" id="current-hp" class="input-field w-full text-center text-lg font-bold" value="8" />
-                        </div>
-                        <div class="text-center">
-                            <label class="block text-sm font-medium text-text-secondary mb-2">Temporário</label>
-                            <input type="number" id="temp-hp" class="input-field w-full text-center text-lg font-bold" value="0" />
-                        </div>
-                        <div class="text-center">
-                            <label class="block text-sm font-medium text-text-secondary mb-2">Máximo</label>
-                            <input type="number" id="max-hp" class="input-field w-full text-center text-lg font-bold" value="8" />
-                        </div>
-                    </div>
-                </section>
-
-                <!-- Hit Dice -->
-                <section class="card p-6">
-                    <h2 class="font-heading text-xl text-primary mb-4">Dados de Vida</h2>
-                    <div class="text-center">
-                        <div class="text-lg font-bold text-primary" id="hit-dice">1d8</div>
-                        <p class="text-sm text-text-secondary mt-1">Dados disponíveis para recuperação</p>
-                    </div>
-                </section>
-
-                <!-- Inventory Management -->
-                <section class="card p-6">
-                    <h2 class="font-heading text-xl text-primary mb-4">Inventário</h2>
-                    <div class="space-y-4">
-                        <div class="flex justify-between items-center">
-                            <span class="text-sm text-text-secondary">Capacidade de Carga:</span>
-                            <span class="font-mono text-sm" id="carrying-capacity">75 kg</span>
-                        </div>
-                        <div class="flex justify-between items-center">
-                            <span class="text-sm text-text-secondary">Carga Atual:</span>
-                            <span class="font-mono text-sm" id="current-load">0 kg</span>
-                        </div>
-                        <div class="w-full bg-gray-200 rounded-full h-2">
-                            <div class="bg-primary h-2 rounded-full transition-all" id="load-bar" style="width: 0%"></div>
-                        </div>
-                        <button onclick="openInventoryModal()" class="btn-primary w-full px-4 py-2 rounded-lg font-medium">
-                            Gerenciar Inventário
-                        </button>
-                    </div>
-                </section>
-
-                <!-- Proficiências e Idiomas -->
-                <section class="card p-6">
-                    <h2 class="font-heading text-xl text-primary mb-4">Outras Proficiências e Idiomas</h2>
-                    <div class="space-y-4">
-                        <div>
-                            <label for="proficiencies" class="block text-sm font-medium text-text-secondary mb-2">Proficiências</label>
-                            <textarea name="proficiencies" id="proficiencies" class="input-field w-full px-3 py-2 resize-none" rows="4" placeholder="Armaduras, armas, ferramentas..."></textarea>
-                        </div>
-                        <div>
-                            <label for="languages" class="block text-sm font-medium text-text-secondary mb-2">Idiomas</label>
-                            <textarea name="languages" id="languages" class="input-field w-full px-3 py-2 resize-none" rows="3" placeholder="Comum, Élfico, Anão..."></textarea>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- Características e Habilidades -->
-                <section class="card p-6">
-                    <h2 class="font-heading text-xl text-primary mb-4">Características e Habilidades</h2>
-                    <div class="space-y-4">
-                        <div>
-                            <label for="features-traits" class="block text-sm font-medium text-text-secondary mb-2">Características & Traços</label>
-                            <textarea name="features-traits" id="features-traits" class="input-field w-full px-3 py-2 resize-none" rows="6" placeholder="Características raciais, traços de antecedente..."></textarea>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- Ataques e Magias -->
-                <section class="card p-6">
-                    <h2 class="font-heading text-xl text-primary mb-4">Ataques e Conjuração</h2>
-                    <div class="space-y-4">
-                        <div>
-                            <label for="attacks" class="block text-sm font-medium text-text-secondary mb-2">Ataques</label>
-                            <textarea name="attacks" id="attacks" class="input-field w-full px-3 py-2 resize-none" rows="5" placeholder="Nome | Bônus de Ataque | Dano/Tipo"></textarea>
-                        </div>
-                        <div class="grid grid-cols-3 gap-4">
-                            <div>
-                                <label for="spell-slots" class="block text-sm font-medium text-text-secondary mb-2">Espaços de Magia</label>
-                                <input type="text" name="spell-slots" id="spell-slots" class="input-field w-full px-3 py-2" placeholder="1º: 4">
-                            </div>
-                            <div>
-                                <label for="spell-save-dc" class="block text-sm font-medium text-text-secondary mb-2">CD de Magia</label>
-                                <input type="number" name="spell-save-dc" id="spell-save-dc" class="input-field w-full px-3 py-2" placeholder="13">
-                            </div>
-                            <div>
-                                <label for="spell-attack" class="block text-sm font-medium text-text-secondary mb-2">Ataque Mágico</label>
-                                <input type="text" name="spell-attack" id="spell-attack" class="input-field w-full px-3 py-2" placeholder="+5">
-                            </div>
-                        </div>
-                    </div>
-                </section>
-
-                    </section>
-
                     <!-- Personalidade -->
                     <section class="card p-6">
-                        <h2 class="font-heading text-xl text-primary mb-4">Personalidade</h2>
+                        <h2>💬 Personalidade</h2>
                         <div class="space-y-3">
                             <div>
-                                <label for="personality-traits" class="block text-sm font-medium text-text-secondary mb-1">Traços de Personalidade</label>
+                                <label for="personality-traits" class="block text-sm mb-1" style="color:var(--cs-text-muted);">Traços de Personalidade</label>
                                 <textarea name="personality-traits" id="personality-traits" class="input-field w-full px-3 py-2 resize-none" rows="2" placeholder="Como seu personagem age?"></textarea>
                             </div>
                             <div>
-                                <label for="ideals" class="block text-sm font-medium text-text-secondary mb-1">Ideais</label>
+                                <label for="ideals" class="block text-sm mb-1" style="color:var(--cs-text-muted);">Ideais</label>
                                 <textarea name="ideals" id="ideals" class="input-field w-full px-3 py-2 resize-none" rows="2" placeholder="No que seu personagem acredita?"></textarea>
                             </div>
                             <div>
-                                <label for="bonds" class="block text-sm font-medium text-text-secondary mb-1">Vínculos</label>
+                                <label for="bonds" class="block text-sm mb-1" style="color:var(--cs-text-muted);">Vínculos</label>
                                 <textarea name="bonds" id="bonds" class="input-field w-full px-3 py-2 resize-none" rows="2" placeholder="O que é importante para seu personagem?"></textarea>
                             </div>
                             <div>
-                                <label for="flaws" class="block text-sm font-medium text-text-secondary mb-1">Defeitos</label>
+                                <label for="flaws" class="block text-sm mb-1" style="color:var(--cs-text-muted);">Defeitos</label>
                                 <textarea name="flaws" id="flaws" class="input-field w-full px-3 py-2 resize-none" rows="2" placeholder="Quais são as fraquezas do seu personagem?"></textarea>
                             </div>
                         </div>
                     </section>
                 </div>
 
-                <!-- Coluna Direita - Aparência e História -->
+                <!-- Coluna Direita -->
                 <div class="space-y-6">
+
                     <!-- Aparência -->
                     <section class="card p-6">
-                        <h2 class="font-heading text-xl text-primary mb-4">Aparência</h2>
+                        <h2>🪞 Aparência</h2>
                         <div class="grid grid-cols-2 gap-4">
                             <div>
-                                <label for="age" class="block text-sm font-medium text-text-secondary mb-1">Idade</label>
-                                <input type="text" name="age" id="age" class="input-field w-full px-3 py-2" placeholder="25">
+                                <label for="age" class="block text-sm mb-1" style="color:var(--cs-text-muted);">Idade</label>
+                                <input type="text" name="age" id="age" class="input-field w-full px-3 py-2" placeholder="25" />
                             </div>
                             <div>
-                                <label for="height" class="block text-sm font-medium text-text-secondary mb-1">Altura</label>
-                                <input type="text" name="height" id="height" class="input-field w-full px-3 py-2" placeholder="1,75m">
+                                <label for="height" class="block text-sm mb-1" style="color:var(--cs-text-muted);">Altura</label>
+                                <input type="text" name="height" id="height" class="input-field w-full px-3 py-2" placeholder="1,75m" />
                             </div>
                             <div>
-                                <label for="weight" class="block text-sm font-medium text-text-secondary mb-1">Peso</label>
-                                <input type="text" name="weight" id="weight" class="input-field w-full px-3 py-2" placeholder="70kg">
+                                <label for="weight" class="block text-sm mb-1" style="color:var(--cs-text-muted);">Peso</label>
+                                <input type="text" name="weight" id="weight" class="input-field w-full px-3 py-2" placeholder="70kg" />
                             </div>
                             <div>
-                                <label for="eyes" class="block text-sm font-medium text-text-secondary mb-1">Olhos</label>
-                                <input type="text" name="eyes" id="eyes" class="input-field w-full px-3 py-2" placeholder="Azuis">
+                                <label for="eyes" class="block text-sm mb-1" style="color:var(--cs-text-muted);">Olhos</label>
+                                <input type="text" name="eyes" id="eyes" class="input-field w-full px-3 py-2" placeholder="Azuis" />
                             </div>
                             <div>
-                                <label for="skin" class="block text-sm font-medium text-text-secondary mb-1">Pele</label>
-                                <input type="text" name="skin" id="skin" class="input-field w-full px-3 py-2" placeholder="Clara">
+                                <label for="skin" class="block text-sm mb-1" style="color:var(--cs-text-muted);">Pele</label>
+                                <input type="text" name="skin" id="skin" class="input-field w-full px-3 py-2" placeholder="Clara" />
                             </div>
                             <div>
-                                <label for="hair" class="block text-sm font-medium text-text-secondary mb-1">Cabelo</label>
-                                <input type="text" name="hair" id="hair" class="input-field w-full px-3 py-2" placeholder="Castanho">
+                                <label for="hair" class="block text-sm mb-1" style="color:var(--cs-text-muted);">Cabelo</label>
+                                <input type="text" name="hair" id="hair" class="input-field w-full px-3 py-2" placeholder="Castanho" />
                             </div>
                         </div>
                         <div class="mt-4">
-                            <label for="appearance" class="block text-sm font-medium text-text-secondary mb-1">Descrição da Aparência</label>
+                            <label for="appearance" class="block text-sm mb-1" style="color:var(--cs-text-muted);">Descrição da Aparência</label>
                             <textarea name="appearance" id="appearance" class="input-field w-full px-3 py-2 resize-none" rows="4" placeholder="Descreva a aparência do seu personagem..."></textarea>
                         </div>
                     </section>
 
                     <!-- História -->
                     <section class="card p-6">
-                        <h2 class="font-heading text-xl text-primary mb-4">História do Personagem</h2>
+                        <h2>📖 História do Personagem</h2>
+                        <textarea name="backstory" id="backstory" class="input-field w-full px-3 py-2 resize-none" rows="8" placeholder="Conte a história do seu personagem..."></textarea>
+                    </section>
+
+                    <!-- Ataques e Conjuração -->
+                    <section class="card p-6">
+                        <h2>⚡ Ataques e Conjuração</h2>
                         <div class="space-y-4">
-                            <textarea name="backstory" id="backstory" class="input-field w-full px-3 py-2 resize-none" rows="8" placeholder="Conte a história do seu personagem..."></textarea>
+                            <div>
+                                <label for="attacks" class="block text-sm mb-2" style="color:var(--cs-text-muted);">Ataques</label>
+                                <textarea name="attacks" id="attacks" class="input-field w-full px-3 py-2 resize-none" rows="4" placeholder="Nome | Bônus de Ataque | Dano/Tipo"></textarea>
+                            </div>
+                            <div class="grid grid-cols-3 gap-4">
+                                <div>
+                                    <label for="spell-slots" class="block text-sm mb-1" style="color:var(--cs-text-muted);">Espaços de Magia</label>
+                                    <input type="text" name="spell-slots" id="spell-slots" class="input-field w-full px-3 py-2" placeholder="1º: 4" />
+                                </div>
+                                <div>
+                                    <label for="spell-save-dc" class="block text-sm mb-1" style="color:var(--cs-text-muted);">CD de Magia</label>
+                                    <input type="number" name="spell-save-dc" id="spell-save-dc" class="input-field w-full px-3 py-2" placeholder="13" />
+                                </div>
+                                <div>
+                                    <label for="spell-attack" class="block text-sm mb-1" style="color:var(--cs-text-muted);">Ataque Mágico</label>
+                                    <input type="text" name="spell-attack" id="spell-attack" class="input-field w-full px-3 py-2" placeholder="+5" />
+                                </div>
+                            </div>
                         </div>
                     </section>
                 </div>
             </div>
         </div>
 
-        <!-- ABA 4: RECURSOS & HABILIDADES -->
-        <div id="tab-resources" class="tab-content" style="display: none;">
+        <!-- ══════════════════════════════════════
+             ABA 4: RECURSOS & HABILIDADES
+        ══════════════════════════════════════ -->
+        <div id="tab-resources" class="tab-content" style="display:none;">
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                <!-- Coluna Esquerda - Características e Inventário -->
+
+                <!-- Coluna Esquerda -->
                 <div class="space-y-6">
+
                     <!-- Características e Habilidades -->
                     <section class="card p-6">
-                        <div class="flex justify-between items-center mb-4">
-                            <h2 class="font-heading text-xl text-primary">Características e Habilidades</h2>
+                        <div class="flex justify-between items-center mb-4" style="border-bottom:1px solid var(--cs-gold-border);padding-bottom:10px;">
+                            <h2 style="border:none;padding:0;margin:0;">✨ Características e Habilidades</h2>
                             <div class="flex gap-2">
-                                <button id="toggleLockFeatures" class="btn-icon" title="Travar/Destravar habilidades">
+                                <button id="toggleLockFeatures" class="btn-icon" title="Travar/Destravar">
                                     <span class="lock-icon">🔒</span>
                                 </button>
-                                <button id="addFeatureBtn" class="btn-primary px-4 py-2 rounded-lg font-medium">
-                                    + Adicionar Habilidade
+                                <button id="addFeatureBtn" class="btn-primary px-4 py-2" style="border-radius:8px;font-size:0.78rem;">
+                                    + Habilidade
                                 </button>
                             </div>
                         </div>
                         <div id="featuresList" class="space-y-2">
-                            <!-- Cards de habilidades serão inseridos aqui -->
-                            <p class="text-text-secondary text-center py-8">Nenhuma habilidade adicionada ainda.</p>
+                            <div class="text-center py-10" style="color:var(--cs-text-dim);font-style:italic;">
+                                <div style="font-size:2rem;margin-bottom:8px;">✨</div>
+                                Nenhuma habilidade adicionada ainda.
+                            </div>
                         </div>
                     </section>
 
-                    <!-- Inventory Management -->
+                    <!-- Inventário -->
                     <section class="card p-6">
-                        <h2 class="font-heading text-xl text-primary mb-4">Inventário</h2>
+                        <h2>🎒 Inventário</h2>
                         <div class="space-y-4">
                             <div class="flex justify-between items-center">
-                                <span class="text-sm text-text-secondary">Capacidade de Carga:</span>
+                                <span class="text-sm" style="color:var(--cs-text-muted);">Capacidade de Carga:</span>
                                 <span class="font-mono text-sm" id="carrying-capacity-2">75 kg</span>
                             </div>
                             <div class="flex justify-between items-center">
-                                <span class="text-sm text-text-secondary">Carga Atual:</span>
+                                <span class="text-sm" style="color:var(--cs-text-muted);">Carga Atual:</span>
                                 <span class="font-mono text-sm" id="current-load-2">0 kg</span>
                             </div>
-                            <div class="w-full bg-gray-200 rounded-full h-2">
-                                <div class="bg-primary h-2 rounded-full transition-all" id="load-bar-2" style="width: 0%"></div>
+                            <div class="w-full bg-gray-200" style="height:6px;border-radius:999px;overflow:hidden;">
+                                <div class="bg-primary" style="height:100%;border-radius:999px;transition:width 0.4s ease;width:0%;" id="load-bar-2"></div>
                             </div>
-                            <button onclick="openInventoryModal()" class="btn-primary w-full px-4 py-2 rounded-lg font-medium">
+                            <button onclick="openInventoryModal()" class="btn-primary w-full px-4 py-2" style="border-radius:8px;font-size:0.88rem;">
                                 Gerenciar Inventário
                             </button>
                         </div>
                     </section>
                 </div>
 
-                <!-- Coluna Direita - Tesouro e Aliados -->
+                <!-- Coluna Direita -->
                 <div class="space-y-6">
+
                     <!-- Tesouro -->
                     <section class="card p-6">
-                        <h2 class="font-heading text-xl text-primary mb-4">Tesouro</h2>
+                        <h2>💰 Tesouro</h2>
                         <div class="space-y-4">
                             <div class="grid grid-cols-5 gap-3">
                                 <div>
-                                    <label for="cp-2" class="block text-sm font-medium text-text-secondary mb-1">PC</label>
-                                    <input type="number" name="cp-2" id="cp-2" class="input-field w-full px-2 py-2 text-center" value="0" min="0">
+                                    <label for="cp-2" class="block text-xs mb-1 text-center" style="color:var(--cs-text-muted);">PC</label>
+                                    <input type="number" name="cp-2" id="cp-2" class="input-field w-full px-2 py-2 text-center" value="0" min="0" />
                                 </div>
                                 <div>
-                                    <label for="sp-2" class="block text-sm font-medium text-text-secondary mb-1">PP</label>
-                                    <input type="number" name="sp-2" id="sp-2" class="input-field w-full px-2 py-2 text-center" value="0" min="0">
+                                    <label for="sp-2" class="block text-xs mb-1 text-center" style="color:var(--cs-text-muted);">PP</label>
+                                    <input type="number" name="sp-2" id="sp-2" class="input-field w-full px-2 py-2 text-center" value="0" min="0" />
                                 </div>
                                 <div>
-                                    <label for="ep-2" class="block text-sm font-medium text-text-secondary mb-1">PE</label>
-                                    <input type="number" name="ep-2" id="ep-2" class="input-field w-full px-2 py-2 text-center" value="0" min="0">
+                                    <label for="ep-2" class="block text-xs mb-1 text-center" style="color:var(--cs-text-muted);">PE</label>
+                                    <input type="number" name="ep-2" id="ep-2" class="input-field w-full px-2 py-2 text-center" value="0" min="0" />
                                 </div>
                                 <div>
-                                    <label for="gp-2" class="block text-sm font-medium text-text-secondary mb-1">PO</label>
-                                    <input type="number" name="gp-2" id="gp-2" class="input-field w-full px-2 py-2 text-center" value="0" min="0">
+                                    <label for="gp-2" class="block text-xs mb-1 text-center" style="color:var(--cs-text-muted);">PO</label>
+                                    <input type="number" name="gp-2" id="gp-2" class="input-field w-full px-2 py-2 text-center" value="0" min="0" />
                                 </div>
                                 <div>
-                                    <label for="pp-2" class="block text-sm font-medium text-text-secondary mb-1">PL</label>
-                                    <input type="number" name="pp-2" id="pp-2" class="input-field w-full px-2 py-2 text-center" value="0" min="0">
+                                    <label for="pp-2" class="block text-xs mb-1 text-center" style="color:var(--cs-text-muted);">PL</label>
+                                    <input type="number" name="pp-2" id="pp-2" class="input-field w-full px-2 py-2 text-center" value="0" min="0" />
                                 </div>
                             </div>
                             <div>
-                                <label for="treasure-2" class="block text-sm font-medium text-text-secondary mb-2">Outros Tesouros</label>
+                                <label for="treasure-2" class="block text-sm mb-2" style="color:var(--cs-text-muted);">Outros Tesouros</label>
                                 <textarea name="treasure-2" id="treasure-2" class="input-field w-full px-3 py-2 resize-none" rows="4" placeholder="Gemas, joias, itens valiosos..."></textarea>
                             </div>
                         </div>
@@ -626,48 +576,70 @@
 
                     <!-- Aliados e Organizações -->
                     <section class="card p-6">
-                        <h2 class="font-heading text-xl text-primary mb-4">Aliados e Organizações</h2>
-                        <div class="space-y-4">
-                            <textarea name="allies-2" id="allies-2" class="input-field w-full px-3 py-2 resize-none" rows="6" placeholder="Liste aliados, contatos e organizações..."></textarea>
-                        </div>
+                        <h2>🤝 Aliados e Organizações</h2>
+                        <textarea name="allies-2" id="allies-2" class="input-field w-full px-3 py-2 resize-none" rows="6" placeholder="Liste aliados, contatos e organizações..."></textarea>
+                    </section>
+
+                    <!-- Características e Traços (texto livre) -->
+                    <section class="card p-6">
+                        <h2>📋 Características &amp; Traços</h2>
+                        <textarea name="features-traits" id="features-traits" class="input-field w-full px-3 py-2 resize-none" rows="6" placeholder="Características raciais, traços de antecedente..."></textarea>
                     </section>
                 </div>
             </div>
         </div>
 
-        <!-- Fim das Abas -->
-    </div>
+    </div><!-- /container -->
 
-    </div>
+    <!-- ══════════════════════════════════════
+         MOBILE BOTTOM NAVIGATION
+    ══════════════════════════════════════ -->
+    <nav class="cs-bottom-nav" role="navigation" aria-label="Navegação das abas">
+        <button class="cs-bottom-nav__btn active" data-tab="combat" onclick="switchTab('combat')" aria-label="Combate">
+            <span class="cs-bottom-nav__icon">⚔️</span>
+            <span class="cs-bottom-nav__label">Combate</span>
+        </button>
+        <button class="cs-bottom-nav__btn" data-tab="attributes" onclick="switchTab('attributes')" aria-label="Atributos">
+            <span class="cs-bottom-nav__icon">📊</span>
+            <span class="cs-bottom-nav__label">Atributos</span>
+        </button>
+        <button class="cs-bottom-nav__btn" data-tab="identity" onclick="switchTab('identity')" aria-label="Identidade">
+            <span class="cs-bottom-nav__icon">🎭</span>
+            <span class="cs-bottom-nav__label">Identidade</span>
+        </button>
+        <button class="cs-bottom-nav__btn" data-tab="resources" onclick="switchTab('resources')" aria-label="Recursos">
+            <span class="cs-bottom-nav__icon">🎒</span>
+            <span class="cs-bottom-nav__label">Recursos</span>
+        </button>
+    </nav>
 
-    <!-- Modal de Adicionar Ataque -->
-    <div id="attackModal" class="fixed inset-0 bg-black bg-opacity-75 z-50 hidden items-center justify-center p-4" style="display: none;">
-        <div class="bg-surface border-2 border-primary rounded-lg max-w-md w-full p-6 shadow-2xl">
-            <div class="flex justify-between items-center mb-6 border-b border-primary pb-3">
-                <h3 class="font-heading text-2xl text-primary">Adicionar Ataque</h3>
-                <button id="closeAttackModal" class="text-text-secondary hover:text-primary text-3xl leading-none">&times;</button>
+    <!-- ══════════════════════════════════════
+         MODAL: ADICIONAR ATAQUE
+    ══════════════════════════════════════ -->
+    <div id="attackModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4" style="display:none;">
+        <div style="max-width:440px;width:100%;padding:0;overflow:hidden;">
+            <div class="cs-modal__header">
+                <span class="cs-modal__title">⚔️ Adicionar Ataque</span>
+                <button id="closeAttackModal" class="cs-modal__close">&times;</button>
             </div>
-            
-            <form id="attackForm" class="space-y-4">
-                <div>
-                    <label class="block text-sm font-medium text-text-secondary mb-2">Nome do Ataque</label>
-                    <input type="text" id="attackName" class="input-field w-full px-3 py-2 border-2 border-primary rounded-lg" placeholder="Ex: Espada Longa" required>
+            <form id="attackForm" class="cs-modal__body">
+                <div class="form-group">
+                    <label>Nome do Ataque</label>
+                    <input type="text" id="attackName" class="input-field w-full" placeholder="Ex: Espada Longa" required />
                 </div>
-                
                 <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-sm font-medium text-text-secondary mb-2">Bônus de Ataque</label>
-                        <input type="text" id="attackBonus" class="input-field w-full px-3 py-2 border-2 border-primary rounded-lg text-center" placeholder="+5" required>
+                    <div class="form-group">
+                        <label>Bônus de Ataque</label>
+                        <input type="text" id="attackBonus" class="input-field w-full text-center" placeholder="+5" required />
                     </div>
-                    <div>
-                        <label class="block text-sm font-medium text-text-secondary mb-2">Dano</label>
-                        <input type="text" id="attackDamage" class="input-field w-full px-3 py-2 border-2 border-primary rounded-lg text-center" placeholder="1d8+3" required>
+                    <div class="form-group">
+                        <label>Dano</label>
+                        <input type="text" id="attackDamage" class="input-field w-full text-center" placeholder="1d8+3" required />
                     </div>
                 </div>
-                
-                <div>
-                    <label class="block text-sm font-medium text-text-secondary mb-2">Tipo de Dano</label>
-                    <select id="attackType" class="input-field w-full px-3 py-2 border-2 border-primary rounded-lg">
+                <div class="form-group">
+                    <label>Tipo de Dano</label>
+                    <select id="attackType" class="input-field w-full">
                         <option value="Cortante">Cortante</option>
                         <option value="Perfurante">Perfurante</option>
                         <option value="Contundente">Contundente</option>
@@ -682,33 +654,34 @@
                         <option value="Trovejante">Trovejante</option>
                     </select>
                 </div>
-                
-                <div class="flex gap-3 pt-4">
-                    <button type="submit" class="btn-primary flex-1 py-3 rounded-lg font-medium">Adicionar</button>
-                    <button type="button" id="cancelAttackModal" class="bg-surface border-2 border-default hover:border-primary text-text-secondary flex-1 py-3 rounded-lg font-medium transition-colors">Cancelar</button>
+                <div class="cs-modal__footer" style="margin-top:8px;padding:0;">
+                    <button type="submit" class="btn-primary flex-1 py-3" style="border-radius:8px;">Adicionar</button>
+                    <button type="button" id="cancelAttackModal" class="btn-secondary flex-1 py-3" style="border-radius:8px;">Cancelar</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- Inventory Modal -->
-    <div id="inventory-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50">
+    <!-- ══════════════════════════════════════
+         MODAL: INVENTÁRIO
+    ══════════════════════════════════════ -->
+    <div id="inventory-modal" class="fixed inset-0 hidden z-50" style="background:rgba(0,0,0,0.8);backdrop-filter:blur(6px);">
         <div class="flex items-center justify-center min-h-screen p-4">
-            <div class="bg-surface rounded-lg shadow-xl max-w-4xl w-full max-h-screen overflow-y-auto modal-enter">
+            <div style="background:rgba(18,18,28,0.97);border:1px solid var(--cs-gold-border-strong);border-radius:20px;max-width:800px;width:100%;max-height:92vh;overflow-y:auto;" class="modal-enter">
                 <div class="p-6">
                     <div class="flex justify-between items-center mb-6">
-                        <h2 class="font-heading text-2xl text-primary">Gerenciar Inventário</h2>
-                        <button onclick="closeInventoryModal()" class="text-text-secondary hover:text-primary text-2xl">&times;</button>
+                        <h2 style="font-family:var(--font-heading);font-size:1.2rem;color:var(--cs-gold);">🎒 Gerenciar Inventário</h2>
+                        <button onclick="closeInventoryModal()" style="background:none;border:1px solid var(--cs-gold-border);color:var(--cs-text-muted);width:32px;height:32px;border-radius:50%;font-size:1.2rem;cursor:pointer;display:flex;align-items:center;justify-content:center;">&times;</button>
                     </div>
-                    
-                    <!-- Add Item Section -->
-                    <div class="mb-6 p-4 bg-background rounded-lg">
-                        <h3 class="font-heading text-lg text-primary mb-4">Adicionar Item</h3>
+
+                    <!-- Add Item -->
+                    <div class="mb-6 p-4" style="background:rgba(10,10,18,0.5);border-radius:12px;border:1px solid var(--cs-gold-border);">
+                        <h3 style="font-family:var(--font-heading);color:var(--cs-gold);font-size:0.95rem;margin-bottom:16px;">Adicionar Item</h3>
                         <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                             <div>
-                                <label class="block text-sm font-medium text-text-secondary mb-1">Categoria</label>
+                                <label class="block text-sm mb-1" style="color:var(--cs-text-muted);">Categoria</label>
                                 <select id="item-category" class="input-field w-full px-3 py-2">
-                                    <option value>Selecione categoria</option>
+                                    <option value="">Selecione categoria</option>
                                     <option value="armor">Armadura</option>
                                     <option value="weapons">Armas</option>
                                     <option value="kits">Kits</option>
@@ -716,26 +689,26 @@
                                 </select>
                             </div>
                             <div>
-                                <label class="block text-sm font-medium text-text-secondary mb-1">Item</label>
+                                <label class="block text-sm mb-1" style="color:var(--cs-text-muted);">Item</label>
                                 <select id="item-select" class="input-field w-full px-3 py-2" disabled>
-                                    <option value>Selecione um item</option>
+                                    <option value="">Selecione um item</option>
                                 </select>
                             </div>
                             <div>
-                                <label class="block text-sm font-medium text-text-secondary mb-1">Quantidade</label>
+                                <label class="block text-sm mb-1" style="color:var(--cs-text-muted);">Quantidade</label>
                                 <input type="number" id="item-quantity" class="input-field w-full px-3 py-2" min="1" value="1" />
                             </div>
                             <div class="flex items-end">
-                                <button onclick="addInventoryItem()" class="btn-primary px-4 py-2 rounded-lg w-full">Adicionar</button>
+                                <button onclick="addInventoryItem()" class="btn-primary px-4 py-2 w-full" style="border-radius:8px;">Adicionar</button>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Inventory List -->
+                    <!-- Items list -->
                     <div>
-                        <h3 class="font-heading text-lg text-primary mb-4">Itens no Inventário</h3>
+                        <h3 style="font-family:var(--font-heading);color:var(--cs-gold);font-size:0.95rem;margin-bottom:16px;">Itens no Inventário</h3>
                         <div id="inventory-items" class="space-y-2">
-                            <p class="text-text-secondary text-center py-8">Nenhum item no inventário</p>
+                            <p class="text-center py-8" style="color:var(--cs-text-dim);font-style:italic;">Nenhum item no inventário</p>
                         </div>
                     </div>
                 </div>
@@ -743,74 +716,212 @@
         </div>
     </div>
 
-    <!-- Scripts -->
+    <!-- ══════════════════════════════════════
+         MODAL: CHARACTER CREATION WIZARD
+    ══════════════════════════════════════ -->
+    <div id="characterCreationModal" class="creation-modal">
+        <div class="creation-modal-content">
+            <div class="creation-header">
+                <h2>🎭 Criar Novo Personagem</h2>
+                <button class="close-creation" title="Fechar">✕</button>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-step active"><div class="step-number">1</div><span>Nome</span></div>
+                <div class="progress-step"><div class="step-number">2</div><span>Raça</span></div>
+                <div class="progress-step"><div class="step-number">3</div><span>Classe</span></div>
+                <div class="progress-step"><div class="step-number">4</div><span>Perícias</span></div>
+                <div class="progress-step"><div class="step-number">5</div><span>Atributos</span></div>
+                <div class="progress-step"><div class="step-number">6</div><span>Detalhes</span></div>
+                <div class="progress-step"><div class="step-number">7</div><span>Equip.</span></div>
+                <div class="progress-step"><div class="step-number">8</div><span>Finalizar</span></div>
+                <div class="progress-fill"></div>
+            </div>
+            <div id="creationContent" class="creation-body"></div>
+            <div class="creation-footer">
+                <button id="prevBtn" class="wizard-btn secondary-btn hidden">← Anterior</button>
+                <button id="nextBtn" class="wizard-btn primary-btn">Próximo →</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ══════════════════════════════════════
+         MODAL: ADD/EDIT FEATURE
+    ══════════════════════════════════════ -->
+    <div id="featureModal" class="feature-modal" style="display:none;">
+        <div class="feature-modal-content">
+            <div class="feature-modal-header">
+                <h2>Adicionar Habilidade</h2>
+                <button id="closeFeatureModal" class="close-feature-modal">&times;</button>
+            </div>
+            <form id="featureForm" class="feature-form">
+                <div class="form-group">
+                    <label for="featureName">Nome da Habilidade</label>
+                    <input type="text" id="featureName" class="input-field w-full" placeholder="Ex: Visão no Escuro" required />
+                </div>
+                <div class="form-group">
+                    <label for="featureType">Tipo da Habilidade</label>
+                    <select id="featureType" class="input-field w-full" required>
+                        <option value="">Selecione o tipo</option>
+                        <option value="class">Habilidade de Classe</option>
+                        <option value="feat">Talento (Feat)</option>
+                        <option value="racial">Habilidade Racial</option>
+                        <option value="background">Habilidade de Background</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="featureSource">Detalhe do Tipo</label>
+                    <input type="text" id="featureSource" class="input-field w-full" placeholder="Ex: Elfo, Guerreiro, Nível 3" />
+                </div>
+                <div class="form-group">
+                    <label for="featureDescription">Descrição</label>
+                    <textarea id="featureDescription" class="input-field w-full" rows="5" placeholder="O que esta habilidade faz?"></textarea>
+                </div>
+                <div class="feature-modal-footer">
+                    <button type="button" id="cancelFeatureBtn" class="wizard-btn secondary-btn">Cancelar</button>
+                    <button type="submit" class="wizard-btn primary-btn">Adicionar Habilidade</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ══════════════════════════════════════
+         MODAL: EDIT ATTRIBUTE
+    ══════════════════════════════════════ -->
+    <div id="editAttrModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.82);z-index:9999;align-items:center;justify-content:center;backdrop-filter:blur(6px);">
+        <div style="background:rgba(18,18,28,0.97);border:1px solid var(--cs-gold-border-strong);border-radius:20px;width:min(360px,90vw);overflow:hidden;box-shadow:0 30px 80px rgba(0,0,0,0.7),var(--glow-gold-subtle);animation:cs-slideup 0.26s cubic-bezier(0.34,1.56,0.64,1) both;">
+            <div style="padding:18px 22px 14px;border-bottom:1px solid var(--cs-gold-border);display:flex;justify-content:space-between;align-items:center;background:linear-gradient(180deg,rgba(212,175,55,0.1),transparent);">
+                <span id="editAttrTitle" style="font-family:var(--font-heading);color:var(--cs-gold);font-size:0.95rem;letter-spacing:0.04em;">✏️ Editar Atributo</span>
+                <button onclick="closeEditAttrModal()" style="background:none;border:1px solid var(--cs-gold-border);color:var(--cs-text-muted);width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:1.1rem;display:flex;align-items:center;justify-content:center;" aria-label="Fechar">×</button>
+            </div>
+            <div style="padding:24px 22px;">
+                <label style="display:block;font-size:0.65rem;font-weight:bold;margin-bottom:10px;color:var(--cs-text-muted);text-transform:uppercase;letter-spacing:0.1em;">Valor (1–30)</label>
+                <input type="number" id="editAttrInput" min="1" max="30"
+                    style="width:100%;background:rgba(10,10,18,0.7);border:1px solid var(--cs-gold-border);border-radius:10px;padding:14px;color:var(--cs-text);font-family:var(--font-heading);font-size:1.6rem;text-align:center;outline:none;transition:border-color 0.2s,box-shadow 0.2s;" />
+                <div style="font-size:0.75rem;color:var(--cs-text-muted);margin-top:12px;text-align:center;">
+                    Modificador: <strong id="editAttrMod" style="color:var(--cs-gold);font-size:0.95rem;">+0</strong>
+                </div>
+            </div>
+            <div style="padding:14px 22px;border-top:1px solid var(--cs-gold-border);display:flex;justify-content:flex-end;gap:10px;background:rgba(0,0,0,0.2);">
+                <button onclick="closeEditAttrModal()" style="padding:8px 18px;border:1px solid var(--cs-gold-border);border-radius:8px;background:transparent;color:var(--cs-text-muted);cursor:pointer;font-family:var(--font-heading);font-size:0.82rem;">Cancelar</button>
+                <button onclick="confirmEditAttr()" style="padding:8px 22px;background:linear-gradient(135deg,var(--cs-gold),var(--cs-gold-dark));border:none;border-radius:8px;color:#0a0a0a;font-weight:700;cursor:pointer;font-family:var(--font-heading);font-size:0.82rem;">Salvar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ══════════════════════════════════════
+         SCRIPTS
+    ══════════════════════════════════════ -->
     <script>
-        // Tab Switching System
+        // ── Tab Switching ──
         function switchTab(tabName) {
-            // Hide all tab contents
-            const tabContents = document.querySelectorAll('.tab-content');
-            tabContents.forEach(content => {
-                content.style.display = 'none';
-                content.classList.remove('active');
+            document.querySelectorAll('.tab-content').forEach(el => {
+                el.style.display = 'none';
+                el.classList.remove('active');
             });
-            
-            // Remove active class from all tab buttons
-            const tabButtons = document.querySelectorAll('.tab-btn');
-            tabButtons.forEach(btn => {
-                btn.classList.remove('active');
-            });
-            
-            // Show selected tab content
-            const selectedTab = document.getElementById(`tab-${tabName}`);
-            if (selectedTab) {
-                selectedTab.style.display = 'block';
-                selectedTab.classList.add('active');
+
+            // Desktop tabs
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+
+            // Mobile bottom nav
+            document.querySelectorAll('.cs-bottom-nav__btn').forEach(btn => btn.classList.remove('active'));
+
+            const tab = document.getElementById(`tab-${tabName}`);
+            if (tab) {
+                tab.style.display = 'block';
+                tab.classList.add('active');
+                // Retrigger animation
+                tab.style.animation = 'none';
+                tab.offsetHeight; // reflow
+                tab.style.animation = '';
             }
-            
-            // Add active class to selected button
-            const selectedButton = document.querySelector(`[data-tab="${tabName}"]`);
-            if (selectedButton) {
-                selectedButton.classList.add('active');
-            }
+
+            document.querySelectorAll(`[data-tab="${tabName}"]`).forEach(el => el.classList.add('active'));
         }
-        
-        // Attribute Editor - Modal simples para editar atributos
+
+        // ── HP Bar Update ──
+        function updateHpBar() {
+            const current = parseInt(document.getElementById('currenthp')?.value) || 0;
+            const max = parseInt(document.getElementById('maxhp')?.value) || 1;
+            const ratio = Math.max(0, Math.min(1, current / max));
+            const bar = document.getElementById('hp-bar-visual');
+            if (!bar) return;
+            bar.style.width = (ratio * 100) + '%';
+            bar.className = 'hp-bar';
+            if (ratio <= 0.25) bar.classList.add('danger');
+            else if (ratio <= 0.5) bar.classList.add('warning');
+        }
+
+        document.getElementById('currenthp')?.addEventListener('input', updateHpBar);
+        document.getElementById('maxhp')?.addEventListener('input', updateHpBar);
+
+        // ── Edit Attribute Modal ──
+        let _currentEditAttr = null;
+
         function editAttribute(attrName) {
             const valueElement = document.getElementById(`${attrName}-value`);
             if (!valueElement) return;
-            
+            _currentEditAttr = attrName;
             const currentValue = parseInt(valueElement.textContent) || 10;
-            const newValue = prompt(`Digite o novo valor para ${attrName.toUpperCase()}:`, currentValue);
-            
-            if (newValue !== null && !isNaN(newValue)) {
-                const parsedValue = parseInt(newValue);
-                if (parsedValue >= 1 && parsedValue <= 30) {
-                    valueElement.textContent = parsedValue;
-                    
-                    // Calcular modificador
-                    const modifier = Math.floor((parsedValue - 10) / 2);
-                    const modifierElement = document.getElementById(`${attrName}-modifier`);
-                    if (modifierElement) {
-                        modifierElement.textContent = modifier >= 0 ? `+${modifier}` : `${modifier}`;
-                    }
-                    
-                    // Recalcular tudo
-                    if (window.characterSheet) {
-                        window.characterSheet.calculateAll();
-                    }
-                } else {
-                    alert('Valor deve estar entre 1 e 30');
-                }
-            }
+            const labels = {
+                forca:'FORÇA', destreza:'DESTREZA', constituicao:'CONSTITUIÇÃO',
+                inteligencia:'INTELIGÊNCIA', sabedoria:'SABEDORIA', carisma:'CARISMA'
+            };
+            document.getElementById('editAttrTitle').textContent = `✏️ ${labels[attrName] || attrName.toUpperCase()}`;
+            const inputEl = document.getElementById('editAttrInput');
+            inputEl.value = currentValue;
+            inputEl.style.borderColor = 'var(--cs-gold-border)';
+            inputEl.style.boxShadow = 'none';
+            const updateMod = v => {
+                const calc = Math.floor(((parseInt(v) || 10) - 10) / 2);
+                document.getElementById('editAttrMod').textContent = calc >= 0 ? `+${calc}` : `${calc}`;
+            };
+            updateMod(currentValue);
+            inputEl.oninput = () => updateMod(inputEl.value);
+            const modal = document.getElementById('editAttrModal');
+            modal.style.display = 'flex';
+            setTimeout(() => { inputEl.focus(); inputEl.select(); }, 60);
         }
-        
-        // Initialize first tab on page load
+
+        function closeEditAttrModal() {
+            document.getElementById('editAttrModal').style.display = 'none';
+            _currentEditAttr = null;
+        }
+
+        function confirmEditAttr() {
+            if (!_currentEditAttr) return;
+            const inputEl = document.getElementById('editAttrInput');
+            const parsedValue = parseInt(inputEl.value);
+            if (isNaN(parsedValue) || parsedValue < 1 || parsedValue > 30) {
+                inputEl.style.borderColor = 'var(--cs-danger)';
+                inputEl.style.boxShadow = '0 0 0 3px var(--cs-danger-muted)';
+                inputEl.focus();
+                return;
+            }
+            const valueElement = document.getElementById(`${_currentEditAttr}-value`);
+            if (valueElement) {
+                valueElement.textContent = parsedValue;
+                const modifier = Math.floor((parsedValue - 10) / 2);
+                const modEl = document.getElementById(`${_currentEditAttr}-modifier`);
+                if (modEl) modEl.textContent = modifier >= 0 ? `+${modifier}` : `${modifier}`;
+                if (window.characterSheet) window.characterSheet.calculateAll();
+            }
+            closeEditAttrModal();
+        }
+
+        document.addEventListener('click', e => { if (e.target.id === 'editAttrModal') closeEditAttrModal(); });
+        document.addEventListener('keydown', e => {
+            if (e.key === 'Escape') closeEditAttrModal();
+            if (e.key === 'Enter' && _currentEditAttr) confirmEditAttr();
+        });
+
+        // ── Initialize ──
         document.addEventListener('DOMContentLoaded', () => {
             switchTab('combat');
+            updateHpBar();
             initializeAttackModal();
         });
 
-        // Sistema de Ataques
+        // ── Attack Modal System ──
         function initializeAttackModal() {
             const modal = document.getElementById('attackModal');
             const addBtn = document.getElementById('addAttackBtn');
@@ -818,86 +929,53 @@
             const cancelBtn = document.getElementById('cancelAttackModal');
             const form = document.getElementById('attackForm');
             const attacksList = document.getElementById('attacksList');
-            
-            // Verificar se todos os elementos existem
-            if (!modal || !addBtn || !closeBtn || !cancelBtn || !form || !attacksList) {
-                console.error('❌ Elementos do modal não encontrados:', {
-                    modal: !!modal,
-                    addBtn: !!addBtn,
-                    closeBtn: !!closeBtn,
-                    cancelBtn: !!cancelBtn,
-                    form: !!form,
-                    attacksList: !!attacksList
-                });
-                return;
-            }
-            
-            console.log('✅ Modal de ataques inicializado');
-            
+
+            if (!modal || !addBtn || !form || !attacksList) return;
+
             let attacks = [];
-            
-            // Abrir modal
-            addBtn.addEventListener('click', () => {
-                modal.style.display = 'flex';
-            });
-            
-            // Fechar modal
-            const closeModal = () => {
-                modal.style.display = 'none';
-            };
-            
-            closeBtn.addEventListener('click', closeModal);
-            cancelBtn.addEventListener('click', closeModal);
-            modal.addEventListener('click', (e) => {
-                if (e.target === modal) closeModal();
-            });
-            
-            // Adicionar ataque
-            form.addEventListener('submit', (e) => {
+
+            const openModal  = () => { modal.style.display = 'flex'; };
+            const closeModal = () => { modal.style.display = 'none'; form.reset(); };
+
+            addBtn.addEventListener('click', openModal);
+            closeBtn?.addEventListener('click', closeModal);
+            cancelBtn?.addEventListener('click', closeModal);
+            modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
+
+            form.addEventListener('submit', e => {
                 e.preventDefault();
-                
                 const attack = {
                     id: Date.now(),
-                    name: document.getElementById('attackName').value,
-                    bonus: document.getElementById('attackBonus').value,
+                    name:   document.getElementById('attackName').value,
+                    bonus:  document.getElementById('attackBonus').value,
                     damage: document.getElementById('attackDamage').value,
-                    type: document.getElementById('attackType').value
+                    type:   document.getElementById('attackType').value
                 };
-                
                 attacks.push(attack);
                 renderAttacks();
                 closeModal();
             });
-            
-            // Renderizar lista de ataques
+
             function renderAttacks() {
                 if (attacks.length === 0) {
                     attacksList.innerHTML = `
-                        <div class="text-center text-text-secondary py-12 italic">
+                        <div class="text-center py-12" style="color:var(--cs-text-dim);font-style:italic;">
+                            <div style="font-size:2rem;margin-bottom:8px;">⚔️</div>
                             Nenhum ataque cadastrado.<br>
-                            <span class="text-xs">Clique no botão + para adicionar</span>
-                        </div>
-                    `;
+                            <span style="font-size:0.78rem;">Toque em + para adicionar</span>
+                        </div>`;
                     return;
                 }
-                
-                attacksList.innerHTML = attacks.map(attack => `
-                    <div class="grid grid-cols-12 gap-2 items-center bg-surface border border-default hover:border-primary rounded-lg p-3 transition-colors group">
-                        <div class="col-span-4 font-medium text-primary">${attack.name}</div>
-                        <div class="col-span-3 text-center text-lg font-bold text-primary">${attack.bonus}</div>
-                        <div class="col-span-4 text-center">
-                            <span class="text-lg font-bold text-primary">${attack.damage}</span>
-                            <span class="text-xs text-text-secondary ml-1">${attack.type}</span>
-                        </div>
-                        <div class="col-span-1 text-right">
-                            <button onclick="deleteAttack(${attack.id})" class="text-text-secondary hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity">✕</button>
-                        </div>
-                    </div>
-                `).join('');
+                attacksList.innerHTML = attacks.map(a => `
+                    <div class="attack-row">
+                        <div class="attack-row__name">${a.name}</div>
+                        <div class="attack-row__bonus">${a.bonus}</div>
+                        <div class="attack-row__damage">${a.damage} <span style="font-size:0.7rem;opacity:0.7;">${a.type}</span></div>
+                        <button onclick="deleteAttack(${a.id})" class="attack-row__delete" title="Remover">✕</button>
+                    </div>`).join('');
             }
-            
-            // Deletar ataque
-            window.deleteAttack = (id) => {
+
+            window.deleteAttack = id => {
                 if (confirm('Deseja remover este ataque?')) {
                     attacks = attacks.filter(a => a.id !== id);
                     renderAttacks();
@@ -906,116 +984,9 @@
         }
     </script>
 
-    <!-- Modal: Character Creation Wizard -->
-    <div id="characterCreationModal" class="creation-modal">
-        <div class="creation-modal-content">
-            <div class="creation-header">
-                <h2>🎭 Criar Novo Personagem</h2>
-                <button class="close-creation" title="Fechar">✕</button>
-            </div>
-
-            <div class="progress-bar">
-                <div class="progress-step active">
-                    <div class="step-number">1</div>
-                    <span>Nome</span>
-                </div>
-                <div class="progress-step">
-                    <div class="step-number">2</div>
-                    <span>Raça</span>
-                </div>
-                <div class="progress-step">
-                    <div class="step-number">3</div>
-                    <span>Classe</span>
-                </div>
-                <div class="progress-step">
-                    <div class="step-number">4</div>
-                    <span>Perícias</span>
-                </div>
-                <div class="progress-step">
-                    <div class="step-number">5</div>
-                    <span>Atributos</span>
-                </div>
-                <div class="progress-step">
-                    <div class="step-number">6</div>
-                    <span>Detalhes</span>
-                </div>
-                <div class="progress-step">
-                    <div class="step-number">7</div>
-                    <span>Equipamento</span>
-                </div>
-                <div class="progress-step">
-                    <div class="step-number">8</div>
-                    <span>Finalizar</span>
-                </div>
-                <div class="progress-fill"></div>
-            </div>
-
-            <div id="creationContent" class="creation-body"></div>
-
-            <div class="creation-footer">
-                <button id="prevBtn" class="wizard-btn secondary-btn hidden">← Anterior</button>
-                <button id="nextBtn" class="wizard-btn primary-btn">Próximo →</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal: Add/Edit Feature -->
-    <div id="featureModal" class="feature-modal" style="display: none;">
-        <div class="feature-modal-content">
-            <div class="feature-modal-header">
-                <h2>Adicionar Habilidade</h2>
-                <button id="closeFeatureModal" class="close-feature-modal">&times;</button>
-            </div>
-
-            <form id="featureForm" class="feature-form">
-                <!-- Nome da Habilidade -->
-                <div class="form-group">
-                    <label for="featureName">Nome da Habilidade</label>
-                    <input type="text" id="featureName" placeholder="Ex: Visão no Escuro" required>
-                </div>
-
-                <!-- Tipo da Habilidade -->
-                <div class="form-group">
-                    <label for="featureType">Tipo da Habilidade</label>
-                    <select id="featureType" required>
-                        <option value="">Selecione o tipo</option>
-                        <option value="class">Habilidade de Classe</option>
-                        <option value="feat">Talento (Feat)</option>
-                        <option value="racial">Habilidade Racial</option>
-                        <option value="background">Habilidade de Background</option>
-                    </select>
-                </div>
-
-                <!-- Detalhe do Tipo -->
-                <div class="form-group">
-                    <label for="featureSource">Detalhe do Tipo</label>
-                    <input type="text" id="featureSource" placeholder="Ex: Elfo, Guerreiro, Nível 3">
-                </div>
-
-                <!-- Descrição -->
-                <div class="form-group">
-                    <label for="featureDescription">Descrição</label>
-                    <textarea id="featureDescription" rows="5" placeholder="O que esta habilidade faz?"></textarea>
-                </div>
-
-                <!-- Botões -->
-                <div class="feature-modal-footer">
-                    <button type="button" id="cancelFeatureBtn" class="wizard-btn secondary-btn">
-                        Cancelar
-                    </button>
-                    <button type="submit" class="wizard-btn primary-btn">
-                        Adicionar Habilidade
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
-
     <script type="module">
-        // Importar e expor Dice3DRoller globalmente
         import { Dice3DRoller } from './js/dice3d.js?v=3.1';
         window.Dice3DRoller = Dice3DRoller;
-        console.log('✅ Dice3DRoller v3.1 carregado');
     </script>
     <script type="module" src="js/features-manager.js"></script>
     <script type="module" src="js/character-sheet.js?v=3.1"></script>

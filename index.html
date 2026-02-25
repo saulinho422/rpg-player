@@ -3,25 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="RPG Player — Sistema de Fichas D&D 5E. Gerencie personagens, mesas e aventuras épicas.">
     <title>RPG Player - Carregando...</title>
-    
+
     <!-- Favicons -->
     <link rel="apple-touch-icon" sizes="180x180" href="img/apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="32x32" href="img/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="img/favicon-16x16.png">
     <link rel="manifest" href="img/site.webmanifest">
     <link rel="shortcut icon" href="img/favicon.ico">
-    
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Cinzel+Decorative:wght@400;700;900&display=swap" rel="stylesheet">
-    
+
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
             font-family: 'Cinzel', serif;
@@ -31,14 +28,10 @@
             overflow: hidden;
         }
 
-        /* Overlay escuro sobre o fundo */
         body::before {
             content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
             background: rgba(10, 10, 20, 0.85);
             z-index: 1;
         }
@@ -61,152 +54,98 @@
         }
 
         .logo-icon {
-            width: 120px;
-            height: 120px;
+            width: 120px; height: 120px;
             margin: 0 auto 20px;
             animation: float 3s ease-in-out infinite;
         }
 
         .logo-icon img {
-            width: 100%;
-            height: 100%;
+            width: 100%; height: 100%;
             filter: drop-shadow(0 0 20px rgba(212, 175, 55, 0.8));
         }
 
         .logo-title {
             font-family: 'Cinzel Decorative', serif;
-            font-size: 48px;
-            font-weight: 900;
+            font-size: 48px; font-weight: 900;
             color: #d4af37;
-            text-shadow: 
-                0 0 30px rgba(212, 175, 55, 0.8),
-                0 4px 15px rgba(0, 0, 0, 0.9);
-            letter-spacing: 4px;
-            margin-bottom: 10px;
+            text-shadow: 0 0 30px rgba(212, 175, 55, 0.8), 0 4px 15px rgba(0, 0, 0, 0.9);
+            letter-spacing: 4px; margin-bottom: 10px;
         }
 
         .logo-subtitle {
             font-size: 18px;
             color: rgba(232, 220, 198, 0.8);
-            letter-spacing: 2px;
-            text-transform: uppercase;
+            letter-spacing: 2px; text-transform: uppercase;
         }
 
-        .loading-section {
-            margin-top: 40px;
-        }
+        .loading-section { margin-top: 40px; }
 
         .loading-text {
-            font-size: 20px;
-            color: #d4af37;
+            font-size: 20px; color: #d4af37;
             margin-bottom: 30px;
             animation: pulse 2s ease-in-out infinite;
         }
 
         .loading-bar-container {
-            width: 300px;
-            height: 8px;
+            width: 300px; height: 8px;
             background: rgba(212, 175, 55, 0.2);
-            border-radius: 10px;
-            overflow: hidden;
+            border-radius: 10px; overflow: hidden;
             border: 2px solid rgba(212, 175, 55, 0.4);
             box-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
         }
 
         .loading-bar {
-            width: 0%;
-            height: 100%;
+            width: 0%; height: 100%;
             background: linear-gradient(90deg, #d4af37 0%, #f0c84f 50%, #d4af37 100%);
             animation: loadProgress 2s ease-out forwards;
             box-shadow: 0 0 15px rgba(212, 175, 55, 0.8);
         }
 
         .loading-spinner {
-            margin-top: 30px;
-            display: flex;
-            gap: 10px;
-            justify-content: center;
+            margin-top: 30px; display: flex; gap: 10px; justify-content: center;
         }
 
         .spinner-dot {
-            width: 12px;
-            height: 12px;
-            background: #d4af37;
-            border-radius: 50%;
+            width: 12px; height: 12px;
+            background: #d4af37; border-radius: 50%;
             animation: bounce 1.4s ease-in-out infinite;
             box-shadow: 0 0 10px rgba(212, 175, 55, 0.8);
         }
-
-        .spinner-dot:nth-child(2) {
-            animation-delay: -0.32s;
-        }
-
-        .spinner-dot:nth-child(3) {
-            animation-delay: -0.16s;
-        }
+        .spinner-dot:nth-child(2) { animation-delay: -0.32s; }
+        .spinner-dot:nth-child(3) { animation-delay: -0.16s; }
 
         @keyframes fadeInScale {
-            from {
-                opacity: 0;
-                transform: scale(0.8);
-            }
-            to {
-                opacity: 1;
-                transform: scale(1);
-            }
+            from { opacity: 0; transform: scale(0.8); }
+            to { opacity: 1; transform: scale(1); }
         }
-
         @keyframes float {
-            0%, 100% {
-                transform: translateY(0px);
-            }
-            50% {
-                transform: translateY(-15px);
-            }
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-15px); }
         }
-
         @keyframes pulse {
-            0%, 100% {
-                opacity: 1;
-            }
-            50% {
-                opacity: 0.6;
-            }
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
         }
-
         @keyframes loadProgress {
-            from {
-                width: 0%;
-            }
-            to {
-                width: 100%;
-            }
+            from { width: 0%; }
+            to { width: 100%; }
+        }
+        @keyframes bounce {
+            0%, 80%, 100% { transform: scale(0); opacity: 0.5; }
+            40% { transform: scale(1); opacity: 1; }
         }
 
-        @keyframes bounce {
-            0%, 80%, 100% {
-                transform: scale(0);
-                opacity: 0.5;
-            }
-            40% {
-                transform: scale(1);
-                opacity: 1;
+        @media (prefers-reduced-motion: reduce) {
+            *, ::before, ::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
             }
         }
 
         @media (max-width: 768px) {
-            .logo-title {
-                font-size: 32px;
-            }
-            
-            .logo-icon {
-                width: 80px;
-                height: 80px;
-            }
-            
-            .loading-bar-container {
-                width: 250px;
-            }
+            .logo-title { font-size: 32px; }
+            .logo-icon { width: 80px; height: 80px; }
+            .loading-bar-container { width: 250px; }
         }
     </style>
 </head>
@@ -232,403 +171,26 @@
             </div>
         </div>
     </div>
-    
-    <script>
-        // Redireciona para login após carregar
-        setTimeout(() => {
-            window.location.href = 'login.html';
-        }, 2500);
+
+    <!-- FIX #4 — Verificar autenticação Firebase antes de redirecionar -->
+    <script type="module">
+        import { auth } from './js/firebase-config.js'
+        import { onAuthStateChanged } from 'firebase/auth'
+
+        const minDisplayTime = new Promise(resolve => setTimeout(resolve, 1500))
+        let redirectTarget = 'login.html'
+
+        const authCheck = new Promise(resolve => {
+            const unsubscribe = onAuthStateChanged(auth, (user) => {
+                unsubscribe()
+                redirectTarget = user ? 'dashboard.html' : 'login.html'
+                resolve()
+            })
+        })
+
+        Promise.all([minDisplayTime, authCheck]).then(() => {
+            window.location.href = redirectTarget
+        })
     </script>
-</body>
-</html>
-        <div class="auth-container">
-            <!-- Título Medieval Elaborado -->
-            <div class="title-section">
-                <div class="title-ornament top">
-                    <span class="ornament-left">⚜</span>
-                    <span class="title-divider"></span>
-                    <span class="ornament-center">◊</span>
-                    <span class="title-divider"></span>
-                    <span class="ornament-right">⚜</span>
-                </div>
-                
-                <h1 class="main-title">
-                    <span class="title-word rpg">RPG</span>
-                    <span class="title-separator">✦</span>
-                    <span class="title-word player">PLAYER</span>
-                </h1>
-                
-                <div class="title-subtitle">
-                    <span class="subtitle-text">Sistema de Fichas de D&D 5E</span>
-                </div>
-                
-                <div class="title-ornament bottom">
-                    <span class="ornament-left">❖</span>
-                    <span class="title-divider-bottom"></span>
-                    <span class="ornament-center">⬟</span>
-                    <span class="title-divider-bottom"></span>
-                    <span class="ornament-right">❖</span>
-                </div>
-            </div>
-            
-            <!-- Formulário de Login -->
-            <div id="loginForm" class="form-container">
-                <h2>Entrar</h2>
-                
-                <!-- Login Social -->
-                <div class="social-login">
-                    <button type="button" id="googleLogin" class="social-btn google-btn">
-                        <svg width="20" height="20" viewBox="0 0 24 24">
-                            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-                            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-                            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-                            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-                        </svg>
-                        Entrar com Google
-                    </button>
-                </div>
-                
-                <div class="divider">
-                    <span>ou</span>
-                </div>
-                
-                <form id="login">
-                    <div class="input-group">
-                        <label for="loginEmail">Email:</label>
-                        <input type="email" id="loginEmail" required>
-                    </div>
-                    <div class="input-group">
-                        <label for="loginPassword">Senha:</label>
-                        <input type="password" id="loginPassword" required>
-                    </div>
-                    <button type="submit">Entrar</button>
-                </form>
-                <p>Não tem uma conta? <a href="#" id="showRegister">Cadastre-se</a></p>
-                <p><a href="#" id="showForgotPassword">Esqueceu a senha?</a></p>
-            </div>
-            
-            <!-- Formulário de Cadastro -->
-            <div id="registerForm" class="form-container hidden">
-                <h2>Cadastrar</h2>
-                
-                <!-- Login Social -->
-                <div class="social-login">
-                    <button type="button" id="googleRegister" class="social-btn google-btn">
-                        <svg width="20" height="20" viewBox="0 0 24 24">
-                            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-                            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-                            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-                            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-                        </svg>
-                        Cadastrar com Google
-                    </button>
-                </div>
-                
-                <div class="divider">
-                    <span>ou</span>
-                </div>
-                
-                <form id="register">
-                    <div class="input-group">
-                        <label for="registerEmail">Email:</label>
-                        <input type="email" id="registerEmail" required>
-                    </div>
-                    <div class="input-group">
-                        <label for="registerPassword">Senha:</label>
-                        <input type="password" id="registerPassword" required minlength="6">
-                    </div>
-                    <div class="input-group">
-                        <label for="confirmPassword">Confirmar Senha:</label>
-                        <input type="password" id="confirmPassword" required minlength="6">
-                    </div>
-                    <button type="submit">Cadastrar</button>
-                </form>
-                <p>Já tem uma conta? <a href="#" id="showLogin">Entrar</a></p>
-            </div>
-            
-            <!-- Formulário de Recuperação de Senha -->
-            <div id="forgotPasswordForm" class="form-container hidden">
-                <h2>Recuperar Senha</h2>
-                <form id="forgotPassword">
-                    <div class="input-group">
-                        <label for="resetEmail">Email:</label>
-                        <input type="email" id="resetEmail" required>
-                    </div>
-                    <button type="submit">Enviar Link de Recuperação</button>
-                </form>
-                <p><a href="#" id="backToLogin">Voltar ao Login</a></p>
-            </div>
-            
-            <!-- Verificação de Email -->
-            <div id="emailVerification" class="form-container hidden">
-                <h2>Verificação de Email</h2>
-                <p>Um email de verificação foi enviado para seu endereço. Por favor, verifique sua caixa de entrada e clique no link para ativar sua conta.</p>
-                <button id="resendVerification">Reenviar Email de Verificação</button>
-                <p><a href="#" id="backToLoginFromVerification">Voltar ao Login</a></p>
-            </div>
-            
-            <!-- Dashboard do Usuário -->
-            <div id="userDashboard" class="form-container hidden">
-                <h2>Bem-vindo!</h2>
-                <div id="userInfo"></div>
-                <div id="emailStatus"></div>
-                <button id="logout">Sair</button>
-            </div>
-
-            <!-- === SISTEMA DE ONBOARDING === -->
-            <!-- Barra de Progresso Medieval -->
-            <div id="onboardingProgress" class="onboarding-progress hidden">
-                <div class="progress-ornament left">⚜</div>
-                <div class="progress-track">
-                    <div class="progress-bar">
-                        <div class="progress-fill" id="progressFill"></div>
-                        <div class="progress-steps">
-                            <div class="progress-step active" data-step="1">
-                                <span class="step-icon">🖼️</span>
-                                <span class="step-label">Foto</span>
-                            </div>
-                            <div class="progress-step" data-step="2">
-                                <span class="step-icon">👤</span>
-                                <span class="step-label">Nome</span>
-                            </div>
-                            <div class="progress-step" data-step="3">
-                                <span class="step-icon">📅</span>
-                                <span class="step-label">Idade</span>
-                            </div>
-                            <div class="progress-step" data-step="4">
-                                <span class="step-icon">⚔️</span>
-                                <span class="step-label">Experiência</span>
-                            </div>
-                            <div class="progress-step" data-step="5">
-                                <span class="step-icon">👑</span>
-                                <span class="step-label">Função</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="progress-ornament right">⚜</div>
-            </div>
-
-            <!-- Etapa 1: Foto de Perfil -->
-            <div id="onboardingStep1" class="onboarding-step hidden">
-                <div class="step-header">
-                    <h2>Escolha sua Imagem de Perfil</h2>
-                    <p class="step-subtitle">Como você gostaria de ser reconhecido em suas aventuras?</p>
-                </div>
-                
-                <div class="avatar-section">
-                    <!-- Upload personalizado -->
-                    <div class="avatar-upload">
-                        <div class="avatar-preview" id="avatarPreview">
-                            <div class="avatar-placeholder">
-                                <span class="upload-icon">📸</span>
-                                <span class="upload-text">Clique para enviar sua foto</span>
-                            </div>
-                        </div>
-                        <input type="file" id="avatarInput" accept="image/*" class="hidden">
-                    </div>
-                    
-                    <!-- Ou avatares pré-definidos -->
-                    <div class="divider-section">
-                        <div class="divider">
-                            <span>ou escolha um avatar</span>
-                        </div>
-                    </div>
-                    
-                    <div class="preset-avatars">
-                        <div class="avatar-option" data-avatar="wizard">🧙‍♂️</div>
-                        <div class="avatar-option" data-avatar="warrior">⚔️</div>
-                        <div class="avatar-option" data-avatar="rogue">🗡️</div>
-                        <div class="avatar-option" data-avatar="cleric">⚡</div>
-                        <div class="avatar-option" data-avatar="ranger">🏹</div>
-                        <div class="avatar-option" data-avatar="bard">🎵</div>
-                    </div>
-                </div>
-                
-                <div class="step-navigation">
-                    <button class="btn-next" id="step1Next">
-                        <span>Seguir</span>
-                        <span class="btn-arrow">→</span>
-                    </button>
-                </div>
-            </div>
-
-            <!-- Etapa 2: Nome de Usuário -->
-            <div id="onboardingStep2" class="onboarding-step hidden">
-                <div class="step-header">
-                    <h2>Como devemos te chamar?</h2>
-                    <p class="step-subtitle">Escolha um nome que represente sua identidade no mundo dos RPGs</p>
-                </div>
-                
-                <div class="input-section">
-                    <div class="input-group medieval">
-                        <label for="userName">Nome de Usuário</label>
-                        <input type="text" id="userName" placeholder="Insira seu nome de aventureiro..." maxlength="30">
-                        <div class="input-feedback" id="nameValidation"></div>
-                    </div>
-                </div>
-                
-                <div class="step-navigation">
-                    <button class="btn-back" id="step2Back">
-                        <span class="btn-arrow">←</span>
-                        <span>Voltar</span>
-                    </button>
-                    <button class="btn-next" id="step2Next" disabled>
-                        <span>Seguir</span>
-                        <span class="btn-arrow">→</span>
-                    </button>
-                </div>
-            </div>
-
-            <!-- Etapa 3: Idade -->
-            <div id="onboardingStep3" class="onboarding-step hidden">
-                <div class="step-header">
-                    <h2>Qual é a sua idade?</h2>
-                    <p class="step-subtitle">Isso nos ajuda a personalizar sua experiência</p>
-                </div>
-                
-                <div class="age-section">
-                    <div class="age-input-group">
-                        <div class="age-display">
-                            <span class="age-number" id="ageDisplay">18</span>
-                            <span class="age-label">anos</span>
-                        </div>
-                        <div class="age-slider-container">
-                            <input type="range" id="ageSlider" min="13" max="99" value="18" class="age-slider">
-                            <div class="age-marks">
-                                <span>13</span>
-                                <span>25</span>
-                                <span>35</span>
-                                <span>50</span>
-                                <span>99</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="step-navigation">
-                    <button class="btn-back" id="step3Back">
-                        <span class="btn-arrow">←</span>
-                        <span>Voltar</span>
-                    </button>
-                    <button class="btn-next" id="step3Next">
-                        <span>Seguir</span>
-                        <span class="btn-arrow">→</span>
-                    </button>
-                </div>
-            </div>
-
-            <!-- Etapa 4: Experiência RPG -->
-            <div id="onboardingStep4" class="onboarding-step hidden">
-                <div class="step-header">
-                    <h2>Qual sua experiência com RPG?</h2>
-                    <p class="step-subtitle">Isso nos ajuda a adaptar o conteúdo para você</p>
-                </div>
-                
-                <div class="experience-options">
-                    <div class="experience-card" data-experience="beginner">
-                        <div class="card-icon">🌱</div>
-                        <h3>Iniciante</h3>
-                        <p>Estou começando minha jornada no mundo dos RPGs</p>
-                    </div>
-                    <div class="experience-card" data-experience="intermediate">
-                        <div class="card-icon">⚔️</div>
-                        <h3>Pouco Tempo</h3>
-                        <p>Já tenho alguma experiência, mas ainda estou aprendendo</p>
-                    </div>
-                    <div class="experience-card" data-experience="veteran">
-                        <div class="card-icon">🏆</div>
-                        <h3>Muito Tempo</h3>
-                        <p>Sou um veterano das mesas de RPG</p>
-                    </div>
-                </div>
-                
-                <div class="step-navigation">
-                    <button class="btn-back" id="step4Back">
-                        <span class="btn-arrow">←</span>
-                        <span>Voltar</span>
-                    </button>
-                    <button class="btn-next" id="step4Next" disabled>
-                        <span>Seguir</span>
-                        <span class="btn-arrow">→</span>
-                    </button>
-                </div>
-            </div>
-
-            <!-- Etapa 5: Função no RPG -->
-            <div id="onboardingStep5" class="onboarding-step hidden">
-                <div class="step-header">
-                    <h2>Qual sua função preferida?</h2>
-                    <p class="step-subtitle">Você pode escolher mais de uma opção</p>
-                </div>
-                
-                <div class="role-options">
-                    <div class="role-card" data-role="player">
-                        <div class="card-icon">🎭</div>
-                        <h3>Jogador</h3>
-                        <p>Gosto de interpretar personagens e viver aventuras</p>
-                        <div class="card-checkbox">
-                            <input type="checkbox" id="rolePlayer">
-                            <label for="rolePlayer"></label>
-                        </div>
-                    </div>
-                    <div class="role-card" data-role="dm">
-                        <div class="card-icon">👑</div>
-                        <h3>Mestre (DM)</h3>
-                        <p>Adoro narrar histórias e guiar outros jogadores</p>
-                        <div class="card-checkbox">
-                            <input type="checkbox" id="roleDM">
-                            <label for="roleDM"></label>
-                        </div>
-                    </div>
-                    <div class="role-card" data-role="both">
-                        <div class="card-icon">⚖️</div>
-                        <h3>Ambos</h3>
-                        <p>Gosto tanto de jogar quanto de mestrar</p>
-                        <div class="card-checkbox">
-                            <input type="checkbox" id="roleBoth">
-                            <label for="roleBoth"></label>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="step-navigation">
-                    <button class="btn-back" id="step5Back">
-                        <span class="btn-arrow">←</span>
-                        <span>Voltar</span>
-                    </button>
-                    <button class="btn-next" id="step5Next" disabled>
-                        <span>Finalizar</span>
-                        <span class="btn-arrow">✓</span>
-                    </button>
-                </div>
-            </div>
-
-            <!-- Conclusão do Onboarding -->
-            <div id="onboardingComplete" class="onboarding-step hidden">
-                <div class="completion-animation">
-                    <div class="success-icon">🎉</div>
-                    <h2>Bem-vindo ao RPG Player!</h2>
-                    <p>Seu perfil foi criado com sucesso. Você está pronto para começar suas aventuras!</p>
-                    
-                    <div class="profile-summary">
-                        <div class="summary-avatar" id="summaryAvatar"></div>
-                        <div class="summary-info">
-                            <h3 id="summaryName"></h3>
-                            <p id="summaryDetails"></p>
-                        </div>
-                    </div>
-                    
-                    <button class="btn-primary" id="enterPlatform">
-                        <span>Entrar na Plataforma</span>
-                        <span class="btn-arrow">→</span>
-                    </button>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Mensagens de Feedback -->
-        <div id="message" class="message hidden"></div>
-    </div>
 </body>
 </html>

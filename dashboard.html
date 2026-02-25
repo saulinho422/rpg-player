@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="RPG Player Dashboard — gerencie seus personagens, mesas e aventuras de D&D 5e">
     <title>RPG Player - Dashboard</title>
 
     <!-- Favicons -->
@@ -23,20 +24,25 @@
 
 <body>
     <div class="dashboard-container">
-        <!-- Header -->
+
+        <!-- ═══════════════════════════════════
+             HEADER — Sticky top
+        ═══════════════════════════════════ -->
         <header class="dashboard-header">
             <div class="header-content">
                 <div class="logo">
                     <img src="img/logo_vetorizada.png" alt="RPG Player"
-                        style="height: 50px; margin-right: 10px; vertical-align: middle;">
-                    <h1 style="display: inline-block; vertical-align: middle;">RPG Player</h1>
+                        style="height:44px;margin-right:10px;vertical-align:middle;">
+                    <h1 style="display:inline-block;vertical-align:middle;">RPG Player</h1>
                 </div>
                 <div class="user-info">
+                    <!-- FIX #8 — Avatar local em vez de via.placeholder.com -->
                     <div class="user-avatar">
-                        <img id="userAvatar" src="https://via.placeholder.com/40" alt="Avatar">
+                        <img id="userAvatar" src="img/perfil_empty_user.png" alt="Avatar do usuário"
+                            onerror="this.src='img/perfil_empty_user.png'">
                     </div>
                     <div class="user-details">
-                        <span id="userName">Jogador</span>
+                        <span id="userName">Aventureiro</span>
                     </div>
                     <button id="logoutBtn" class="logout-btn">Sair</button>
                 </div>
@@ -44,166 +50,232 @@
         </header>
 
         <div class="dashboard-main">
-            <!-- Sidebar (Desktop) -->
+
+            <!-- ═══════════════════════════════════
+                 SIDEBAR — Desktop only
+            ═══════════════════════════════════ -->
             <nav class="sidebar">
+                <div class="sidebar-section-title">Principal</div>
                 <div class="nav-menu">
                     <button class="nav-item active" data-tab="inicio">
                         <span class="nav-icon">
-                            <img src="img/logo_inicio.png" alt="Início" style="width: 24px; height: 24px;">
+                            <img src="img/logo_inicio.png" alt="Início" style="width:22px;height:22px;">
                         </span>
                         <span class="nav-text">Início</span>
                     </button>
                     <button class="nav-item" data-tab="personagens">
                         <span class="nav-icon">
-                            <img src="img/logo_personagem.png" alt="Personagens" style="width: 24px; height: 24px;">
+                            <img src="img/logo_personagem.png" alt="Personagens" style="width:22px;height:22px;">
                         </span>
                         <span class="nav-text">Personagens</span>
+                        <span class="nav-badge" id="sidebarCharBadge">…</span>
                     </button>
                     <button class="nav-item" data-tab="mesas">
                         <span class="nav-icon">
-                            <img src="img/logo_mesas.png" alt="Mesas" style="width: 24px; height: 24px;">
+                            <img src="img/logo_mesas.png" alt="Mesas" style="width:22px;height:22px;">
                         </span>
                         <span class="nav-text">Mesas</span>
+                        <span class="nav-badge" id="sidebarTableBadge">…</span>
                     </button>
+                </div>
+
+                <div class="sidebar-section-title">Ferramentas</div>
+                <div class="nav-menu">
+                    <button class="nav-item" data-tab="personagens">
+                        <span class="nav-icon">📋</span>
+                        <span class="nav-text">Fichas</span>
+                    </button>
+                    <button class="nav-item" onclick="window.location.href='roll-4d6.html'">
+                        <span class="nav-icon">🎲</span>
+                        <span class="nav-text">Rolar Dados</span>
+                    </button>
+                </div>
+
+                <div class="sidebar-footer">
+                    <div class="sidebar-user">
+                        <img class="sidebar-avatar-sm" id="sidebarAvatar" src="img/perfil_empty_user.png" alt="Avatar"
+                            onerror="this.src='img/perfil_empty_user.png'">
+                        <div>
+                            <div class="sidebar-user-name" id="sidebarUserName">Aventureiro</div>
+                            <div class="sidebar-user-level" id="sidebarUserLevel">Carregando…</div>
+                        </div>
+                    </div>
                 </div>
             </nav>
 
-            <!-- Content Area -->
+            <!-- ═══════════════════════════════════
+                 MAIN CONTENT
+            ═══════════════════════════════════ -->
             <main class="dashboard-content">
-                <!-- Tab: Início -->
+
+                <!-- ══ TAB: INÍCIO ══ -->
                 <div class="tab-content active" id="inicio-tab">
-                    <div class="content-header">
-                        <h2>Bem-vindo de volta!</h2>
-                        <p>Sua jornada épica continua...</p>
-                    </div>
 
-                    <div class="stats-grid">
-                        <div class="stat-card">
-                            <div class="stat-icon">
-                                <img src="img/logo_personagem.png" alt="Personagens" style="width: 40px; height: 40px;">
-                            </div>
-                            <div class="stat-info">
-                                <div class="stat-number">3</div>
-                                <div class="stat-label">Personagens</div>
-                            </div>
+                    <!-- Page Header -->
+                    <div class="inicio-header">
+                        <div>
+                            <div class="inicio-title">Bem-vindo de volta, <span id="userNameGreet">Aventureiro</span>!
+                                ⚔️</div>
+                            <div class="inicio-subtitle" id="lastSessionInfo">Carregando informações…</div>
                         </div>
-                        <div class="stat-card">
-                            <div class="stat-icon">
-                                <img src="img/logo_mesas.png" alt="Mesas Ativas" style="width: 40px; height: 40px;">
-                            </div>
-                            <div class="stat-info">
-                                <div class="stat-number">2</div>
-                                <div class="stat-label">Mesas Ativas</div>
-                            </div>
+                        <div class="inicio-cta">
+                            <button class="btn-secondary">📅 Agendar Sessão</button>
+                            <button class="btn-primary" id="createCharacterBtn">+ Criar</button>
                         </div>
                     </div>
 
-                    <div class="recent-activity">
-                        <h3>Atividade Recente</h3>
-                        <div class="activity-list">
-                            <div class="activity-item">
-                                <div class="activity-icon">
-                                    <img src="img/logo_vetorizada.png" alt="" style="width: 30px; height: 30px;">
-                                </div>
-                                <div class="activity-content">
-                                    <div class="activity-title">Batalha Épica Concluída</div>
-                                    <div class="activity-time">Há 2 horas</div>
-                                </div>
+                    <!-- KPI Row — preenchido dinamicamente -->
+                    <div class="kpi-row">
+                        <div class="kpi-card">
+                            <div class="kpi-icon">👥</div>
+                            <div class="kpi-value" id="kpiCharacters">—</div>
+                            <div class="kpi-label">Personagens</div>
+                            <div class="kpi-trend" id="kpiCharTrend"></div>
+                        </div>
+                        <div class="kpi-card">
+                            <div class="kpi-icon">🎲</div>
+                            <div class="kpi-value" id="kpiTables">—</div>
+                            <div class="kpi-label">Mesas Ativas</div>
+                            <div class="kpi-trend" id="kpiTableTrend"></div>
+                        </div>
+                        <div class="kpi-card">
+                            <div class="kpi-icon">⏱️</div>
+                            <div class="kpi-value" id="kpiSessions">—</div>
+                            <div class="kpi-label">Sessões</div>
+                            <div class="kpi-trend" id="kpiSessionTrend"></div>
+                        </div>
+                        <div class="kpi-card">
+                            <div class="kpi-icon">⭐</div>
+                            <div class="kpi-value" id="kpiXP">—</div>
+                            <div class="kpi-label">XP Acumulado</div>
+                            <div class="kpi-trend" id="kpiXPTrend"></div>
+                        </div>
+                    </div>
+
+                    <!-- Two-Column Layout -->
+                    <div class="inicio-grid">
+
+                        <!-- Left: My Characters -->
+                        <div class="section-card">
+                            <div class="section-header">
+                                <span class="section-title">Meus Personagens</span>
+                                <button class="btn-primary" id="createCharBtn2"
+                                    style="padding:5px 14px;font-size:0.75rem;">+ Criar Personagem</button>
                             </div>
-                            <div class="activity-item">
-                                <div class="activity-icon">👤</div>
-                                <div class="activity-content">
-                                    <div class="activity-title">Novo personagem criado: Elara</div>
-                                    <div class="activity-time">Ontem</div>
-                                </div>
-                            </div>
-                            <div class="activity-item">
-                                <div class="activity-icon">🎲</div>
-                                <div class="activity-content">
-                                    <div class="activity-title">Entrou na mesa "Dragões Antigos"</div>
-                                    <div class="activity-time">2 dias atrás</div>
+                            <div class="section-body">
+                                <div id="characters-inline">
+                                    <!-- Carregado dinamicamente por dashboard-real.js -->
+                                    <div class="loading-placeholder"
+                                        style="text-align:center;padding:30px;color:#8a8a9a;">
+                                        ⏳ Carregando personagens…
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                </div>
 
-                <!-- Tab: Personagens -->
+                        <!-- Right Column -->
+                        <div class="right-column">
+
+                            <!-- Mesa Ativa -->
+                            <div class="section-card">
+                                <div class="section-header">
+                                    <span class="section-title">Mesa Ativa</span>
+                                    <span class="mesa-status-badge" id="mesaStatusBadge"></span>
+                                </div>
+                                <div class="section-body" id="mesa-ativa-content">
+                                    <!-- Carregado dinamicamente -->
+                                    <div class="loading-placeholder"
+                                        style="text-align:center;padding:20px;color:#8a8a9a;">
+                                        ⏳ Carregando…
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Quick Actions -->
+                            <div class="section-card">
+                                <div class="section-header">
+                                    <span class="section-title">Ações Rápidas</span>
+                                </div>
+                                <div class="section-body">
+                                    <div class="quick-actions-grid">
+                                        <button class="quick-action-btn" onclick="window.location.href='roll-4d6.html'">
+                                            <span class="quick-action-icon">🎲</span>
+                                            <span>Rolar Dados</span>
+                                        </button>
+                                        <button class="quick-action-btn" id="qaNewChar">
+                                            <span class="quick-action-icon">📋</span>
+                                            <span>Nova Ficha</span>
+                                        </button>
+                                        <button class="quick-action-btn">
+                                            <span class="quick-action-icon">📅</span>
+                                            <span>Agendar Sessão</span>
+                                        </button>
+                                        <button class="quick-action-btn">
+                                            <span class="quick-action-icon">💬</span>
+                                            <span>Mensagens</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Activity Feed -->
+                            <div class="section-card">
+                                <div class="section-header">
+                                    <span class="section-title">Atividade Recente</span>
+                                </div>
+                                <div class="section-body" style="padding:8px 18px;" id="feed-activities">
+                                    <!-- Carregado dinamicamente -->
+                                    <div class="loading-placeholder"
+                                        style="text-align:center;padding:20px;color:#8a8a9a;">
+                                        ⏳ Carregando atividades…
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div><!-- /right-column -->
+                    </div><!-- /inicio-grid -->
+
+                    <!-- All Tables List -->
+                    <div class="section-card" style="margin-bottom:24px;">
+                        <div class="section-header">
+                            <span class="section-title">Minhas Mesas</span>
+                            <div style="display:flex;gap:8px;">
+                                <button class="btn-primary" style="font-size:0.75rem;padding:5px 12px;">+ Criar
+                                    Mesa</button>
+                            </div>
+                        </div>
+                        <div class="section-body" style="padding:8px 18px;" id="mesas-list-content">
+                            <!-- Carregado dinamicamente -->
+                            <div class="loading-placeholder" style="text-align:center;padding:20px;color:#8a8a9a;">
+                                ⏳ Carregando mesas…
+                            </div>
+                        </div>
+                    </div>
+
+                </div><!-- /inicio-tab -->
+
+                <!-- ══ TAB: PERSONAGENS ══ -->
                 <div class="tab-content" id="personagens-tab">
                     <div class="content-header">
                         <h2>Meus Personagens</h2>
-                        <button class="add-btn" id="createCharacterBtn">+ Criar Personagem</button>
+                        <button class="add-btn" id="createCharacterBtnPersonagens">+ Criar Personagem</button>
                     </div>
-
                     <div class="characters-grid">
-                        <!-- Os personagens serão carregados dinamicamente via JavaScript -->
+                        <!-- Carregado dinamicamente por dashboard-real.js -->
                     </div>
                 </div>
 
-                <!-- Tab: Mesas -->
+                <!-- ══ TAB: MESAS ══ -->
                 <div class="tab-content" id="mesas-tab">
                     <div class="content-header">
                         <h2>Minhas Mesas</h2>
                         <button class="add-btn">+ Criar Mesa</button>
                     </div>
-
                     <div class="tables-grid">
-                        <div class="table-card active">
-                            <div class="table-header">
-                                <div class="table-status">🟢 Ativa</div>
-                                <div class="table-players">4/6 jogadores</div>
-                            </div>
-                            <div class="table-info">
-                                <h3>A Lenda dos Dragões Antigos</h3>
-                                <div class="table-system">D&D 5e</div>
-                                <div class="table-description">
-                                    Uma épica jornada através das terras místicas em busca dos últimos dragões
-                                    ancestrais...
-                                </div>
-                            </div>
-                            <div class="table-actions">
-                                <button class="btn-secondary">Configurar</button>
-                                <button class="btn-primary">Entrar na Mesa</button>
-                            </div>
-                        </div>
-
-                        <div class="table-card">
-                            <div class="table-header">
-                                <div class="table-status">🟡 Aguardando</div>
-                                <div class="table-players">2/4 jogadores</div>
-                            </div>
-                            <div class="table-info">
-                                <h3>Mistérios de Ravenloft</h3>
-                                <div class="table-system">D&D 5e</div>
-                                <div class="table-description">
-                                    Horror gótico e mistérios sombrios aguardam os aventureiros corajosos...
-                                </div>
-                            </div>
-                            <div class="table-actions">
-                                <button class="btn-secondary">Configurar</button>
-                                <button class="btn-primary">Entrar na Mesa</button>
-                            </div>
-                        </div>
-
-                        <div class="table-card completed">
-                            <div class="table-header">
-                                <div class="table-status">✅ Concluída</div>
-                                <div class="table-players">5/5 jogadores</div>
-                            </div>
-                            <div class="table-info">
-                                <h3>A Queda do Rei Lich</h3>
-                                <div class="table-system">D&D 5e</div>
-                                <div class="table-description">
-                                    Uma campanha épica que resultou na derrota do temível Rei Lich...
-                                </div>
-                            </div>
-                            <div class="table-actions">
-                                <button class="btn-secondary">Ver Histórico</button>
-                                <button class="btn-secondary">Exportar</button>
-                            </div>
-                        </div>
+                        <!-- Carregado dinamicamente por dashboard-real.js -->
                     </div>
                 </div>
+
             </main>
         </div>
 
@@ -221,6 +293,10 @@
                 <span class="nav-icon">🎲</span>
                 <span class="nav-text">Mesas</span>
             </button>
+            <button class="nav-item" onclick="window.location.href='roll-4d6.html'">
+                <span class="nav-icon">⚔️</span>
+                <span class="nav-text">Dados</span>
+            </button>
         </nav>
     </div>
 
@@ -230,82 +306,19 @@
     <script type="module" src="js/dashboard.js?v=3"></script>
 
     <script>
-        // Adiciona evento ao botão de criar personagem
         document.addEventListener('DOMContentLoaded', function () {
-            const createBtn = document.getElementById('createCharacterBtn');
-            if (createBtn) {
-                createBtn.addEventListener('click', function (e) {
-                    e.preventDefault();
+            // Criar personagem — todos os botões
+            const charBtns = [
+                'createCharacterBtn', 'createCharBtn2', 'createCharacterBtnPersonagens',
+                'qaNewChar', 'emptyNewCharBtn'
+            ];
+            charBtns.forEach(id => {
+                const btn = document.getElementById(id);
+                if (btn) btn.addEventListener('click', () => {
                     window.location.href = 'character-sheet.html?new=true';
                 });
-            }
+            });
         });
-
-        // Função para mostrar notificações
-        function showNotification(message, type = 'info') {
-            // Remove notificação anterior se existir
-            const existingNotification = document.querySelector('.notification-toast');
-            if (existingNotification) {
-                existingNotification.remove();
-            }
-
-            // Cria nova notificação
-            const notification = document.createElement('div');
-            notification.className = `notification-toast ${type}`;
-            notification.textContent = message;
-
-            // Estilos inline
-            notification.style.cssText = `
-                position: fixed;
-                top: 20px;
-                right: 20px;
-                padding: 15px 25px;
-                background: linear-gradient(135deg, #3498db, #2980b9);
-                color: white;
-                border-radius: 10px;
-                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-                z-index: 10000;
-                font-family: 'Cinzel', serif;
-                font-size: 14px;
-                animation: slideInRight 0.3s ease-out;
-                max-width: 300px;
-            `;
-
-            document.body.appendChild(notification);
-
-            // Remove após 3 segundos
-            setTimeout(() => {
-                notification.style.animation = 'slideOutRight 0.3s ease-out';
-                setTimeout(() => notification.remove(), 300);
-            }, 3000);
-        }
-
-        // Adiciona animações CSS
-        const style = document.createElement('style');
-        style.textContent = `
-            @keyframes slideInRight {
-                from {
-                    transform: translateX(400px);
-                    opacity: 0;
-                }
-                to {
-                    transform: translateX(0);
-                    opacity: 1;
-                }
-            }
-            
-            @keyframes slideOutRight {
-                from {
-                    transform: translateX(0);
-                    opacity: 1;
-                }
-                to {
-                    transform: translateX(400px);
-                    opacity: 0;
-                }
-            }
-        `;
-        document.head.appendChild(style);
     </script>
 </body>
 

@@ -1190,8 +1190,8 @@ h1, h2, h3, h4, h5, h6 {
   /* Forest green */
   --color-warning: #ffcc00;
   /* Dourado warning */
-  --color-error: #d4af37;
-  /* Dourado error */
+  --color-error: #e74c3c;
+  /* Vermelho error (FIX #14) */
   /* Shadow and Border */
   --shadow-subtle: 0 2px 4px rgba(212, 175, 55, 0.3);
   --border-color: rgba(212, 175, 55, 0.5);

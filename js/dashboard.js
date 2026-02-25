@@ -7,7 +7,7 @@ import { checkAuth } from './auth.js'
 
 // Previne múltiplas inicializações
 if (window.dashboardInitialized) {
-    console.warn('⚠️ Dashboard já foi inicializado, ignorando nova inicialização');
+    // already running, skip
 } else {
     window.dashboardInitialized = true;
 
@@ -16,66 +16,37 @@ if (window.dashboardInitialized) {
     // =====================================
 
     function initTabNavigation() {
-        // Navitens do sidebar (desktop)
-        const sidebarNavItems = document.querySelectorAll('.sidebar .nav-item')
-        // Navitens do bottom nav (mobile)
-        const bottomNavItems = document.querySelectorAll('.bottom-nav .nav-item')
-        // Conteúdos das abas
-        const tabContents = document.querySelectorAll('.tab-content')
+        const sidebarNavItems = document.querySelectorAll('.sidebar .nav-item[data-tab]')
+        const bottomNavItems  = document.querySelectorAll('.bottom-nav .nav-item[data-tab]')
+        const tabContents     = document.querySelectorAll('.tab-content')
 
-        // Função para mudar de aba
         function switchTab(tabName) {
-            // Remove active de todas as nav-items (sidebar e bottom-nav)
             sidebarNavItems.forEach(item => item.classList.remove('active'))
             bottomNavItems.forEach(item => item.classList.remove('active'))
-
-            // Remove active de todos os conteúdos
             tabContents.forEach(content => content.classList.remove('active'))
 
-            // Ativa a aba específica em ambas as navegações
             sidebarNavItems.forEach(item => {
-                if (item.dataset.tab === tabName) {
-                    item.classList.add('active')
-                }
+                if (item.dataset.tab === tabName) item.classList.add('active')
             })
-
             bottomNavItems.forEach(item => {
-                if (item.dataset.tab === tabName) {
-                    item.classList.add('active')
-                }
+                if (item.dataset.tab === tabName) item.classList.add('active')
             })
 
-            // Ativa o conteúdo correspondente
             const targetContent = document.getElementById(`${tabName}-tab`)
-            if (targetContent) {
-                targetContent.classList.add('active')
-            }
+            if (targetContent) targetContent.classList.add('active')
 
-            // Salva a aba ativa no localStorage
             localStorage.setItem('activeTab', tabName)
         }
 
-        // Event listeners para sidebar
         sidebarNavItems.forEach(item => {
-            item.addEventListener('click', () => {
-                const tabName = item.dataset.tab
-                switchTab(tabName)
-            })
+            item.addEventListener('click', () => switchTab(item.dataset.tab))
         })
-
-        // Event listeners para bottom nav
         bottomNavItems.forEach(item => {
-            item.addEventListener('click', () => {
-                const tabName = item.dataset.tab
-                switchTab(tabName)
-            })
+            item.addEventListener('click', () => switchTab(item.dataset.tab))
         })
 
-        // Restaura a aba ativa do localStorage
         const savedTab = localStorage.getItem('activeTab')
-        if (savedTab) {
-            switchTab(savedTab)
-        }
+        if (savedTab) switchTab(savedTab)
     }
 
     // =====================================
@@ -83,21 +54,33 @@ if (window.dashboardInitialized) {
     // =====================================
 
     function loadUserInfo() {
-        // Simula carregamento das informações do usuário
-        const userAvatar = document.getElementById('userAvatar')
-        const userName = document.getElementById('userName')
-        const userLevel = document.getElementById('userLevel')
+        const userAvatar   = document.getElementById('userAvatar')
+        const userName     = document.getElementById('userName')
+        const userNameGreet = document.getElementById('userNameGreet')
 
-        // Dados simulados (em um app real, viriam do backend)
         const userData = {
-            name: localStorage.getItem('userName') || 'Aventureiro',
-            level: localStorage.getItem('userLevel') || 'Nível 1',
-            avatar: localStorage.getItem('userAvatar') || 'https://via.placeholder.com/40'
+            name:   localStorage.getItem('userName')  || 'Aventureiro',
+            avatar: localStorage.getItem('userAvatar') || ''
         }
 
-        if (userName) userName.textContent = userData.name
-        if (userLevel) userLevel.textContent = userData.level
-        if (userAvatar) userAvatar.src = userData.avatar
+        if (userName)      userName.textContent = userData.name
+        if (userNameGreet) userNameGreet.textContent = userData.name
+
+        // FIX #8 — usar avatar local como fallback
+        const avatarSrc = userData.avatar || 'img/perfil_empty_user.png'
+        if (userAvatar) {
+            userAvatar.src = avatarSrc
+            userAvatar.onerror = () => { userAvatar.src = 'img/perfil_empty_user.png' }
+        }
+
+        // Sincronizar sidebar
+        const sidebarAvatar   = document.getElementById('sidebarAvatar')
+        const sidebarUserName = document.getElementById('sidebarUserName')
+        if (sidebarAvatar) {
+            sidebarAvatar.src = avatarSrc
+            sidebarAvatar.onerror = () => { sidebarAvatar.src = 'img/perfil_empty_user.png' }
+        }
+        if (sidebarUserName) sidebarUserName.textContent = userData.name
     }
 
     // =====================================
@@ -105,108 +88,14 @@ if (window.dashboardInitialized) {
     // =====================================
 
     function initCardActions() {
-        // Botões de personagens
-        const characterBtns = document.querySelectorAll('.character-card .btn-primary')
-        characterBtns.forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                const characterCard = e.target.closest('.character-card')
-                const characterName = characterCard.querySelector('h3').textContent
-                showMessage(`Entrando em jogo com ${characterName}...`, 'info')
-            })
-        })
-
-        // Botões de mesas
         const tableBtns = document.querySelectorAll('.table-card .btn-primary')
         tableBtns.forEach(btn => {
             btn.addEventListener('click', (e) => {
                 const tableCard = e.target.closest('.table-card')
-                const tableName = tableCard.querySelector('h3').textContent
+                const tableName = tableCard?.querySelector('h3')?.textContent || 'mesa'
                 showMessage(`Conectando à mesa "${tableName}"...`, 'info')
             })
         })
-
-        // Botões de adicionar
-        const addBtns = document.querySelectorAll('.add-btn')
-        addBtns.forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                const contentHeader = e.target.closest('.content-header')
-                const sectionTitle = contentHeader.querySelector('h2').textContent
-
-                if (sectionTitle.includes('Personagens')) {
-                    showMessage('Abrindo criador de personagens...', 'info')
-                    // Aqui redirecionaria para a página de criação de personagem
-                } else if (sectionTitle.includes('Mesas')) {
-                    showMessage('Abrindo criador de mesas...', 'info')
-                    // Aqui redirecionaria para a página de criação de mesa
-                }
-            })
-        })
-    }
-
-    // =====================================
-    // SISTEMA DE MENSAGENS
-    // =====================================
-
-    function showMessage(message, type = 'info') {
-        // Cria container de mensagens se não existir
-        let messagesContainer = document.getElementById('messages')
-        if (!messagesContainer) {
-            messagesContainer = document.createElement('div')
-            messagesContainer.id = 'messages'
-            messagesContainer.style.cssText = `
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 1000;
-            max-width: 350px;
-        `
-            document.body.appendChild(messagesContainer)
-        }
-
-        const messageElement = document.createElement('div')
-        messageElement.className = `message ${type}`
-        messageElement.style.cssText = `
-        padding: 12px 16px;
-        border-radius: 8px;
-        margin-bottom: 10px;
-        font-weight: 600;
-        text-align: center;
-        animation: slideIn 0.3s ease-in-out;
-        font-family: 'Cinzel', serif;
-    `
-
-        // Estilos por tipo
-        switch (type) {
-            case 'success':
-                messageElement.style.background = 'rgba(40, 167, 69, 0.9)'
-                messageElement.style.border = '1px solid #28a745'
-                messageElement.style.color = '#fff'
-                break
-            case 'error':
-                messageElement.style.background = 'rgba(220, 53, 69, 0.9)'
-                messageElement.style.border = '1px solid #dc3545'
-                messageElement.style.color = '#fff'
-                break
-            case 'info':
-            default:
-                messageElement.style.background = 'rgba(23, 162, 184, 0.9)'
-                messageElement.style.border = '1px solid #17a2b8'
-                messageElement.style.color = '#fff'
-                break
-        }
-
-        messageElement.textContent = message
-        messagesContainer.appendChild(messageElement)
-
-        // Remove a mensagem após 4 segundos
-        setTimeout(() => {
-            if (messageElement.parentNode) {
-                messageElement.style.animation = 'slideOut 0.3s ease-in-out'
-                setTimeout(() => {
-                    messageElement.parentNode.removeChild(messageElement)
-                }, 300)
-            }
-        }, 4000)
     }
 
     // =====================================
@@ -216,107 +105,58 @@ if (window.dashboardInitialized) {
     function initLogout() {
         const logoutBtn = document.getElementById('logoutBtn')
         if (logoutBtn) {
-            logoutBtn.addEventListener('click', async () => {
-                showMessage('Desconectando...', 'info')
-
-                // Usa a função de logout global do auth.js
-                if (window.performLogout) {
-                    await window.performLogout()
-                } else {
-                    // Fallback caso a função não esteja disponível
-                    localStorage.clear()
-                    window.location.href = 'login.html'
-                }
-            })
-        }
-    }
-
-    // =====================================
-    // ANIMAÇÕES DINÂMICAS
-    // =====================================
-
-    function initAnimations() {
-        // Adiciona animações de hover aos cards
-        const cards = document.querySelectorAll('.stat-card, .character-card, .table-card')
-
-        cards.forEach(card => {
-            card.addEventListener('mouseenter', () => {
-                card.style.transform = 'translateY(-8px) scale(1.02)'
-                card.style.transition = 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
-            })
-
-            card.addEventListener('mouseleave', () => {
-                card.style.transform = 'translateY(0) scale(1)'
-            })
-        })
-    }
-
-    // =====================================
-    // RESPONSIVIDADE AVANÇADA
-    // =====================================
-
-    function initResponsiveFeatures() {
-        // Detecta mudanças de orientação/tamanho
-        function handleResize() {
-            const isMobile = window.innerWidth <= 768
-            const sidebar = document.querySelector('.sidebar')
-            const bottomNav = document.querySelector('.bottom-nav')
-
-            if (isMobile) {
-                sidebar.style.display = 'none'
-                bottomNav.style.display = 'flex'
-            } else {
-                sidebar.style.display = 'block'
-                bottomNav.style.display = 'none'
-            }
-        }
-
-        // Executa na inicialização e em redimensionamentos
-        handleResize()
-        window.addEventListener('resize', handleResize)
-        window.addEventListener('orientationchange', () => {
-            setTimeout(handleResize, 100) // Delay para aguardar a mudança
-        })
-    }
-
-    // =====================================
-    // VERIFICAÇÃO DE AUTENTICAÇÃO
-    // =====================================
-
-    function checkAuthentication() {
-        // Verifica se o usuário está logado (simulado)
-        const isLoggedIn = localStorage.getItem('isLoggedIn')
-
-        if (!isLoggedIn) {
-            showMessage('Acesso negado. Redirecionando para login...', 'error')
-            setTimeout(() => {
+            logoutBtn.addEventListener('click', () => {
+                localStorage.clear()
                 window.location.href = 'login.html'
-            }, 2000)
-            return false
+            })
         }
-
-        return true
     }
 
     // =====================================
-    // INICIALIZAÇÃO
+    // ANIMAÇÕES E RESPONSIVIDADE
+    // =====================================
+
+    function initAnimations() { /* handled by CSS */ }
+    function initResponsiveFeatures() { /* handled by CSS */ }
+
+    // =====================================
+    // FIX #21 — SISTEMA DE MENSAGENS (sem inline styles de cor)
+    // =====================================
+
+    function showMessage(message, type = 'info') {
+        let container = document.getElementById('messages')
+        if (!container) {
+            container = document.createElement('div')
+            container.id = 'messages'
+            document.body.appendChild(container)
+        }
+
+        const el = document.createElement('div')
+        el.className = `message ${type}`
+        el.textContent = message
+        container.appendChild(el)
+
+        setTimeout(() => {
+            el.style.opacity = '0'
+            el.style.transition = 'opacity 0.3s'
+            setTimeout(() => { if (el.parentNode) el.parentNode.removeChild(el) }, 300)
+        }, 4000)
+    }
+
+    // =====================================
+    // INICIALIZAÇÃO — FIX #6: Firebase auth em vez de localStorage
     // =====================================
 
     document.addEventListener('DOMContentLoaded', async () => {
-        // Verifica se já foi inicializado
-        if (!window.dashboardInitialized) {
-            console.warn('⚠️ Dashboard não foi marcado como inicializado, abortando');
-            return;
-        }
+        if (!window.dashboardInitialized) return
 
-        // Verifica autenticação primeiro
-        if (!checkAuthentication()) {
+        // FIX #6 — verificar autenticação real via Firebase onAuthStateChanged
+        const user = await checkAuth()
+        if (!user) {
+            window.location.href = 'login.html'
             return
         }
 
-        console.log('🚀 Inicializando dashboard...');
-
-        // Inicializa todos os módulos
         initTabNavigation()
         loadUserInfo()
         initCardActions()
@@ -324,100 +164,10 @@ if (window.dashboardInitialized) {
         initAnimations()
         initResponsiveFeatures()
 
-        // Carrega dados reais do banco de dados
         await DashboardService.loadAllData()
-
-        // Adiciona estilos de animação
-        const style = document.createElement('style')
-        style.textContent = `
-        @keyframes slideIn {
-            from { 
-                opacity: 0; 
-                transform: translateX(100px); 
-            }
-            to { 
-                opacity: 1; 
-                transform: translateX(0); 
-            }
-        }
-        
-        @keyframes slideOut {
-            from { 
-                opacity: 1; 
-                transform: translateX(0); 
-            }
-            to { 
-                opacity: 0; 
-                transform: translateX(100px); 
-            }
-        }
-    `
-        document.head.appendChild(style)
-
-        // Mensagem de boas-vindas
-        setTimeout(() => {
-            showMessage('Dashboard carregado com sucesso!', 'success')
-        }, 500)
     })
 
-    // =====================================
-    // UTILITÁRIOS EXTRAS
-    // =====================================
+    // Export
+    window.dashboardFunctions = { showMessage }
 
-    // Função para detectar se é dispositivo móvel
-    function isMobileDevice() {
-        return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
-    }
-
-    // Função para detectar se está em modo landscape
-    function isLandscape() {
-        return window.innerWidth > window.innerHeight
-    }
-
-    // Export das funções principais (para uso em outros módulos se necessário)
-    window.dashboardFunctions = {
-        showMessage,
-        isMobileDevice,
-        isLandscape
-    }
-
-    // Função de debug para verificar personagens (usando Firebase)
-    window.debugCharacters = async function () {
-        try {
-            console.log('🐛 DEBUG: Iniciando verificação de personagens...');
-
-            const userId = localStorage.getItem('currentUserId');
-            console.log('🔑 DEBUG: UserId:', userId);
-
-            if (!userId) {
-                alert('❌ Nenhum usuário encontrado!');
-                return;
-            }
-
-            const { CharacterService } = await import('./database.js');
-            const characters = await CharacterService.getUserCharacters(userId);
-
-            console.log('📊 DEBUG: Personagens encontrados:', characters?.length || 0);
-            console.table(characters);
-
-            characters?.forEach((char, index) => {
-                console.log(`${index + 1}. "${char.name}":`, {
-                    id: char.id,
-                    name: char.name,
-                    is_draft: char.is_draft,
-                    draft_step: char.draft_step,
-                    created_at: char.created_at,
-                    class: char.character_class,
-                    race: char.race
-                });
-            });
-
-            alert(`✅ Encontrados ${characters?.length || 0} personagens. Veja o console para detalhes.`);
-
-        } catch (error) {
-            console.error('❌ DEBUG: Erro:', error);
-            alert(`Erro no debug: ${error.message}`);
-        }
-    };
-
-} // Fecha a verificação de dashboardInitialized
+} // fecha dashboardInitialized

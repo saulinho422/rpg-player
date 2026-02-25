@@ -17,6 +17,8 @@ body {
     align-items: center;
     color: #e8dcc6;
     position: relative;
+    /* FIX #7 — previne borda laranja nas bordas */
+    overflow: hidden;
 }
 
 body::before {
@@ -402,7 +404,7 @@ body::before {
     .auth-container {
         padding: 40px;
     }
-    
+
     .google-btn:hover,
     .auth-btn:hover {
         transform: translateY(-3px);

@@ -3,9 +3,6 @@
 // =====================================
 
 import { UserService, CharacterService, CampaignService, ActivityService } from './database.js'
-import defaultAvatar from '../img/perfil_empty_user.png'
-import emptyCharacterIcon from '../img/logo_personagem_vazio.png'
-import emptyTableIcon from '../img/logo_mesas.png'
 
 export class DashboardService {
 
@@ -20,15 +17,13 @@ export class DashboardService {
                 throw new Error('Usuário não identificado')
             }
 
-            // Carrega estatísticas completas do usuário
             const userStats = await UserService.getUserStats(userId)
 
             if (userStats) {
-                // Atualiza informações no header
                 this.updateUserHeader(userStats)
-
-                // Atualiza cards de estatísticas
-                this.updateStatsCards(userStats)
+                this.updateKPICards(userStats)
+                this.updateSidebarBadges(userStats)
+                this.updateSidebarLevel(userStats)
             }
 
             return userStats
@@ -44,7 +39,7 @@ export class DashboardService {
 
     static async loadUserCharacters() {
         try {
-            let userId = localStorage.getItem('currentUserId');
+            let userId = localStorage.getItem('currentUserId')
 
             console.log('🔍 Dashboard: Carregando personagens para userId:', userId)
 
@@ -53,24 +48,18 @@ export class DashboardService {
                 return []
             }
 
-            // Usar CharacterService do database.js
             const characters = await CharacterService.getUserCharacters(userId)
 
             console.log('👥 Dashboard: Personagens carregados:', characters)
-            console.log('👥 Dashboard: Total de personagens retornados:', characters.length)
 
-            // Mostra TODOS os personagens finalizados (is_draft = false), mesmo sem nome
-            const validCharacters = characters.filter(char => {
-                const isFinished = char.is_draft === false;
-                console.log(`👤 Personagem "${char.name || '(sem nome)'}": is_draft=${char.is_draft}, mostrando=${isFinished}`);
-                return isFinished;
-            });
+            // Mostra TODOS os personagens finalizados (is_draft = false)
+            const validCharacters = characters.filter(char => char.is_draft === false)
 
-            console.log('👥 Dashboard: Personagens finalizados:', validCharacters.length, 'de', characters.length, 'total');
+            console.log('👥 Dashboard: Personagens finalizados:', validCharacters.length)
 
-            // Atualiza a seção de personagens
+            // Atualiza AMBAS as seções: inline (aba Início) e grid (aba Personagens)
+            this.updateInlineCharacters(validCharacters)
             this.updateCharactersSection(validCharacters)
-            console.log('✅ Dashboard: Seção de personagens atualizada')
 
             return validCharacters
         } catch (error) {
@@ -90,7 +79,9 @@ export class DashboardService {
 
             const campaigns = await CampaignService.getUserCampaigns(userId)
 
-            // Atualiza a seção de mesas
+            // Atualiza todas as seções de mesas
+            this.updateActiveMesa(campaigns)
+            this.updateMesasList(campaigns)
             this.updateCampaignsSection(campaigns)
 
             return campaigns
@@ -111,8 +102,8 @@ export class DashboardService {
 
             const activities = await ActivityService.getUserActivities(userId, 5)
 
-            // Atualiza a seção de atividades
-            this.updateActivitiesSection(activities)
+            this.updateFeedActivities(activities)
+            this.updateLastSessionInfo(activities)
 
             return activities
         } catch (error) {
@@ -122,93 +113,370 @@ export class DashboardService {
     }
 
     // =====================================
-    // ATUALIZAÇÃO DA INTERFACE
+    // ATUALIZAÇÃO DO HEADER E SIDEBAR
     // =====================================
 
     static updateUserHeader(userStats) {
         const userName = document.getElementById('userName')
+        const userNameGreet = document.getElementById('userNameGreet')
         const userAvatar = document.getElementById('userAvatar')
+        const sidebarAvatar = document.getElementById('sidebarAvatar')
+        const sidebarUserName = document.getElementById('sidebarUserName')
 
-        console.log('🎨 updateUserHeader - userStats recebido:', userStats)
-        console.log('🖼️ Avatar URL:', userStats.avatar_url)
-        console.log('📋 Avatar Type:', userStats.avatar_type)
+        const displayName = userStats.display_name || 'Aventureiro'
 
-        if (userName && userStats.display_name) {
-            userName.textContent = userStats.display_name
-        }
+        if (userName) userName.textContent = displayName
+        if (userNameGreet) userNameGreet.textContent = displayName
+        if (sidebarUserName) sidebarUserName.textContent = displayName
 
+        // Avatar
+        const avatarSrc = this._getAvatarSrc(userStats)
         if (userAvatar) {
-            if (userStats.avatar_url) {
-                console.log('✅ Avatar URL existe:', userStats.avatar_url)
-                if (userStats.avatar_type === 'preset') {
-                    // Se é emoji, cria SVG
-                    console.log('🎭 Tipo: preset (emoji)')
-                    userAvatar.src = `data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40"><text x="50%" y="50%" text-anchor="middle" dy=".3em" font-size="24">${encodeURIComponent(userStats.avatar_url)}</text></svg>`
-                } else {
-                    // Se é URL de imagem (upload ou default)
-                    console.log('🖼️ Tipo: upload/default (imagem)', userStats.avatar_url)
-                    userAvatar.src = userStats.avatar_url
-                    console.log('📍 Avatar src definido como:', userAvatar.src)
-                }
-            } else {
-                // Fallback se não tiver avatar_url
-                console.log('⚠️ Avatar URL vazio, usando fallback')
-                userAvatar.src = defaultAvatar
-            }
-        } else {
-            console.log('❌ Elemento userAvatar não encontrado no DOM')
+            userAvatar.src = avatarSrc
+            userAvatar.onerror = () => { userAvatar.src = 'img/perfil_empty_user.png' }
+        }
+        if (sidebarAvatar) {
+            sidebarAvatar.src = avatarSrc
+            sidebarAvatar.onerror = () => { sidebarAvatar.src = 'img/perfil_empty_user.png' }
         }
     }
 
-    static updateStatsCards(userStats) {
-        // Atualiza cards de estatísticas com dados reais
-        const statsData = [
-            {
-                selector: '.stat-card:nth-child(1) .stat-number',
-                value: userStats.total_characters || 0,
-                label: 'Personagens'
-            },
-            {
-                selector: '.stat-card:nth-child(2) .stat-number',
-                value: userStats.total_campaigns || 0,
-                label: 'Mesas Ativas'
-            },
-            {
-                selector: '.stat-card:nth-child(3) .stat-number',
-                value: userStats.total_sessions || 0,
-                label: 'Aventuras'
-            },
-            {
-                selector: '.stat-card:nth-child(4) .stat-number',
-                value: `Nível ${userStats.player_level || 1}`,
-                label: 'Experiência'
-            }
-        ]
+    static _getAvatarSrc(userStats) {
+        if (!userStats.avatar_url) return 'img/perfil_empty_user.png'
 
-        statsData.forEach(stat => {
-            const element = document.querySelector(stat.selector)
-            if (element) {
-                element.textContent = stat.value
-            }
-        })
+        if (userStats.avatar_type === 'preset') {
+            return `data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40"><text x="50%" y="50%" text-anchor="middle" dy=".3em" font-size="24">${encodeURIComponent(userStats.avatar_url)}</text></svg>`
+        }
+
+        return userStats.avatar_url
     }
 
-    static updateCharactersSection(characters) {
-        console.log('🎨 Dashboard: Atualizando seção de personagens com:', characters)
+    // =====================================
+    // KPI CARDS (aba Início)
+    // =====================================
 
-        const charactersGrid = document.querySelector('.characters-grid')
-        if (!charactersGrid) {
-            console.error('❌ Dashboard: Elemento .characters-grid não encontrado!')
+    static updateKPICards(userStats) {
+        const kpiCharacters = document.getElementById('kpiCharacters')
+        const kpiTables = document.getElementById('kpiTables')
+        const kpiSessions = document.getElementById('kpiSessions')
+        const kpiXP = document.getElementById('kpiXP')
+
+        if (kpiCharacters) kpiCharacters.textContent = userStats.total_characters || 0
+        if (kpiTables) kpiTables.textContent = userStats.total_campaigns || 0
+        if (kpiSessions) kpiSessions.textContent = userStats.total_sessions || 0
+
+        // XP — usar campo do perfil ou calcular
+        const xp = userStats.xp || userStats.total_xp || 0
+        if (kpiXP) kpiXP.textContent = xp >= 1000 ? `${(xp / 1000).toFixed(1)}k` : xp
+
+        // Trends opcionais
+        const charTrend = document.getElementById('kpiCharTrend')
+        const tableTrend = document.getElementById('kpiTableTrend')
+        const sessionTrend = document.getElementById('kpiSessionTrend')
+        const xpTrend = document.getElementById('kpiXPTrend')
+
+        if (charTrend) charTrend.textContent = userStats.total_characters > 0 ? `${userStats.total_characters} criado(s)` : 'Nenhum ainda'
+        if (tableTrend) tableTrend.textContent = userStats.total_campaigns > 0 ? `${userStats.total_campaigns} ativa(s)` : 'Nenhuma ainda'
+        if (sessionTrend) sessionTrend.textContent = userStats.total_sessions > 0 ? `${userStats.total_sessions} participação(ões)` : 'Nenhuma ainda'
+        if (xpTrend) xpTrend.textContent = xp > 0 ? 'Acumulado total' : 'Comece a jogar!'
+    }
+
+    // =====================================
+    // SIDEBAR BADGES
+    // =====================================
+
+    static updateSidebarBadges(userStats) {
+        const charBadge = document.getElementById('sidebarCharBadge')
+        const tableBadge = document.getElementById('sidebarTableBadge')
+
+        if (charBadge) charBadge.textContent = userStats.total_characters || 0
+        if (tableBadge) tableBadge.textContent = userStats.total_campaigns || 0
+    }
+
+    static updateSidebarLevel(userStats) {
+        const levelEl = document.getElementById('sidebarUserLevel')
+        if (!levelEl) return
+
+        const xp = userStats.xp || userStats.total_xp || 0
+        let levelTitle = 'Iniciante'
+        if (xp >= 10000) levelTitle = 'Lendário'
+        else if (xp >= 5000) levelTitle = 'Épico'
+        else if (xp >= 2000) levelTitle = 'Herói'
+        else if (xp >= 500) levelTitle = 'Veterano'
+        else if (xp >= 100) levelTitle = 'Aventureiro'
+
+        levelEl.textContent = `Nível de XP: ${levelTitle}`
+    }
+
+    // =====================================
+    // PERSONAGENS INLINE (aba Início)
+    // =====================================
+
+    static updateInlineCharacters(characters) {
+        const container = document.getElementById('characters-inline')
+        if (!container) return
+
+        if (characters.length === 0) {
+            container.innerHTML = `
+                <div class="empty-state-inline">
+                    <div class="empty-icon-sm">➕</div>
+                    <div class="empty-text-sm">Crie um novo personagem para começar sua aventura</div>
+                    <button class="btn-secondary" style="font-size:0.78rem;padding:6px 14px;"
+                            onclick="window.location.href='character-sheet.html?new=true'">+ Novo Personagem</button>
+                </div>
+            `
             return
         }
 
+        const html = characters.map(char => {
+            const hp = char.hp_current ?? char.hit_points ?? 0
+            const hpMax = char.hp_max ?? char.max_hit_points ?? 1
+            const hpPercent = Math.round((hp / hpMax) * 100)
+            const hpClass = hpPercent >= 60 ? 'high' : hpPercent >= 30 ? 'mid' : 'low'
+
+            const classIcon = this._getClassIcon(char.character_class || char.class)
+            const race = char.race || 'Desconhecida'
+            const charClass = char.character_class || char.class || 'Aventureiro'
+            const level = char.level || 1
+
+            // Stats — pegar os 3 mais relevantes
+            const stats = this._getTopStats(char)
+
+            return `
+                <div class="char-card-inline" data-character-id="${char.id}">
+                    <div class="char-img-inline-placeholder">${classIcon}</div>
+                    <div class="char-info-inline">
+                        <div class="char-name-inline">${char.name || 'Sem Nome'}</div>
+                        <div class="char-meta-inline">${race} · ${charClass} · Nível ${level}</div>
+                        <div class="hp-bar-container">
+                            <div class="hp-bar-labels"><span>PV</span><span>${hp}/${hpMax}</span></div>
+                            <div class="hp-bar-track">
+                                <div class="hp-bar-fill ${hpClass}" style="width:${hpPercent}%"></div>
+                            </div>
+                        </div>
+                        <div class="char-stats-pills">
+                            ${stats}
+                        </div>
+                    </div>
+                    <div class="char-actions-inline">
+                        <button class="btn-primary char-open-btn" style="font-size:0.7rem;padding:6px 10px;white-space:nowrap;"
+                                onclick="window.location.href='character-sheet.html?id=${char.id}'">Abrir Ficha</button>
+                        <button class="btn-secondary" style="font-size:0.7rem;padding:5px 10px;"
+                                onclick="window.location.href='character-sheet.html?id=${char.id}'">Editar</button>
+                    </div>
+                </div>
+            `
+        }).join('')
+
+        // Adiciona botão de criar no final
+        container.innerHTML = html + `
+            <div class="empty-state-inline">
+                <div class="empty-icon-sm">➕</div>
+                <div class="empty-text-sm">Crie um novo personagem para começar sua aventura</div>
+                <button class="btn-secondary" style="font-size:0.78rem;padding:6px 14px;"
+                        onclick="window.location.href='character-sheet.html?new=true'">+ Novo Personagem</button>
+            </div>
+        `
+    }
+
+    static _getClassIcon(charClass) {
+        const icons = {
+            'Mago': '🧙', 'Wizard': '🧙',
+            'Guerreiro': '⚔️', 'Fighter': '⚔️',
+            'Ladino': '🗡️', 'Rogue': '🗡️',
+            'Clérigo': '✝️', 'Cleric': '✝️',
+            'Paladino': '🛡️', 'Paladin': '🛡️',
+            'Bárbaro': '💪', 'Barbarian': '💪',
+            'Druida': '🌿', 'Druid': '🌿',
+            'Ranger': '🏹',
+            'Bardo': '🎵', 'Bard': '🎵',
+            'Feiticeiro': '✨', 'Sorcerer': '✨',
+            'Bruxo': '🔮', 'Warlock': '🔮',
+            'Monge': '👊', 'Monk': '👊',
+            'Artífice': '⚙️', 'Artificer': '⚙️'
+        }
+        return icons[charClass] || '🧝'
+    }
+
+    static _getTopStats(char) {
+        // Tenta pegar atributos do personagem
+        const abilities = char.abilities || char.attributes || {}
+        const mapping = [
+            { key: 'strength', label: 'FOR' },
+            { key: 'dexterity', label: 'DES' },
+            { key: 'constitution', label: 'CON' },
+            { key: 'intelligence', label: 'INT' },
+            { key: 'wisdom', label: 'SAB' },
+            { key: 'charisma', label: 'CAR' }
+        ]
+
+        const stats = mapping
+            .filter(m => abilities[m.key] !== undefined && abilities[m.key] !== null)
+            .sort((a, b) => (abilities[b.key] || 0) - (abilities[a.key] || 0))
+            .slice(0, 3)
+            .map(m => `<span class="stat-pill-sm">${m.label} ${abilities[m.key]}</span>`)
+
+        // Se tiver CA, adiciona
+        const ac = char.armor_class ?? char.ac
+        if (ac !== undefined && ac !== null) {
+            stats.push(`<span class="stat-pill-sm">CA ${ac}</span>`)
+        }
+
+        if (stats.length === 0) {
+            return `<span class="stat-pill-sm" style="opacity:0.5">Lv ${char.level || 1}</span>`
+        }
+
+        return stats.slice(0, 3).join('')
+    }
+
+    // =====================================
+    // MESA ATIVA (aba Início — coluna direita)
+    // =====================================
+
+    static updateActiveMesa(campaigns) {
+        const container = document.getElementById('mesa-ativa-content')
+        const badge = document.getElementById('mesaStatusBadge')
+        if (!container) return
+
+        // Encontra a campanha ativa mais recente
+        const activeCampaign = campaigns.find(c =>
+            c.status === 'active' || c.player_status === 'active'
+        )
+
+        if (!activeCampaign) {
+            if (badge) badge.textContent = ''
+            container.innerHTML = `
+                <div style="text-align:center;padding:20px;color:#8a8a9a;">
+                    <div style="font-size:1.5rem;margin-bottom:8px;">🎲</div>
+                    <div>Nenhuma mesa ativa no momento</div>
+                    <button class="btn-secondary" style="margin-top:12px;font-size:0.82rem;"
+                            onclick="alert('Funcionalidade em breve!')">Procurar Mesas</button>
+                </div>
+            `
+            return
+        }
+
+        const statusConfig = this.getCampaignStatusConfig(activeCampaign.status)
+        if (badge) badge.textContent = `${statusConfig.icon} ${statusConfig.text}`
+
+        container.innerHTML = `
+            <div class="mesa-title">${activeCampaign.name || 'Mesa sem nome'}</div>
+            <div class="mesa-meta">${activeCampaign.system || 'D&D 5e'} · ${activeCampaign.current_players || '?'}/${activeCampaign.max_players || '?'} jogadores</div>
+            ${activeCampaign.next_session
+                ? `<div class="mesa-next">Próxima sessão: <strong style="color:#d4af37;">${activeCampaign.next_session}</strong></div>`
+                : '<div class="mesa-next" style="color:#8a8a9a;">Sem sessão agendada</div>'
+            }
+            <div class="mesa-actions">
+                <button class="btn-primary" style="flex:1;font-size:0.82rem;"
+                        onclick="joinCampaignSession('${activeCampaign.id}')">Entrar na Mesa</button>
+                <button class="btn-secondary" style="font-size:0.82rem;"
+                        onclick="viewCampaign('${activeCampaign.id}')">Info</button>
+            </div>
+        `
+    }
+
+    // =====================================
+    // FEED DE ATIVIDADES (aba Início)
+    // =====================================
+
+    static updateFeedActivities(activities) {
+        const container = document.getElementById('feed-activities')
+        if (!container) return
+
+        if (!activities || activities.length === 0) {
+            container.innerHTML = `
+                <div class="feed-item">
+                    <div class="feed-icon-circle">📝</div>
+                    <div>
+                        <div class="feed-title">Bem-vindo ao RPG Player!</div>
+                        <div class="feed-time">Complete seu perfil e comece suas aventuras</div>
+                    </div>
+                </div>
+            `
+            return
+        }
+
+        container.innerHTML = activities.map(activity => {
+            const timeAgo = this.getTimeAgo(activity.created_at)
+            const icon = this.getActivityIcon(activity.activity_type)
+
+            return `
+                <div class="feed-item">
+                    <div class="feed-icon-circle">${icon}</div>
+                    <div>
+                        <div class="feed-title">${activity.title || activity.description || 'Atividade'}</div>
+                        <div class="feed-time">${timeAgo}</div>
+                    </div>
+                </div>
+            `
+        }).join('')
+    }
+
+    // =====================================
+    // ÚLTIMA SESSÃO INFO (subtítulo da saudação)
+    // =====================================
+
+    static updateLastSessionInfo(activities) {
+        const el = document.getElementById('lastSessionInfo')
+        if (!el) return
+
+        if (!activities || activities.length === 0) {
+            el.textContent = 'Bem-vindo! Comece criando seu primeiro personagem.'
+            return
+        }
+
+        const lastActivity = activities[0]
+        const timeAgo = this.getTimeAgo(lastActivity.created_at)
+        el.textContent = `Última atividade: ${timeAgo}`
+    }
+
+    // =====================================
+    // LISTA DE MESAS (aba Início — seção inferior)
+    // =====================================
+
+    static updateMesasList(campaigns) {
+        const container = document.getElementById('mesas-list-content')
+        if (!container) return
+
+        if (!campaigns || campaigns.length === 0) {
+            container.innerHTML = `
+                <div style="text-align:center;padding:20px;color:#8a8a9a;">
+                    <div>Nenhuma mesa encontrada</div>
+                    <button class="btn-secondary" style="margin-top:10px;font-size:0.78rem;"
+                            onclick="alert('Funcionalidade em breve!')">+ Criar Mesa</button>
+                </div>
+            `
+            return
+        }
+
+        container.innerHTML = campaigns.map(campaign => {
+            const statusConfig = this.getCampaignStatusConfig(campaign.status)
+            const statusClass = campaign.status === 'active' ? 'active' : campaign.status === 'completed' ? 'done' : 'waiting'
+            const actionText = campaign.status === 'active' ? 'Entrar' : campaign.status === 'completed' ? 'Histórico' : 'Configurar'
+
+            return `
+                <div class="tables-list-item">
+                    <div class="table-status-dot ${statusClass}"></div>
+                    <div class="table-list-name">${campaign.name || 'Mesa sem nome'}</div>
+                    <div class="table-list-info">${campaign.system || 'D&D 5e'} · ${campaign.current_players || '?'}/${campaign.max_players || '?'} · ${statusConfig.icon} ${statusConfig.text}</div>
+                    <span class="table-list-action" onclick="viewCampaign('${campaign.id}')">${actionText}</span>
+                </div>
+            `
+        }).join('')
+    }
+
+    // =====================================
+    // PERSONAGENS GRID (aba Personagens)
+    // =====================================
+
+    static updateCharactersSection(characters) {
+        const charactersGrid = document.querySelector('.characters-grid')
+        if (!charactersGrid) return
+
         if (characters.length === 0) {
-            console.log('📝 Dashboard: Nenhum personagem encontrado, exibindo mensagem')
             charactersGrid.innerHTML = `
                 <div class="no-data-message">
-                    <div class="no-data-icon">
-                        <img src="${emptyCharacterIcon}" alt="Sem personagens" style="width: 120px; height: 120px; opacity: 0.6;">
-                    </div>
+                    <div class="no-data-icon" style="font-size:3rem;margin-bottom:12px;">🧝</div>
                     <h3>Nenhum personagem ainda</h3>
                     <p>Crie seu primeiro personagem para começar suas aventuras!</p>
                     <button class="btn-primary" onclick="window.location.href='character-sheet.html?new=true'">+ Criar Personagem</button>
@@ -217,17 +485,19 @@ export class DashboardService {
             return
         }
 
-        const charactersHTML = characters.map(character => `
+        charactersGrid.innerHTML = characters.map(character => `
             <div class="character-card" data-character-id="${character.id}">
                 <div class="character-avatar">
-                    <img src="${character.avatar_url || 'https://via.placeholder.com/400x200'}" alt="${character.name || 'Personagem'}">
+                    <div style="width:100%;height:200px;display:flex;align-items:center;justify-content:center;font-size:4rem;background:rgba(212,175,55,0.1);">
+                        ${this._getClassIcon(character.character_class || character.class)}
+                    </div>
                 </div>
                 <div class="character-overlay">
                     <div class="character-level">Nível ${character.level || 1}</div>
                     <div class="character-info">
                         <h3>${character.name || 'Sem Nome'}</h3>
                         <div class="character-details">
-                            <div class="character-class">${character.character_class || 'Aventureiro'}</div>
+                            <div class="character-class">${character.character_class || character.class || 'Aventureiro'}</div>
                             <div class="character-race">${character.race || 'Humano'}</div>
                         </div>
                     </div>
@@ -238,43 +508,43 @@ export class DashboardService {
                 </div>
             </div>
         `).join('')
-
-        charactersGrid.innerHTML = charactersHTML
     }
+
+    // =====================================
+    // CAMPANHAS GRID (aba Mesas)
+    // =====================================
 
     static updateCampaignsSection(campaigns) {
         const campaignsGrid = document.querySelector('.tables-grid')
         if (!campaignsGrid) return
 
-        if (campaigns.length === 0) {
+        if (!campaigns || campaigns.length === 0) {
             campaignsGrid.innerHTML = `
                 <div class="no-data-message">
-                    <div class="no-data-icon">
-                        <img src="${emptyTableIcon}" alt="Sem mesas" style="width: 120px; height: 120px; opacity: 0.6;">
-                    </div>
+                    <div class="no-data-icon" style="font-size:3rem;margin-bottom:12px;">🎲</div>
                     <h3>Nenhuma mesa ainda</h3>
                     <p>Participe de uma mesa ou crie a sua própria!</p>
-                    <div style="display: flex; gap: 10px; justify-content: center; margin-top: 20px;">
-                        <button class="btn-secondary" onclick="browseCampaigns()">Procurar Mesas</button>
-                        <button class="btn-primary" onclick="createNewCampaign()">+ Criar Mesa</button>
+                    <div style="display:flex;gap:10px;justify-content:center;margin-top:20px;">
+                        <button class="btn-secondary" onclick="alert('Funcionalidade em breve!')">Procurar Mesas</button>
+                        <button class="btn-primary" onclick="alert('Funcionalidade em breve!')">+ Criar Mesa</button>
                     </div>
                 </div>
             `
             return
         }
 
-        const campaignsHTML = campaigns.map(campaign => {
+        campaignsGrid.innerHTML = campaigns.map(campaign => {
             const statusConfig = this.getCampaignStatusConfig(campaign.status)
 
             return `
                 <div class="table-card ${campaign.status}" data-campaign-id="${campaign.id}">
                     <div class="table-header">
                         <div class="table-status">${statusConfig.icon} ${statusConfig.text}</div>
-                        <div class="table-players">${campaign.current_players}/${campaign.max_players} jogadores</div>
+                        <div class="table-players">${campaign.current_players || '?'}/${campaign.max_players || '?'} jogadores</div>
                     </div>
                     <div class="table-info">
-                        <h3>${campaign.name}</h3>
-                        <div class="table-system">${campaign.system}</div>
+                        <h3>${campaign.name || 'Mesa sem nome'}</h3>
+                        <div class="table-system">${campaign.system || 'D&D 5e'}</div>
                         <div class="table-description">
                             ${campaign.description || 'Sem descrição disponível.'}
                         </div>
@@ -288,9 +558,11 @@ export class DashboardService {
                 </div>
             `
         }).join('')
-
-        campaignsGrid.innerHTML = campaignsHTML
     }
+
+    // =====================================
+    // UTILITÁRIOS
+    // =====================================
 
     static getCampaignStatusConfig(status) {
         const configs = {
@@ -299,48 +571,8 @@ export class DashboardService {
             'paused': { icon: '⏸️', text: 'Pausada' },
             'completed': { icon: '✅', text: 'Concluída' }
         }
-
         return configs[status] || { icon: '❓', text: 'Desconhecido' }
     }
-
-    static updateActivitiesSection(activities) {
-        const activityList = document.querySelector('.activity-list')
-        if (!activityList) return
-
-        if (activities.length === 0) {
-            activityList.innerHTML = `
-                <div class="activity-item">
-                    <div class="activity-icon">📝</div>
-                    <div class="activity-content">
-                        <div class="activity-title">Bem-vindo ao RPG Player!</div>
-                        <div class="activity-time">Complete seu perfil e comece suas aventuras</div>
-                    </div>
-                </div>
-            `
-            return
-        }
-
-        const activitiesHTML = activities.map(activity => {
-            const timeAgo = this.getTimeAgo(activity.created_at)
-            const icon = this.getActivityIcon(activity.activity_type)
-
-            return `
-                <div class="activity-item">
-                    <div class="activity-icon">${icon}</div>
-                    <div class="activity-content">
-                        <div class="activity-title">${activity.title}</div>
-                        <div class="activity-time">${timeAgo}</div>
-                    </div>
-                </div>
-            `
-        }).join('')
-
-        activityList.innerHTML = activitiesHTML
-    }
-
-    // =====================================
-    // UTILITÁRIOS
-    // =====================================
 
     static getActivityIcon(activityType) {
         const icons = {
@@ -351,11 +583,11 @@ export class DashboardService {
             'campaign_joined': '🤝',
             'session_completed': '🏆'
         }
-
         return icons[activityType] || '📝'
     }
 
     static getTimeAgo(dateString) {
+        if (!dateString) return ''
         const date = new Date(dateString)
         const now = new Date()
         const diffMs = now - date
@@ -380,10 +612,8 @@ export class DashboardService {
         try {
             console.log('🚀 Dashboard: Iniciando carregamento de todos os dados')
 
-            // Exibe loading
             this.showLoading(true)
 
-            // Carrega todos os dados em paralelo
             const [userData, characters, campaigns, activities] = await Promise.all([
                 this.loadUserData(),
                 this.loadUserCharacters(),
@@ -398,15 +628,9 @@ export class DashboardService {
                 activities: activities ? `${activities.length} atividades` : 'NULL'
             })
 
-            // Remove loading
             this.showLoading(false)
 
-            return {
-                userData,
-                characters,
-                campaigns,
-                activities
-            }
+            return { userData, characters, campaigns, activities }
         } catch (error) {
             console.error('❌ Dashboard: Erro ao carregar dados:', error)
             this.showLoading(false)
@@ -416,12 +640,10 @@ export class DashboardService {
     }
 
     static showLoading(show) {
-        // Implementar loading spinner se necessário
-        if (show) {
-            console.log('Carregando dados do dashboard...')
-        } else {
-            console.log('Dados carregados com sucesso!')
-        }
+        const placeholders = document.querySelectorAll('.loading-placeholder')
+        placeholders.forEach(p => {
+            p.style.display = show ? 'block' : 'none'
+        })
     }
 
     static showError(message) {
@@ -438,11 +660,11 @@ export class DashboardService {
 // =====================================
 
 window.createNewCharacter = function () {
-    window.location.href = 'character-creation.html'
+    window.location.href = 'character-sheet.html?new=true'
 }
 
 window.editCharacter = function (characterId) {
-    alert(`Editar personagem: ${characterId}`)
+    window.location.href = `character-sheet.html?id=${characterId}`
 }
 
 window.playCharacter = function (characterId) {

@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RPG Player - Login</title>
+    <meta name="description" content="Faça login no RPG Player — Sistema de Fichas D&D 5E. Entre na sua conta ou crie uma nova para começar sua aventura.">
 
     <!-- Favicons -->
     <link rel="apple-touch-icon" sizes="180x180" href="img/apple-touch-icon.png">
@@ -84,6 +85,27 @@
                     </div>
                     <button type="submit" class="auth-btn">Entrar</button>
                 </form>
+                <!-- FIX #17 — Restaurar link "Esqueceu a senha?" -->
+                <p style="text-align:center;margin-top:12px;font-size:0.82rem;">
+                    <a href="#" id="forgotPasswordLink" style="color:rgba(212,175,55,0.75);text-decoration:underline;">Esqueceu a senha?</a>
+                </p>
+            </div>
+
+            <!-- Reset Password section (hidden by default) -->
+            <div id="reset-tab" style="display:none;">
+                <p style="text-align:center;margin-bottom:16px;font-size:0.85rem;color:rgba(232,220,198,0.65);">
+                    Informe seu email para receber o link de recuperação.
+                </p>
+                <form id="resetForm">
+                    <div class="input-group">
+                        <label for="resetEmail">Email:</label>
+                        <input type="email" name="email" id="resetEmail" required>
+                    </div>
+                    <button type="submit" class="auth-btn">Enviar Link de Recuperação</button>
+                </form>
+                <p style="text-align:center;margin-top:12px;font-size:0.82rem;">
+                    <a href="#" id="backToLoginLink" style="color:rgba(212,175,55,0.75);text-decoration:underline;">← Voltar ao Login</a>
+                </p>
             </div>
 
             <!-- Tab Registro -->
@@ -131,6 +153,61 @@
     </div>
 
     <script type="module" src="js/auth.js"></script>
+    <script type="module">
+        // FIX #17 — Esqueceu a senha
+        import { auth } from './js/firebase-config.js'
+        import { sendPasswordResetEmail } from 'firebase/auth'
+
+        const authContainer  = document.querySelector('.auth-container')
+        const loginTab       = document.getElementById('login-tab')
+        const resetTab       = document.getElementById('reset-tab')
+        const tabsEl         = document.querySelector('.auth-tabs')
+
+        document.getElementById('forgotPasswordLink')?.addEventListener('click', (e) => {
+            e.preventDefault()
+            loginTab.style.display = 'none'
+            if (tabsEl) tabsEl.style.display = 'none'
+            resetTab.style.display = 'block'
+        })
+
+        document.getElementById('backToLoginLink')?.addEventListener('click', (e) => {
+            e.preventDefault()
+            resetTab.style.display = 'none'
+            loginTab.style.display = 'block'
+            if (tabsEl) tabsEl.style.display = 'flex'
+        })
+
+        document.getElementById('resetForm')?.addEventListener('submit', async (e) => {
+            e.preventDefault()
+            const email = document.getElementById('resetEmail').value
+            const msgEl = document.getElementById('messages')
+            try {
+                await sendPasswordResetEmail(auth, email)
+                if (msgEl) {
+                    const m = document.createElement('div')
+                    m.className = 'message success'
+                    m.textContent = 'Link de recuperação enviado! Verifique seu email.'
+                    msgEl.appendChild(m)
+                    setTimeout(() => m.remove(), 5000)
+                }
+                // Volta ao login após 2s
+                setTimeout(() => {
+                    resetTab.style.display = 'none'
+                    loginTab.style.display = 'block'
+                    if (tabsEl) tabsEl.style.display = 'flex'
+                }, 2000)
+            } catch (err) {
+                if (msgEl) {
+                    const m = document.createElement('div')
+                    m.className = 'message error'
+                    m.textContent = err.code === 'auth/user-not-found'
+                        ? 'Email não encontrado.' : 'Erro ao enviar link. Tente novamente.'
+                    msgEl.appendChild(m)
+                    setTimeout(() => m.remove(), 5000)
+                }
+            }
+        })
+    </script>
 </body>
 
 </html>

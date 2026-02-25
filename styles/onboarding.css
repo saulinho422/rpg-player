@@ -13,7 +13,8 @@ body {
     background: url('../img/plano_de_fundo1.png') center/cover no-repeat fixed;
     color: #e8dcc6;
     min-height: 100vh;
-    overflow-x: hidden;
+    /* FIX #7 — previne borda laranja nas bordas */
+    overflow: hidden;
     position: relative;
 }
 
@@ -829,6 +830,15 @@ body::before {
     .step-content {
         max-width: 700px;
         margin: 0 auto;
+    }
+}
+
+/* FIX #19 — Respeitar prefers-reduced-motion */
+@media (prefers-reduced-motion: reduce) {
+    *, ::before, ::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
     }
 }
 
