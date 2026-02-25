@@ -1491,19 +1491,13 @@ class CharacterCreationWizard {
             case 4: // Atributos - verificar se todos os valores foram alocados
                 // Se o método ainda não foi escolhido, bloquear
                 if (this.wizardData.attributeMethod === null) return false;
+                // Se ainda tem valores não distribuídos, bloquear
                 if (!this.wizardData.availableValues || this.wizardData.availableValues.length > 0) {
-                    return false; // Ainda tem valores não alocados
+                    return false;
                 }
-                // Verificar se todos os atributos foram preenchidos
-                const attrs = ['str', 'dex', 'con', 'int', 'wis', 'cha'];
-                const allAllocated = attrs.every(attr => this.wizardData.attributes[attr] !== 10 || this.wizardData.attributeMethod === 'standard');
-
-                // Marcar que os atributos foram alocados
-                if (allAllocated && this.wizardData.availableValues.length === 0) {
-                    this.wizardData.attributesAllocated = true;
-                }
-
-                return allAllocated;
+                // Se availableValues está vazio, todos os valores foram distribuídos
+                this.wizardData.attributesAllocated = true;
+                return true;
             case 5: // Detalhes (alinhamento + antecedente)
                 return this.wizardData.alignment !== null && this.wizardData.background !== null;
             case 6: // Equipamentos (opcional - pode pular se não há dados)
