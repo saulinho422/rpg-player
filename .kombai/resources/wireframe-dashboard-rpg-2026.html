@@ -1,0 +1,830 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wireframe — RPG Player Dashboard Reimaginado</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Comic Sans MS', 'Chalkboard SE', cursive;
+    background: #f0f0f0;
+    color: #222;
+    font-size: 13px;
+  }
+
+  /* ─── Legend ─── */
+  .legend {
+    position: fixed;
+    top: 16px; right: 16px;
+    background: white;
+    border: 2px solid #555;
+    border-radius: 6px;
+    padding: 12px 16px;
+    z-index: 9999;
+    box-shadow: 2px 2px 8px rgba(0,0,0,0.15);
+    max-width: 200px;
+  }
+  .legend h4 { font-size: 12px; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px; }
+  .legend-item { display: flex; align-items: center; gap: 6px; margin-bottom: 5px; font-size: 11px; }
+  .badge { display: inline-block; padding: 2px 6px; border-radius: 3px; font-size: 10px; font-weight: bold; color: white; }
+  .badge.reuse { background: #4CAF50; }
+  .badge.new   { background: #FF9800; }
+  .badge.fix   { background: #F44336; }
+
+  /* ─── Page Wrapper ─── */
+  .page {
+    max-width: 1300px;
+    margin: 0 auto;
+    background: white;
+    box-shadow: 0 0 30px rgba(0,0,0,0.2);
+    min-height: 100vh;
+  }
+
+  /* ─── Header ─── */
+  .wf-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 24px;
+    border-bottom: 3px solid #333;
+    background: #f5f5f5;
+  }
+  .logo-area { display: flex; align-items: center; gap: 12px; }
+  .logo-box {
+    width: 44px; height: 44px;
+    border: 2px dashed #666;
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10px; color: #666; text-align: center; line-height: 1.2;
+  }
+  .logo-text { font-size: 18px; font-weight: bold; }
+  .header-actions { display: flex; align-items: center; gap: 12px; }
+  .search-bar {
+    border: 2px solid #888;
+    border-radius: 4px;
+    padding: 6px 12px;
+    width: 220px;
+    font-family: inherit;
+    font-size: 12px;
+    color: #999;
+  }
+  .notif-btn, .avatar-btn {
+    width: 36px; height: 36px;
+    border: 2px solid #666;
+    border-radius: 50%;
+    background: #eee;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px;
+    cursor: pointer;
+  }
+  .user-chip {
+    display: flex; align-items: center; gap: 8px;
+    border: 2px solid #888;
+    border-radius: 20px;
+    padding: 4px 12px 4px 4px;
+    background: #f0f0f0;
+  }
+  .user-chip .avatar { width: 28px; height: 28px; border-radius: 50%; border: 2px dashed #666; background: #ddd; display: flex; align-items: center; justify-content: center; font-size: 11px; }
+  .user-chip .name { font-size: 12px; font-weight: bold; }
+  .logout-link { font-size: 11px; color: #666; text-decoration: underline; cursor: pointer; }
+
+  /* ─── Layout ─── */
+  .layout { display: flex; min-height: calc(100vh - 72px); }
+
+  /* ─── Sidebar ─── */
+  .sidebar {
+    width: 220px;
+    border-right: 3px solid #333;
+    padding: 24px 0;
+    background: #fafafa;
+    flex-shrink: 0;
+  }
+  .sidebar-section-title {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: #999;
+    padding: 0 20px;
+    margin: 16px 0 8px;
+  }
+  .nav-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 20px;
+    cursor: pointer;
+    border-left: 3px solid transparent;
+    margin-bottom: 2px;
+  }
+  .nav-item.active {
+    background: #eee;
+    border-left-color: #333;
+    font-weight: bold;
+  }
+  .nav-icon { font-size: 16px; width: 20px; text-align: center; }
+  .nav-label { font-size: 13px; }
+  .nav-badge {
+    margin-left: auto;
+    background: #555;
+    color: white;
+    border-radius: 10px;
+    padding: 1px 7px;
+    font-size: 10px;
+  }
+  .sidebar-footer {
+    margin-top: 40px;
+    padding: 20px;
+    border-top: 2px dashed #ccc;
+  }
+
+  /* ─── Main Content ─── */
+  .main { flex: 1; padding: 28px 32px; overflow-y: auto; }
+
+  /* ─── Page Header ─── */
+  .page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 28px;
+  }
+  .page-title { font-size: 22px; font-weight: bold; margin-bottom: 4px; }
+  .page-subtitle { font-size: 12px; color: #666; }
+  .header-cta {
+    display: flex; gap: 10px; align-items: center;
+  }
+  .btn {
+    padding: 8px 16px;
+    border: 2px solid #333;
+    border-radius: 4px;
+    font-family: inherit;
+    font-size: 12px;
+    cursor: pointer;
+    background: white;
+  }
+  .btn.primary { background: #333; color: white; }
+  .btn.secondary { background: #f0f0f0; }
+
+  /* ─── KPI Row ─── */
+  .kpi-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 28px;
+  }
+  .kpi-card {
+    border: 2px solid #888;
+    border-radius: 6px;
+    padding: 16px;
+    background: #fafafa;
+    position: relative;
+  }
+  .kpi-icon { font-size: 20px; margin-bottom: 8px; }
+  .kpi-value { font-size: 26px; font-weight: bold; margin-bottom: 4px; }
+  .kpi-label { font-size: 11px; color: #666; text-transform: uppercase; letter-spacing: 0.5px; }
+  .kpi-trend { font-size: 11px; color: #444; margin-top: 6px; }
+
+  /* ─── Two Column ─── */
+  .two-col { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; margin-bottom: 24px; }
+  .three-col { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 24px; }
+
+  /* ─── Section Card ─── */
+  .section-card {
+    border: 2px solid #888;
+    border-radius: 6px;
+    overflow: hidden;
+    background: white;
+    position: relative;
+  }
+  .section-header {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 12px 16px;
+    border-bottom: 2px solid #ccc;
+    background: #f5f5f5;
+  }
+  .section-title { font-weight: bold; font-size: 14px; }
+  .section-body { padding: 16px; }
+
+  /* ─── Character Card ─── */
+  .char-card {
+    border: 2px solid #999;
+    border-radius: 6px;
+    overflow: hidden;
+    margin-bottom: 12px;
+    background: #fafafa;
+    display: flex;
+  }
+  .char-img-placeholder {
+    width: 90px;
+    min-height: 90px;
+    background: #ddd;
+    border-right: 2px solid #ccc;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10px; color: #888; text-align: center;
+    flex-shrink: 0;
+  }
+  .char-info { padding: 10px 14px; flex: 1; }
+  .char-name { font-size: 14px; font-weight: bold; margin-bottom: 4px; }
+  .char-meta { font-size: 11px; color: #666; margin-bottom: 8px; }
+  .char-stats { display: flex; gap: 10px; flex-wrap: wrap; }
+  .stat-pill {
+    border: 1px solid #999;
+    border-radius: 12px;
+    padding: 2px 8px;
+    font-size: 10px;
+    background: white;
+  }
+  .char-actions { display: flex; gap: 8px; align-items: center; padding: 10px 14px; flex-direction: column; justify-content: center; }
+
+  /* ─── Activity Feed ─── */
+  .feed-item {
+    display: flex; gap: 10px; align-items: flex-start;
+    padding: 10px 0;
+    border-bottom: 1px dashed #ddd;
+  }
+  .feed-item:last-child { border-bottom: none; }
+  .feed-icon { width: 32px; height: 32px; border-radius: 50%; background: #eee; border: 2px solid #ccc; display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; }
+  .feed-content { flex: 1; }
+  .feed-title { font-size: 12px; font-weight: bold; margin-bottom: 2px; }
+  .feed-time { font-size: 10px; color: #888; }
+
+  /* ─── Table Card ─── */
+  .table-list-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 10px 0;
+    border-bottom: 1px dashed #ddd;
+  }
+  .table-list-item:last-child { border-bottom: none; }
+  .table-dot { width: 10px; height: 10px; border-radius: 50%; background: #888; flex-shrink: 0; }
+  .table-dot.active { background: #444; }
+  .table-dot.waiting { background: #bbb; border: 2px dashed #888; }
+  .table-name { font-size: 12px; font-weight: bold; flex: 1; }
+  .table-info { font-size: 10px; color: #666; }
+  .table-action { font-size: 10px; text-decoration: underline; cursor: pointer; }
+
+  /* ─── Quick Actions ─── */
+  .quick-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .quick-action {
+    border: 2px dashed #888;
+    border-radius: 6px;
+    padding: 14px;
+    text-align: center;
+    cursor: pointer;
+    background: #fafafa;
+  }
+  .quick-action-icon { font-size: 22px; margin-bottom: 6px; }
+  .quick-action-label { font-size: 11px; font-weight: bold; }
+
+  /* ─── HP Bar ─── */
+  .hp-bar-container { margin: 8px 0; }
+  .hp-bar-label { display: flex; justify-content: space-between; font-size: 10px; color: #666; margin-bottom: 3px; }
+  .hp-bar-track { height: 8px; background: #ddd; border: 1px solid #bbb; border-radius: 4px; overflow: hidden; }
+  .hp-bar-fill { height: 100%; background: #555; border-radius: 4px; }
+
+  /* ─── Empty State ─── */
+  .empty-state {
+    text-align: center;
+    padding: 32px 20px;
+    border: 2px dashed #ccc;
+    border-radius: 6px;
+    background: #fafafa;
+  }
+  .empty-icon { font-size: 32px; margin-bottom: 8px; }
+  .empty-text { font-size: 12px; color: #777; margin-bottom: 12px; }
+
+  /* ─── Toast (Fixed) ─── */
+  .toast-preview {
+    position: fixed;
+    bottom: 20px; right: 20px;
+    border: 2px solid #666;
+    border-radius: 6px;
+    padding: 12px 16px;
+    background: #f5f5f5;
+    display: flex; align-items: center; gap: 10px;
+    max-width: 280px;
+    z-index: 999;
+    box-shadow: 2px 2px 8px rgba(0,0,0,0.15);
+    font-size: 12px;
+  }
+
+  /* ─── Badge positioning ─── */
+  .comp-wrapper { position: relative; }
+  .comp-badge {
+    position: absolute;
+    top: -8px; right: -8px;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-size: 10px;
+    font-weight: bold;
+    color: white;
+    z-index: 10;
+    white-space: nowrap;
+    font-family: Arial, sans-serif;
+  }
+  .comp-badge.reuse { background: #4CAF50; }
+  .comp-badge.new   { background: #FF9800; }
+  .comp-badge.fix   { background: #F44336; }
+
+  /* ─── Annotations ─── */
+  .annotation {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: #fffde7;
+    border: 1px solid #f0d400;
+    border-radius: 4px;
+    padding: 4px 8px;
+    font-size: 10px;
+    color: #5a4a00;
+    margin-top: 6px;
+  }
+  .annotation::before { content: '💡'; font-size: 11px; }
+
+  /* ─── Section Divider ─── */
+  .wf-title {
+    text-align: center;
+    padding: 24px;
+    background: #f0f0f0;
+    border-bottom: 3px solid #333;
+    margin-bottom: 0;
+  }
+  .wf-title h1 { font-size: 20px; }
+  .wf-title p { font-size: 12px; color: #666; margin-top: 4px; }
+
+  /* ─── Mobile Preview (side annotation) ─── */
+  .mobile-note {
+    font-size: 10px;
+    color: #888;
+    font-style: italic;
+    margin-top: 8px;
+    text-align: center;
+  }
+
+  /* ─── Tab Bar (character sheet) ─── */
+  .tab-bar {
+    display: flex;
+    border-bottom: 2px solid #888;
+    margin-bottom: 20px;
+  }
+  .tab-item {
+    padding: 10px 18px;
+    font-size: 12px;
+    cursor: pointer;
+    border: 2px solid transparent;
+    border-bottom: none;
+    border-radius: 4px 4px 0 0;
+    margin-bottom: -2px;
+  }
+  .tab-item.active {
+    border-color: #888;
+    border-bottom-color: white;
+    background: white;
+    font-weight: bold;
+  }
+
+  /* ─── Scrollbar ─── */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-thumb { background: #ccc; border-radius: 3px; }
+
+  /* ─── Modal Overlay ─── */
+  .modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.4);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 500;
+    pointer-events: none;
+  }
+  .modal-box {
+    background: white;
+    border: 3px solid #333;
+    border-radius: 8px;
+    width: 460px;
+    overflow: hidden;
+  }
+  .modal-header { padding: 16px 20px; border-bottom: 2px solid #ccc; display: flex; justify-content: space-between; align-items: center; background: #f5f5f5; }
+  .modal-body { padding: 20px; }
+  .modal-footer { padding: 14px 20px; border-top: 2px solid #ccc; display: flex; justify-content: flex-end; gap: 10px; background: #fafafa; }
+  .form-row { margin-bottom: 14px; }
+  .form-label { display: block; font-size: 11px; font-weight: bold; margin-bottom: 4px; }
+  .form-input { width: 100%; border: 2px solid #888; border-radius: 4px; padding: 8px; font-size: 12px; font-family: inherit; background: #fafafa; }
+  .form-input:focus { outline: 2px dashed #555; }
+</style>
+</head>
+<body>
+
+<!-- Legend -->
+<div class="legend">
+  <h4>Componentes</h4>
+  <div class="legend-item"><span class="badge reuse">REUSE</span> Reutilizar</div>
+  <div class="legend-item"><span class="badge new">NEW</span> Criar novo</div>
+  <div class="legend-item"><span class="badge fix">FIX</span> Corrigir bug</div>
+</div>
+
+<!-- Wireframe Title -->
+<div class="wf-title">
+  <h1>🎲 RPG Player — Dashboard Reimaginado</h1>
+  <p>Wireframe Lofi · Todas as melhorias de UX/Visual/Acessibilidade aplicadas · Grayscale Mid-Fidelity</p>
+</div>
+
+<div class="page">
+
+  <!-- ══════════════════════════════════════
+       HEADER — Fixed, sticky top
+  ══════════════════════════════════════ -->
+  <!-- REUSABLE: .dashboard-header from dashboard.html -->
+  <header class="wf-header comp-wrapper">
+    <span class="comp-badge reuse" title="dashboard.html .dashboard-header (corrigido)">REUSE Header</span>
+
+    <div class="logo-area">
+      <div class="logo-box">[Logo<br>SVG]</div>
+      <div class="logo-text">RPG Player</div>
+    </div>
+
+    <!-- NEW: SearchBar component -->
+    <div class="comp-wrapper" style="flex: 1; max-width: 320px; margin: 0 32px;">
+      <span class="comp-badge new" title="js/components/SearchBar.js (novo)">NEW SearchBar</span>
+      <input class="search-bar" placeholder="🔍 Buscar personagens, mesas..." />
+    </div>
+
+    <div class="header-actions">
+      <!-- NEW: NotificationBell component -->
+      <div class="comp-wrapper">
+        <span class="comp-badge new" title="NotificationBell.js (novo)">NEW NotifBell</span>
+        <div class="notif-btn">🔔</div>
+      </div>
+
+      <!-- FIX: Avatar using local asset instead of placeholder.com -->
+      <div class="comp-wrapper">
+        <span class="comp-badge fix" title="dashboard.html:36 — substituir via.placeholder.com por asset local">FIX Avatar</span>
+        <div class="user-chip">
+          <div class="avatar">[img]</div>
+          <span class="name">Aventureiro</span>
+        </div>
+      </div>
+
+      <span class="logout-link">Sair →</span>
+    </div>
+  </header>
+
+  <div class="layout">
+
+    <!-- ══════════════════════════════════════
+         SIDEBAR — Desktop only
+    ══════════════════════════════════════ -->
+    <!-- REUSABLE: .sidebar from dashboard.html -->
+    <nav class="sidebar comp-wrapper">
+      <span class="comp-badge reuse" title="dashboard.html .sidebar">REUSE Sidebar</span>
+
+      <div class="sidebar-section-title">Principal</div>
+
+      <div class="nav-item active">
+        <span class="nav-icon">🏠</span>
+        <span class="nav-label">Início</span>
+      </div>
+
+      <div class="nav-item">
+        <span class="nav-icon">👥</span>
+        <span class="nav-label">Personagens</span>
+        <span class="nav-badge">3</span>
+      </div>
+
+      <div class="nav-item">
+        <span class="nav-icon">🎲</span>
+        <span class="nav-label">Mesas</span>
+        <span class="nav-badge">2</span>
+      </div>
+
+      <div class="sidebar-section-title">Ferramentas</div>
+
+      <div class="nav-item">
+        <span class="nav-icon">📋</span>
+        <span class="nav-label">Fichas</span>
+      </div>
+
+      <!-- NEW: Dice Roller quick access in sidebar -->
+      <div class="nav-item comp-wrapper">
+        <span class="comp-badge new" title="sidebar quick-dice-roller">NEW QuickDice</span>
+        <span class="nav-icon">🎯</span>
+        <span class="nav-label">Rolar Dados</span>
+      </div>
+
+      <div class="sidebar-footer">
+        <div style="font-size: 11px; color: #666;">
+          [Avatar] Aventureiro<br>
+          <span style="font-size: 10px;">Nível de XP: Herói</span>
+        </div>
+      </div>
+    </nav>
+
+    <!-- ══════════════════════════════════════
+         MAIN CONTENT AREA
+    ══════════════════════════════════════ -->
+    <main class="main">
+
+      <!-- Page Header -->
+      <div class="page-header">
+        <div>
+          <div class="page-title">Bem-vindo de volta, Aventureiro! ⚔️</div>
+          <div class="page-subtitle">Sua última sessão foi há 2 horas · Mesa: Dragões Antigos</div>
+        </div>
+        <div class="header-cta">
+          <div class="btn secondary">📅 Agendar Sessão</div>
+          <!-- NEW: QuickCreateButton with dropdown -->
+          <div class="comp-wrapper">
+            <span class="comp-badge new" title="QuickCreateButton dropdown">NEW QuickCreate</span>
+            <div class="btn primary">+ Criar ▾</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ─── KPI Row (FIX: 4 cards, full width) ─── -->
+      <!-- FIX: stats-grid era 2 cards sem utilizar espaço; agora 4 KPIs -->
+      <div class="kpi-row comp-wrapper">
+        <span class="comp-badge fix" title="dashboard.html .stats-grid — FIX: utilizar largura total com 4 KPIs">FIX StatsGrid</span>
+
+        <div class="kpi-card">
+          <div class="kpi-icon">👥</div>
+          <div class="kpi-value">3</div>
+          <div class="kpi-label">Personagens</div>
+          <div class="kpi-trend">↑ 1 novo esta semana</div>
+        </div>
+
+        <div class="kpi-card">
+          <div class="kpi-icon">🎲</div>
+          <div class="kpi-value">2</div>
+          <div class="kpi-label">Mesas Ativas</div>
+          <div class="kpi-trend">Próxima sessão: sábado</div>
+        </div>
+
+        <!-- NEW: Hours Played KPI -->
+        <div class="kpi-card comp-wrapper">
+          <span class="comp-badge new" title="NEW KPI: horas jogadas">NEW HorasKPI</span>
+          <div class="kpi-icon">⏱️</div>
+          <div class="kpi-value">47h</div>
+          <div class="kpi-label">Horas Jogadas</div>
+          <div class="kpi-trend">Mês atual</div>
+        </div>
+
+        <!-- NEW: XP Total KPI -->
+        <div class="kpi-card comp-wrapper">
+          <span class="comp-badge new" title="NEW KPI: XP total">NEW XPKpi</span>
+          <div class="kpi-icon">⭐</div>
+          <div class="kpi-value">2.4k</div>
+          <div class="kpi-label">XP Acumulado</div>
+          <div class="kpi-trend">+300 esta semana</div>
+        </div>
+      </div>
+
+      <!-- ─── Two Column: Characters + Quick Actions ─── -->
+      <div class="two-col">
+
+        <!-- Characters Section -->
+        <div class="section-card comp-wrapper">
+          <span class="comp-badge reuse" title="dashboard.html .characters-grid (melhorado)">REUSE CharGrid</span>
+
+          <div class="section-header">
+            <span class="section-title">Meus Personagens</span>
+            <div class="btn primary" style="padding: 5px 12px; font-size: 11px;">+ Criar Personagem</div>
+          </div>
+
+          <div class="section-body">
+
+            <!-- Character Card 1 -->
+            <!-- REUSABLE: .character-card -->
+            <div class="char-card comp-wrapper">
+              <span class="comp-badge reuse" title="dashboard.html .character-card">REUSE CharCard</span>
+              <div class="char-img-placeholder">[Foto<br>80×80]</div>
+              <div class="char-info">
+                <div class="char-name">Elara Brightwood</div>
+                <div class="char-meta">Elfa · Mago · Nível 5</div>
+                <!-- NEW: HP bar inline -->
+                <div class="comp-wrapper">
+                  <span class="comp-badge new" title="NEW HPBar component">NEW HPBar</span>
+                  <div class="hp-bar-container">
+                    <div class="hp-bar-label"><span>PV</span><span>28/35</span></div>
+                    <div class="hp-bar-track"><div class="hp-bar-fill" style="width: 80%;"></div></div>
+                  </div>
+                </div>
+                <div class="char-stats">
+                  <span class="stat-pill">FOR 8</span>
+                  <span class="stat-pill">INT 18</span>
+                  <span class="stat-pill">CA 13</span>
+                </div>
+              </div>
+              <div class="char-actions">
+                <div class="btn primary" style="font-size: 10px; width: 100%;">Abrir Ficha</div>
+                <div class="btn secondary" style="font-size: 10px; width: 100%;">Editar</div>
+              </div>
+            </div>
+
+            <!-- Character Card 2 -->
+            <div class="char-card">
+              <div class="char-img-placeholder">[Foto<br>80×80]</div>
+              <div class="char-info">
+                <div class="char-name">Thorin Ferroforte</div>
+                <div class="char-meta">Anão · Guerreiro · Nível 3</div>
+                <div class="hp-bar-container">
+                  <div class="hp-bar-label"><span>PV</span><span>18/30</span></div>
+                  <div class="hp-bar-track"><div class="hp-bar-fill" style="width: 60%; background: #888;"></div></div>
+                </div>
+                <div class="char-stats">
+                  <span class="stat-pill">FOR 18</span>
+                  <span class="stat-pill">CON 16</span>
+                  <span class="stat-pill">CA 18</span>
+                </div>
+              </div>
+              <div class="char-actions">
+                <div class="btn primary" style="font-size: 10px; width: 100%;">Abrir Ficha</div>
+                <div class="btn secondary" style="font-size: 10px; width: 100%;">Editar</div>
+              </div>
+            </div>
+
+            <!-- Empty slot CTA -->
+            <div class="empty-state" style="padding: 18px;">
+              <div class="empty-icon">➕</div>
+              <div class="empty-text">Crie um novo personagem para começar sua aventura</div>
+              <div class="btn secondary" style="display: inline-block;">+ Novo Personagem</div>
+            </div>
+
+          </div>
+        </div><!-- /characters -->
+
+        <!-- Right Column: Active Mesa + Quick Actions + Activity -->
+        <div style="display: flex; flex-direction: column; gap: 16px;">
+
+          <!-- Active Mesa Card -->
+          <!-- NEW: ActiveMesaCard — destaque da mesa ativa -->
+          <div class="section-card comp-wrapper">
+            <span class="comp-badge new" title="NEW ActiveMesaCard — mesa em destaque">NEW ActiveMesa</span>
+            <div class="section-header">
+              <span class="section-title">Mesa Ativa</span>
+              <span style="font-size: 11px; border: 1px solid #888; border-radius: 10px; padding: 2px 8px;">🟢 Online</span>
+            </div>
+            <div class="section-body">
+              <div style="font-weight: bold; font-size: 14px; margin-bottom: 4px;">Dragões Antigos</div>
+              <div style="font-size: 11px; color: #666; margin-bottom: 10px;">D&D 5e · 4/6 jogadores</div>
+              <div style="font-size: 11px; margin-bottom: 8px;">Próxima sessão: <strong>Sábado 19h</strong></div>
+              <div style="display: flex; gap: 8px;">
+                <div class="btn primary" style="flex: 1; text-align: center; font-size: 11px;">Entrar na Mesa</div>
+                <div class="btn secondary" style="font-size: 11px;">Info</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Quick Actions -->
+          <!-- NEW: QuickActionsPanel -->
+          <div class="section-card comp-wrapper">
+            <span class="comp-badge new" title="NEW QuickActionsPanel">NEW QuickPanel</span>
+            <div class="section-header">
+              <span class="section-title">Ações Rápidas</span>
+            </div>
+            <div class="section-body">
+              <div class="quick-actions">
+                <div class="quick-action">
+                  <div class="quick-action-icon">🎲</div>
+                  <div class="quick-action-label">Rolar Dados</div>
+                </div>
+                <div class="quick-action">
+                  <div class="quick-action-icon">📋</div>
+                  <div class="quick-action-label">Nova Ficha</div>
+                </div>
+                <div class="quick-action">
+                  <div class="quick-action-icon">📅</div>
+                  <div class="quick-action-label">Agendar Sessão</div>
+                </div>
+                <div class="quick-action">
+                  <div class="quick-action-icon">💬</div>
+                  <div class="quick-action-label">Mensagens</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Activity Feed -->
+          <!-- REUSABLE: .recent-activity from dashboard.html -->
+          <div class="section-card comp-wrapper">
+            <span class="comp-badge reuse" title="dashboard.html .recent-activity">REUSE ActivityFeed</span>
+            <div class="section-header">
+              <span class="section-title">Atividade Recente</span>
+              <span style="font-size: 10px; text-decoration: underline; cursor: pointer;">Ver tudo</span>
+            </div>
+            <div class="section-body" style="padding: 8px 16px;">
+              <div class="feed-item">
+                <div class="feed-icon">⚔️</div>
+                <div class="feed-content">
+                  <div class="feed-title">Batalha Épica Concluída</div>
+                  <div class="feed-time">Há 2 horas · Mesa: Dragões Antigos</div>
+                </div>
+              </div>
+              <div class="feed-item">
+                <div class="feed-icon">👤</div>
+                <div class="feed-content">
+                  <div class="feed-title">Novo personagem criado: Elara</div>
+                  <div class="feed-time">Ontem</div>
+                </div>
+              </div>
+              <div class="feed-item">
+                <div class="feed-icon">🎲</div>
+                <div class="feed-content">
+                  <div class="feed-title">Entrou na mesa "Dragões Antigos"</div>
+                  <div class="feed-time">2 dias atrás</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div><!-- /right col -->
+      </div><!-- /two-col -->
+
+      <!-- ─── All Tables ─── -->
+      <div class="section-card" style="margin-bottom: 24px;">
+        <div class="section-header">
+          <span class="section-title">Minhas Mesas</span>
+          <div style="display: flex; gap: 8px;">
+            <div class="btn secondary" style="font-size: 11px;">Filtrar ▾</div>
+            <div class="btn primary" style="font-size: 11px;">+ Criar Mesa</div>
+          </div>
+        </div>
+        <div class="section-body" style="padding: 8px 16px;">
+          <div class="table-list-item">
+            <div class="table-dot active"></div>
+            <div class="table-name">A Lenda dos Dragões Antigos</div>
+            <div class="table-info">D&D 5e · 4/6 · 🟢 Ativa</div>
+            <div class="table-action">Entrar</div>
+          </div>
+          <div class="table-list-item">
+            <div class="table-dot waiting"></div>
+            <div class="table-name">Mistérios de Ravenloft</div>
+            <div class="table-info">D&D 5e · 2/4 · 🟡 Aguardando</div>
+            <div class="table-action">Configurar</div>
+          </div>
+          <div class="table-list-item">
+            <div class="table-dot"></div>
+            <div class="table-name">A Queda do Rei Lich</div>
+            <div class="table-info">D&D 5e · 5/5 · ✅ Concluída</div>
+            <div class="table-action">Histórico</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ─── Annotations / Fix Notes ─── -->
+      <div style="border: 2px dashed #f0d400; border-radius: 6px; padding: 16px; background: #fffde7; margin-bottom: 24px;">
+        <div style="font-weight: bold; font-size: 13px; margin-bottom: 10px;">📌 Notas de Correção (Issues Aplicados neste Wireframe)</div>
+        <div class="annotation">FIX #7 — Borda laranja: adicionar <code>overflow: hidden</code> no body e garantir overlay cobre 100% do viewport</div><br>
+        <div class="annotation">FIX #8 — Avatar placeholder: usar img local <code>/img/perfil_empty_user.png</code> como fallback</div><br>
+        <div class="annotation">FIX #9 — Toast: cor alterada para dourado/preto para seguir tema medieval</div><br>
+        <div class="annotation">FIX #10 — Stats mobile: grid 2×2 em vez de coluna única gigante</div><br>
+        <div class="annotation">FIX #16 — Dashboard desktop: 4 KPIs + layout 2-colunas usa 100% da largura</div><br>
+        <div class="annotation">FIX #17 — Link "Esqueceu a senha?" restaurado abaixo do formulário de login</div><br>
+        <div class="annotation">NEW — HP bars inline nos cards de personagem dão contexto de estado sem precisar abrir a ficha</div><br>
+        <div class="annotation">NEW — Quick Actions panel reduz passos para ações frequentes (rolar dados, nova ficha, agenda)</div>
+      </div>
+
+    </main><!-- /main -->
+  </div><!-- /layout -->
+
+</div><!-- /page -->
+
+<!-- ─── Toast Preview (Fixed) — FIX #9 ─── -->
+<div class="toast-preview comp-wrapper">
+  <span class="comp-badge fix" style="top: -22px; right: 0;" title="FIX #9 — cor do toast corrigida para tema medieval">FIX Toast</span>
+  <span style="font-size: 18px;">⚔️</span>
+  <div>
+    <div style="font-weight: bold; font-size: 12px;">Personagem salvo!</div>
+    <div style="font-size: 10px; color: #666;">Elara Brightwood atualizada.</div>
+  </div>
+  <span style="cursor: pointer; color: #888; font-size: 16px;">×</span>
+</div>
+
+<!-- ─── MODAL PREVIEW (editAttribute FIX) ─── -->
+<!-- FIX #5: substituir window.prompt() por modal estilizado -->
+<div class="modal-backdrop">
+  <div class="modal-box comp-wrapper">
+    <span class="comp-badge fix" title="FIX #5 — substituir prompt() por modal estilizado">FIX EditAttr Modal</span>
+    <div class="modal-header">
+      <span style="font-weight: bold; font-size: 14px;">✏️ Editar Atributo: FORÇA</span>
+      <span style="font-size: 20px; cursor: pointer; color: #666;">×</span>
+    </div>
+    <div class="modal-body">
+      <div class="form-row">
+        <label class="form-label">Valor (1–30)</label>
+        <input class="form-input" type="number" value="16" min="1" max="30" />
+      </div>
+      <div style="font-size: 11px; color: #666;">
+        Modificador calculado automaticamente: <strong>+3</strong>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <div class="btn secondary">Cancelar</div>
+      <div class="btn primary">Salvar</div>
+    </div>
+  </div>
+</div>
+
+<!-- ─── Mobile Note ─── -->
+<div class="mobile-note" style="padding: 12px;">
+  📱 Mobile: sidebar é substituído por bottom nav (🏠 Início · 👥 Personagens · 🎲 Mesas · ⚙️ Config) · Stats grid usa 2×2 · Cards de personagem ocupam 100% da largura com ações colapsadas
+</div>
+
+</body>
+</html>

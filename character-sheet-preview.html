@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Preview — Ficha de Personagem D&D 5e</title>
+    <link rel="stylesheet" href="styles/main.css" />
+    <link rel="stylesheet" href="styles/character-sheet.css?v=3.0" />
+</head>
+<body class="bg-background min-h-screen">
+
+    <!-- TOP BAR -->
+    <div class="cs-top-bar">
+        <div class="cs-top-bar__left">
+            <button class="cs-icon-btn">☰</button>
+            <button class="cs-icon-btn">←</button>
+        </div>
+        <div class="cs-top-bar__center">
+            <div class="cs-top-bar__char-name">Aragorn, Filho de Arathorn</div>
+            <div class="cs-top-bar__char-subtitle">Guerreiro · Nível 10 · Humano</div>
+        </div>
+        <div class="cs-top-bar__right">
+            <button class="cs-save-btn">💾 Salvar</button>
+        </div>
+    </div>
+
+    <div class="container mx-auto px-4 py-6 max-w-7xl">
+
+        <!-- Tab Nav Desktop -->
+        <div class="cs-tab-nav-desktop mb-6">
+            <button class="tab-btn active" data-tab="combat">
+                <span class="tab-icon">⚔️</span><span>Combate</span>
+            </button>
+            <button class="tab-btn" data-tab="attributes">
+                <span class="tab-icon">📊</span><span>Atributos &amp; Perícias</span>
+            </button>
+            <button class="tab-btn" data-tab="identity">
+                <span class="tab-icon">🎭</span><span>Identidade</span>
+            </button>
+            <button class="tab-btn" data-tab="resources">
+                <span class="tab-icon">🎒</span><span>Recursos</span>
+            </button>
+        </div>
+
+        <!-- ABA COMBATE (preview sempre visível) -->
+        <div class="tab-content active">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+
+                <!-- Coluna Esquerda -->
+                <div class="space-y-6">
+
+                    <!-- Pontos de Vida -->
+                    <section class="card p-6">
+                        <h2>❤️ Pontos de Vida</h2>
+                        <div class="hp-bar-wrap mb-4">
+                            <div class="hp-bar" style="width: 62%;"></div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="stat-box hp-main-box">
+                                <div class="hp-total-row">
+                                    <span style="font-size:0.65rem;color:var(--cs-text-muted);text-transform:uppercase;letter-spacing:0.08em;">Máx</span>
+                                    <input type="number" class="hp-total-input" value="104" readonly />
+                                </div>
+                                <div class="stat-box__value" style="font-size:clamp(2.4rem,8vw,3.6rem);">65</div>
+                                <span class="stat-box__label">PV Atuais</span>
+                            </div>
+                            <div class="stat-box">
+                                <div class="stat-box__value">0</div>
+                                <span class="stat-box__label">PV Temp.</span>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Estatísticas de Combate -->
+                    <section class="card p-6">
+                        <h2>🛡️ Estatísticas de Combate</h2>
+                        <div class="grid grid-cols-3 gap-3">
+                            <div class="stat-box">
+                                <div class="stat-box__value">18</div>
+                                <span class="stat-box__label">Classe<br>de Armadura</span>
+                            </div>
+                            <div class="stat-box">
+                                <div class="stat-box__value">+3</div>
+                                <span class="stat-box__label">Iniciativa</span>
+                            </div>
+                            <div class="stat-box">
+                                <div class="stat-box__value">9m</div>
+                                <span class="stat-box__label">Deslocamento</span>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Dados de Vida -->
+                    <section class="card p-6">
+                        <h2>🎲 Dados de Vida</h2>
+                        <div class="stat-box" style="padding:24px 14px;">
+                            <p style="font-size:0.65rem;color:var(--cs-text-muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px;">Total: 10d10 + MOD de CON</p>
+                            <div class="stat-box__value">10d10</div>
+                            <span class="stat-box__label">Dados de Vida</span>
+                        </div>
+                    </section>
+                </div>
+
+                <!-- Coluna Direita — Ataques -->
+                <div class="space-y-6">
+                    <section class="card p-6">
+                        <div class="flex justify-between items-center mb-4" style="border-bottom:1px solid var(--cs-gold-border);padding-bottom:10px;">
+                            <h2 style="border:none;padding:0;margin:0;">⚔️ Ataques</h2>
+                            <button class="cs-add-btn">+</button>
+                        </div>
+                        <div class="grid gap-2 mb-2" style="grid-template-columns:1fr 60px 100px 32px;font-size:0.65rem;color:var(--cs-text-muted);text-transform:uppercase;letter-spacing:0.08em;padding:0 4px;">
+                            <div>Nome</div>
+                            <div style="text-align:center;">Bônus</div>
+                            <div style="text-align:center;">Dano / Tipo</div>
+                            <div></div>
+                        </div>
+                        <div class="space-y-2">
+                            <div class="attack-row">
+                                <div class="attack-row__name">Andúril</div>
+                                <div class="attack-row__bonus">+9</div>
+                                <div class="attack-row__damage">1d8+5 <span style="font-size:0.7rem;opacity:0.7;">Cortante</span></div>
+                                <button class="attack-row__delete">✕</button>
+                            </div>
+                            <div class="attack-row">
+                                <div class="attack-row__name">Arco Longo</div>
+                                <div class="attack-row__bonus">+7</div>
+                                <div class="attack-row__damage">1d8+3 <span style="font-size:0.7rem;opacity:0.7;">Perfurante</span></div>
+                                <button class="attack-row__delete">✕</button>
+                            </div>
+                            <div class="attack-row">
+                                <div class="attack-row__name">Faca de Combate</div>
+                                <div class="attack-row__bonus">+8</div>
+                                <div class="attack-row__damage">1d4+5 <span style="font-size:0.7rem;opacity:0.7;">Perfurante</span></div>
+                                <button class="attack-row__delete">✕</button>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Atributos preview (mini) -->
+                    <section class="card p-6">
+                        <h2>📊 Atributos</h2>
+                        <div class="grid grid-cols-3 gap-3">
+                            <div class="attr-block"><div class="attr-block__inner"><div class="attr-block__name">FORÇA</div><div class="attr-block__value">18</div><div class="attr-block__mod">+4</div></div></div>
+                            <div class="attr-block"><div class="attr-block__inner"><div class="attr-block__name">DESTREZA</div><div class="attr-block__value">16</div><div class="attr-block__mod">+3</div></div></div>
+                            <div class="attr-block"><div class="attr-block__inner"><div class="attr-block__name">CONST.</div><div class="attr-block__value">16</div><div class="attr-block__mod">+3</div></div></div>
+                            <div class="attr-block"><div class="attr-block__inner"><div class="attr-block__name">INTELIG.</div><div class="attr-block__value">13</div><div class="attr-block__mod">+1</div></div></div>
+                            <div class="attr-block"><div class="attr-block__inner"><div class="attr-block__name">SABEDORIA</div><div class="attr-block__value">14</div><div class="attr-block__mod">+2</div></div></div>
+                            <div class="attr-block"><div class="attr-block__inner"><div class="attr-block__name">CARISMA</div><div class="attr-block__value">17</div><div class="attr-block__mod">+3</div></div></div>
+                        </div>
+                        <div class="flex justify-around mt-4">
+                            <div class="text-center">
+                                <div class="cs-badge-circle">+4</div>
+                                <div style="font-size:0.6rem;color:var(--cs-text-muted);margin-top:6px;text-transform:uppercase;letter-spacing:0.06em;">Prof. Bônus</div>
+                            </div>
+                            <div class="text-center">
+                                <div class="cs-badge-circle">15</div>
+                                <div style="font-size:0.6rem;color:var(--cs-text-muted);margin-top:6px;text-transform:uppercase;letter-spacing:0.06em;">Percepção Passiva</div>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Mobile Bottom Nav -->
+    <nav class="cs-bottom-nav">
+        <button class="cs-bottom-nav__btn active" data-tab="combat">
+            <span class="cs-bottom-nav__icon">⚔️</span>
+            <span class="cs-bottom-nav__label">Combate</span>
+        </button>
+        <button class="cs-bottom-nav__btn" data-tab="attributes">
+            <span class="cs-bottom-nav__icon">📊</span>
+            <span class="cs-bottom-nav__label">Atributos</span>
+        </button>
+        <button class="cs-bottom-nav__btn" data-tab="identity">
+            <span class="cs-bottom-nav__icon">🎭</span>
+            <span class="cs-bottom-nav__label">Identidade</span>
+        </button>
+        <button class="cs-bottom-nav__btn" data-tab="resources">
+            <span class="cs-bottom-nav__icon">🎒</span>
+            <span class="cs-bottom-nav__label">Recursos</span>
+        </button>
+    </nav>
+
+</body>
+</html>

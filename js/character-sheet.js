@@ -2347,14 +2347,22 @@ class CharacterCreationWizard {
             if (category.items.length === 0) return '';
 
             const itemsHtml = category.items.map(item => {
-                const custo = typeof item.custo === 'string' ? JSON.parse(item.custo) : item.custo;
-                const custoText = `${custo.quantidade} ${custo.moeda}`;
+                let custo = null;
+                let custoText = 'Preço indisponível';
+                try {
+                    custo = typeof item.custo === 'string' ? JSON.parse(item.custo) : item.custo;
+                    if (custo && custo.quantidade !== undefined && custo.moeda) {
+                        custoText = `${custo.quantidade} ${custo.moeda}`;
+                    }
+                } catch (e) {
+                    console.warn('⚠️ Erro ao parsear custo do item:', item.nome, e);
+                }
                 const isPurchased = this.wizardData.purchasedItems.some(p => p.id === item.id);
 
                 return `
                     <div class="shop-item ${isPurchased ? 'purchased' : ''}" data-item-id="${item.id}" data-item-category="${category.key}">
                         <div class="shop-item-header">
-                            <span class="shop-item-name">${item.nome}</span>
+                            <span class="shop-item-name">${item.nome || 'Item sem nome'}</span>
                             <span class="shop-item-cost">${custoText}</span>
                         </div>
                         ${item.dano ? `<div class="shop-item-detail">Dano: ${item.dano}</div>` : ''}
@@ -2454,16 +2462,26 @@ class CharacterCreationWizard {
                 const item = this.gameData[category].find(i => i.id === itemId);
                 if (!item) return;
 
+                let custo = null;
+                try {
+                    custo = typeof item.custo === 'string' ? JSON.parse(item.custo) : item.custo;
+                } catch (e) {
+                    console.warn('⚠️ Erro ao parsear custo:', item.nome, e);
+                    return;
+                }
+                if (!custo || custo.quantidade === undefined) {
+                    alert('⚠️ Este item não possui preço definido.');
+                    return;
+                }
+
                 const isPurchased = this.wizardData.purchasedItems.some(p => p.id === itemId);
 
                 if (isPurchased) {
                     // Remover item
                     this.wizardData.purchasedItems = this.wizardData.purchasedItems.filter(p => p.id !== itemId);
-                    const custo = typeof item.custo === 'string' ? JSON.parse(item.custo) : item.custo;
                     this.wizardData.startingWealth += this.convertToGold(custo);
                 } else {
                     // Adicionar item
-                    const custo = typeof item.custo === 'string' ? JSON.parse(item.custo) : item.custo;
                     const costInGold = this.convertToGold(custo);
 
                     if (this.wizardData.startingWealth >= costInGold) {
@@ -2504,6 +2522,11 @@ class CharacterCreationWizard {
     }
 
     convertToGold(custo) {
+        if (!custo || !custo.moeda || custo.quantidade === undefined) {
+            console.warn('⚠️ convertToGold: custo inválido', custo);
+            return 0;
+        }
+
         // Converter diferentes moedas para ouro
         const conversions = {
             'po': 1,     // Peça de ouro
@@ -2611,9 +2634,20 @@ class CharacterCreationWizard {
             console.log('💾 Finalizando personagem...');
             console.log('📊 Wizard Data:', this.wizardData);
 
-            // Verificar se já existe um personagem carregado
+            // Se não existe um characterId, criar um novo documento
             if (!this.characterSheet.characterId) {
-                throw new Error('Nenhum personagem carregado para atualizar!');
+                console.log('📝 Nenhum characterId encontrado, criando novo personagem...');
+                const userId = this.characterSheet.currentUser?.uid;
+                if (!userId) {
+                    throw new Error('Usuário não autenticado!');
+                }
+                const newDraft = await this.characterSheet.createNewDraft(userId);
+                if (newDraft && newDraft.id) {
+                    this.characterSheet.characterId = newDraft.id;
+                    console.log('✅ Novo personagem criado com ID:', newDraft.id);
+                } else {
+                    throw new Error('Falha ao criar novo personagem no banco de dados.');
+                }
             }
 
             const hitDie = this.getHitDieValue(this.wizardData.class.hit_die);
