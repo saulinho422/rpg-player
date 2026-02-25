@@ -10,12 +10,18 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@supabase/supabase-js": "^2.38.0"
+    "firebase": "^12.9.0",
+    "firebase-admin": "^13.6.1"
   },
   "devDependencies": {
     "vite": "^4.4.5"
   },
-  "keywords": ["rpg", "player", "supabase", "auth"],
+  "keywords": [
+    "rpg",
+    "player",
+    "firebase",
+    "auth"
+  ],
   "author": "saulinho422",
   "license": "MIT"
 }

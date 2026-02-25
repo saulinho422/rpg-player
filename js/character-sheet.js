@@ -1,10 +1,11 @@
-// Supabase Configuration
-import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.38.0/+esm';
-
-const SUPABASE_URL = 'https://bifiatkpfmrrnfhvgrpb.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpZmlhdGtwZm1ycm5maHZncnBiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA0ODM2NTMsImV4cCI6MjA3NjA1OTY1M30.g5S4aT-ml_cgGoJHWudB36EWz-3bonFZW3DEIWNOUAM';
-
-const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+// Firebase Configuration
+import { auth, db } from './firebase-config.js';
+import { onAuthStateChanged } from 'firebase/auth';
+import {
+    doc, getDoc, setDoc, updateDoc, addDoc,
+    collection, query, where, orderBy, limit, getDocs
+} from 'firebase/firestore';
+import { GameDataService } from './database.js';
 
 // Character Sheet Manager
 class CharacterSheet {
@@ -26,7 +27,7 @@ class CharacterSheet {
     async init() {
         await this.checkAuth();
         await this.loadGameData();
-        
+
         // Se não tem ID, está em modo de criação
         if (!this.characterId) {
             await this.initCreationMode();
@@ -37,12 +38,12 @@ class CharacterSheet {
         this.populateSheet();
         this.calculateAll();
         this.setupEventListeners();
-        
+
         // Inicializar Features Manager
         if (window.FeaturesManager) {
             window.featuresManager = new window.FeaturesManager(this);
         }
-        
+
         // Wizard agora só abre pelo botão do menu
         // setTimeout(() => {
         //     console.log('🧙 Inicializando wizard automaticamente...');
@@ -51,40 +52,36 @@ class CharacterSheet {
     }
 
     async checkAuth() {
-        try {
-            const { data: { user } } = await supabase.auth.getUser();
-            if (!user) {
-                window.location.href = '/login.html';
-                return;
-            }
-            this.currentUser = user;
-        } catch (error) {
-            console.error('❌ Erro na autenticação:', error);
-            window.location.href = '/login.html';
-        }
+        return new Promise((resolve) => {
+            const unsubscribe = onAuthStateChanged(auth, (user) => {
+                unsubscribe();
+                if (!user) {
+                    window.location.href = '/login.html';
+                    resolve();
+                    return;
+                }
+                this.currentUser = user;
+                resolve();
+            });
+        });
     }
 
     async loadGameData() {
         try {
             console.log('📦 Carregando dados do banco de dados...');
-            
-            const [racesResult, classesResult, backgroundsResult, alignmentsResult] = await Promise.all([
-                supabase.from('races').select('*'),
-                supabase.from('classes').select('*'),
-                supabase.from('game_backgrounds').select('*'),
-                supabase.from('game_alignments').select('*')
+
+            const [races, classes, backgrounds, alignments] = await Promise.all([
+                GameDataService.getAll('races'),
+                GameDataService.getAll('classes'),
+                GameDataService.getAll('game_backgrounds'),
+                GameDataService.getAll('game_alignments')
             ]);
 
-            if (racesResult.error) throw new Error('Erro ao carregar raças: ' + racesResult.error.message);
-            if (classesResult.error) throw new Error('Erro ao carregar classes: ' + classesResult.error.message);
-            if (backgroundsResult.error) throw new Error('Erro ao carregar antecedentes: ' + backgroundsResult.error.message);
-            if (alignmentsResult.error) throw new Error('Erro ao carregar tendências: ' + alignmentsResult.error.message);
-
             this.gameData = {
-                races: racesResult.data || [],
-                classes: classesResult.data || [],
-                backgrounds: backgroundsResult.data || [],
-                alignments: alignmentsResult.data || []
+                races: races || [],
+                classes: classes || [],
+                backgrounds: backgrounds || [],
+                alignments: alignments || []
             };
 
             console.log('✅ Dados carregados:', {
@@ -93,7 +90,7 @@ class CharacterSheet {
                 backgrounds: this.gameData.backgrounds.length,
                 alignments: this.gameData.alignments.length
             });
-            
+
             // Popular dropdowns da ficha
             this.populateSheetDropdowns();
         } catch (error) {
@@ -104,7 +101,7 @@ class CharacterSheet {
 
     populateSheetDropdowns() {
         console.log('📋 Populando dropdowns da ficha...');
-        
+
         // Popular dropdown de Classes
         const classSelect = document.getElementById('character-class-2');
         if (classSelect && this.gameData.classes) {
@@ -171,7 +168,7 @@ class CharacterSheet {
         try {
             // Verificar se existe um rascunho para este usuário
             const draft = await this.loadOrCreateDraft();
-            
+
             if (draft) {
                 console.log('📝 Rascunho encontrado, continuando criação:', draft);
                 this.character = this.convertDraftToCharacter(draft);
@@ -188,20 +185,20 @@ class CharacterSheet {
                     attributes: { str: 10, dex: 10, con: 10, int: 10, wis: 10, cha: 10 }
                 };
             }
-            
+
             // Popular a ficha com dados existentes
             this.populateSheet();
-            
+
             // Setup event listeners
             this.setupEventListeners();
             this.setupCreationListeners();
-            
+
             // Atualizar cálculos
             this.calculateAll();
-            
+
             // Setup auto-save para rascunho
             this.setupAutoSave();
-            
+
         } catch (error) {
             console.error('❌ Erro ao inicializar modo de criação:', error);
             alert('Erro ao inicializar criação de personagem!');
@@ -210,32 +207,32 @@ class CharacterSheet {
 
     async loadOrCreateDraft() {
         try {
-            const { data: { user } } = await supabase.auth.getUser();
-            if (!user) return null;
+            if (!this.currentUser) return null;
+            const userId = this.currentUser.uid;
 
             // Buscar rascunho existente
-            const { data: drafts, error } = await supabase
-                .from('characters')
-                .select('*')
-                .eq('user_id', user.id)
-                .eq('is_draft', true)
-                .order('updated_at', { ascending: false })
-                .limit(1);
+            const q = query(
+                collection(db, 'characters'),
+                where('user_id', '==', userId),
+                where('is_draft', '==', true),
+                orderBy('updated_at', 'desc'),
+                limit(1)
+            );
 
-            if (error) throw error;
+            const snapshot = await getDocs(q);
 
             // Se encontrou um rascunho, retorna
-            if (drafts && drafts.length > 0) {
-                return drafts[0];
+            if (!snapshot.empty) {
+                const docSnap = snapshot.docs[0];
+                return { id: docSnap.id, ...docSnap.data() };
             }
 
             // Se não encontrou, verifica se deve criar um novo
             const params = new URLSearchParams(window.location.search);
             const isNewCharacter = params.get('new') === 'true';
-            
+
             if (isNewCharacter) {
-                // Criar novo rascunho
-                const newDraft = await this.createNewDraft(user.id);
+                const newDraft = await this.createNewDraft(userId);
                 return newDraft;
             }
 
@@ -248,29 +245,28 @@ class CharacterSheet {
 
     async createNewDraft(userId) {
         try {
-            const { data, error } = await supabase
-                .from('characters')
-                .insert([{
-                    user_id: userId,
-                    name: '',
-                    is_draft: true,
-                    draft_step: 'basic_info',
-                    level: 1,
-                    strength: 10,
-                    dexterity: 10,
-                    constitution: 10,
-                    intelligence: 10,
-                    wisdom: 10,
-                    charisma: 10,
-                    hit_points_max: 8,
-                    hit_points_current: 8,
-                    armor_class: 10
-                }])
-                .select()
-                .single();
+            const draftData = {
+                user_id: userId,
+                name: '',
+                is_draft: true,
+                draft_step: 'basic_info',
+                level: 1,
+                strength: 10,
+                dexterity: 10,
+                constitution: 10,
+                intelligence: 10,
+                wisdom: 10,
+                charisma: 10,
+                hit_points_max: 8,
+                hit_points_current: 8,
+                armor_class: 10,
+                created_at: new Date().toISOString(),
+                updated_at: new Date().toISOString()
+            };
 
-            if (error) throw error;
-            
+            const docRef = await addDoc(collection(db, 'characters'), draftData);
+
+            const data = { id: docRef.id, ...draftData };
             console.log('✅ Novo rascunho criado:', data);
             return data;
         } catch (error) {
@@ -281,7 +277,7 @@ class CharacterSheet {
 
     convertDraftToCharacter(draft) {
         console.log('🔄 Convertendo rascunho para personagem:', draft);
-        
+
         const character = {
             id: draft.id,
             name: draft.name || '',
@@ -321,21 +317,24 @@ class CharacterSheet {
             bonds: draft.bonds,
             flaws: draft.flaws
         };
-        
+
         console.log('✅ Personagem convertido:', character);
         return character;
     }
 
     async loadCharacter() {
         try {
-            const { data, error } = await supabase
-                .from('characters')
-                .select('*')
-                .eq('id', this.characterId)
-                .eq('user_id', this.currentUser.id)
-                .single();
+            const docRef = doc(db, 'characters', this.characterId);
+            const docSnap = await getDoc(docRef);
 
-            if (error) throw error;
+            if (!docSnap.exists()) throw new Error('Personagem não encontrado');
+
+            const data = { id: docSnap.id, ...docSnap.data() };
+
+            // Verifica se pertence ao usuário
+            if (data.user_id !== this.currentUser.uid) {
+                throw new Error('Sem permissão');
+            }
 
             this.isDraft = data.is_draft === true;
             console.log(`📋 Personagem carregado - isDraft: ${this.isDraft}`);
@@ -389,7 +388,7 @@ class CharacterSheet {
         this.setInputValue('temphp', 0);
         this.setInputValue('ac', this.character.armor_class);
         this.setInputValue('speed', `${this.character.speed}m`);
-        
+
         if (this.character.character_class) {
             const hitDie = this.getHitDieForClass(this.character.character_class);
             this.setInputValue('hitdice', `${this.character.level}${hitDie}`);
@@ -494,23 +493,23 @@ class CharacterSheet {
 
         // Proficiências (textarea na aba Identidade)
         if (this.character.proficiencies) {
-            const profText = Array.isArray(this.character.proficiencies) 
-                ? this.character.proficiencies.join(', ') 
+            const profText = Array.isArray(this.character.proficiencies)
+                ? this.character.proficiencies.join(', ')
                 : this.character.proficiencies;
             this.setInputValue('proficiencies', profText);
         }
 
         // Idiomas (textarea na aba Identidade)
         if (this.character.languages) {
-            const langText = Array.isArray(this.character.languages) 
-                ? this.character.languages.join(', ') 
+            const langText = Array.isArray(this.character.languages)
+                ? this.character.languages.join(', ')
                 : this.character.languages;
             this.setInputValue('languages', langText);
         }
 
         // Histórico (backstory textarea na aba Identidade)
         this.setInputValue('backstory', this.character.backstory);
-        
+
         // Aparência (appearance textarea na aba Identidade)  
         this.setInputValue('appearance', this.character.appearance);
 
@@ -611,11 +610,11 @@ class CharacterSheet {
 
     calculateModifiers() {
         const attributes = ['Strength', 'Dexterity', 'Constitution', 'Intelligence', 'Wisdom', 'Charisma'];
-        
+
         attributes.forEach(attr => {
             const scoreElement = document.getElementById(`${attr}score`);
             const modElement = document.getElementById(`${attr}mod`);
-            
+
             if (scoreElement && modElement) {
                 const score = parseInt(scoreElement.value) || 10;
                 const modifier = Math.floor((score - 10) / 2);
@@ -648,12 +647,12 @@ class CharacterSheet {
     calculateSavingThrows() {
         const attributes = ['Strength', 'Dexterity', 'Constitution', 'Intelligence', 'Wisdom', 'Charisma'];
         const profBonus = this.calculateProficiencyBonus();
-        
+
         attributes.forEach(attr => {
             const modElement = document.getElementById(`${attr}mod`);
             const saveElement = document.getElementById(`${attr}-save`);
             const profElement = document.getElementById(`${attr}-save-prof`);
-            
+
             if (modElement && saveElement) {
                 const modifier = parseInt(modElement.value) || 0;
                 const isProficient = profElement?.checked || false;
@@ -691,7 +690,7 @@ class CharacterSheet {
         skills.forEach(skill => {
             const checkbox = document.getElementById(`skill-${skill.id}`);
             const valueElement = document.getElementById(`skill-${skill.id}-value`);
-            
+
             if (valueElement) {
                 // Pegar o modificador do atributo correspondente
                 const attrValue = this.getAttributeValue(skill.attr);
@@ -722,7 +721,7 @@ class CharacterSheet {
         // Obter o valor da perícia de Percepção
         const perceptionValueElement = document.getElementById('skill-perception-value');
         const passiveElement = document.getElementById('passive-perception');
-        
+
         if (perceptionValueElement && passiveElement) {
             // Parse do bônus (ex: "+3" ou "-1")
             const perceptionBonus = parseInt(perceptionValueElement.textContent) || 0;
@@ -735,7 +734,7 @@ class CharacterSheet {
         // AC básica (10 + mod Dex)
         const dexModElement = document.getElementById('Dexteritymod');
         const acElement = document.getElementById('ac');
-        
+
         if (dexModElement && acElement) {
             const dexMod = parseInt(dexModElement.value) || 0;
             const baseAC = 10 + dexMod;
@@ -829,11 +828,11 @@ class CharacterSheet {
                 this.calculateAll();
             });
         });
-        
+
         // Sincronização de campos duplicados entre abas
         this.setupFieldSync();
     }
-    
+
     setupFieldSync() {
         // Pares de campos que devem ser sincronizados entre abas
         const syncPairs = [
@@ -845,11 +844,11 @@ class CharacterSheet {
             { id1: 'character-subclass', id2: 'character-subclass-2' },
             { id1: 'character-level', id2: 'character-level-2' }
         ];
-        
+
         syncPairs.forEach(pair => {
             const el1 = document.getElementById(pair.id1);
             const el2 = document.getElementById(pair.id2);
-            
+
             if (el1 && el2) {
                 // Sincronizar de 1 para 2
                 el1.addEventListener('input', (e) => {
@@ -858,7 +857,7 @@ class CharacterSheet {
                 el1.addEventListener('change', (e) => {
                     el2.value = e.target.value;
                 });
-                
+
                 // Sincronizar de 2 para 1
                 el2.addEventListener('input', (e) => {
                     el1.value = e.target.value;
@@ -868,7 +867,7 @@ class CharacterSheet {
                 });
             }
         });
-        
+
         console.log('✅ Sincronização de campos configurada');
     }
 
@@ -926,23 +925,23 @@ class CharacterSheet {
     openRaceModal() {
         const modal = document.getElementById('raceModal');
         const grid = document.getElementById('raceGrid');
-        
+
         if (!modal || !grid) return;
-        
+
         grid.innerHTML = '';
-        
+
         if (!this.gameData.races || this.gameData.races.length === 0) {
             grid.innerHTML = '<p style="color: white; text-align: center; padding: 2rem;">Nenhuma raça disponível.</p>';
             modal.classList.add('active');
             return;
         }
-        
+
         this.gameData.races.forEach(race => {
             const card = document.createElement('div');
             card.className = 'modal-item';
             const raceName = race.name_pt || race.name || 'Sem Nome';
             if (this.character.race === race.id) card.classList.add('selected');
-            
+
             card.innerHTML = `
                 <h3>${raceName}</h3>
                 <p>${race.description || ''}</p>
@@ -950,34 +949,34 @@ class CharacterSheet {
                     <small>Tamanho: ${race.size || 'Médio'} | Velocidade: ${race.speed || 30}ft</small>
                 </div>
             `;
-            
+
             card.addEventListener('click', () => this.selectRace(race));
             grid.appendChild(card);
         });
-        
+
         modal.classList.add('active');
     }
 
     openClassModal() {
         const modal = document.getElementById('classModal');
         const grid = document.getElementById('classGrid');
-        
+
         if (!modal || !grid) return;
-        
+
         grid.innerHTML = '';
-        
+
         if (!this.gameData.classes || this.gameData.classes.length === 0) {
             grid.innerHTML = '<p style="color: white; text-align: center; padding: 2rem;">Nenhuma classe disponível.</p>';
             modal.classList.add('active');
             return;
         }
-        
+
         this.gameData.classes.forEach(cls => {
             const card = document.createElement('div');
             card.className = 'modal-item';
             const className = cls.name_pt || cls.name || 'Sem Nome';
             if (this.character.class === cls.id) card.classList.add('selected');
-            
+
             card.innerHTML = `
                 <h3>${className}</h3>
                 <p>${cls.description || ''}</p>
@@ -985,75 +984,75 @@ class CharacterSheet {
                     <small>Dado de Vida: d${cls.hit_die || 8} | Proficiências: ${cls.primary_ability || 'Variado'}</small>
                 </div>
             `;
-            
+
             card.addEventListener('click', () => this.selectClass(cls));
             grid.appendChild(card);
         });
-        
+
         modal.classList.add('active');
     }
 
     openBackgroundModal() {
         const modal = document.getElementById('backgroundModal');
         const grid = document.getElementById('backgroundGrid');
-        
+
         if (!modal || !grid) return;
-        
+
         grid.innerHTML = '';
-        
+
         if (!this.gameData.backgrounds || this.gameData.backgrounds.length === 0) {
             grid.innerHTML = '<p style="color: white; text-align: center; padding: 2rem;">Nenhum antecedente disponível.</p>';
             modal.classList.add('active');
             return;
         }
-        
+
         this.gameData.backgrounds.forEach(bg => {
             const card = document.createElement('div');
             card.className = 'modal-item';
             const bgName = bg.name_pt || bg.name || 'Sem Nome';
             if (this.character.background === bg.id) card.classList.add('selected');
-            
+
             card.innerHTML = `
                 <h3>${bgName}</h3>
                 <p>${bg.description || ''}</p>
             `;
-            
+
             card.addEventListener('click', () => this.selectBackground(bg));
             grid.appendChild(card);
         });
-        
+
         modal.classList.add('active');
     }
 
     openAlignmentModal() {
         const modal = document.getElementById('alignmentModal');
         const grid = document.getElementById('alignmentGrid');
-        
+
         if (!modal || !grid) return;
-        
+
         grid.innerHTML = '';
-        
+
         if (!this.gameData.alignments || this.gameData.alignments.length === 0) {
             grid.innerHTML = '<p style="color: white; text-align: center; padding: 2rem;">Nenhuma tendência disponível.</p>';
             modal.classList.add('active');
             return;
         }
-        
+
         this.gameData.alignments.forEach(align => {
             const card = document.createElement('div');
             card.className = 'alignment-item';
             const alignName = align.name_pt || align.name || 'Sem Nome';
             if (this.character.alignment === align.id) card.classList.add('selected');
-            
+
             card.innerHTML = `
                 <h4>${alignName}</h4>
                 <p>${align.description || ''}</p>
             `;
-            
+
             card.addEventListener('click', () => this.selectAlignment(align));
             grid.appendChild(card);
         });
-        
+
         modal.classList.add('active');
     }
 
@@ -1064,9 +1063,9 @@ class CharacterSheet {
         document.getElementById('race').value = raceName;
         document.getElementById('raceModal').classList.remove('active');
         this.saveDraft();
-        
+
         console.log('✅ Raça selecionada:', raceName);
-        
+
         // Abrir modal de classe após selecionar raça
         setTimeout(() => this.openClassModal(), 500);
     }
@@ -1078,9 +1077,9 @@ class CharacterSheet {
         document.getElementById('classlevel').value = `${className} ${this.character.level || 1}`;
         document.getElementById('classModal').classList.remove('active');
         this.saveDraft();
-        
+
         console.log('✅ Classe selecionada:', className);
-        
+
         // Abrir modal de antecedente após selecionar classe
         setTimeout(() => this.openBackgroundModal(), 500);
     }
@@ -1092,9 +1091,9 @@ class CharacterSheet {
         document.getElementById('background').value = bgName;
         document.getElementById('backgroundModal').classList.remove('active');
         this.saveDraft();
-        
+
         console.log('✅ Antecedente selecionado:', bgName);
-        
+
         // Abrir modal de tendência após selecionar antecedente
         setTimeout(() => this.openAlignmentModal(), 500);
     }
@@ -1106,13 +1105,13 @@ class CharacterSheet {
         document.getElementById('alignment').value = alignName;
         document.getElementById('alignmentModal').classList.remove('active');
         this.saveDraft();
-        
+
         console.log('✅ Tendência selecionada:', alignName);
     }
 
     async saveDraft() {
         if (!this.characterId || !this.character) return;
-        
+
         try {
             const updateData = {
                 name: this.character.name || '',
@@ -1132,13 +1131,9 @@ class CharacterSheet {
                 updated_at: new Date().toISOString()
             };
 
-            const { error } = await supabase
-                .from('characters')
-                .update(updateData)
-                .eq('id', this.characterId);
+            const docRef = doc(db, 'characters', this.characterId);
+            await updateDoc(docRef, updateData);
 
-            if (error) throw error;
-            
             console.log('💾 Rascunho salvo automaticamente');
         } catch (error) {
             console.error('❌ Erro ao salvar rascunho:', error);
@@ -1182,21 +1177,14 @@ class CharacterSheet {
 
             console.log('📦 Dados para salvar:', updateData);
 
-            const { error } = await supabase
-                .from('characters')
-                .update(updateData)
-                .eq('id', this.characterId);
+            const docRef = doc(db, 'characters', this.characterId);
+            await updateDoc(docRef, updateData);
 
-            if (error) {
-                console.error('❌ Erro do Supabase:', error);
-                throw error;
-            }
-            
             console.log('✅ Personagem salvo com sucesso!');
-            
+
             // Redirecionar para dashboard SEM alert (evita duplo alert)
             window.location.href = 'dashboard.html';
-            
+
         } catch (error) {
             console.error('❌ Erro ao salvar personagem:', error);
             alert(`❌ Erro ao salvar personagem: ${error.message || 'Tente novamente'}`);
@@ -1209,7 +1197,7 @@ class CharacterSheet {
             alert('⚠️ Este personagem já foi finalizado! Não é possível usar o wizard de criação.');
             return;
         }
-        
+
         console.log('🧙 Abrindo wizard de criação...');
         if (!this.wizard) {
             this.wizard = new CharacterCreationWizard(this);
@@ -1223,7 +1211,7 @@ class CharacterSheet {
     toggleSidebar() {
         const sidebar = document.getElementById('sidebarMenu');
         const overlay = document.getElementById('sidebarOverlay');
-        
+
         if (sidebar && overlay) {
             sidebar.classList.toggle('active');
             overlay.classList.toggle('active');
@@ -1273,30 +1261,30 @@ class CharacterCreationWizard {
 
     async init() {
         console.log('🎯 Inicializando wizard...');
-        
+
         // Carregar dados do jogo
         await this.loadGameData();
-        
+
         // Setup modal
         this.modal = document.getElementById('characterCreationModal');
         this.contentArea = document.getElementById('creationContent');
         this.prevButton = document.getElementById('prevBtn');
         this.nextButton = document.getElementById('nextBtn');
-        
+
         if (!this.modal || !this.contentArea) {
             console.error('❌ Elementos do modal não encontrados!');
             return;
         }
-        
+
         // Setup event listeners
         this.setupEventListeners();
-        
+
         // Mostrar modal
         this.showModal();
-        
+
         // Renderizar primeira etapa
         this.renderStep();
-        
+
         console.log('✅ Wizard inicializado');
     }
 
@@ -1308,61 +1296,39 @@ class CharacterCreationWizard {
     async loadGameData() {
         try {
             console.log('📦 Carregando dados do jogo...');
-            
-            // Carregar raças (ordenar por name_pt em português)
-            const { data: races, error: racesError } = await supabase
-                .from('races')
-                .select('*')
-                .order('name_pt');
-            
-            if (!racesError && races) {
-                this.gameData.races = races;
-                console.log(`✅ ${races.length} raças carregadas`);
-            }
 
-            // Carregar subraças
-            const { data: subraces, error: subracesError } = await supabase
-                .from('subraces')
-                .select('*')
-                .order('name_pt');
-            
-            if (!subracesError && subraces) {
-                this.gameData.subraces = subraces;
-                console.log(`✅ ${subraces.length} subraças carregadas`);
-            }
+            // Carregar todos os dados em paralelo usando GameDataService
+            const [races, subraces, classes, subclasses, backgrounds, weapons, armors, equipment] = await Promise.all([
+                GameDataService.getAll('races'),
+                GameDataService.getAll('subraces'),
+                GameDataService.getAll('classes'),
+                GameDataService.getAll('subclasses'),
+                GameDataService.getAll('game_backgrounds'),
+                GameDataService.getAll('game_weapons'),
+                GameDataService.getAll('game_armor'),
+                GameDataService.getAll('game_equipment')
+            ]);
 
-            // Carregar classes (ordenar por name_pt)
-            const { data: classes, error: classesError } = await supabase
-                .from('classes')
-                .select('*')
-                .order('name_pt');
-            
-            if (!classesError && classes) {
-                this.gameData.classes = classes;
-                console.log(`✅ ${classes.length} classes carregadas`);
-            }
+            this.gameData.races = races || [];
+            this.gameData.subraces = subraces || [];
+            this.gameData.classes = classes || [];
+            this.gameData.subclasses = subclasses || [];
+            this.gameData.backgrounds = backgrounds || [];
+            this.gameData.weapons = weapons || [];
+            this.gameData.armors = armors || [];
+            this.gameData.equipment = equipment || [];
 
-            // Carregar subclasses
-            const { data: subclasses, error: subclassesError } = await supabase
-                .from('subclasses')
-                .select('*')
-                .order('name_pt');
-            
-            if (!subclassesError && subclasses) {
-                this.gameData.subclasses = subclasses;
-                console.log(`✅ ${subclasses.length} subclasses carregadas`);
-            }
+            console.log(`✅ Dados carregados: ${races.length} raças, ${classes.length} classes, ${backgrounds.length} antecedentes`);
 
             // Criar lista de perícias a partir das classes
-            // Como não temos tabela 'skills', vamos extrair das skills_available das classes
             const allSkills = new Set();
             if (this.gameData.classes && this.gameData.classes.length > 0) {
                 this.gameData.classes.forEach(cls => {
                     try {
-                        const skillsAvailable = typeof cls.skills_available === 'string' 
-                            ? JSON.parse(cls.skills_available) 
+                        const skillsAvailable = typeof cls.skills_available === 'string'
+                            ? JSON.parse(cls.skills_available)
                             : cls.skills_available || [];
-                        
+
                         if (Array.isArray(skillsAvailable)) {
                             skillsAvailable.forEach(skill => allSkills.add(skill));
                         }
@@ -1371,7 +1337,7 @@ class CharacterCreationWizard {
                     }
                 });
             }
-            
+
             // Mapeamento de perícias para atributos (baseado em D&D 5e)
             const skillAbilityMap = {
                 'Acrobacia': 'DES', 'Atletismo': 'FOR', 'Atuação': 'CAR',
@@ -1381,7 +1347,7 @@ class CharacterCreationWizard {
                 'Percepção': 'SAB', 'Persuasão': 'CAR', 'Prestidigitação': 'DES',
                 'Religião': 'INT', 'Sobrevivência': 'SAB', 'Arcana': 'INT'
             };
-            
+
             // Se não conseguiu extrair perícias, usar lista padrão
             if (allSkills.size === 0) {
                 console.warn('⚠️ Nenhuma perícia encontrada nas classes, usando lista padrão');
@@ -1393,62 +1359,14 @@ class CharacterCreationWizard {
                 ];
                 defaultSkills.forEach(skill => allSkills.add(skill));
             }
-            
+
             this.gameData.skills = Array.from(allSkills).map(skillName => ({
                 name: skillName,
                 ability: skillAbilityMap[skillName] || 'INT'
             })).sort((a, b) => a.name.localeCompare(b.name));
-            
+
             console.log(`✅ ${this.gameData.skills.length} perícias criadas a partir das classes`);
-            console.log('📋 Perícias disponíveis:', this.gameData.skills.map(s => s.name).join(', '));
 
-            // Carregar antecedentes do banco de dados (usar 'nome' ao invés de 'name')
-            const { data: backgrounds, error: backgroundsError } = await supabase
-                .from('game_backgrounds')
-                .select('*')
-                .order('nome');
-            
-            if (!backgroundsError && backgrounds && backgrounds.length > 0) {
-                this.gameData.backgrounds = backgrounds;
-                console.log(`✅ ${backgrounds.length} antecedentes carregados do banco`);
-            } else {
-                console.warn('⚠️ Nenhum antecedente encontrado no banco');
-                this.gameData.backgrounds = [];
-            }
-
-            // Carregar armas
-            const { data: weapons, error: weaponsError } = await supabase
-                .from('game_weapons')
-                .select('*')
-                .order('nome');
-            
-            if (!weaponsError && weapons) {
-                this.gameData.weapons = weapons;
-                console.log(`✅ ${weapons.length} armas carregadas`);
-            }
-
-            // Carregar armaduras
-            const { data: armors, error: armorsError } = await supabase
-                .from('game_armor')
-                .select('*')
-                .order('nome');
-            
-            if (!armorsError && armors) {
-                this.gameData.armors = armors;
-                console.log(`✅ ${armors.length} armaduras carregadas`);
-            }
-
-            // Carregar equipamentos gerais (incluindo pacotes)
-            const { data: equipment, error: equipmentError } = await supabase
-                .from('game_equipment')
-                .select('*')
-                .order('nome');
-            
-            if (!equipmentError && equipment) {
-                this.gameData.equipment = equipment;
-                console.log(`✅ ${equipment.length} equipamentos carregados`);
-            }
-            
         } catch (error) {
             console.error('❌ Erro ao carregar dados do jogo:', error);
         }
@@ -1458,7 +1376,7 @@ class CharacterCreationWizard {
         if (this.prevButton) {
             this.prevButton.addEventListener('click', () => this.previousStep());
         }
-        
+
         if (this.nextButton) {
             this.nextButton.addEventListener('click', () => this.nextStep());
         }
@@ -1478,10 +1396,10 @@ class CharacterCreationWizard {
 
     renderStep() {
         console.log(`📍 Renderizando etapa ${this.currentStep}`);
-        
+
         // Atualizar barra de progresso
         this.updateProgressBar();
-        
+
         // Renderizar conteúdo da etapa
         switch (this.currentStep) {
             case 0:
@@ -1509,7 +1427,7 @@ class CharacterCreationWizard {
                 this.renderFinalStep();
                 break;
         }
-        
+
         // Atualizar botões
         this.updateButtons();
     }
@@ -1517,7 +1435,7 @@ class CharacterCreationWizard {
     updateProgressBar() {
         const steps = document.querySelectorAll('.progress-step');
         const progressFill = document.querySelector('.progress-fill');
-        
+
         steps.forEach((step, index) => {
             step.classList.remove('active', 'completed');
             if (index < this.currentStep) {
@@ -1526,7 +1444,7 @@ class CharacterCreationWizard {
                 step.classList.add('active');
             }
         });
-        
+
         if (progressFill) {
             const percentage = (this.currentStep / (this.totalSteps - 1)) * 100;
             progressFill.style.width = `${percentage}%`;
@@ -1542,7 +1460,7 @@ class CharacterCreationWizard {
                 this.prevButton.classList.remove('hidden');
             }
         }
-        
+
         // Botão próximo
         if (this.nextButton) {
             if (this.currentStep === this.totalSteps - 1) {
@@ -1552,7 +1470,7 @@ class CharacterCreationWizard {
                 this.nextButton.textContent = 'Próximo';
                 this.nextButton.classList.remove('primary');
             }
-            
+
             // Validar se pode avançar
             const canProceed = this.validateCurrentStep();
             this.nextButton.disabled = !canProceed;
@@ -1577,12 +1495,12 @@ class CharacterCreationWizard {
                 // Verificar se todos os atributos foram preenchidos
                 const attrs = ['str', 'dex', 'con', 'int', 'wis', 'cha'];
                 const allAllocated = attrs.every(attr => this.wizardData.attributes[attr] !== 10 || this.wizardData.attributeMethod === 'standard');
-                
+
                 // Marcar que os atributos foram alocados
                 if (allAllocated && this.wizardData.availableValues.length === 0) {
                     this.wizardData.attributesAllocated = true;
                 }
-                
+
                 return allAllocated;
             case 5: // Detalhes (alinhamento + antecedente)
                 return this.wizardData.alignment !== null && this.wizardData.background !== null;
@@ -1604,7 +1522,7 @@ class CharacterCreationWizard {
 
     async nextStep() {
         if (!this.validateCurrentStep()) return;
-        
+
         if (this.currentStep === this.totalSteps - 1) {
             await this.finalizeCharacter();
         } else {
@@ -1632,7 +1550,7 @@ class CharacterCreationWizard {
                 </div>
             </div>
         `;
-        
+
         const input = document.getElementById('wizardCharName');
         if (input) {
             input.focus();
@@ -1650,7 +1568,7 @@ class CharacterCreationWizard {
             // Parsear traits se for string JSON
             const traits = typeof race.traits === 'string' ? JSON.parse(race.traits) : race.traits;
             const traitsText = Array.isArray(traits) && traits.length > 0 ? traits.slice(0, 2).join(', ') : '';
-            
+
             return `
                 <div class="selection-card ${isSelected ? 'selected' : ''}" data-race-id="${race.id}">
                     <h3>${race.name_pt || race.name}</h3>
@@ -1672,18 +1590,18 @@ class CharacterCreationWizard {
                     <h4 style="color: var(--primary-color); margin-top: 30px; margin-bottom: 15px;">Sub-raça</h4>
                     <div class="selection-grid">
                         ${subraces.map(subrace => {
-                            const isSelected = this.wizardData.subrace?.id === subrace.id;
-                            const subTraits = typeof subrace.traits === 'string' ? JSON.parse(subrace.traits) : subrace.traits;
-                            const subTraitsText = Array.isArray(subTraits) && subTraits.length > 0 ? subTraits[0] : '';
-                            
-                            return `
+                    const isSelected = this.wizardData.subrace?.id === subrace.id;
+                    const subTraits = typeof subrace.traits === 'string' ? JSON.parse(subrace.traits) : subrace.traits;
+                    const subTraitsText = Array.isArray(subTraits) && subTraits.length > 0 ? subTraits[0] : '';
+
+                    return `
                                 <div class="selection-card ${isSelected ? 'selected' : ''}" data-subrace-id="${subrace.id}">
                                     <h3>${subrace.name_pt || subrace.name}</h3>
                                     <p>${subrace.description || 'Sub-raça disponível'}</p>
                                     ${subTraitsText ? `<div class="card-details"><small>${subTraitsText}</small></div>` : ''}
                                 </div>
                             `;
-                        }).join('')}
+                }).join('')}
                     </div>
                 `;
             }
@@ -1701,7 +1619,7 @@ class CharacterCreationWizard {
                 ${subraceHtml}
             </div>
         `;
-        
+
         document.querySelectorAll('[data-race-id]').forEach(card => {
             card.addEventListener('click', () => {
                 const raceId = card.dataset.raceId; // UUID string
@@ -1729,7 +1647,7 @@ class CharacterCreationWizard {
             // Parsear saving_throws se for string JSON
             const savingThrows = typeof cls.saving_throws === 'string' ? JSON.parse(cls.saving_throws) : cls.saving_throws;
             const savesText = Array.isArray(savingThrows) ? savingThrows.join(', ') : '';
-            
+
             return `
                 <div class="selection-card ${isSelected ? 'selected' : ''}" data-class-id="${cls.id}">
                     <h3>${cls.name_pt || cls.name}</h3>
@@ -1751,15 +1669,15 @@ class CharacterCreationWizard {
                     <h4 style="color: var(--primary-color); margin-top: 30px; margin-bottom: 15px;">Subclasse (Opcional)</h4>
                     <div class="selection-grid">
                         ${subclasses.map(subclass => {
-                            const isSelected = this.wizardData.subclass?.id === subclass.id;
-                            return `
+                    const isSelected = this.wizardData.subclass?.id === subclass.id;
+                    return `
                                 <div class="selection-card ${isSelected ? 'selected' : ''}" data-subclass-id="${subclass.id}">
                                     <h3>${subclass.name_pt || subclass.name}</h3>
                                     <p>${subclass.description || 'Subclasse disponível'}</p>
                                     ${subclass.level_available ? `<div class="card-details"><small>Disponível no nível ${subclass.level_available}</small></div>` : ''}
                                 </div>
                             `;
-                        }).join('')}
+                }).join('')}
                     </div>
                 `;
             }
@@ -1777,7 +1695,7 @@ class CharacterCreationWizard {
                 ${subclassHtml}
             </div>
         `;
-        
+
         document.querySelectorAll('[data-class-id]').forEach(card => {
             card.addEventListener('click', () => {
                 const classId = card.dataset.classId; // UUID string
@@ -1827,14 +1745,14 @@ class CharacterCreationWizard {
         // Parsear skills_available se for string JSON
         let classSkills = [];
         try {
-            classSkills = typeof this.wizardData.class.skills_available === 'string' 
-                ? JSON.parse(this.wizardData.class.skills_available) 
+            classSkills = typeof this.wizardData.class.skills_available === 'string'
+                ? JSON.parse(this.wizardData.class.skills_available)
                 : this.wizardData.class.skills_available || [];
         } catch (error) {
             console.error('❌ Erro ao parsear skills_available:', error);
             classSkills = [];
         }
-        
+
         const maxSkills = this.wizardData.class.skills_choose || 2;
 
         console.log('  - Classe:', this.wizardData.class.name_pt);
@@ -1843,7 +1761,7 @@ class CharacterCreationWizard {
 
         // Filtrar perícias disponíveis para esta classe
         const availableSkills = this.gameData.skills.filter(skill => classSkills.includes(skill.name));
-        
+
         console.log('  - Perícias filtradas:', availableSkills.length);
 
         if (availableSkills.length === 0) {
@@ -1859,7 +1777,7 @@ class CharacterCreationWizard {
         const skillsHtml = availableSkills.map(skill => {
             const isSelected = this.wizardData.skills.includes(skill.name);
             const isDisabled = !isSelected && this.wizardData.skills.length >= maxSkills;
-            
+
             return `
                 <div class="checkbox-item ${isDisabled ? 'disabled' : ''}" data-skill="${skill.name}">
                     <input 
@@ -1886,11 +1804,11 @@ class CharacterCreationWizard {
                 </div>
             </div>
         `;
-        
+
         document.querySelectorAll('.checkbox-item input[type="checkbox"]').forEach(checkbox => {
             checkbox.addEventListener('change', (e) => {
                 const skillName = e.target.closest('.checkbox-item').dataset.skill;
-                
+
                 if (e.target.checked) {
                     if (this.wizardData.skills.length < maxSkills) {
                         this.wizardData.skills.push(skillName);
@@ -1900,7 +1818,7 @@ class CharacterCreationWizard {
                 } else {
                     this.wizardData.skills = this.wizardData.skills.filter(s => s !== skillName);
                 }
-                
+
                 this.renderStep();
             });
         });
@@ -1917,7 +1835,7 @@ class CharacterCreationWizard {
         }
 
         const attrNames = { str: 'Força', dex: 'Destreza', con: 'Constituição', int: 'Inteligência', wis: 'Sabedoria', cha: 'Carisma' };
-        
+
         const toggleHtml = `
             <div class="toggle-group">
                 <div class="toggle-option ${this.wizardData.attributeMethod === 'roll' ? 'active' : ''}" data-method="roll">
@@ -1934,7 +1852,7 @@ class CharacterCreationWizard {
         if (this.wizardData.attributeMethod === 'roll') {
             // Modo 4d6 - Rolar valores individuais com dados 3D
             const needsRolling = this.wizardData.rolledValues.length < 6;
-            
+
             if (needsRolling) {
                 methodContentHtml = `
                     <div style="text-align: center; margin: 30px 0;">
@@ -1976,11 +1894,11 @@ class CharacterCreationWizard {
         } else {
             // Modo Array Padrão - valores fixos [15, 14, 13, 12, 10, 8]
             // Só preencher se ainda não iniciou a alocação
-            if (this.wizardData.availableValues.length === 0 && 
+            if (this.wizardData.availableValues.length === 0 &&
                 !this.wizardData.attributesAllocated) {
                 this.wizardData.availableValues = [15, 14, 13, 12, 10, 8];
             }
-            
+
             methodContentHtml = `
                 <div style="margin: 20px 0;">
                     <h4 style="color: var(--primary-color); margin-bottom: 15px; text-align: center;">
@@ -2003,19 +1921,19 @@ class CharacterCreationWizard {
         const attributesHtml = `
             <div class="attribute-distribution">
                 ${['str', 'dex', 'con', 'int', 'wis', 'cha'].map(attr => {
-                    const value = this.wizardData.attributes[attr];
-                    const modifier = Math.floor((value - 10) / 2);
-                    const modString = modifier >= 0 ? `+${modifier}` : modifier;
-                    const hasValue = value !== 10 || this.wizardData.availableValues.length < 6;
-                    
-                    return `
+            const value = this.wizardData.attributes[attr];
+            const modifier = Math.floor((value - 10) / 2);
+            const modString = modifier >= 0 ? `+${modifier}` : modifier;
+            const hasValue = value !== 10 || this.wizardData.availableValues.length < 6;
+
+            return `
                         <div class="attribute-box ${hasValue ? 'has-value' : ''}" data-attr="${attr}">
                             <label>${attrNames[attr]}</label>
                             <div class="attribute-value">${value}</div>
                             <span class="modifier">${modString}</span>
                         </div>
                     `;
-                }).join('')}
+        }).join('')}
             </div>
         `;
 
@@ -2029,7 +1947,7 @@ class CharacterCreationWizard {
                 ${this.wizardData.availableValues.length > 0 || this.wizardData.rolledValues.length === 6 ? attributesHtml : ''}
             </div>
         `;
-        
+
         // Event listeners para toggle
         document.querySelectorAll('.toggle-option').forEach(option => {
             option.addEventListener('click', () => {
@@ -2040,11 +1958,11 @@ class CharacterCreationWizard {
                     this.wizardData.availableValues = [];
                     this.wizardData.attributes = { str: 10, dex: 10, con: 10, int: 10, wis: 10, cha: 10 };
                     this.wizardData.attributesAllocated = false; // Reset da flag
-                    
+
                     if (newMethod === 'standard') {
                         this.wizardData.availableValues = [15, 14, 13, 12, 10, 8];
                     }
-                    
+
                     this.renderStep();
                 }
             });
@@ -2055,35 +1973,35 @@ class CharacterCreationWizard {
         if (rollSingleBtn) {
             rollSingleBtn.addEventListener('click', async () => {
                 console.log('🎲 Botão clicado! Dice3DRoller disponível?', typeof window.Dice3DRoller);
-                
+
                 if (this.isRolling) return; // Prevenir cliques duplos
-                
+
                 this.isRolling = true;
                 rollSingleBtn.disabled = true;
                 rollSingleBtn.textContent = '🎲 Rolando...';
-                
+
                 try {
                     // Criar instância do roller de dados 3D
                     const diceRoller = new window.Dice3DRoller('diceContainer');
-                    
+
                     // Rolar os dados e esperar o resultado
                     const value = await diceRoller.roll();
-                    
+
                     console.log('✅ Valor rolado:', value);
-                    
+
                     // Adicionar valor aos rolados
                     this.wizardData.rolledValues.push(value);
-                    
+
                     // Se completou os 6 valores, transferir para availableValues
                     if (this.wizardData.rolledValues.length === 6) {
                         this.wizardData.availableValues = [...this.wizardData.rolledValues];
                     }
-                    
+
                     this.isRolling = false;
-                    
+
                     // Aguardar 1 segundo antes de re-renderizar
                     await this.wait(1000);
-                    
+
                     this.renderStep();
                 } catch (error) {
                     console.error('❌ Erro ao rolar dados:', error);
@@ -2102,7 +2020,7 @@ class CharacterCreationWizard {
             valueDiv.addEventListener('click', () => {
                 // Remover seleção anterior
                 document.querySelectorAll('.available-value').forEach(v => v.classList.remove('selected'));
-                
+
                 // Selecionar novo valor
                 valueDiv.classList.add('selected');
                 selectedValue = parseInt(valueDiv.dataset.value);
@@ -2115,38 +2033,38 @@ class CharacterCreationWizard {
                 if (selectedValue !== null && selectedIndex !== null) {
                     const attr = attrBox.dataset.attr;
                     const oldValue = this.wizardData.attributes[attr];
-                    
+
                     console.log('📊 Alocando:', { attr, selectedValue, selectedIndex, oldValue });
                     console.log('📊 availableValues antes:', [...this.wizardData.availableValues]);
-                    
+
                     // Se o atributo já tinha um valor alocado, devolver para availableValues
                     if (oldValue !== 10) {
                         this.wizardData.availableValues.push(oldValue);
                     }
-                    
+
                     // Alocar novo valor
                     this.wizardData.attributes[attr] = selectedValue;
-                    
+
                     // Remover valor de availableValues pelo VALOR, não pelo índice
                     const valueIndex = this.wizardData.availableValues.indexOf(selectedValue);
                     if (valueIndex !== -1) {
                         this.wizardData.availableValues.splice(valueIndex, 1);
                     }
-                    
+
                     // Se zerou availableValues, marcar como completo IMEDIATAMENTE
                     if (this.wizardData.availableValues.length === 0) {
                         this.wizardData.attributesAllocated = true;
                         console.log('✅ Todos os valores foram alocados! Flag marcada.');
                     }
-                    
+
                     console.log('📊 availableValues depois:', [...this.wizardData.availableValues]);
-                    console.log('📊 attributes:', {...this.wizardData.attributes});
+                    console.log('📊 attributes:', { ...this.wizardData.attributes });
                     console.log('📊 attributesAllocated:', this.wizardData.attributesAllocated);
-                    
+
                     // Resetar seleção
                     selectedValue = null;
                     selectedIndex = null;
-                    
+
                     // Renderizar novamente
                     this.renderStep();
                     this.updateButtons();
@@ -2183,7 +2101,7 @@ class CharacterCreationWizard {
             // Usar 'nome' e 'descricao' do banco real
             const bgName = bg.nome || bg.name || 'Sem nome';
             const bgDesc = bg.descricao || bg.description || '';
-            
+
             return `
                 <div class="selection-card ${isSelected ? 'selected' : ''}" data-background-id="${bg.id}">
                     <h3>${bgName}</h3>
@@ -2208,7 +2126,7 @@ class CharacterCreationWizard {
                 </div>
             </div>
         `;
-        
+
         document.querySelectorAll('[data-alignment]').forEach(card => {
             card.addEventListener('click', () => {
                 this.wizardData.alignment = card.dataset.alignment;
@@ -2288,7 +2206,7 @@ class CharacterCreationWizard {
         const choicesHtml = equipmentOptions.map((option, index) => {
             // Extrair opções (a), (b), (c) do texto
             const matches = option.match(/\(([a-z])\)\s*([^(]+?)(?=\s*\([a-z]\)|$)/gi);
-            
+
             if (!matches || matches.length === 0) {
                 // Item fixo sem escolha
                 return `
@@ -2331,7 +2249,7 @@ class CharacterCreationWizard {
                 const bgEquipment = typeof this.wizardData.background.equipamento === 'string'
                     ? JSON.parse(this.wizardData.background.equipamento)
                     : this.wizardData.background.equipamento || [];
-                
+
                 if (Array.isArray(bgEquipment) && bgEquipment.length > 0) {
                     backgroundEquipmentHtml = `
                         <div class="background-equipment">
@@ -2364,7 +2282,7 @@ class CharacterCreationWizard {
         // Verificar se já rolou a riqueza inicial
         if (this.wizardData.startingWealth === 0) {
             const wealthFormula = this.wizardData.class.starting_wealth || '4d4 x 10 po';
-            
+
             return `
                 <div style="text-align: center; margin: 30px 0;">
                     <h4 style="color: var(--primary-color); margin-bottom: 15px;">Riqueza Inicial da Classe</h4>
@@ -2462,12 +2380,12 @@ class CharacterCreationWizard {
             option.addEventListener('click', () => {
                 const choiceIndex = option.dataset.choiceIndex;
                 const choiceLetter = option.dataset.choiceLetter;
-                
+
                 this.wizardData.equipmentChoices[`choice_${choiceIndex}`] = choiceLetter;
-                
+
                 // Atualizar lista de equipamentos
                 this.updateEquipmentFromChoices();
-                
+
                 this.renderStep();
                 this.updateButtons();
             });
@@ -2490,12 +2408,12 @@ class CharacterCreationWizard {
                 const itemDiv = e.target.closest('.shop-item');
                 const itemId = itemDiv.dataset.itemId;
                 const category = itemDiv.dataset.itemCategory;
-                
+
                 const item = this.gameData[category].find(i => i.id === itemId);
                 if (!item) return;
 
                 const isPurchased = this.wizardData.purchasedItems.some(p => p.id === itemId);
-                
+
                 if (isPurchased) {
                     // Remover item
                     this.wizardData.purchasedItems = this.wizardData.purchasedItems.filter(p => p.id !== itemId);
@@ -2505,7 +2423,7 @@ class CharacterCreationWizard {
                     // Adicionar item
                     const custo = typeof item.custo === 'string' ? JSON.parse(item.custo) : item.custo;
                     const costInGold = this.convertToGold(custo);
-                    
+
                     if (this.wizardData.startingWealth >= costInGold) {
                         this.wizardData.purchasedItems.push({
                             id: item.id,
@@ -2562,7 +2480,7 @@ class CharacterCreationWizard {
     updateEquipmentFromChoices() {
         // Montar lista de equipamentos baseada nas escolhas
         const equipment = [];
-        
+
         // Adicionar escolhas do pacote da classe
         Object.entries(this.wizardData.equipmentChoices).forEach(([key, choice]) => {
             equipment.push(`Escolha ${key}: Opção (${choice})`);
@@ -2574,7 +2492,7 @@ class CharacterCreationWizard {
                 const bgEquipment = typeof this.wizardData.background.equipamento === 'string'
                     ? JSON.parse(this.wizardData.background.equipamento)
                     : this.wizardData.background.equipamento || [];
-                
+
                 equipment.push(...bgEquipment);
             } catch (error) {
                 console.error('Erro ao adicionar equipamento do antecedente:', error);
@@ -2606,10 +2524,10 @@ class CharacterCreationWizard {
                 <div class="image-upload-area">
                     <h4 style="color: var(--primary-color); margin-bottom: 15px;">Imagem (Opcional)</h4>
                     <div class="image-preview" id="imagePreview">
-                        ${this.wizardData.image ? 
-                            `<img src="${this.wizardData.image}" alt="Personagem">` :
-                            '<div class="image-preview-placeholder">📷</div>'
-                        }
+                        ${this.wizardData.image ?
+                `<img src="${this.wizardData.image}" alt="Personagem">` :
+                '<div class="image-preview-placeholder">📷</div>'
+            }
                     </div>
                     <input type="file" id="imageUpload" accept="image/*" style="display: none;">
                     <button class="upload-button" id="uploadBtn">Adicionar Imagem</button>
@@ -2617,7 +2535,7 @@ class CharacterCreationWizard {
                 </div>
             </div>
         `;
-        
+
         const levelSlider = document.getElementById('levelSlider');
         if (levelSlider) {
             levelSlider.addEventListener('input', (e) => {
@@ -2628,10 +2546,10 @@ class CharacterCreationWizard {
 
         const uploadBtn = document.getElementById('uploadBtn');
         const imageUpload = document.getElementById('imageUpload');
-        
+
         if (uploadBtn && imageUpload) {
             uploadBtn.addEventListener('click', () => imageUpload.click());
-            
+
             imageUpload.addEventListener('change', (e) => {
                 const file = e.target.files[0];
                 if (file) {
@@ -2650,7 +2568,7 @@ class CharacterCreationWizard {
         try {
             console.log('💾 Finalizando personagem...');
             console.log('📊 Wizard Data:', this.wizardData);
-            
+
             // Verificar se já existe um personagem carregado
             if (!this.characterSheet.characterId) {
                 throw new Error('Nenhum personagem carregado para atualizar!');
@@ -2663,8 +2581,8 @@ class CharacterCreationWizard {
             const baseAC = 10 + dexMod;
 
             // Parsear saving_throws da classe
-            const savingThrows = typeof this.wizardData.class?.saving_throws === 'string' 
-                ? JSON.parse(this.wizardData.class.saving_throws) 
+            const savingThrows = typeof this.wizardData.class?.saving_throws === 'string'
+                ? JSON.parse(this.wizardData.class.saving_throws)
                 : this.wizardData.class?.saving_throws || [];
 
             console.log('🔍 DEBUG - Salvaguardas:', {
@@ -2708,15 +2626,8 @@ class CharacterCreationWizard {
             console.log('📦 Atualizando personagem ID:', this.characterSheet.characterId);
             console.log('� Character Data:', characterData);
 
-            const { error } = await supabase
-                .from('characters')
-                .update(characterData)
-                .eq('id', this.characterSheet.characterId);
-
-            if (error) {
-                console.error('❌ Erro ao atualizar:', error);
-                throw error;
-            }
+            const charDocRef = doc(db, 'characters', this.characterSheet.characterId);
+            await updateDoc(charDocRef, characterData);
 
             console.log('✅ Personagem atualizado com sucesso!');
 
@@ -2725,9 +2636,9 @@ class CharacterCreationWizard {
 
             // Recarregar personagem do banco para garantir dados completos
             await this.characterSheet.loadCharacter();
-            
+
             console.log('🔍 Personagem carregado do banco:', this.characterSheet.character);
-            
+
             // Preencher ficha com dados do banco
             this.characterSheet.populateSheet();
             this.characterSheet.calculateAll();
@@ -2744,13 +2655,13 @@ class CharacterCreationWizard {
     getHitDieValue(hitDie) {
         // Se já for um número, retornar direto
         if (typeof hitDie === 'number') return hitDie;
-        
+
         // Se for string, fazer parse
         if (typeof hitDie === 'string') {
             const match = hitDie.match(/d(\d+)/);
             return match ? parseInt(match[1]) : 8;
         }
-        
+
         // Fallback
         return 8;
     }
@@ -2784,7 +2695,7 @@ let characterSheet = null; // Expor globalmente
 document.addEventListener('DOMContentLoaded', () => {
     characterSheet = new CharacterSheet();
     window.characterSheet = characterSheet; // Expor no objeto window
-    
+
     // Se está em modo de criação, iniciar wizard
     const params = new URLSearchParams(window.location.search);
     if (params.get('new') === 'true' || !params.get('id')) {

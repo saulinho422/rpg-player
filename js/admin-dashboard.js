@@ -1,63 +1,65 @@
-import { supabase } from './database.js';
+import { auth, db } from './firebase-config.js';
+import { UserService, GameDataService } from './database.js';
+import { onAuthStateChanged, signOut } from 'firebase/auth';
 
 // Verificar autenticação e permissões de admin
 async function checkAdminAccess() {
-    const { data: { user } } = await supabase.auth.getUser();
-    
-    if (!user) {
-        window.location.href = '/login.html';
-        return null;
-    }
+    return new Promise((resolve) => {
+        const unsubscribe = onAuthStateChanged(auth, async (user) => {
+            unsubscribe();
 
-    const { data: profile, error } = await supabase
-        .from('profiles')
-        .select('is_owner, is_admin, is_beta_tester, display_name')
-        .eq('id', user.id)
-        .single();
+            if (!user) {
+                window.location.href = '/login.html';
+                resolve(null);
+                return;
+            }
 
-    console.log('🔍 Admin Check - User:', user.id);
-    console.log('🔍 Admin Check - Profile:', profile);
-    console.log('🔍 Admin Check - Error:', error);
+            const profile = await UserService.getProfile(user.uid);
 
-    if (error) {
-        console.error('❌ Erro ao buscar perfil:', error);
-        showNotification('❌ Erro ao verificar permissões: ' + error.message, 'error');
-        setTimeout(() => {
-            window.location.href = '/dashboard.html';
-        }, 2000);
-        return null;
-    }
+            console.log('🔍 Admin Check - User:', user.uid);
+            console.log('🔍 Admin Check - Profile:', profile);
 
-    if (!profile.is_owner && !profile.is_admin) {
-        console.warn('⚠️ Usuário não tem permissões de admin');
-        showNotification('❌ Você não tem permissão para acessar esta página', 'error');
-        setTimeout(() => {
-            window.location.href = '/dashboard.html';
-        }, 2000);
-        return null;
-    }
+            if (!profile) {
+                console.error('❌ Perfil não encontrado');
+                showNotification('❌ Erro ao verificar permissões', 'error');
+                setTimeout(() => {
+                    window.location.href = '/dashboard.html';
+                }, 2000);
+                resolve(null);
+                return;
+            }
 
-    console.log('✅ Acesso admin autorizado!');
-    return profile;
+            if (!profile.is_owner && !profile.is_admin) {
+                console.warn('⚠️ Usuário não tem permissões de admin');
+                showNotification('❌ Você não tem permissão para acessar esta página', 'error');
+                setTimeout(() => {
+                    window.location.href = '/dashboard.html';
+                }, 2000);
+                resolve(null);
+                return;
+            }
 
-    return profile;
+            console.log('✅ Acesso admin autorizado!');
+            resolve(profile);
+        });
+    });
 }
 
 // Exibir informações do usuário admin
 function displayUserBadge(profile) {
     const badge = document.getElementById('userBadge');
     let roleText = '';
-    
+
     if (profile.is_owner) {
         roleText = '👑 OWNER';
     } else if (profile.is_admin) {
         roleText = '🛡️ ADMIN';
     }
-    
+
     if (profile.is_beta_tester) {
         roleText += ' | 🧪 BETA TESTER';
     }
-    
+
     badge.textContent = `${profile.display_name || 'Admin'} - ${roleText}`;
 }
 
@@ -72,27 +74,24 @@ async function loadAllCounts() {
         { id: 'armorCount', table: 'game_armor' },
         { id: 'equipmentCount', table: 'game_equipment' },
         { id: 'featsCount', table: 'game_feats' },
-        { id: 'usersCount', table: 'profiles' },
+        { id: 'usersCount', table: 'users' },
         { id: 'charactersCount', table: 'characters' },
         { id: 'campaignsCount', table: 'campaigns' }
     ];
 
     for (const item of tables) {
-        const { count, error } = await supabase
-            .from(item.table)
-            .select('*', { count: 'exact', head: true });
-
-        if (error) {
+        try {
+            const count = await GameDataService.getCount(item.table);
+            document.getElementById(item.id).textContent = count;
+        } catch (error) {
             console.error(`Erro ao contar ${item.table}:`, error);
             document.getElementById(item.id).textContent = '?';
-        } else {
-            document.getElementById(item.id).textContent = count || 0;
         }
     }
 }
 
 // Funções de Modal
-window.openModal = function(type) {
+window.openModal = function (type) {
     const modal = document.getElementById('genericModal');
     const modalTitle = document.getElementById('modalTitle');
     const modalBody = document.getElementById('modalBody');
@@ -100,7 +99,7 @@ window.openModal = function(type) {
     let title = '';
     let form = '';
 
-    switch(type) {
+    switch (type) {
         case 'classes':
             title = 'Adicionar Nova Classe';
             form = `
@@ -437,12 +436,12 @@ window.openModal = function(type) {
     modal.classList.add('active');
 }
 
-window.closeModal = function() {
+window.closeModal = function () {
     document.getElementById('genericModal').classList.remove('active');
 }
 
 // Funções de submissão de formulários
-window.submitClass = async function(event) {
+window.submitClass = async function (event) {
     event.preventDefault();
     const formData = new FormData(event.target);
     const data = {
@@ -456,18 +455,17 @@ window.submitClass = async function(event) {
         skills_choose: parseInt(formData.get('skills_choose')) || 2
     };
 
-    const { error } = await supabase.from('classes').insert(data);
-
-    if (error) {
-        showNotification('❌ Erro ao adicionar classe: ' + error.message, 'error');
-    } else {
+    try {
+        await GameDataService.addItem('classes', data);
         showNotification('✅ Classe adicionada com sucesso!', 'success');
         closeModal();
         loadAllCounts();
+    } catch (error) {
+        showNotification('❌ Erro ao adicionar classe: ' + error.message, 'error');
     }
 }
 
-window.submitRace = async function(event) {
+window.submitRace = async function (event) {
     event.preventDefault();
     const formData = new FormData(event.target);
     const data = {
@@ -483,18 +481,17 @@ window.submitRace = async function(event) {
         languages: formData.get('languages').split(',').map(s => s.trim())
     };
 
-    const { error } = await supabase.from('races').insert(data);
-
-    if (error) {
-        showNotification('❌ Erro ao adicionar raça: ' + error.message, 'error');
-    } else {
+    try {
+        await GameDataService.addItem('races', data);
         showNotification('✅ Raça adicionada com sucesso!', 'success');
         closeModal();
         loadAllCounts();
+    } catch (error) {
+        showNotification('❌ Erro ao adicionar raça: ' + error.message, 'error');
     }
 }
 
-window.submitBackground = async function(event) {
+window.submitBackground = async function (event) {
     event.preventDefault();
     const formData = new FormData(event.target);
     const data = {
@@ -507,18 +504,17 @@ window.submitBackground = async function(event) {
         language_count: parseInt(formData.get('language_count')) || 0
     };
 
-    const { error } = await supabase.from('game_backgrounds').insert(data);
-
-    if (error) {
-        showNotification('❌ Erro ao adicionar antecedente: ' + error.message, 'error');
-    } else {
+    try {
+        await GameDataService.addItem('game_backgrounds', data);
         showNotification('✅ Antecedente adicionado com sucesso!', 'success');
         closeModal();
         loadAllCounts();
+    } catch (error) {
+        showNotification('❌ Erro ao adicionar antecedente: ' + error.message, 'error');
     }
 }
 
-window.submitLanguage = async function(event) {
+window.submitLanguage = async function (event) {
     event.preventDefault();
     const formData = new FormData(event.target);
     const data = {
@@ -531,18 +527,17 @@ window.submitLanguage = async function(event) {
         description: formData.get('description')
     };
 
-    const { error } = await supabase.from('languages').insert(data);
-
-    if (error) {
-        showNotification('❌ Erro ao adicionar idioma: ' + error.message, 'error');
-    } else {
+    try {
+        await GameDataService.addItem('languages', data);
         showNotification('✅ Idioma adicionado com sucesso!', 'success');
         closeModal();
         loadAllCounts();
+    } catch (error) {
+        showNotification('❌ Erro ao adicionar idioma: ' + error.message, 'error');
     }
 }
 
-window.submitWeapon = async function(event) {
+window.submitWeapon = async function (event) {
     event.preventDefault();
     const formData = new FormData(event.target);
     const data = {
@@ -555,18 +550,17 @@ window.submitWeapon = async function(event) {
         properties: formData.get('properties') ? formData.get('properties').split(',').map(s => s.trim()) : []
     };
 
-    const { error } = await supabase.from('game_weapons').insert(data);
-
-    if (error) {
-        showNotification('❌ Erro ao adicionar arma: ' + error.message, 'error');
-    } else {
+    try {
+        await GameDataService.addItem('game_weapons', data);
         showNotification('✅ Arma adicionada com sucesso!', 'success');
         closeModal();
         loadAllCounts();
+    } catch (error) {
+        showNotification('❌ Erro ao adicionar arma: ' + error.message, 'error');
     }
 }
 
-window.submitArmor = async function(event) {
+window.submitArmor = async function (event) {
     event.preventDefault();
     const formData = new FormData(event.target);
     const data = {
@@ -580,18 +574,17 @@ window.submitArmor = async function(event) {
         stealth_disadvantage: formData.get('stealth_disadvantage') === 'true'
     };
 
-    const { error } = await supabase.from('game_armor').insert(data);
-
-    if (error) {
-        showNotification('❌ Erro ao adicionar armadura: ' + error.message, 'error');
-    } else {
+    try {
+        await GameDataService.addItem('game_armor', data);
         showNotification('✅ Armadura adicionada com sucesso!', 'success');
         closeModal();
         loadAllCounts();
+    } catch (error) {
+        showNotification('❌ Erro ao adicionar armadura: ' + error.message, 'error');
     }
 }
 
-window.submitEquipment = async function(event) {
+window.submitEquipment = async function (event) {
     event.preventDefault();
     const formData = new FormData(event.target);
     const data = {
@@ -602,18 +595,17 @@ window.submitEquipment = async function(event) {
         description: formData.get('description')
     };
 
-    const { error } = await supabase.from('game_equipment').insert(data);
-
-    if (error) {
-        showNotification('❌ Erro ao adicionar equipamento: ' + error.message, 'error');
-    } else {
+    try {
+        await GameDataService.addItem('game_equipment', data);
         showNotification('✅ Equipamento adicionado com sucesso!', 'success');
         closeModal();
         loadAllCounts();
+    } catch (error) {
+        showNotification('❌ Erro ao adicionar equipamento: ' + error.message, 'error');
     }
 }
 
-window.submitFeat = async function(event) {
+window.submitFeat = async function (event) {
     event.preventDefault();
     const formData = new FormData(event.target);
     const data = {
@@ -622,19 +614,18 @@ window.submitFeat = async function(event) {
         description: formData.get('description')
     };
 
-    const { error } = await supabase.from('game_feats').insert(data);
-
-    if (error) {
-        showNotification('❌ Erro ao adicionar talento: ' + error.message, 'error');
-    } else {
+    try {
+        await GameDataService.addItem('game_feats', data);
         showNotification('✅ Talento adicionado com sucesso!', 'success');
         closeModal();
         loadAllCounts();
+    } catch (error) {
+        showNotification('❌ Erro ao adicionar talento: ' + error.message, 'error');
     }
 }
 
 // Função para visualizar tabelas (simplificada - pode ser expandida)
-window.viewTable = function(table) {
+window.viewTable = function (table) {
     showNotification(`📊 Visualização de tabelas será implementada em breve`, 'info');
     // TODO: Implementar listagem completa com edição/exclusão
 }
@@ -652,15 +643,16 @@ function showNotification(message, type = 'info') {
 }
 
 // Logout
-window.logout = async function() {
-    await supabase.auth.signOut();
+window.logout = async function () {
+    await signOut(auth);
+    localStorage.clear();
     window.location.href = '/login.html';
 }
 
 // Inicialização
 document.addEventListener('DOMContentLoaded', async () => {
     const profile = await checkAdminAccess();
-    
+
     if (profile) {
         displayUserBadge(profile);
         loadAllCounts();

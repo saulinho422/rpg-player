@@ -1,0 +1,80 @@
+rules_version='2'
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ===== USERS (profiles) =====
+    match /users/{userId} {
+      // Qualquer usuário autenticado pode ler perfis
+      allow read: if request.auth != null;
+      // Apenas o próprio usuário pode criar/editar seu perfil
+      allow create, update: if request.auth != null && request.auth.uid == userId;
+      allow delete: if false;
+    }
+
+    // ===== CHARACTERS =====
+    match /characters/{characterId} {
+      // O dono pode ler, criar, editar e deletar seus personagens
+      allow read: if request.auth != null && resource.data.user_id == request.auth.uid;
+      allow create: if request.auth != null && request.resource.data.user_id == request.auth.uid;
+      allow update, delete: if request.auth != null && resource.data.user_id == request.auth.uid;
+    }
+
+    // ===== CHARACTER FEATURES =====
+    match /character_features/{featureId} {
+      allow read, write: if request.auth != null;
+    }
+
+    // ===== CAMPAIGNS =====
+    match /campaigns/{campaignId} {
+      // Qualquer usuário autenticado pode ler campanhas
+      allow read: if request.auth != null;
+      // O criador pode editar/deletar
+      allow create: if request.auth != null;
+      allow update, delete: if request.auth != null && resource.data.created_by == request.auth.uid;
+    }
+
+    // ===== ACTIVITY LOG =====
+    match /activityLog/{activityId} {
+      // Apenas o dono pode ler suas atividades
+      allow read: if request.auth != null && resource.data.user_id == request.auth.uid;
+      // Qualquer autenticado pode criar (sistema registra atividades)
+      allow create: if request.auth != null;
+      allow update, delete: if false;
+    }
+
+    // ===== GAME DATA (somente leitura para jogadores, admin pode escrever) =====
+    match /classes/{docId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null;
+    }
+    match /races/{docId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null;
+    }
+    match /game_backgrounds/{docId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null;
+    }
+    match /languages/{docId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null;
+    }
+    match /game_weapons/{docId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null;
+    }
+    match /game_armor/{docId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null;
+    }
+    match /game_equipment/{docId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null;
+    }
+    match /game_feats/{docId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null;
+    }
+  }
+}

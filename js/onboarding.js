@@ -2,7 +2,9 @@
 // ONBOARDING - SISTEMA COMPLETO COM BANCO REAL
 // =====================================
 
-import { UserService, supabase } from './database.js'
+import { UserService } from './database.js'
+import { db } from './firebase-config.js'
+import { collection, query, where, limit, getDocs } from 'firebase/firestore'
 import { checkAuth } from './auth.js'
 import defaultAvatar from '../img/perfil_empty_user.png'
 
@@ -353,20 +355,15 @@ class OnboardingSystem {
 
     async checkNameAvailability(name, validationElement) {
         try {
-            const { data, error } = await supabase
-                .from('profiles')
-                .select('display_name')
-                .ilike('display_name', name)
-                .limit(1)
+            // Busca no Firestore por nomes similares (case-sensitive)
+            const q = query(
+                collection(db, 'users'),
+                where('display_name', '==', name),
+                limit(1)
+            )
+            const snapshot = await getDocs(q)
 
-            if (error) {
-                console.error('Erro ao verificar nome:', error)
-                validationElement.textContent = 'Nome válido ✓'
-                validationElement.className = 'input-validation valid'
-                return
-            }
-
-            if (data && data.length > 0) {
+            if (!snapshot.empty) {
                 // Nome já existe - gera sugestões
                 const suggestions = this.generateNameSuggestions(name)
                 validationElement.innerHTML = `
@@ -408,18 +405,13 @@ class OnboardingSystem {
 
     async isNameTaken(name) {
         try {
-            const { data, error } = await supabase
-                .from('profiles')
-                .select('display_name')
-                .ilike('display_name', name)
-                .limit(1)
-
-            if (error) {
-                console.error('Erro ao verificar nome:', error)
-                return false
-            }
-
-            return data && data.length > 0
+            const q = query(
+                collection(db, 'users'),
+                where('display_name', '==', name),
+                limit(1)
+            )
+            const snapshot = await getDocs(q)
+            return !snapshot.empty
         } catch (error) {
             console.error('Erro ao verificar nome:', error)
             return false
@@ -516,7 +508,7 @@ class OnboardingSystem {
             // Salva no banco de dados real
             console.log('💾 Step 3 - Chamando UserService.completeOnboarding...')
             const result = await UserService.completeOnboarding(userId, this.userData)
-            console.log('✅ Step 3 - Dados salvos no Supabase:', result)
+            console.log('✅ Step 3 - Dados salvos no Firebase:', result)
 
             // Atualiza localStorage com dados salvos
             console.log('💾 Step 4 - Salvando no localStorage...')
@@ -642,34 +634,17 @@ async function checkAuthentication() {
     console.log('🔐 Verificando autenticação...')
 
     try {
-        // CORREÇÃO: Verificar se há token de confirmação na URL (vindo do email)
-        const hashParams = new URLSearchParams(window.location.hash.substring(1))
-        const accessToken = hashParams.get('access_token')
-
-        if (accessToken) {
-            console.log('📧 Token de confirmação de email detectado na URL!')
-            console.log('⏳ Aguardando Supabase processar a sessão...')
-
-            // Aguarda um pouco para o Supabase processar o token
-            await new Promise(resolve => setTimeout(resolve, 1500))
-        }
-
-        // Usa o checkAuth da nova autenticação
+        // Usa o checkAuth do Firebase Auth
         const user = await checkAuth()
 
         if (user) {
-            console.log('✅ Usuário autenticado:', user.id)
-            // CORREÇÃO: Garantir que currentUserId está no localStorage
-            localStorage.setItem('currentUserId', user.id)
+            console.log('✅ Usuário autenticado:', user.uid)
+            localStorage.setItem('currentUserId', user.uid)
             localStorage.setItem('isLoggedIn', 'true')
             localStorage.setItem('userEmail', user.email || '')
             localStorage.setItem('onboardingCompleted', 'false')
 
-            // Limpa o hash da URL para evitar reprocessamento
-            if (accessToken) {
-                console.log('🧹 Limpando token da URL...')
-                window.history.replaceState(null, '', window.location.pathname)
-            }
+
 
             return true
         } else {
@@ -797,8 +772,8 @@ window.debugUserState = async function () {
     console.log('  - onboardingCompleted:', localStorage.getItem('onboardingCompleted'))
     console.log('  - userName:', localStorage.getItem('userName'))
 
-    // 2. Sessão Supabase
-    console.log('\n🔐 SESSÃO SUPABASE:')
+    // 2. Sessão Firebase
+    console.log('\n🔐 SESSÃO FIREBASE:')
     try {
         const { checkAuth } = await import('./auth.js')
         const user = await checkAuth()

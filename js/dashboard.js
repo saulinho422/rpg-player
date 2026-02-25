@@ -381,15 +381,12 @@ if (window.dashboardInitialized) {
         isLandscape
     }
 
-    // Função de debug para verificar personagens
+    // Função de debug para verificar personagens (usando Firebase)
     window.debugCharacters = async function () {
         try {
             console.log('🐛 DEBUG: Iniciando verificação de personagens...');
 
-            // Pega userId
-            const { data: { user } } = await supabase.auth.getUser();
-            const userId = user?.id || localStorage.getItem('currentUserId');
-
+            const userId = localStorage.getItem('currentUserId');
             console.log('🔑 DEBUG: UserId:', userId);
 
             if (!userId) {
@@ -397,24 +394,13 @@ if (window.dashboardInitialized) {
                 return;
             }
 
-            // Busca TODOS os personagens sem filtro
-            const { data, error } = await supabase
-                .from('characters')
-                .select('*')
-                .eq('user_id', userId)
-                .order('created_at', { ascending: false });
+            const { CharacterService } = await import('./database.js');
+            const characters = await CharacterService.getUserCharacters(userId);
 
-            if (error) {
-                console.error('❌ DEBUG: Erro ao buscar:', error);
-                alert(`Erro: ${error.message}`);
-                return;
-            }
+            console.log('📊 DEBUG: Personagens encontrados:', characters?.length || 0);
+            console.table(characters);
 
-            console.log('📊 DEBUG: Personagens encontrados:', data?.length || 0);
-            console.table(data);
-
-            // Mostra detalhes de cada personagem
-            data?.forEach((char, index) => {
+            characters?.forEach((char, index) => {
                 console.log(`${index + 1}. "${char.name}":`, {
                     id: char.id,
                     name: char.name,
@@ -426,60 +412,10 @@ if (window.dashboardInitialized) {
                 });
             });
 
-            alert(`✅ Encontrados ${data?.length || 0} personagens. Veja o console para detalhes.`);
+            alert(`✅ Encontrados ${characters?.length || 0} personagens. Veja o console para detalhes.`);
 
         } catch (error) {
             console.error('❌ DEBUG: Erro:', error);
-            alert(`Erro no debug: ${error.message}`);
-        }
-    };
-
-    // Função global de debug
-    window.debugCharacters = async function () {
-        try {
-            const { createClient } = await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.38.0/+esm');
-            const supabase = createClient(
-                'https://bifiatkpfmrrnfhvgrpb.supabase.co',
-                'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpZmlhdGtwZm1ycm5maHZncnBiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA0ODM2NTMsImV4cCI6MjA3NjA1OTY1M30.g5S4aT-ml_cgGoJHWudB36EWz-3bonFZW3DEIWNOUAM'
-            );
-
-            const { data: { user } } = await supabase.auth.getUser();
-            const userId = user?.id || localStorage.getItem('currentUserId');
-
-            console.log('🔍 DEBUG - UserId:', userId);
-
-            if (!userId) {
-                alert('❌ Nenhum usuário encontrado!');
-                return;
-            }
-
-            const { data, error } = await supabase
-                .from('characters')
-                .select('*')
-                .eq('user_id', userId)
-                .order('created_at', { ascending: false });
-
-            if (error) {
-                console.error('❌ Erro na query:', error);
-                alert(`Erro: ${error.message}`);
-                return;
-            }
-
-            console.log('📊 TODOS OS PERSONAGENS:', data);
-
-            const summary = data.map(char => ({
-                nome: char.name || '(sem nome)',
-                is_draft: char.is_draft,
-                criado_em: new Date(char.created_at).toLocaleString('pt-BR'),
-                id: char.id.substring(0, 8) + '...'
-            }));
-
-            console.table(summary);
-
-            alert(`Encontrados ${data.length} personagens no banco!\nVerifique o console para detalhes.`);
-
-        } catch (error) {
-            console.error('❌ Erro no debug:', error);
             alert(`Erro no debug: ${error.message}`);
         }
     };

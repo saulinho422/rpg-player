@@ -2,12 +2,11 @@
 // FEATURES & TRAITS MANAGER
 // ========================================
 
-import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.38.0/+esm';
-
-const SUPABASE_URL = 'https://bifiatkpfmrrnfhvgrpb.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpZmlhdGtwZm1ycm5maHZncnBiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA0ODM2NTMsImV4cCI6MjA3NjA1OTY1M30.g5S4aT-ml_cgGoJHWudB36EWz-3bonFZW3DEIWNOUAM';
-
-const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+import { db } from './firebase-config.js';
+import {
+    doc, getDoc, updateDoc, addDoc, deleteDoc,
+    collection, query, where, orderBy, getDocs
+} from 'firebase/firestore';
 
 class FeaturesManager {
     constructor(characterSheet) {
@@ -56,15 +55,18 @@ class FeaturesManager {
         try {
             if (!this.characterSheet.characterId) return;
 
-            const { data, error } = await supabase
-                .from('character_features')
-                .select('*')
-                .eq('character_id', this.characterSheet.characterId)
-                .order('display_order', { ascending: true });
+            const q = query(
+                collection(db, 'character_features'),
+                where('character_id', '==', this.characterSheet.characterId),
+                orderBy('display_order', 'asc')
+            );
 
-            if (error) throw error;
+            const snapshot = await getDocs(q);
+            this.features = [];
+            snapshot.forEach(docSnap => {
+                this.features.push({ id: docSnap.id, ...docSnap.data() });
+            });
 
-            this.features = data || [];
             this.renderFeatures();
         } catch (error) {
             console.error('Erro ao carregar habilidades:', error);
@@ -127,7 +129,7 @@ class FeaturesManager {
         const lockBtn = document.getElementById('toggleLockFeatures');
         const lockIcon = lockBtn.querySelector('.lock-icon');
         const container = document.getElementById('featuresList');
-        
+
         if (this.isUnlocked) {
             lockIcon.textContent = '🔓';
             lockBtn.classList.add('unlocked');
@@ -137,7 +139,7 @@ class FeaturesManager {
             lockBtn.classList.remove('unlocked');
             container.classList.remove('features-unlocked');
         }
-        
+
         this.renderFeatures();
     }
 
@@ -145,7 +147,7 @@ class FeaturesManager {
         const modal = document.getElementById('featureModal');
         const title = modal.querySelector('h2');
         const submitBtn = modal.querySelector('button[type="submit"]');
-        
+
         if (feature) {
             // Modo edição
             this.editingFeatureId = feature.id;
@@ -162,7 +164,7 @@ class FeaturesManager {
             submitBtn.textContent = 'Adicionar Habilidade';
             document.getElementById('featureForm').reset();
         }
-        
+
         modal.style.display = 'flex';
         modal.classList.add('active');
     }
@@ -200,19 +202,11 @@ class FeaturesManager {
 
             if (this.editingFeatureId) {
                 // Atualizar habilidade existente
-                const { error } = await supabase
-                    .from('character_features')
-                    .update(featureData)
-                    .eq('id', this.editingFeatureId);
-
-                if (error) throw error;
+                const featureRef = doc(db, 'character_features', this.editingFeatureId);
+                await updateDoc(featureRef, featureData);
             } else {
                 // Criar nova habilidade
-                const { error } = await supabase
-                    .from('character_features')
-                    .insert([featureData]);
-
-                if (error) throw error;
+                await addDoc(collection(db, 'character_features'), featureData);
             }
 
             this.closeModal();
@@ -234,13 +228,7 @@ class FeaturesManager {
         if (!confirm('Tem certeza que deseja deletar esta habilidade?')) return;
 
         try {
-            const { error } = await supabase
-                .from('character_features')
-                .delete()
-                .eq('id', featureId);
-
-            if (error) throw error;
-
+            await deleteDoc(doc(db, 'character_features', featureId));
             await this.loadFeatures();
         } catch (error) {
             console.error('Erro ao deletar habilidade:', error);
@@ -250,7 +238,7 @@ class FeaturesManager {
 
     setupDragAndDrop() {
         const cards = document.querySelectorAll('.feature-card');
-        
+
         cards.forEach(card => {
             card.addEventListener('dragstart', (e) => {
                 card.classList.add('dragging');
@@ -277,7 +265,7 @@ class FeaturesManager {
             card.addEventListener('drop', (e) => {
                 e.preventDefault();
                 card.classList.remove('drag-over');
-                
+
                 const draggingCard = document.querySelector('.dragging');
                 if (draggingCard && draggingCard !== card) {
                     this.reorderFeatures(
@@ -305,10 +293,8 @@ class FeaturesManager {
             }));
 
             for (const update of updates) {
-                await supabase
-                    .from('character_features')
-                    .update({ display_order: update.display_order })
-                    .eq('id', update.id);
+                const featureRef = doc(db, 'character_features', update.id);
+                await updateDoc(featureRef, { display_order: update.display_order });
             }
 
             this.renderFeatures();

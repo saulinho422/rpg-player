@@ -1,15 +1,16 @@
 // =====================================
-// NOVA AUTENTICAÇÃO - SÓ SUPABASE
+// NOVA AUTENTICAÇÃO - FIREBASE
 // =====================================
 
-import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.38.0/+esm'
+import { auth, googleProvider } from './firebase-config.js'
+import {
+    signInWithPopup,
+    signInWithEmailAndPassword,
+    createUserWithEmailAndPassword,
+    signOut,
+    onAuthStateChanged
+} from 'firebase/auth'
 import { UserService } from './database.js'
-
-// Configuração do Supabase
-const SUPABASE_URL = 'https://bifiatkpfmrrnfhvgrpb.supabase.co'
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpZmlhdGtwZm1ycm5maHZncnBiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA0ODM2NTMsImV4cCI6MjA3NjA1OTY1M30.g5S4aT-ml_cgGoJHWudB36EWz-3bonFZW3DEIWNOUAM'
-
-const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
 
 // =====================================
 // SISTEMA DE MENSAGENS
@@ -33,36 +34,37 @@ function showMessage(message, type = 'info') {
 }
 
 // =====================================
-// AUTENTICAÇÃO COM GOOGLE (SUPABASE)
+// AUTENTICAÇÃO COM GOOGLE (FIREBASE)
 // =====================================
 
 async function signInWithGoogle() {
     try {
         showMessage('Conectando com Google...', 'info')
 
-        const { data, error } = await supabase.auth.signInWithOAuth({
-            provider: 'google',
-            options: {
-                // Redireciona para a página atual para processar o callback
-                redirectTo: `${window.location.origin}/login.html`
-            }
-        })
+        const result = await signInWithPopup(auth, googleProvider)
+        const user = result.user
 
-        if (error) throw error
+        console.log('✅ Login com Google realizado:', user.uid)
 
-        showMessage('Redirecionando para Google...', 'info')
+        localStorage.setItem('isLoggedIn', 'true')
+        localStorage.setItem('currentUserId', user.uid)
 
-        // O Supabase vai redirecionar automaticamente
+        showMessage('Login com Google realizado!', 'success')
+
+        // Verifica perfil e redireciona
+        await checkUserProfile(user)
 
     } catch (error) {
         console.error('Erro no login com Google:', error)
 
         let errorMessage = 'Erro no login com Google'
 
-        if (error.message.includes('popup')) {
+        if (error.code === 'auth/popup-closed-by-user') {
+            errorMessage = 'Pop-up fechado. Tente novamente.'
+        } else if (error.code === 'auth/popup-blocked') {
             errorMessage = 'Pop-up bloqueado! Permita pop-ups e tente novamente.'
-        } else if (error.message.includes('OAuth')) {
-            errorMessage = 'Erro na configuração do Google. Tente novamente mais tarde.'
+        } else if (error.code === 'auth/cancelled-popup-request') {
+            errorMessage = 'Requisição cancelada. Tente novamente.'
         } else {
             errorMessage = error.message
         }
@@ -72,135 +74,92 @@ async function signInWithGoogle() {
 }
 
 // =====================================
-// AUTENTICAÇÃO COM EMAIL (SUPABASE)
+// AUTENTICAÇÃO COM EMAIL (FIREBASE)
 // =====================================
 
 async function signInWithEmail(email, password) {
     try {
         showMessage('Conectando...', 'info')
 
-        const { data, error } = await supabase.auth.signInWithPassword({
-            email: email,
-            password: password
-        })
+        const result = await signInWithEmailAndPassword(auth, email, password)
+        const user = result.user
 
-        if (error) throw error
-
-        if (data.user) {
+        if (user) {
             localStorage.setItem('isLoggedIn', 'true')
-            localStorage.setItem('currentUserId', data.user.id)
+            localStorage.setItem('currentUserId', user.uid)
 
-            console.log('✅ Usuário logado com ID:', data.user.id)
+            console.log('✅ Usuário logado com ID:', user.uid)
         }
 
         showMessage('Login realizado com sucesso!', 'success')
 
         // Verifica perfil e redireciona
-        await checkUserProfile(data.user)
+        await checkUserProfile(user)
 
     } catch (error) {
         console.error('Erro no login:', error)
-        showMessage(error.message || 'Erro no login', 'error')
+
+        let errorMessage = 'Erro no login'
+
+        if (error.code === 'auth/user-not-found') {
+            errorMessage = '❌ Usuário não encontrado. Verifique o email.'
+        } else if (error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
+            errorMessage = '❌ Senha incorreta.'
+        } else if (error.code === 'auth/invalid-email') {
+            errorMessage = '❌ Email inválido.'
+        } else if (error.code === 'auth/too-many-requests') {
+            errorMessage = '❌ Muitas tentativas. Aguarde um momento.'
+        } else {
+            errorMessage = error.message || 'Erro no login'
+        }
+
+        showMessage(errorMessage, 'error')
     }
 }
 
 // =====================================
-// REGISTRO COM EMAIL (SUPABASE)
+// REGISTRO COM EMAIL (FIREBASE)
 // =====================================
 
 async function registerWithEmail(email, password) {
     try {
-        showMessage('Verificando disponibilidade...', 'info')
-
-        // Verifica se email já existe
-        const { data: existingUsers } = await supabase.rpc('check_email_exists', {
-            search_email: email
-        })
-
-        if (existingUsers && existingUsers > 0) {
-            showMessage('❌ Este email já possui uma conta! Use "Entrar" para fazer login.', 'error')
-            return
-        }
-
         showMessage('Criando conta...', 'info')
 
-        const { data, error } = await supabase.auth.signUp({
-            email: email,
-            password: password,
-            options: {
-                // Redireciona para onboarding após confirmar email
-                emailRedirectTo: `${window.location.origin}/onboarding.html`,
-                data: {
-                    email: email
-                }
-            }
-        })
+        const result = await createUserWithEmailAndPassword(auth, email, password)
+        const user = result.user
 
-        if (error) {
-            if (error.message.includes('User already registered')) {
-                showMessage('❌ Este email já possui uma conta! Use "Entrar" para fazer login.', 'error')
-                return
-            }
-            throw error
-        }
-
-        if (!data.user) {
+        if (!user) {
             showMessage('Erro: Não foi possível criar a conta.', 'error')
             return
         }
 
         console.log('🔍 Dados do registro:', {
-            user: data.user.id,
-            session: data.session ? 'Sessão ativa' : 'Sem sessão',
-            email: email,
-            identities: data.user.identities?.length || 0
+            user: user.uid,
+            email: email
         })
 
-        // ⚠️ Com CONFIRMAÇÃO DE EMAIL HABILITADA:
-        // - Usuário recebe email de confirmação
-        // - Não há sessão até confirmar
-        // - Precisa clicar no link do email
+        // Firebase cria sessão imediatamente ✅
+        localStorage.setItem('isLoggedIn', 'true')
+        localStorage.setItem('currentUserId', user.uid)
+        localStorage.setItem('userEmail', email)
+        localStorage.setItem('onboardingCompleted', 'false')
 
-        if (data.session) {
-            // Sessão criada imediatamente (confirmação desabilitada no Supabase) ✅
-            console.log('✅ Sessão criada imediatamente - Email já confirmado ou confirmação desabilitada')
+        showMessage('✅ Conta criada com sucesso! Redirecionando...', 'success')
 
-            localStorage.setItem('isLoggedIn', 'true')
-            localStorage.setItem('currentUserId', data.user.id)
-            localStorage.setItem('userEmail', email)
-            localStorage.setItem('onboardingCompleted', 'false')
-
-            showMessage('✅ Conta criada com sucesso! Redirecionando...', 'success')
-
-            setTimeout(() => {
-                window.location.href = 'onboarding.html'
-            }, 1500)
-
-        } else {
-            // Sem sessão = precisa confirmar email 📧
-            console.log('📧 Email de confirmação enviado para:', email)
-
-            // Salva email temporariamente para a página de espera
-            localStorage.setItem('pendingEmail', email)
-            localStorage.setItem('registrationTime', new Date().toISOString())
-
-            showMessage('📧 Conta criada! Verifique seu email para confirmar.', 'success')
-
-            setTimeout(() => {
-                window.location.href = 'aguarde-confirmacao.html'
-            }, 2000)
-        }
+        setTimeout(() => {
+            window.location.href = 'onboarding.html'
+        }, 1500)
 
     } catch (error) {
         console.error('Erro no registro:', error)
 
         let errorMessage = 'Erro ao criar conta'
 
-        if (error.message.includes('already registered')) {
-            errorMessage = '❌ Este email já tem uma conta! Use "Entrar" para fazer login.'
-        } else if (error.message.includes('invalid email')) {
+        if (error.code === 'auth/email-already-in-use') {
+            errorMessage = '❌ Este email já possui uma conta! Use "Entrar" para fazer login.'
+        } else if (error.code === 'auth/invalid-email') {
             errorMessage = '❌ Email inválido. Verifique o formato.'
-        } else if (error.message.includes('weak password')) {
+        } else if (error.code === 'auth/weak-password') {
             errorMessage = '❌ Senha muito fraca. Use pelo menos 6 caracteres.'
         } else if (error.message) {
             errorMessage = `❌ ${error.message}`
@@ -216,15 +175,15 @@ async function registerWithEmail(email, password) {
 
 async function checkUserProfile(user) {
     try {
-        console.log('🔍 Verificando perfil do usuário:', user.id)
+        console.log('🔍 Verificando perfil do usuário:', user.uid)
 
-        const profile = await UserService.getProfile(user.id)
+        const profile = await UserService.getProfile(user.uid)
         console.log('📋 Perfil encontrado:', profile)
 
         localStorage.setItem('isLoggedIn', 'true')
-        localStorage.setItem('currentUserId', user.id)
+        localStorage.setItem('currentUserId', user.uid)
 
-        await UserService.updateLastLogin(user.id)
+        await UserService.updateLastLogin(user.uid)
 
         // DEBUG: Verificações detalhadas
         console.log('🔍 profile existe:', !!profile)
@@ -277,7 +236,7 @@ async function checkUserProfile(user) {
         console.error('Erro ao verificar perfil:', error)
 
         localStorage.setItem('isLoggedIn', 'true')
-        localStorage.setItem('currentUserId', user.id)
+        localStorage.setItem('currentUserId', user.uid)
         localStorage.setItem('onboardingCompleted', 'false')
 
         setTimeout(() => {
@@ -290,46 +249,24 @@ async function checkUserProfile(user) {
 // VERIFICAÇÃO DE AUTENTICAÇÃO
 // =====================================
 
-export async function checkAuth() {
-    try {
-        console.log('🔐 checkAuth() - Verificando sessão...')
+export function checkAuth() {
+    return new Promise((resolve) => {
+        const unsubscribe = onAuthStateChanged(auth, (user) => {
+            unsubscribe()
 
-        const { data: { session }, error } = await supabase.auth.getSession()
-
-        if (error) {
-            console.error('❌ Erro ao obter sessão:', error)
-            throw error
-        }
-
-        console.log('📊 Sessão obtida:', session ? {
-            user_id: session.user.id,
-            email: session.user.email,
-            confirmed_at: session.user.confirmed_at
-        } : 'Nenhuma sessão')
-
-        if (session && session.user) {
-            // Verifica se o email foi confirmado
-            if (!session.user.confirmed_at && !session.user.email_confirmed_at) {
-                console.log('⚠️ Email ainda não confirmado')
-                // Mesmo assim permite acesso (para desenvolvimento)
+            if (user) {
+                localStorage.setItem('isLoggedIn', 'true')
+                localStorage.setItem('currentUserId', user.uid)
+                console.log('✅ Usuário autenticado:', user.uid)
+                resolve(user)
+            } else {
+                console.log('❌ Nenhuma sessão ativa, limpando localStorage')
+                localStorage.removeItem('isLoggedIn')
+                localStorage.removeItem('currentUserId')
+                resolve(null)
             }
-
-            localStorage.setItem('isLoggedIn', 'true')
-            localStorage.setItem('currentUserId', session.user.id)
-            console.log('✅ Usuário autenticado:', session.user.id)
-            return session.user
-        }
-
-        // Se não há sessão, limpa localStorage
-        console.log('❌ Nenhuma sessão ativa, limpando localStorage')
-        localStorage.removeItem('isLoggedIn')
-        localStorage.removeItem('currentUserId')
-        return null
-
-    } catch (error) {
-        console.error('❌ Erro ao verificar autenticação:', error)
-        return null
-    }
+        })
+    })
 }
 
 // =====================================
@@ -340,9 +277,7 @@ async function logout() {
     try {
         showMessage('Fazendo logout...', 'info')
 
-        const { error } = await supabase.auth.signOut()
-
-        if (error) throw error
+        await signOut(auth)
 
         // Limpa localStorage
         localStorage.clear()
@@ -365,40 +300,6 @@ async function logout() {
 
 document.addEventListener('DOMContentLoaded', async () => {
     console.log('🚀 Iniciando auth.js')
-
-    // CORREÇÃO: Verifica se há hash de callback do OAuth/confirmação de email na URL
-    const hashParams = new URLSearchParams(window.location.hash.substring(1))
-    const accessToken = hashParams.get('access_token')
-    const type = hashParams.get('type')
-
-    if (accessToken) {
-        console.log('� Callback de autenticação detectado!', { type })
-
-        // Aguarda o Supabase processar a sessão
-        setTimeout(async () => {
-            const { data: { session } } = await supabase.auth.getSession()
-            if (session) {
-                console.log('✅ Sessão criada após callback:', session.user.id)
-
-                localStorage.setItem('isLoggedIn', 'true')
-                localStorage.setItem('currentUserId', session.user.id)
-
-                // Verifica se é login com Google (signup) ou confirmação de email
-                if (type === 'signup') {
-                    console.log('📧 Confirmação de email detectada')
-                    showMessage('✅ Email confirmado! Configurando sua conta...', 'success')
-                } else {
-                    console.log('🔐 Login com Google detectado')
-                    showMessage('✅ Autenticado com Google! Verificando perfil...', 'success')
-                }
-
-                // Verifica o perfil e redireciona adequadamente
-                await checkUserProfile(session.user)
-            }
-        }, 1000)
-
-        return
-    }
 
     // Inicializa sistema de abas se existir
     initTabs()
@@ -438,19 +339,16 @@ document.addEventListener('DOMContentLoaded', async () => {
         btn.addEventListener('click', logout)
     })
 
-    // Verifica sessão ao carregar
-    const { data: { session } } = await supabase.auth.getSession()
-    if (session) {
-        console.log('🔐 Sessão encontrada ao carregar página:', session.user.email)
+    // Verifica sessão ao carregar via Firebase onAuthStateChanged
+    const user = await checkAuth()
+    if (user) {
+        console.log('🔐 Sessão encontrada ao carregar página:', user.email)
 
         if (window.location.pathname.includes('login.html')) {
-            // NÃO redireciona automaticamente - deixa usuário fazer logout se quiser
             console.log('ℹ️ Usuário já está logado, mas permanece na página de login')
-            // Notificação removida - silencioso
         } else if (window.location.pathname.includes('onboarding.html')) {
-            // Se está no onboarding, verifica se realmente precisa estar aqui
             console.log('🔍 Verificando se usuário precisa mesmo do onboarding')
-            const profile = await UserService.getProfile(session.user.id)
+            const profile = await UserService.getProfile(user.uid)
 
             if (profile && profile.onboarding_completed === true) {
                 console.log('⚠️ Usuário já completou onboarding mas está na página de onboarding!')
@@ -491,7 +389,7 @@ function initTabs() {
 }
 
 // Exporta funções principais
-window.supabaseAuth = {
+window.firebaseAuth = {
     signInWithGoogle,
     signInWithEmail,
     registerWithEmail,

@@ -1,51 +1,14 @@
 // =====================================
 // RPG PLAYER - SERVIÇOS DE BANCO DE DADOS
-// Integração com Supabase
+// Integração com Firebase Firestore
 // =====================================
 
-import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.38.0/+esm'
-
-// Configuração do Supabase
-const SUPABASE_URL = 'https://bifiatkpfmrrnfhvgrpb.supabase.co'
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpZmlhdGtwZm1ycm5maHZncnBiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA0ODM2NTMsImV4cCI6MjA3NjA1OTY1M30.g5S4aT-ml_cgGoJHWudB36EWz-3bonFZW3DEIWNOUAM'
-
-// Singleton - evita multiple instances
-let supabaseInstance = null;
-function getSupabaseClient() {
-    if (!supabaseInstance) {
-        supabaseInstance = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-            auth: {
-                storageKey: 'rpg-player-auth',
-                storage: window.localStorage
-            }
-        });
-    }
-    return supabaseInstance;
-}
-
-const supabase = getSupabaseClient();
-
-// =====================================
-// FUNÇÃO PARA OBTER CLIENTE AUTENTICADO
-// =====================================
-async function getAuthenticatedSupabaseClient() {
-    // Pega a sessão atual
-    const { data: { session } } = await supabase.auth.getSession()
-
-    if (session) {
-        console.log('✅ Sessão encontrada:', session.user.id)
-        return supabase
-    }
-
-    // Se não há sessão, tenta verificar localStorage
-    const userId = localStorage.getItem('currentUserId')
-    if (userId) {
-        console.log('⚠️ Usando localStorage userId:', userId)
-        return supabase
-    }
-
-    throw new Error('Usuário não autenticado')
-}
+import { db, auth } from './firebase-config.js'
+import {
+    doc, getDoc, setDoc, updateDoc, addDoc, deleteDoc,
+    collection, query, where, orderBy, limit, getDocs,
+    getCountFromServer, serverTimestamp, Timestamp
+} from 'firebase/firestore'
 
 // =====================================
 // SERVIÇOS DE USUÁRIO/PERFIL
@@ -55,17 +18,14 @@ export class UserService {
     // Busca perfil do usuário
     static async getProfile(userId) {
         try {
-            const { data, error } = await supabase
-                .from('profiles')
-                .select('*')
-                .eq('id', userId)
-                .single()
+            const docRef = doc(db, 'users', userId)
+            const docSnap = await getDoc(docRef)
 
-            if (error && error.code !== 'PGRST116') { // PGRST116 = não encontrado
-                throw error
+            if (!docSnap.exists()) {
+                return null
             }
 
-            return data
+            return { id: docSnap.id, ...docSnap.data() }
         } catch (error) {
             console.error('Erro ao buscar perfil:', error)
             return null
@@ -75,70 +35,31 @@ export class UserService {
     // Cria ou atualiza perfil do usuário
     static async saveProfile(userId, profileData) {
         try {
-            console.log('💾 Salvando perfil no Supabase...')
+            console.log('💾 Salvando perfil no Firestore...')
             console.log('🔑 UserId:', userId)
             console.log('📋 ProfileData:', profileData)
 
-            // Verifica se há sessão ativa
-            const { data: { session } } = await supabase.auth.getSession()
-            console.log('🔐 Sessão atual:', session ? session.user.id : 'Nenhuma sessão')
+            const docRef = doc(db, 'users', userId)
+            const docSnap = await getDoc(docRef)
 
             const dataToSave = {
-                id: userId,
                 ...profileData,
                 updated_at: new Date().toISOString()
             }
 
-            console.log('📦 Dados finais para salvar:', dataToSave)
-
-            // CORREÇÃO: NUNCA USAR UPSERT - Pode substituir dados existentes!
-
-            // 1. Primeiro verifica se o perfil já existe
-            const { data: existingProfile } = await supabase
-                .from('profiles')
-                .select('id, display_name, email')
-                .eq('id', userId)
-                .single()
-
-            let data, error
-
-            if (existingProfile) {
-                console.log('⚠️ Perfil já existe:', existingProfile)
-                // Se já existe, apenas atualiza campos específicos
-                const result = await supabase
-                    .from('profiles')
-                    .update({
-                        ...profileData,
-                        updated_at: new Date().toISOString()
-                    })
-                    .eq('id', userId)
-                    .select()
-                    .single()
-
-                data = result.data
-                error = result.error
+            if (docSnap.exists()) {
+                console.log('⚠️ Perfil já existe, atualizando...')
+                await updateDoc(docRef, dataToSave)
             } else {
                 console.log('✅ Criando novo perfil...')
-                // Usa INSERT direto (mais seguro com RLS)
-                const result = await supabase
-                    .from('profiles')
-                    .insert(dataToSave)
-                    .select()
-                    .single()
-
-                data = result.data
-                error = result.error
+                await setDoc(docRef, {
+                    id: userId,
+                    ...dataToSave,
+                    created_at: new Date().toISOString()
+                })
             }
 
-            if (error) {
-                console.error('❌ Erro do Supabase:', error)
-                console.error('❌ Código do erro:', error.code)
-                console.error('❌ Detalhes:', error.details)
-                console.error('❌ Mensagem:', error.message)
-                throw error
-            }
-
-            console.log('✅ Dados salvos com sucesso:', data)
+            console.log('✅ Dados salvos com sucesso')
 
             // Log da atividade
             await ActivityService.logActivity(userId, {
@@ -147,7 +68,9 @@ export class UserService {
                 description: 'O usuário atualizou suas informações de perfil'
             })
 
-            return data
+            // Retorna o perfil atualizado
+            const updatedDoc = await getDoc(docRef)
+            return { id: updatedDoc.id, ...updatedDoc.data() }
         } catch (error) {
             console.error('Erro ao salvar perfil:', error)
             throw error
@@ -199,12 +122,12 @@ export class UserService {
     // Atualiza último login
     static async updateLastLogin(userId) {
         try {
-            const { error } = await supabase
-                .from('profiles')
-                .update({ last_login: new Date().toISOString() })
-                .eq('id', userId)
+            const docRef = doc(db, 'users', userId)
+            const docSnap = await getDoc(docRef)
 
-            if (error) throw error
+            if (docSnap.exists()) {
+                await updateDoc(docRef, { last_login: new Date().toISOString() })
+            }
         } catch (error) {
             console.error('Erro ao atualizar último login:', error)
         }
@@ -213,11 +136,9 @@ export class UserService {
     // Busca estatísticas do usuário
     static async getUserStats(userId) {
         try {
-            // Busca perfil
             const profile = await this.getProfile(userId)
             if (!profile) return null
 
-            // Busca contadores reais
             const [charactersCount, campaignsCount, sessionsCount] = await Promise.all([
                 this.getCharactersCount(userId),
                 this.getCampaignsCount(userId),
@@ -238,36 +159,46 @@ export class UserService {
 
     // Contadores auxiliares
     static async getCharactersCount(userId) {
-        const { count, error } = await supabase
-            .from('characters')
-            .select('*', { count: 'exact', head: true })
-            .eq('user_id', userId)
-            .eq('is_draft', false)
-
-        return error ? 0 : count
+        try {
+            const q = query(
+                collection(db, 'characters'),
+                where('user_id', '==', userId),
+                where('is_draft', '==', false)
+            )
+            const snapshot = await getCountFromServer(q)
+            return snapshot.data().count
+        } catch (error) {
+            return 0
+        }
     }
 
     static async getCampaignsCount(userId) {
-        const { count, error } = await supabase
-            .from('campaign_players')
-            .select('*', { count: 'exact', head: true })
-            .eq('user_id', userId)
-            .eq('status', 'active')
-
-        return error ? 0 : count
+        try {
+            // Buscar campanhas onde o usuário é jogador ativo
+            const q = query(
+                collection(db, 'campaign_players'),
+                where('user_id', '==', userId),
+                where('status', '==', 'active')
+            )
+            const snapshot = await getCountFromServer(q)
+            return snapshot.data().count
+        } catch (error) {
+            return 0
+        }
     }
 
     static async getSessionsCount(userId) {
-        const { count, error } = await supabase
-            .from('sessions')
-            .select(`
-                *,
-                campaigns!inner(campaign_players!inner(*))
-            `, { count: 'exact', head: true })
-            .eq('campaigns.campaign_players.user_id', userId)
-            .eq('status', 'completed')
-
-        return error ? 0 : count
+        // Simplificado - conta campanhas completadas
+        try {
+            const q = query(
+                collection(db, 'campaign_players'),
+                where('user_id', '==', userId)
+            )
+            const snapshot = await getDocs(q)
+            return snapshot.size
+        } catch (error) {
+            return 0
+        }
     }
 }
 
@@ -279,28 +210,23 @@ export class CharacterService {
     // Lista personagens do usuário
     static async getUserCharacters(userId) {
         try {
-            console.log('🔍 Buscando personagens para userId:', userId);
+            console.log('🔍 Buscando personagens para userId:', userId)
 
-            const { data, error } = await supabase
-                .from('characters')
-                .select(`
-                    id, name, race, character_class, background, alignment, level,
-                    strength, dexterity, constitution, intelligence, wisdom, charisma,
-                    hit_points_max, hit_points_current, armor_class, speed, proficiency_bonus,
-                    saving_throws, skills, equipment, avatar_url, is_draft, draft_step,
-                    created_at, updated_at, user_id
-                `)
-                .eq('user_id', userId)
-                .order('created_at', { ascending: false })
+            const q = query(
+                collection(db, 'characters'),
+                where('user_id', '==', userId),
+                orderBy('created_at', 'desc')
+            )
 
-            if (error) {
-                console.error('❌ Erro na query de personagens:', error);
-                throw error;
-            }
+            const snapshot = await getDocs(q)
+            const characters = []
 
-            console.log('� Personagens encontrados:', data?.length || 0);
+            snapshot.forEach(docSnap => {
+                characters.push({ id: docSnap.id, ...docSnap.data() })
+            })
 
-            return data || []
+            console.log('📦 Personagens encontrados:', characters.length)
+            return characters
         } catch (error) {
             console.error('❌ Erro ao buscar personagens:', error)
             return []
@@ -310,14 +236,15 @@ export class CharacterService {
     // Busca personagem específico
     static async getCharacter(characterId, userId) {
         try {
-            const { data, error } = await supabase
-                .from('characters')
-                .select('*')
-                .eq('id', characterId)
-                .eq('user_id', userId)
-                .single()
+            const docRef = doc(db, 'characters', characterId)
+            const docSnap = await getDoc(docRef)
 
-            if (error) throw error
+            if (!docSnap.exists()) return null
+
+            const data = { id: docSnap.id, ...docSnap.data() }
+
+            // Verifica se pertence ao usuário
+            if (data.user_id !== userId) return null
 
             return data
         } catch (error) {
@@ -329,26 +256,24 @@ export class CharacterService {
     // Cria novo personagem
     static async createCharacter(userId, characterData) {
         try {
-            const { data, error } = await supabase
-                .from('characters')
-                .insert({
-                    user_id: userId,
-                    ...characterData
-                })
-                .select()
-                .single()
+            const dataToSave = {
+                user_id: userId,
+                ...characterData,
+                created_at: new Date().toISOString(),
+                updated_at: new Date().toISOString()
+            }
 
-            if (error) throw error
+            const docRef = await addDoc(collection(db, 'characters'), dataToSave)
 
             // Log da atividade
             await ActivityService.logActivity(userId, {
                 activity_type: 'character_created',
                 title: 'Novo personagem criado',
                 description: `Personagem "${characterData.name}" foi criado`,
-                character_id: data.id
+                character_id: docRef.id
             })
 
-            return data
+            return { id: docRef.id, ...dataToSave }
         } catch (error) {
             console.error('Erro ao criar personagem:', error)
             throw error
@@ -358,20 +283,20 @@ export class CharacterService {
     // Atualiza personagem
     static async updateCharacter(characterId, userId, updateData) {
         try {
-            const { data, error } = await supabase
-                .from('characters')
-                .update({
-                    ...updateData,
-                    updated_at: new Date().toISOString()
-                })
-                .eq('id', characterId)
-                .eq('user_id', userId)
-                .select()
-                .single()
+            const docRef = doc(db, 'characters', characterId)
+            const docSnap = await getDoc(docRef)
 
-            if (error) throw error
+            if (!docSnap.exists() || docSnap.data().user_id !== userId) {
+                throw new Error('Personagem não encontrado ou sem permissão')
+            }
 
-            return data
+            await updateDoc(docRef, {
+                ...updateData,
+                updated_at: new Date().toISOString()
+            })
+
+            const updatedDoc = await getDoc(docRef)
+            return { id: updatedDoc.id, ...updatedDoc.data() }
         } catch (error) {
             console.error('Erro ao atualizar personagem:', error)
             throw error
@@ -381,13 +306,14 @@ export class CharacterService {
     // Remove personagem (soft delete)
     static async deleteCharacter(characterId, userId) {
         try {
-            const { error } = await supabase
-                .from('characters')
-                .update({ is_active: false })
-                .eq('id', characterId)
-                .eq('user_id', userId)
+            const docRef = doc(db, 'characters', characterId)
+            const docSnap = await getDoc(docRef)
 
-            if (error) throw error
+            if (!docSnap.exists() || docSnap.data().user_id !== userId) {
+                throw new Error('Personagem não encontrado ou sem permissão')
+            }
+
+            await updateDoc(docRef, { is_active: false })
 
             return true
         } catch (error) {
@@ -403,23 +329,23 @@ export class CharacterService {
 
 export class CampaignService {
     // Lista campanhas públicas
-    static async getPublicCampaigns(limit = 20, offset = 0) {
+    static async getPublicCampaigns(limitCount = 20, offset = 0) {
         try {
-            const { data, error } = await supabase
-                .from('campaigns')
-                .select(`
-                    *,
-                    profiles:dm_user_id (display_name, avatar_url),
-                    campaign_players (status, user_id)
-                `)
-                .eq('is_public', true)
-                .in('status', ['recruiting', 'active'])
-                .order('created_at', { ascending: false })
-                .range(offset, offset + limit - 1)
+            const q = query(
+                collection(db, 'campaigns'),
+                where('is_public', '==', true),
+                orderBy('created_at', 'desc'),
+                limit(limitCount)
+            )
 
-            if (error) throw error
+            const snapshot = await getDocs(q)
+            const campaigns = []
 
-            return data || []
+            snapshot.forEach(docSnap => {
+                campaigns.push({ id: docSnap.id, ...docSnap.data() })
+            })
+
+            return campaigns
         } catch (error) {
             console.error('Erro ao buscar campanhas públicas:', error)
             return []
@@ -429,26 +355,40 @@ export class CampaignService {
     // Lista campanhas do usuário
     static async getUserCampaigns(userId) {
         try {
-            const { data, error } = await supabase
-                .from('campaign_players')
-                .select(`
-                    *,
-                    campaigns (
-                        *,
-                        profiles:dm_user_id (display_name, avatar_url)
-                    )
-                `)
-                .eq('user_id', userId)
-                .in('status', ['approved', 'active'])
-                .order('created_at', { ascending: false })
+            const q = query(
+                collection(db, 'campaign_players'),
+                where('user_id', '==', userId)
+            )
 
-            if (error) throw error
+            const snapshot = await getDocs(q)
+            const campaignIds = []
 
-            return data?.map(cp => ({
-                ...cp.campaigns,
-                player_status: cp.status,
-                joined_at: cp.joined_at
-            })) || []
+            snapshot.forEach(docSnap => {
+                const data = docSnap.data()
+                if (['approved', 'active'].includes(data.status)) {
+                    campaignIds.push({
+                        campaign_id: data.campaign_id,
+                        player_status: data.status,
+                        joined_at: data.joined_at
+                    })
+                }
+            })
+
+            // Buscar detalhes das campanhas
+            const campaigns = []
+            for (const cp of campaignIds) {
+                const campDoc = await getDoc(doc(db, 'campaigns', cp.campaign_id))
+                if (campDoc.exists()) {
+                    campaigns.push({
+                        id: campDoc.id,
+                        ...campDoc.data(),
+                        player_status: cp.player_status,
+                        joined_at: cp.joined_at
+                    })
+                }
+            }
+
+            return campaigns
         } catch (error) {
             console.error('Erro ao buscar campanhas do usuário:', error)
             return []
@@ -458,26 +398,24 @@ export class CampaignService {
     // Cria nova campanha
     static async createCampaign(userId, campaignData) {
         try {
-            const { data, error } = await supabase
-                .from('campaigns')
-                .insert({
-                    dm_user_id: userId,
-                    ...campaignData
-                })
-                .select()
-                .single()
+            const dataToSave = {
+                dm_user_id: userId,
+                ...campaignData,
+                created_at: new Date().toISOString(),
+                updated_at: new Date().toISOString()
+            }
 
-            if (error) throw error
+            const docRef = await addDoc(collection(db, 'campaigns'), dataToSave)
 
             // Log da atividade
             await ActivityService.logActivity(userId, {
                 activity_type: 'campaign_created',
                 title: 'Nova campanha criada',
                 description: `Campanha "${campaignData.name}" foi criada`,
-                campaign_id: data.id
+                campaign_id: docRef.id
             })
 
-            return data
+            return { id: docRef.id, ...dataToSave }
         } catch (error) {
             console.error('Erro ao criar campanha:', error)
             throw error
@@ -487,20 +425,17 @@ export class CampaignService {
     // Solicita participação em campanha
     static async joinCampaign(campaignId, userId, message = '') {
         try {
-            const { data, error } = await supabase
-                .from('campaign_players')
-                .insert({
-                    campaign_id: campaignId,
-                    user_id: userId,
-                    status: 'pending',
-                    application_message: message
-                })
-                .select()
-                .single()
+            const dataToSave = {
+                campaign_id: campaignId,
+                user_id: userId,
+                status: 'pending',
+                application_message: message,
+                created_at: new Date().toISOString()
+            }
 
-            if (error) throw error
+            const docRef = await addDoc(collection(db, 'campaign_players'), dataToSave)
 
-            return data
+            return { id: docRef.id, ...dataToSave }
         } catch (error) {
             console.error('Erro ao solicitar participação:', error)
             throw error
@@ -516,33 +451,34 @@ export class ActivityService {
     // Log de atividade
     static async logActivity(userId, activityData) {
         try {
-            const { error } = await supabase
-                .from('activity_log')
-                .insert({
-                    user_id: userId,
-                    ...activityData,
-                    created_at: new Date().toISOString()
-                })
-
-            if (error) throw error
+            await addDoc(collection(db, 'activity_log'), {
+                user_id: userId,
+                ...activityData,
+                created_at: new Date().toISOString()
+            })
         } catch (error) {
             console.error('Erro ao registrar atividade:', error)
         }
     }
 
     // Busca atividades do usuário
-    static async getUserActivities(userId, limit = 10) {
+    static async getUserActivities(userId, limitCount = 10) {
         try {
-            const { data, error } = await supabase
-                .from('activity_log')
-                .select('*')
-                .eq('user_id', userId)
-                .order('created_at', { ascending: false })
-                .limit(limit)
+            const q = query(
+                collection(db, 'activity_log'),
+                where('user_id', '==', userId),
+                orderBy('created_at', 'desc'),
+                limit(limitCount)
+            )
 
-            if (error) throw error
+            const snapshot = await getDocs(q)
+            const activities = []
 
-            return data || []
+            snapshot.forEach(docSnap => {
+                activities.push({ id: docSnap.id, ...docSnap.data() })
+            })
+
+            return activities
         } catch (error) {
             console.error('Erro ao buscar atividades:', error)
             return []
@@ -550,21 +486,23 @@ export class ActivityService {
     }
 
     // Busca atividades públicas recentes
-    static async getPublicActivities(limit = 20) {
+    static async getPublicActivities(limitCount = 20) {
         try {
-            const { data, error } = await supabase
-                .from('activity_log')
-                .select(`
-                    *,
-                    profiles (display_name, avatar_url)
-                `)
-                .eq('is_public', true)
-                .order('created_at', { ascending: false })
-                .limit(limit)
+            const q = query(
+                collection(db, 'activity_log'),
+                where('is_public', '==', true),
+                orderBy('created_at', 'desc'),
+                limit(limitCount)
+            )
 
-            if (error) throw error
+            const snapshot = await getDocs(q)
+            const activities = []
 
-            return data || []
+            snapshot.forEach(docSnap => {
+                activities.push({ id: docSnap.id, ...docSnap.data() })
+            })
+
+            return activities
         } catch (error) {
             console.error('Erro ao buscar atividades públicas:', error)
             return []
@@ -580,12 +518,9 @@ export class DatabaseUtils {
     // Testa conexão com o banco
     static async testConnection() {
         try {
-            const { data, error } = await supabase
-                .from('profiles')
-                .select('count', { count: 'exact', head: true })
-
-            if (error) throw error
-
+            // Tenta ler um documento qualquer para testar a conexão
+            const q = query(collection(db, 'users'), limit(1))
+            await getDocs(q)
             return true
         } catch (error) {
             console.error('Erro na conexão:', error)
@@ -596,11 +531,69 @@ export class DatabaseUtils {
     // Inicializa dados de teste (apenas desenvolvimento)
     static async initTestData() {
         console.warn('Iniciando dados de teste - apenas para desenvolvimento!')
-
-        // Esta função seria usada apenas em desenvolvimento
-        // para popular o banco com dados de exemplo
     }
 }
 
-// Export do cliente Supabase para uso direto se necessário
-export { supabase }
+// =====================================
+// SERVIÇO DE DADOS DO JOGO (GAME DATA)
+// =====================================
+
+export class GameDataService {
+    // Busca todos os itens de uma tabela de dados do jogo
+    static async getAll(tableName) {
+        try {
+            const q = query(collection(db, tableName))
+            const snapshot = await getDocs(q)
+            const items = []
+
+            snapshot.forEach(docSnap => {
+                items.push({ id: docSnap.id, ...docSnap.data() })
+            })
+
+            return items
+        } catch (error) {
+            console.error(`Erro ao buscar ${tableName}:`, error)
+            return []
+        }
+    }
+
+    // Conta itens de uma tabela
+    static async getCount(tableName) {
+        try {
+            const q = query(collection(db, tableName))
+            const snapshot = await getCountFromServer(q)
+            return snapshot.data().count
+        } catch (error) {
+            console.error(`Erro ao contar ${tableName}:`, error)
+            return 0
+        }
+    }
+
+    // Adiciona item a uma tabela
+    static async addItem(tableName, data) {
+        try {
+            const docRef = await addDoc(collection(db, tableName), {
+                ...data,
+                created_at: new Date().toISOString()
+            })
+            return { id: docRef.id, ...data }
+        } catch (error) {
+            console.error(`Erro ao adicionar em ${tableName}:`, error)
+            throw error
+        }
+    }
+
+    // Remove item de uma tabela
+    static async deleteItem(tableName, itemId) {
+        try {
+            await deleteDoc(doc(db, tableName, itemId))
+            return true
+        } catch (error) {
+            console.error(`Erro ao deletar de ${tableName}:`, error)
+            throw error
+        }
+    }
+}
+
+// Export do db e auth para uso direto se necessário
+export { db, auth }

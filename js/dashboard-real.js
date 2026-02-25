@@ -3,186 +3,140 @@
 // =====================================
 
 import { UserService, CharacterService, CampaignService, ActivityService } from './database.js'
-import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.38.0/+esm'
 import defaultAvatar from '../img/perfil_empty_user.png'
 import emptyCharacterIcon from '../img/logo_personagem_vazio.png'
 import emptyTableIcon from '../img/logo_mesas.png'
 
-const supabase = createClient(
-    'https://bifiatkpfmrrnfhvgrpb.supabase.co',
-    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpZmlhdGtwZm1ycm5maHZncnBiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA0ODM2NTMsImV4cCI6MjA3NjA1OTY1M30.g5S4aT-ml_cgGoJHWudB36EWz-3bonFZW3DEIWNOUAM'
-)
-
 export class DashboardService {
-    
+
     // =====================================
     // CARREGAMENTO DE DADOS DO USUÁRIO
     // =====================================
-    
+
     static async loadUserData() {
         try {
             const userId = localStorage.getItem('currentUserId')
             if (!userId) {
                 throw new Error('Usuário não identificado')
             }
-            
+
             // Carrega estatísticas completas do usuário
             const userStats = await UserService.getUserStats(userId)
-            
+
             if (userStats) {
                 // Atualiza informações no header
                 this.updateUserHeader(userStats)
-                
+
                 // Atualiza cards de estatísticas
                 this.updateStatsCards(userStats)
             }
-            
+
             return userStats
         } catch (error) {
             console.error('Erro ao carregar dados do usuário:', error)
             return null
         }
     }
-    
+
     // =====================================
     // CARREGAMENTO DE PERSONAGENS REAIS
     // =====================================
-    
+
     static async loadUserCharacters() {
         try {
-            // Primeiro tenta pegar do Supabase auth
-            const { data: { user } } = await supabase.auth.getUser();
-            let userId = user?.id;
-            
-            // Fallback para localStorage se não houver sessão ativa
-            if (!userId) {
-                userId = localStorage.getItem('currentUserId');
-            }
-            
+            let userId = localStorage.getItem('currentUserId');
+
             console.log('🔍 Dashboard: Carregando personagens para userId:', userId)
-            console.log('🔍 Dashboard: userId COMPLETO:', userId)
-            console.log('🔍 Dashboard: Tipo do userId:', typeof userId)
-            console.log('🔍 Dashboard: Tamanho do userId:', userId?.length)
-            
+
             if (!userId) {
-                console.warn('⚠️ Dashboard: Nenhum userId encontrado (nem auth nem localStorage)')
+                console.warn('⚠️ Dashboard: Nenhum userId encontrado')
                 return []
             }
-            
-            // DEBUG: Buscar TODOS os personagens para ver o que tem no banco
-            const { data: allChars, error: debugError } = await supabase
-                .from('characters')
-                .select('id, name, user_id, is_draft');
-            
-            console.log('🔍 TODOS os personagens no banco:', allChars);
-            if (allChars && allChars.length > 0) {
-                allChars.forEach(char => {
-                    console.log(`  - Personagem: name="${char.name}", user_id="${char.user_id}", is_draft=${char.is_draft}`);
-                    console.log(`    Match com userId logado: ${char.user_id === userId}`);
-                });
-            }
-            
-            // QUERY DIRETA - não usar CharacterService
-            const { data: characters, error: charError } = await supabase
-                .from('characters')
-                .select(`
-                    id, name, race, character_class, background, alignment, level,
-                    strength, dexterity, constitution, intelligence, wisdom, charisma,
-                    hit_points_max, hit_points_current, armor_class, speed, proficiency_bonus,
-                    saving_throws, skills, equipment, avatar_url, is_draft, draft_step,
-                    created_at, updated_at, user_id
-                `)
-                .eq('user_id', userId)
-                .order('created_at', { ascending: false });
-            
-            if (charError) {
-                console.error('❌ Erro ao buscar personagens:', charError);
-                return [];
-            }
-            
+
+            // Usar CharacterService do database.js
+            const characters = await CharacterService.getUserCharacters(userId)
+
             console.log('👥 Dashboard: Personagens carregados:', characters)
             console.log('👥 Dashboard: Total de personagens retornados:', characters.length)
-            
+
             // Mostra TODOS os personagens finalizados (is_draft = false), mesmo sem nome
             const validCharacters = characters.filter(char => {
                 const isFinished = char.is_draft === false;
-                
                 console.log(`👤 Personagem "${char.name || '(sem nome)'}": is_draft=${char.is_draft}, mostrando=${isFinished}`);
-                
                 return isFinished;
             });
-            
+
             console.log('👥 Dashboard: Personagens finalizados:', validCharacters.length, 'de', characters.length, 'total');
-            
+
             // Atualiza a seção de personagens
             this.updateCharactersSection(validCharacters)
             console.log('✅ Dashboard: Seção de personagens atualizada')
-            
+
             return validCharacters
         } catch (error) {
             console.error('❌ Dashboard: Erro ao carregar personagens:', error)
             return []
         }
     }
-    
+
     // =====================================
     // CARREGAMENTO DE CAMPANHAS REAIS
     // =====================================
-    
+
     static async loadUserCampaigns() {
         try {
             const userId = localStorage.getItem('currentUserId')
             if (!userId) return []
-            
+
             const campaigns = await CampaignService.getUserCampaigns(userId)
-            
+
             // Atualiza a seção de mesas
             this.updateCampaignsSection(campaigns)
-            
+
             return campaigns
         } catch (error) {
             console.error('Erro ao carregar campanhas:', error)
             return []
         }
     }
-    
+
     // =====================================
     // CARREGAMENTO DE ATIVIDADES REAIS
     // =====================================
-    
+
     static async loadRecentActivities() {
         try {
             const userId = localStorage.getItem('currentUserId')
             if (!userId) return []
-            
+
             const activities = await ActivityService.getUserActivities(userId, 5)
-            
+
             // Atualiza a seção de atividades
             this.updateActivitiesSection(activities)
-            
+
             return activities
         } catch (error) {
             console.error('Erro ao carregar atividades:', error)
             return []
         }
     }
-    
+
     // =====================================
     // ATUALIZAÇÃO DA INTERFACE
     // =====================================
-    
+
     static updateUserHeader(userStats) {
         const userName = document.getElementById('userName')
         const userAvatar = document.getElementById('userAvatar')
-        
+
         console.log('🎨 updateUserHeader - userStats recebido:', userStats)
         console.log('🖼️ Avatar URL:', userStats.avatar_url)
         console.log('📋 Avatar Type:', userStats.avatar_type)
-        
+
         if (userName && userStats.display_name) {
             userName.textContent = userStats.display_name
         }
-        
+
         if (userAvatar) {
             if (userStats.avatar_url) {
                 console.log('✅ Avatar URL existe:', userStats.avatar_url)
@@ -205,7 +159,7 @@ export class DashboardService {
             console.log('❌ Elemento userAvatar não encontrado no DOM')
         }
     }
-    
+
     static updateStatsCards(userStats) {
         // Atualiza cards de estatísticas com dados reais
         const statsData = [
@@ -230,7 +184,7 @@ export class DashboardService {
                 label: 'Experiência'
             }
         ]
-        
+
         statsData.forEach(stat => {
             const element = document.querySelector(stat.selector)
             if (element) {
@@ -238,16 +192,16 @@ export class DashboardService {
             }
         })
     }
-    
+
     static updateCharactersSection(characters) {
         console.log('🎨 Dashboard: Atualizando seção de personagens com:', characters)
-        
+
         const charactersGrid = document.querySelector('.characters-grid')
         if (!charactersGrid) {
             console.error('❌ Dashboard: Elemento .characters-grid não encontrado!')
             return
         }
-        
+
         if (characters.length === 0) {
             console.log('📝 Dashboard: Nenhum personagem encontrado, exibindo mensagem')
             charactersGrid.innerHTML = `
@@ -262,7 +216,7 @@ export class DashboardService {
             `
             return
         }
-        
+
         const charactersHTML = characters.map(character => `
             <div class="character-card" data-character-id="${character.id}">
                 <div class="character-avatar">
@@ -284,14 +238,14 @@ export class DashboardService {
                 </div>
             </div>
         `).join('')
-        
+
         charactersGrid.innerHTML = charactersHTML
     }
-    
+
     static updateCampaignsSection(campaigns) {
         const campaignsGrid = document.querySelector('.tables-grid')
         if (!campaignsGrid) return
-        
+
         if (campaigns.length === 0) {
             campaignsGrid.innerHTML = `
                 <div class="no-data-message">
@@ -308,10 +262,10 @@ export class DashboardService {
             `
             return
         }
-        
+
         const campaignsHTML = campaigns.map(campaign => {
             const statusConfig = this.getCampaignStatusConfig(campaign.status)
-            
+
             return `
                 <div class="table-card ${campaign.status}" data-campaign-id="${campaign.id}">
                     <div class="table-header">
@@ -334,10 +288,10 @@ export class DashboardService {
                 </div>
             `
         }).join('')
-        
+
         campaignsGrid.innerHTML = campaignsHTML
     }
-    
+
     static getCampaignStatusConfig(status) {
         const configs = {
             'recruiting': { icon: '🟡', text: 'Recrutando' },
@@ -345,14 +299,14 @@ export class DashboardService {
             'paused': { icon: '⏸️', text: 'Pausada' },
             'completed': { icon: '✅', text: 'Concluída' }
         }
-        
+
         return configs[status] || { icon: '❓', text: 'Desconhecido' }
     }
-    
+
     static updateActivitiesSection(activities) {
         const activityList = document.querySelector('.activity-list')
         if (!activityList) return
-        
+
         if (activities.length === 0) {
             activityList.innerHTML = `
                 <div class="activity-item">
@@ -365,11 +319,11 @@ export class DashboardService {
             `
             return
         }
-        
+
         const activitiesHTML = activities.map(activity => {
             const timeAgo = this.getTimeAgo(activity.created_at)
             const icon = this.getActivityIcon(activity.activity_type)
-            
+
             return `
                 <div class="activity-item">
                     <div class="activity-icon">${icon}</div>
@@ -380,14 +334,14 @@ export class DashboardService {
                 </div>
             `
         }).join('')
-        
+
         activityList.innerHTML = activitiesHTML
     }
-    
+
     // =====================================
     // UTILITÁRIOS
     // =====================================
-    
+
     static getActivityIcon(activityType) {
         const icons = {
             'profile_updated': '👤',
@@ -397,10 +351,10 @@ export class DashboardService {
             'campaign_joined': '🤝',
             'session_completed': '🏆'
         }
-        
+
         return icons[activityType] || '📝'
     }
-    
+
     static getTimeAgo(dateString) {
         const date = new Date(dateString)
         const now = new Date()
@@ -408,27 +362,27 @@ export class DashboardService {
         const diffMinutes = Math.floor(diffMs / 60000)
         const diffHours = Math.floor(diffMinutes / 60)
         const diffDays = Math.floor(diffHours / 24)
-        
+
         if (diffMinutes < 1) return 'Agora mesmo'
         if (diffMinutes < 60) return `Há ${diffMinutes} minutos`
         if (diffHours < 24) return `Há ${diffHours} horas`
         if (diffDays === 1) return 'Ontem'
         if (diffDays < 7) return `Há ${diffDays} dias`
-        
+
         return date.toLocaleDateString('pt-BR')
     }
-    
+
     // =====================================
     // CARREGAMENTO COMPLETO DO DASHBOARD
     // =====================================
-    
+
     static async loadAllData() {
         try {
             console.log('🚀 Dashboard: Iniciando carregamento de todos os dados')
-            
+
             // Exibe loading
             this.showLoading(true)
-            
+
             // Carrega todos os dados em paralelo
             const [userData, characters, campaigns, activities] = await Promise.all([
                 this.loadUserData(),
@@ -436,17 +390,17 @@ export class DashboardService {
                 this.loadUserCampaigns(),
                 this.loadRecentActivities()
             ])
-            
+
             console.log('📊 Dashboard: Dados carregados:', {
                 userData: userData ? 'OK' : 'NULL',
                 characters: characters ? `${characters.length} personagens` : 'NULL',
                 campaigns: campaigns ? `${campaigns.length} campanhas` : 'NULL',
                 activities: activities ? `${activities.length} atividades` : 'NULL'
             })
-            
+
             // Remove loading
             this.showLoading(false)
-            
+
             return {
                 userData,
                 characters,
@@ -460,7 +414,7 @@ export class DashboardService {
             return null
         }
     }
-    
+
     static showLoading(show) {
         // Implementar loading spinner se necessário
         if (show) {
@@ -469,7 +423,7 @@ export class DashboardService {
             console.log('Dados carregados com sucesso!')
         }
     }
-    
+
     static showError(message) {
         if (window.dashboardFunctions && window.dashboardFunctions.showMessage) {
             window.dashboardFunctions.showMessage(message, 'error')
@@ -483,30 +437,30 @@ export class DashboardService {
 // FUNÇÕES GLOBAIS PARA OS BOTÕES
 // =====================================
 
-window.createNewCharacter = function() {
+window.createNewCharacter = function () {
     window.location.href = 'character-creation.html'
 }
 
-window.editCharacter = function(characterId) {
+window.editCharacter = function (characterId) {
     alert(`Editar personagem: ${characterId}`)
 }
 
-window.playCharacter = function(characterId) {
+window.playCharacter = function (characterId) {
     alert(`Jogar com personagem: ${characterId}`)
 }
 
-window.createNewCampaign = function() {
+window.createNewCampaign = function () {
     alert('Funcionalidade de criar mesa será implementada em breve!')
 }
 
-window.browseCampaigns = function() {
+window.browseCampaigns = function () {
     alert('Funcionalidade de procurar mesas será implementada em breve!')
 }
 
-window.viewCampaign = function(campaignId) {
+window.viewCampaign = function (campaignId) {
     alert(`Ver detalhes da campanha: ${campaignId}`)
 }
 
-window.joinCampaignSession = function(campaignId) {
+window.joinCampaignSession = function (campaignId) {
     alert(`Entrar na mesa: ${campaignId}`)
 }

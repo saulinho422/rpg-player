@@ -1,60 +1,43 @@
 // =====================================
-// TESTE DE CONEXÃO COM SUPABASE
+// TESTE DE CONEXÃO COM FIREBASE
 // =====================================
 
-import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.38.0/+esm'
-
-const SUPABASE_URL = 'https://bifiatkpfmrrnfhvgrpb.supabase.co'
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpZmlhdGtwZm1ycm5maHZncnBiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA0ODM2NTMsImV4cCI6MjA3NjA1OTY1M30.g5S4aT-ml_cgGoJHWudB36EWz-3bonFZW3DEIWNOUAM'
-
-const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+import { db } from './firebase-config.js'
+import { collection, getDocs, limit, query } from 'firebase/firestore'
 
 async function testConnection() {
-    console.log('🔍 Testando conexão com Supabase...')
-    
+    console.log('🔍 Testando conexão com Firebase...')
+
     try {
-        // Testa conexão básica
-        const { data, error } = await supabase.from('profiles').select('count')
-        
-        if (error) {
-            console.error('❌ Erro na conexão:', error)
-            return false
-        }
-        
-        console.log('✅ Conexão estabelecida com sucesso!')
-        console.log('📊 Dados retornados:', data)
-        
-        // Testa se as tabelas existem
-        const tables = ['profiles', 'characters', 'campaigns', 'campaign_players', 'sessions', 'activity_log']
-        
+        // Teste básico de conectividade
+        const q = query(collection(db, 'users'), limit(1))
+        const snapshot = await getDocs(q)
+
+        console.log('✅ Conexão com Firebase OK!')
+        console.log('📊 Documentos na coleção users:', snapshot.size)
+
+        // Testa cada coleção
+        const tables = [
+            'users', 'characters', 'campaigns', 'activityLog',
+            'classes', 'races', 'game_backgrounds', 'languages',
+            'game_weapons', 'game_armor', 'game_equipment', 'game_feats'
+        ]
+
+        console.log('\n📋 Verificando coleções:')
         for (const table of tables) {
             try {
-                const { error: tableError } = await supabase.from(table).select('*').limit(1)
-                if (tableError) {
-                    console.warn(`⚠️ Tabela ${table} pode não existir ou ter problemas:`, tableError.message)
-                } else {
-                    console.log(`✅ Tabela ${table} acessível`)
-                }
-            } catch (err) {
-                console.warn(`⚠️ Erro ao testar tabela ${table}:`, err.message)
+                const tableQuery = query(collection(db, table), limit(1))
+                const tableSnap = await getDocs(tableQuery)
+                console.log(`  ✅ ${table}: acessível (${tableSnap.size} docs retornados)`)
+            } catch (tableError) {
+                console.log(`  ❌ ${table}: ${tableError.message}`)
             }
         }
-        
-        return true
+
     } catch (error) {
-        console.error('❌ Erro geral na conexão:', error)
-        return false
+        console.error('❌ Erro ao conectar:', error)
+        console.log('💡 Verifique as configurações do Firebase no firebase-config.js')
     }
 }
 
-// Executa o teste automaticamente
-testConnection().then(success => {
-    if (success) {
-        console.log('🎉 Sistema pronto para uso!')
-    } else {
-        console.log('💡 Certifique-se de que o schema.sql foi executado no Supabase')
-    }
-})
-
-// Expõe a função globalmente para teste manual
-window.testSupabaseConnection = testConnection
+window.testFirebaseConnection = testConnection
