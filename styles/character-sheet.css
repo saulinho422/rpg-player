@@ -1120,6 +1120,8 @@ input[type="checkbox"] {
   overflow-x: auto;
   gap: 6px;
   scrollbar-width: none;
+  position: relative;
+  /* anchor for .progress-fill */
 }
 
 .progress-bar::-webkit-scrollbar {

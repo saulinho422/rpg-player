@@ -1233,7 +1233,7 @@ class CharacterCreationWizard {
             subclass: null,
             skills: [],
             attributes: { str: 10, dex: 10, con: 10, int: 10, wis: 10, cha: 10 },
-            attributeMethod: 'roll',
+            attributeMethod: null,  // null = não escolheu ainda
             alignment: null,
             background: null,
             equipment: [],
@@ -1489,6 +1489,8 @@ class CharacterCreationWizard {
                 const requiredSkills = this.wizardData.class?.skills_choose || 2;
                 return this.wizardData.skills.length === requiredSkills;
             case 4: // Atributos - verificar se todos os valores foram alocados
+                // Se o método ainda não foi escolhido, bloquear
+                if (this.wizardData.attributeMethod === null) return false;
                 if (!this.wizardData.availableValues || this.wizardData.availableValues.length > 0) {
                     return false; // Ainda tem valores não alocados
                 }
@@ -1836,16 +1838,48 @@ class CharacterCreationWizard {
 
         const attrNames = { str: 'Força', dex: 'Destreza', con: 'Constituição', int: 'Inteligência', wis: 'Sabedoria', cha: 'Carisma' };
 
-        const toggleHtml = `
-            <div class="toggle-group">
-                <div class="toggle-option ${this.wizardData.attributeMethod === 'roll' ? 'active' : ''}" data-method="roll">
-                    🎲 4d6 (Rolar Dados)
+        // ── Se nenhum método foi escolhido ainda, mostrar tela de escolha ──
+        if (this.wizardData.attributeMethod === null) {
+            this.contentArea.innerHTML = `
+                <div class="step-content">
+                    <h3 class="step-title">Atributos</h3>
+                    <p class="step-description">Escolha o método para definir seus atributos</p>
+                    
+                    <div class="selection-grid" style="max-width: 600px; margin: 30px auto;">
+                        <div class="selection-card" data-method="roll" style="text-align:center;">
+                            <h3>🎲 4d6 (Rolar Dados)</h3>
+                            <p>Role 4d6 e some os 3 maiores valores, 6 vezes. Mais aleatório e divertido!</p>
+                        </div>
+                        <div class="selection-card" data-method="standard" style="text-align:center;">
+                            <h3>📊 Valores Padrão</h3>
+                            <p>Use os valores fixos [15, 14, 13, 12, 10, 8] e distribua entre os atributos.</p>
+                        </div>
+                    </div>
                 </div>
-                <div class="toggle-option ${this.wizardData.attributeMethod === 'standard' ? 'active' : ''}" data-method="standard">
-                    📊 Valores Padrão
-                </div>
-            </div>
-        `;
+            `;
+
+            // Event listeners para escolher o método (uma vez escolhido, fica travado)
+            document.querySelectorAll('[data-method]').forEach(card => {
+                card.addEventListener('click', () => {
+                    this.wizardData.attributeMethod = card.dataset.method;
+                    this.wizardData.rolledValues = [];
+                    this.wizardData.availableValues = [];
+                    this.wizardData.attributes = { str: 10, dex: 10, con: 10, int: 10, wis: 10, cha: 10 };
+                    this.wizardData.attributesAllocated = false;
+
+                    if (this.wizardData.attributeMethod === 'standard') {
+                        this.wizardData.availableValues = [15, 14, 13, 12, 10, 8];
+                    }
+
+                    this.renderStep();
+                });
+            });
+
+            return; // Sair — não renderizar mais nada
+        }
+
+        // ── Método já foi escolhido — mostrar o conteúdo do método (travado) ──
+        const methodLabel = this.wizardData.attributeMethod === 'roll' ? '🎲 4d6 (Rolar Dados)' : '📊 Valores Padrão';
 
         let methodContentHtml = '';
 
@@ -1856,7 +1890,7 @@ class CharacterCreationWizard {
             if (needsRolling) {
                 methodContentHtml = `
                     <div style="text-align: center; margin: 30px 0;">
-                        <h4 style="color: var(--primary-color); margin-bottom: 15px;">
+                        <h4 style="color: var(--cs-gold); margin-bottom: 15px;">
                             Valores Rolados: ${this.wizardData.rolledValues.length} / 6
                         </h4>
                         <div class="rolled-values-display">
@@ -1875,7 +1909,7 @@ class CharacterCreationWizard {
                 // Todos os 6 valores rolados - mostrar alocação
                 methodContentHtml = `
                     <div style="margin: 20px 0;">
-                        <h4 style="color: var(--primary-color); margin-bottom: 15px; text-align: center;">
+                        <h4 style="color: var(--cs-gold); margin-bottom: 15px; text-align: center;">
                             Valores Disponíveis (clique para alocar)
                         </h4>
                         <div class="available-values-grid">
@@ -1885,7 +1919,7 @@ class CharacterCreationWizard {
                                 </div>
                             `).join('')}
                         </div>
-                        <p style="text-align: center; color: var(--text-color); margin-top: 10px; font-size: 14px;">
+                        <p style="text-align: center; color: var(--cs-text-muted); margin-top: 10px; font-size: 14px;">
                             Clique em um valor acima e depois no atributo abaixo
                         </p>
                     </div>
@@ -1893,7 +1927,6 @@ class CharacterCreationWizard {
             }
         } else {
             // Modo Array Padrão - valores fixos [15, 14, 13, 12, 10, 8]
-            // Só preencher se ainda não iniciou a alocação
             if (this.wizardData.availableValues.length === 0 &&
                 !this.wizardData.attributesAllocated) {
                 this.wizardData.availableValues = [15, 14, 13, 12, 10, 8];
@@ -1901,7 +1934,7 @@ class CharacterCreationWizard {
 
             methodContentHtml = `
                 <div style="margin: 20px 0;">
-                    <h4 style="color: var(--primary-color); margin-bottom: 15px; text-align: center;">
+                    <h4 style="color: var(--cs-gold); margin-bottom: 15px; text-align: center;">
                         Valores Disponíveis (clique para alocar)
                     </h4>
                     <div class="available-values-grid">
@@ -1911,7 +1944,7 @@ class CharacterCreationWizard {
                             </div>
                         `).join('')}
                     </div>
-                    <p style="text-align: center; color: var(--text-color); margin-top: 10px; font-size: 14px;">
+                    <p style="text-align: center; color: var(--cs-text-muted); margin-top: 10px; font-size: 14px;">
                         Clique em um valor acima e depois no atributo abaixo
                     </p>
                 </div>
@@ -1940,33 +1973,14 @@ class CharacterCreationWizard {
         this.contentArea.innerHTML = `
             <div class="step-content">
                 <h3 class="step-title">Atributos</h3>
-                <p class="step-description">Escolha o método e distribua os valores</p>
+                <p class="step-description">Método: <strong>${methodLabel}</strong></p>
                 
-                ${toggleHtml}
                 ${methodContentHtml}
                 ${this.wizardData.availableValues.length > 0 || this.wizardData.rolledValues.length === 6 ? attributesHtml : ''}
             </div>
         `;
 
-        // Event listeners para toggle
-        document.querySelectorAll('.toggle-option').forEach(option => {
-            option.addEventListener('click', () => {
-                const newMethod = option.dataset.method;
-                if (this.wizardData.attributeMethod !== newMethod) {
-                    this.wizardData.attributeMethod = newMethod;
-                    this.wizardData.rolledValues = [];
-                    this.wizardData.availableValues = [];
-                    this.wizardData.attributes = { str: 10, dex: 10, con: 10, int: 10, wis: 10, cha: 10 };
-                    this.wizardData.attributesAllocated = false; // Reset da flag
-
-                    if (newMethod === 'standard') {
-                        this.wizardData.availableValues = [15, 14, 13, 12, 10, 8];
-                    }
-
-                    this.renderStep();
-                }
-            });
-        });
+        // (Sem toggle - o método já foi escolhido e está travado)
 
         // Event listener para rolar valor individual (4d6) com dados 3D
         const rollSingleBtn = document.getElementById('rollSingleBtn');
@@ -2395,10 +2409,19 @@ class CharacterCreationWizard {
         const rollWealthBtn = document.getElementById('rollWealthBtn');
         if (rollWealthBtn) {
             rollWealthBtn.addEventListener('click', () => {
-                const formula = this.wizardData.class.starting_wealth || '4d4 x 10 po';
-                const wealth = this.calculateStartingWealth(formula);
-                this.wizardData.startingWealth = wealth;
-                this.renderStep();
+                try {
+                    const formula = this.wizardData.class?.starting_wealth || '4d4 x 10 po';
+                    console.log('🎲 Rolando riqueza com fórmula:', formula);
+                    const wealth = this.calculateStartingWealth(formula);
+                    console.log('💰 Riqueza calculada:', wealth);
+                    this.wizardData.startingWealth = wealth;
+                    this.renderStep();
+                } catch (error) {
+                    console.error('❌ Erro ao rolar riqueza:', error);
+                    // Fallback: valor fixo
+                    this.wizardData.startingWealth = 100;
+                    this.renderStep();
+                }
             });
         }
 
