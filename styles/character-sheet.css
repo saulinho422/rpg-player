@@ -5,53 +5,57 @@
 
 /* ── Design Tokens (override/extend main.css) ── */
 :root {
-  --cs-gold:           #d4af37;
-  --cs-gold-dark:      #c9b037;
-  --cs-gold-light:     #f0c84f;
-  --cs-gold-muted:     rgba(212, 175, 55, 0.18);
-  --cs-gold-border:    rgba(212, 175, 55, 0.35);
+  --cs-gold: #d4af37;
+  --cs-gold-dark: #c9b037;
+  --cs-gold-light: #f0c84f;
+  --cs-gold-muted: rgba(212, 175, 55, 0.18);
+  --cs-gold-border: rgba(212, 175, 55, 0.35);
   --cs-gold-border-strong: rgba(212, 175, 55, 0.6);
 
-  --cs-bg:             #080808;
-  --cs-surface:        #141414;
-  --cs-surface-2:      #1e1e2a;
-  --cs-surface-3:      #252535;
+  --cs-bg: #080808;
+  --cs-surface: #141414;
+  --cs-surface-2: #1e1e2a;
+  --cs-surface-3: #252535;
 
-  --cs-text:           #e8dcc6;
-  --cs-text-muted:     #9a8060;
-  --cs-text-dim:       #6b5840;
+  --cs-text: #e8dcc6;
+  --cs-text-muted: #9a8060;
+  --cs-text-dim: #6b5840;
 
-  --cs-danger:         #e74c3c;
-  --cs-danger-muted:   rgba(231, 76, 60, 0.2);
-  --cs-success:        #2ecc71;
-  --cs-success-muted:  rgba(46, 204, 113, 0.2);
-  --cs-warning:        #f39c12;
+  --cs-danger: #e74c3c;
+  --cs-danger-muted: rgba(231, 76, 60, 0.2);
+  --cs-success: #2ecc71;
+  --cs-success-muted: rgba(46, 204, 113, 0.2);
+  --cs-warning: #f39c12;
 
-  --glow-gold:         0 0 18px rgba(212, 175, 55, 0.35);
-  --glow-gold-strong:  0 0 30px rgba(212, 175, 55, 0.55);
-  --glow-gold-subtle:  0 0 8px  rgba(212, 175, 55, 0.15);
-  --shadow-card:       0 8px 32px rgba(0, 0, 0, 0.55), 0 2px 8px rgba(0, 0, 0, 0.4);
+  --glow-gold: 0 0 18px rgba(212, 175, 55, 0.35);
+  --glow-gold-strong: 0 0 30px rgba(212, 175, 55, 0.55);
+  --glow-gold-subtle: 0 0 8px rgba(212, 175, 55, 0.15);
+  --shadow-card: 0 8px 32px rgba(0, 0, 0, 0.55), 0 2px 8px rgba(0, 0, 0, 0.4);
 
-  --radius-card:       16px;
-  --radius-stat:       14px;
-  --radius-sm:         8px;
-  --radius-pill:       999px;
+  --radius-card: 16px;
+  --radius-stat: 14px;
+  --radius-sm: 8px;
+  --radius-pill: 999px;
 
-  --nav-height-top:    60px;
+  --nav-height-top: 60px;
   --nav-height-bottom: 64px;
-  --content-padding:   16px;
+  --content-padding: 16px;
 
-  --transition-fast:   150ms ease;
-  --transition-med:    260ms ease;
-  --transition-slow:   400ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-fast: 150ms ease;
+  --transition-med: 260ms ease;
+  --transition-slow: 400ms cubic-bezier(0.4, 0, 0.2, 1);
 
-  --font-heading:      'Marcellus SC', serif;
-  --font-body:         'Libre Baskerville', serif;
-  --font-mono:         'JetBrains Mono', monospace;
+  --font-heading: 'Marcellus SC', serif;
+  --font-body: 'Libre Baskerville', serif;
+  --font-mono: 'JetBrains Mono', monospace;
 }
 
 /* ── Reset / Base ── */
-*, *::before, *::after { box-sizing: border-box; }
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
 
 body {
   font-family: var(--font-body);
@@ -179,7 +183,9 @@ body {
   scrollbar-width: none;
 }
 
-.cs-tab-nav-desktop::-webkit-scrollbar { display: none; }
+.cs-tab-nav-desktop::-webkit-scrollbar {
+  display: none;
+}
 
 .tab-btn {
   display: inline-flex;
@@ -236,8 +242,15 @@ body {
 }
 
 @keyframes cs-fadein {
-  from { opacity: 0; transform: translateY(6px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* ================================================
@@ -262,11 +275,9 @@ body {
   position: absolute;
   inset: 0;
   border-radius: inherit;
-  background: linear-gradient(
-    145deg,
-    rgba(212, 175, 55, 0.04) 0%,
-    transparent 50%
-  );
+  background: linear-gradient(145deg,
+      rgba(212, 175, 55, 0.04) 0%,
+      transparent 50%);
   pointer-events: none;
 }
 
@@ -402,7 +413,9 @@ body {
   caret-color: var(--cs-gold);
 }
 
-.hp-total-input:focus { color: var(--cs-gold); }
+.hp-total-input:focus {
+  color: var(--cs-gold);
+}
 
 /* HP Bar */
 .hp-bar-wrap {
@@ -421,8 +434,14 @@ body {
   width: 100%;
 }
 
-.hp-bar.warning { background: var(--cs-warning); }
-.hp-bar.danger  { background: var(--cs-danger);  box-shadow: 0 0 8px rgba(231, 76, 60, 0.6); }
+.hp-bar.warning {
+  background: var(--cs-warning);
+}
+
+.hp-bar.danger {
+  background: var(--cs-danger);
+  box-shadow: 0 0 8px rgba(231, 76, 60, 0.6);
+}
 
 /* ================================================
    INPUTS & FORM ELEMENTS
@@ -450,7 +469,10 @@ select.input-field:focus {
   box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.15), var(--glow-gold-subtle);
 }
 
-.input-field::placeholder { color: var(--cs-text-dim); font-style: italic; }
+.input-field::placeholder {
+  color: var(--cs-text-dim);
+  font-style: italic;
+}
 
 select.input-field option {
   background: var(--cs-surface-2);
@@ -766,7 +788,9 @@ input[type="checkbox"] {
   overflow-y: auto;
 }
 
-.sidebar-menu.active { left: 0; }
+.sidebar-menu.active {
+  left: 0;
+}
 
 .sidebar-overlay {
   position: fixed;
@@ -819,7 +843,9 @@ input[type="checkbox"] {
   border-color: var(--cs-gold);
 }
 
-.sidebar-content { padding: 16px; }
+.sidebar-content {
+  padding: 16px;
+}
 
 .sidebar-item {
   width: 100%;
@@ -844,7 +870,9 @@ input[type="checkbox"] {
   color: var(--cs-gold);
 }
 
-.sidebar-icon { font-size: 1.3rem; }
+.sidebar-icon {
+  font-size: 1.3rem;
+}
 
 /* ================================================
    MODALS
@@ -874,8 +902,15 @@ input[type="checkbox"] {
 }
 
 @keyframes cs-slideup {
-  from { transform: translateY(24px) scale(0.96); opacity: 0; }
-  to   { transform: translateY(0) scale(1); opacity: 1; }
+  from {
+    transform: translateY(24px) scale(0.96);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
 }
 
 .cs-modal__header {
@@ -939,7 +974,7 @@ input[type="checkbox"] {
   padding: 16px;
 }
 
-#attackModal > div {
+#attackModal>div {
   background: rgba(18, 18, 28, 0.97) !important;
   border: 1px solid var(--cs-gold-border-strong) !important;
   border-radius: 20px !important;
@@ -948,7 +983,7 @@ input[type="checkbox"] {
 }
 
 /* ── Inventory Modal ── */
-#inventory-modal > div > div {
+#inventory-modal>div>div {
   background: rgba(18, 18, 28, 0.97);
   border: 1px solid var(--cs-gold-border-strong);
   border-radius: 20px;
@@ -1000,7 +1035,9 @@ input[type="checkbox"] {
   display: none;
 }
 
-.feature-card.expanded .feature-card-description { display: block; }
+.feature-card.expanded .feature-card-description {
+  display: block;
+}
 
 /* ================================================
    WIZARD — Creation Modal (preserved + enhanced)
@@ -1084,7 +1121,10 @@ input[type="checkbox"] {
   gap: 6px;
   scrollbar-width: none;
 }
-.progress-bar::-webkit-scrollbar { display: none; }
+
+.progress-bar::-webkit-scrollbar {
+  display: none;
+}
 
 .progress-step {
   display: flex;
@@ -1132,7 +1172,10 @@ input[type="checkbox"] {
   transform: scale(1.1);
 }
 
-.progress-step.active span { color: var(--cs-gold); font-weight: 700; }
+.progress-step.active span {
+  color: var(--cs-gold);
+  font-weight: 700;
+}
 
 .progress-step.completed .step-number {
   background: linear-gradient(135deg, #27ae60, #2ecc71);
@@ -1140,7 +1183,9 @@ input[type="checkbox"] {
   color: white;
 }
 
-.progress-step.completed span { color: var(--cs-success); }
+.progress-step.completed span {
+  color: var(--cs-success);
+}
 
 .progress-fill {
   position: absolute;
@@ -1158,6 +1203,8 @@ input[type="checkbox"] {
   padding: 30px 36px;
   overflow-y: auto;
   flex: 1;
+  min-height: 0;
+  /* CRITICAL: allows flex-child to scroll */
 }
 
 .creation-footer {
@@ -1206,8 +1253,15 @@ input[type="checkbox"] {
   color: var(--cs-text);
 }
 
-.wizard-btn.hidden { display: none !important; }
-.wizard-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none !important; }
+.wizard-btn.hidden {
+  display: none !important;
+}
+
+.wizard-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: none !important;
+}
 
 /* Selection cards */
 .selection-grid {
@@ -1243,8 +1297,10 @@ input[type="checkbox"] {
 .selection-card.selected::after {
   content: "✓";
   position: absolute;
-  top: 10px; right: 10px;
-  width: 26px; height: 26px;
+  top: 10px;
+  right: 10px;
+  width: 26px;
+  height: 26px;
   border-radius: 50%;
   background: var(--cs-gold);
   color: #0a0a0a;
@@ -1338,11 +1394,21 @@ input[type="checkbox"] {
   transition: all var(--transition-fast);
 }
 
-.checkbox-item:hover { border-color: var(--cs-gold); background: var(--cs-gold-muted); }
+.checkbox-item:hover {
+  border-color: var(--cs-gold);
+  background: var(--cs-gold-muted);
+}
 
-.checkbox-item input[type="checkbox"] { accent-color: var(--cs-gold); }
+.checkbox-item input[type="checkbox"] {
+  accent-color: var(--cs-gold);
+}
 
-.checkbox-item label { color: var(--cs-text); font-size: 0.85rem; cursor: pointer; flex: 1; }
+.checkbox-item label {
+  color: var(--cs-text);
+  font-size: 0.85rem;
+  cursor: pointer;
+  flex: 1;
+}
 
 /* Attribute boxes in wizard */
 .attribute-box {
@@ -1355,7 +1421,8 @@ input[type="checkbox"] {
   transition: all var(--transition-fast);
 }
 
-.attribute-box:hover, .attribute-box.has-value {
+.attribute-box:hover,
+.attribute-box.has-value {
   border-color: var(--cs-gold);
 }
 
@@ -1380,7 +1447,9 @@ input[type="checkbox"] {
 }
 
 /* Form group */
-.form-group { margin-bottom: 20px; }
+.form-group {
+  margin-bottom: 20px;
+}
 
 .form-group label {
   display: block;
@@ -1412,7 +1481,10 @@ input[type="checkbox"] {
   box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.12);
 }
 
-.form-group textarea { resize: vertical; line-height: 1.6; }
+.form-group textarea {
+  resize: vertical;
+  line-height: 1.6;
+}
 
 /* ================================================
    FEATURE MODAL
@@ -1464,7 +1536,8 @@ input[type="checkbox"] {
   background: rgba(10, 10, 10, 0.2);
   border: 2px solid rgba(10, 10, 10, 0.3);
   color: #0a0a0a;
-  width: 32px; height: 32px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
   cursor: pointer;
   display: flex;
@@ -1537,20 +1610,344 @@ input[type="checkbox"] {
 }
 
 /* ================================================
+   WIZARD — Toggle Group (attribute/equipment method)
+   ================================================ */
+.toggle-group {
+  display: flex;
+  gap: 2px;
+  background: rgba(10, 10, 20, 0.6);
+  border: 1px solid var(--cs-gold-border);
+  border-radius: var(--radius-sm);
+  padding: 3px;
+  margin-bottom: 24px;
+}
+
+.toggle-option {
+  flex: 1;
+  padding: 10px 16px;
+  text-align: center;
+  border-radius: calc(var(--radius-sm) - 2px);
+  cursor: pointer;
+  font-family: var(--font-heading);
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  color: var(--cs-text-muted);
+  transition: all var(--transition-fast);
+}
+
+.toggle-option:hover {
+  color: var(--cs-text);
+  background: rgba(212, 175, 55, 0.08);
+}
+
+.toggle-option.active {
+  background: linear-gradient(135deg, var(--cs-gold), var(--cs-gold-dark));
+  color: #0a0a0a;
+  box-shadow: var(--glow-gold-subtle);
+}
+
+/* ================================================
+   WIZARD — Rolled Values Display
+   ================================================ */
+.rolled-values-display {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+/* ================================================
+   WIZARD — Available Values Grid
+   ================================================ */
+.available-values-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 10px;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+@media (max-width: 600px) {
+  .available-values-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* ================================================
+   WIZARD — Attribute Distribution Grid
+   ================================================ */
+.attribute-distribution {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-top: 20px;
+}
+
+@media (max-width: 600px) {
+  .attribute-distribution {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* ================================================
+   WIZARD — Upload / Roll Button
+   ================================================ */
+.upload-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 28px;
+  background: linear-gradient(135deg, var(--cs-gold), var(--cs-gold-dark));
+  color: #0a0a0a;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-heading);
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  letter-spacing: 0.03em;
+}
+
+.upload-button:hover:not(:disabled) {
+  box-shadow: var(--glow-gold);
+  transform: translateY(-2px);
+}
+
+.upload-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ================================================
+   WIZARD — Dice Container
+   ================================================ */
+.dice-container {
+  width: 100%;
+  max-width: 400px;
+  height: 200px;
+  margin: 20px auto;
+  position: relative;
+}
+
+/* ================================================
+   WIZARD — Equipment Step
+   ================================================ */
+.equipment-choice-group {
+  margin-bottom: 20px;
+  padding: 18px;
+  background: rgba(10, 10, 20, 0.4);
+  border: 1px solid var(--cs-gold-border);
+  border-radius: var(--radius-sm);
+}
+
+.equipment-options {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.equipment-option {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  background: rgba(20, 20, 30, 0.7);
+  border: 1px solid var(--cs-gold-border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.equipment-option:hover {
+  border-color: var(--cs-gold);
+  background: var(--cs-gold-muted);
+}
+
+.equipment-option.selected {
+  border-color: var(--cs-gold);
+  background: rgba(212, 175, 55, 0.12);
+  box-shadow: var(--glow-gold-subtle);
+}
+
+.option-letter {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  color: var(--cs-gold);
+  font-size: 0.85rem;
+  min-width: 24px;
+}
+
+.option-text {
+  color: var(--cs-text);
+  font-size: 0.88rem;
+  line-height: 1.4;
+}
+
+.equipment-fixed-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  color: var(--cs-text-muted);
+  font-size: 0.88rem;
+}
+
+.fixed-icon {
+  color: var(--cs-success);
+  font-weight: 700;
+}
+
+/* ================================================
+   WIZARD — Shop (Wealth Method)
+   ================================================ */
+.shop-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 18px;
+  background: rgba(212, 175, 55, 0.08);
+  border: 1px solid var(--cs-gold-border);
+  border-radius: var(--radius-sm);
+  margin-bottom: 20px;
+}
+
+.wealth-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9rem;
+  color: var(--cs-text);
+}
+
+.wealth-amount {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  color: var(--cs-gold);
+  font-size: 1.1rem;
+}
+
+.wealth-display {
+  padding: 20px;
+  background: rgba(10, 10, 20, 0.5);
+  border: 1px solid var(--cs-gold-border);
+  border-radius: var(--radius-sm);
+  text-align: center;
+}
+
+.wealth-formula {
+  font-family: var(--font-heading);
+  font-size: 1.3rem;
+  color: var(--cs-gold);
+  font-weight: 700;
+}
+
+.purchased-count {
+  color: var(--cs-text-muted);
+  font-size: 0.85rem;
+}
+
+.shop-items-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 10px;
+}
+
+.shop-item {
+  background: rgba(20, 20, 30, 0.7);
+  border: 1px solid var(--cs-gold-border);
+  border-radius: var(--radius-sm);
+  padding: 12px;
+  transition: all var(--transition-fast);
+}
+
+.shop-item.purchased {
+  border-color: var(--cs-success);
+  background: rgba(39, 174, 96, 0.08);
+}
+
+.shop-item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.shop-item-name {
+  font-weight: 600;
+  color: var(--cs-text);
+  font-size: 0.85rem;
+}
+
+.shop-item-cost {
+  color: var(--cs-gold);
+  font-family: var(--font-heading);
+  font-size: 0.8rem;
+}
+
+.shop-item-detail {
+  font-size: 0.75rem;
+  color: var(--cs-text-muted);
+  margin-bottom: 4px;
+}
+
+.shop-item-btn {
+  width: 100%;
+  padding: 6px;
+  margin-top: 8px;
+  border: 1px solid var(--cs-gold-border);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--cs-gold);
+  font-family: var(--font-heading);
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.shop-item-btn:hover {
+  background: var(--cs-gold-muted);
+}
+
+.shop-item-btn.remove {
+  color: var(--cs-danger);
+  border-color: rgba(231, 76, 60, 0.3);
+}
+
+.shop-item-btn.remove:hover {
+  background: rgba(231, 76, 60, 0.1);
+}
+
+/* ================================================
    SCROLLBAR STYLING
    ================================================ */
-::-webkit-scrollbar { width: 6px; height: 6px; }
-::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
 ::-webkit-scrollbar-thumb {
   background: var(--cs-gold-border);
   border-radius: 3px;
 }
-::-webkit-scrollbar-thumb:hover { background: var(--cs-gold); }
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--cs-gold);
+}
 
 /* ================================================
    UTILITY OVERRIDES
    ================================================ */
-.hide { display: none !important; }
+.hide {
+  display: none !important;
+}
 
 /* Override bg-gray-200 used for load bar */
 .w-full.bg-gray-200 {
@@ -1563,9 +1960,10 @@ input[type="checkbox"] {
    MOBILE — Bottom Navigation
    ================================================ */
 @media (max-width: 767px) {
+
   /* Show bottom nav, hide desktop tabs */
   .cs-tab-nav-desktop,
-  .cs-tab-nav-desktop + .mb-6 {
+  .cs-tab-nav-desktop+.mb-6 {
     display: none !important;
   }
 
@@ -1668,32 +2066,60 @@ input[type="checkbox"] {
   }
 
   /* Tab nav on mobile - use bottom nav instead */
-  .tab-btn { display: none; }
+  .tab-btn {
+    display: none;
+  }
 
   /* Sidebar overlay fix */
-  .sidebar-menu { width: 280px; }
+  .sidebar-menu {
+    width: 280px;
+  }
 }
 
 /* Desktop: hide bottom nav */
 @media (min-width: 768px) {
-  .cs-bottom-nav { display: none; }
-  .cs-tab-nav-desktop { display: flex; }
+  .cs-bottom-nav {
+    display: none;
+  }
+
+  .cs-tab-nav-desktop {
+    display: flex;
+  }
 }
 
 /* ================================================
    RESPONSIVE TWEAKS — Tablet
    ================================================ */
 @media (max-width: 1023px) and (min-width: 768px) {
-  .cs-top-bar__char-name { font-size: 0.88rem; }
+  .cs-top-bar__char-name {
+    font-size: 0.88rem;
+  }
 
-  .stat-box__value { font-size: 2rem; }
+  .stat-box__value {
+    font-size: 2rem;
+  }
 }
 
 /* ================================================
    PRINT STYLES
    ================================================ */
 @media print {
-  .cs-top-bar, .cs-bottom-nav, .sidebar-menu, .sidebar-overlay { display: none !important; }
-  .card { border: 1px solid #333; box-shadow: none; background: white; }
-  body { background: white; color: black; }
+
+  .cs-top-bar,
+  .cs-bottom-nav,
+  .sidebar-menu,
+  .sidebar-overlay {
+    display: none !important;
+  }
+
+  .card {
+    border: 1px solid #333;
+    box-shadow: none;
+    background: white;
+  }
+
+  body {
+    background: white;
+    color: black;
+  }
 }
