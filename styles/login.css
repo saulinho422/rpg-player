@@ -18,7 +18,7 @@ body {
     color: #e8dcc6;
     position: relative;
     /* FIX #7 — previne borda laranja nas bordas */
-    overflow: hidden;
+    overflow-x: hidden;
 }
 
 body::before {
@@ -56,7 +56,8 @@ body::before {
     margin-bottom: 15px;
 }
 
-.ornament-left, .ornament-right {
+.ornament-left,
+.ornament-right {
     font-size: 2rem;
     color: #d4af37;
     animation: sparkle 2s infinite alternate;
@@ -71,9 +72,9 @@ body::before {
     font-size: 3rem;
     font-weight: 900;
     color: #d4af37;
-    text-shadow: 
+    text-shadow:
         2px 2px 0px #8b4513,
-        4px 4px 8px rgba(0,0,0,0.5),
+        4px 4px 8px rgba(0, 0, 0, 0.5),
         0 0 20px rgba(212, 175, 55, 0.3);
     letter-spacing: 3px;
     margin-bottom: 10px;
@@ -322,18 +323,37 @@ body::before {
    ===================================== */
 
 @keyframes sparkle {
-    0% { transform: scale(1) rotate(0deg); }
-    100% { transform: scale(1.1) rotate(5deg); }
+    0% {
+        transform: scale(1) rotate(0deg);
+    }
+
+    100% {
+        transform: scale(1.1) rotate(5deg);
+    }
 }
 
 @keyframes pulse {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.02); }
+
+    0%,
+    100% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.02);
+    }
 }
 
 @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 /* =====================================
@@ -346,20 +366,21 @@ body::before {
         padding: 15px;
         margin: 10px;
     }
-    
+
     .main-title {
         font-size: 2.2rem;
     }
-    
+
     .title-subtitle {
         font-size: 0.95rem;
     }
-    
+
     .auth-container {
         padding: 20px;
     }
-    
-    .ornament-left, .ornament-right {
+
+    .ornament-left,
+    .ornament-right {
         font-size: 1.5rem;
     }
 }
@@ -370,11 +391,11 @@ body::before {
         align-items: flex-start;
         padding: 20px 0;
     }
-    
+
     .title-section {
         margin-bottom: 20px;
     }
-    
+
     .main-title {
         font-size: 2.5rem;
     }
@@ -385,7 +406,7 @@ body::before {
     .login-container {
         max-width: 600px;
     }
-    
+
     .main-title {
         font-size: 3.5rem;
     }
@@ -396,11 +417,11 @@ body::before {
     .login-container {
         max-width: 550px;
     }
-    
+
     .main-title {
         font-size: 4rem;
     }
-    
+
     .auth-container {
         padding: 40px;
     }
