@@ -491,20 +491,22 @@ class CharacterSheet {
             });
         }
 
-        // Proficiências (textarea na aba Identidade)
+        // Proficiências (renderizar como tags por categoria)
         if (this.character.proficiencies) {
-            const profText = Array.isArray(this.character.proficiencies)
-                ? this.character.proficiencies.join(', ')
-                : this.character.proficiencies;
-            this.setInputValue('proficiencies', profText);
+            const profList = Array.isArray(this.character.proficiencies)
+                ? this.character.proficiencies
+                : this.character.proficiencies.split(',').map(s => s.trim()).filter(Boolean);
+            
+            this.populateProficiencyTags(profList);
         }
 
-        // Idiomas (textarea na aba Identidade)
+        // Idiomas (renderizar como tags)
         if (this.character.languages) {
-            const langText = Array.isArray(this.character.languages)
-                ? this.character.languages.join(', ')
-                : this.character.languages;
-            this.setInputValue('languages', langText);
+            const langList = Array.isArray(this.character.languages)
+                ? this.character.languages
+                : this.character.languages.split(',').map(s => s.trim()).filter(Boolean);
+            
+            this.populateLanguageTags(langList);
         }
 
         // Histórico (backstory textarea na aba Identidade)
@@ -533,6 +535,76 @@ class CharacterSheet {
         if (element && value !== undefined && value !== null) {
             element.value = value;
         }
+    }
+
+    populateProficiencyTags(profList) {
+        // Categorization keywords
+        const armorKeywords = ['armadura', 'armaduras', 'escudo', 'escudos', 'leve', 'média', 'pesada', 'light armor', 'medium armor', 'heavy armor', 'shield'];
+        const weaponKeywords = ['arma', 'armas', 'simples', 'marciais', 'espada', 'adaga', 'arco', 'besta', 'machado', 'maça', 'lança', 'simple weapons', 'martial weapons'];
+        const toolKeywords = ['ferramenta', 'kit', 'instrumento', 'musical', 'ladrão', 'herbalismo', 'veneno', 'navegação', 'carpinteiro', 'ferreiro', 'thieves', 'tools'];
+
+        const categories = { armaduras: [], armas: [], ferramentas: [], outros: [] };
+
+        profList.forEach(prof => {
+            const lower = prof.toLowerCase();
+            if (armorKeywords.some(k => lower.includes(k))) {
+                categories.armaduras.push(prof);
+            } else if (weaponKeywords.some(k => lower.includes(k))) {
+                categories.armas.push(prof);
+            } else if (toolKeywords.some(k => lower.includes(k))) {
+                categories.ferramentas.push(prof);
+            } else {
+                categories.outros.push(prof);
+            }
+        });
+
+        Object.entries(categories).forEach(([cat, items]) => {
+            const container = document.getElementById(`prof-${cat}`);
+            if (!container) return;
+
+            // Clear existing tags (keep the empty message span)
+            container.querySelectorAll('.prof-tag').forEach(t => t.remove());
+            const emptyMsg = document.getElementById(`empty-prof-${cat}`);
+
+            if (items.length > 0) {
+                if (emptyMsg) emptyMsg.style.display = 'none';
+                items.forEach(item => {
+                    const tag = document.createElement('span');
+                    tag.className = 'prof-tag';
+                    tag.dataset.value = item;
+                    tag.innerHTML = `${item} <span class="remove-tag" onclick="removeProficiencyTag(this, '${cat}')">&times;</span>`;
+                    container.appendChild(tag);
+                });
+            } else {
+                if (emptyMsg) emptyMsg.style.display = '';
+            }
+        });
+
+        console.log('✅ Proficiências populadas como tags:', profList);
+    }
+
+    populateLanguageTags(langList) {
+        const container = document.getElementById('lang-tags');
+        if (!container) return;
+
+        // Clear existing tags
+        container.querySelectorAll('.lang-tag').forEach(t => t.remove());
+        const emptyMsg = document.getElementById('empty-lang');
+
+        if (langList.length > 0) {
+            if (emptyMsg) emptyMsg.style.display = 'none';
+            langList.forEach(lang => {
+                const tag = document.createElement('span');
+                tag.className = 'lang-tag';
+                tag.dataset.value = lang;
+                tag.innerHTML = `${lang} <span class="remove-tag" onclick="removeLanguageTag(this)">&times;</span>`;
+                container.appendChild(tag);
+            });
+        } else {
+            if (emptyMsg) emptyMsg.style.display = '';
+        }
+
+        console.log('✅ Idiomas populados como tags:', langList);
     }
 
     getHitDieForClass(className) {
@@ -568,40 +640,39 @@ class CharacterSheet {
         if (!skillsList) return;
 
         const skills = [
-            { id: 'acrobatics', name: 'Acrobacia', attr: 'dex', attrName: 'Destreza' },
-            { id: 'animal-handling', name: 'Lidar com Animais', attr: 'wis', attrName: 'Sabedoria' },
-            { id: 'arcana', name: 'Arcanismo', attr: 'int', attrName: 'Inteligência' },
-            { id: 'athletics', name: 'Atletismo', attr: 'str', attrName: 'Força' },
-            { id: 'deception', name: 'Enganação', attr: 'cha', attrName: 'Carisma' },
-            { id: 'history', name: 'História', attr: 'int', attrName: 'Inteligência' },
-            { id: 'insight', name: 'Intuição', attr: 'wis', attrName: 'Sabedoria' },
-            { id: 'intimidation', name: 'Intimidação', attr: 'cha', attrName: 'Carisma' },
-            { id: 'investigation', name: 'Investigação', attr: 'int', attrName: 'Inteligência' },
-            { id: 'medicine', name: 'Medicina', attr: 'wis', attrName: 'Sabedoria' },
-            { id: 'nature', name: 'Natureza', attr: 'int', attrName: 'Inteligência' },
-            { id: 'perception', name: 'Percepção', attr: 'wis', attrName: 'Sabedoria' },
-            { id: 'performance', name: 'Performance', attr: 'cha', attrName: 'Carisma' },
-            { id: 'persuasion', name: 'Persuasão', attr: 'cha', attrName: 'Carisma' },
-            { id: 'religion', name: 'Religião', attr: 'int', attrName: 'Inteligência' },
-            { id: 'sleight-of-hand', name: 'Prestidigitação', attr: 'dex', attrName: 'Destreza' },
-            { id: 'stealth', name: 'Furtividade', attr: 'dex', attrName: 'Destreza' },
-            { id: 'survival', name: 'Sobrevivência', attr: 'wis', attrName: 'Sabedoria' }
+            { id: 'acrobatics', name: 'Acrobacia', attr: 'dex', attrName: 'Des' },
+            { id: 'animal-handling', name: 'Lidar c/ Animais', attr: 'wis', attrName: 'Sab' },
+            { id: 'arcana', name: 'Arcanismo', attr: 'int', attrName: 'Int' },
+            { id: 'athletics', name: 'Atletismo', attr: 'str', attrName: 'For' },
+            { id: 'deception', name: 'Enganação', attr: 'cha', attrName: 'Car' },
+            { id: 'history', name: 'História', attr: 'int', attrName: 'Int' },
+            { id: 'insight', name: 'Intuição', attr: 'wis', attrName: 'Sab' },
+            { id: 'intimidation', name: 'Intimidação', attr: 'cha', attrName: 'Car' },
+            { id: 'investigation', name: 'Investigação', attr: 'int', attrName: 'Int' },
+            { id: 'medicine', name: 'Medicina', attr: 'wis', attrName: 'Sab' },
+            { id: 'nature', name: 'Natureza', attr: 'int', attrName: 'Int' },
+            { id: 'perception', name: 'Percepção', attr: 'wis', attrName: 'Sab' },
+            { id: 'performance', name: 'Performance', attr: 'cha', attrName: 'Car' },
+            { id: 'persuasion', name: 'Persuasão', attr: 'cha', attrName: 'Car' },
+            { id: 'religion', name: 'Religião', attr: 'int', attrName: 'Int' },
+            { id: 'sleight-of-hand', name: 'Prestidigitação', attr: 'dex', attrName: 'Des' },
+            { id: 'stealth', name: 'Furtividade', attr: 'dex', attrName: 'Des' },
+            { id: 'survival', name: 'Sobrevivência', attr: 'wis', attrName: 'Sab' }
         ];
 
         skillsList.innerHTML = skills.map(skill => `
-            <div class="flex items-center justify-between hover:bg-surface hover:bg-opacity-50 p-2 rounded transition-colors">
-                <div class="flex items-center flex-1">
+            <div class="skill-row">
+                <div class="flex items-center gap-3">
                     <input 
                         type="checkbox" 
                         id="skill-${skill.id}" 
-                        class="w-4 h-4 text-primary rounded mr-3 cursor-pointer" 
                         onchange="characterSheet.calculateSkills(); characterSheet.calculatePassivePerception();"
                     />
-                    <label for="skill-${skill.id}" class="text-sm cursor-pointer flex-1">
-                        ${skill.name} <span class="text-text-secondary text-xs">(${skill.attrName})</span>
+                    <label for="skill-${skill.id}" style="font-size:0.78rem;">
+                        ${skill.name} <span style="color:var(--cs-text-dim);font-size:0.65rem;">(${skill.attrName})</span>
                     </label>
                 </div>
-                <span class="text-sm font-mono font-bold text-primary" id="skill-${skill.id}-value">+0</span>
+                <span class="skill-val" id="skill-${skill.id}-value">+0</span>
             </div>
         `).join('');
 
@@ -609,22 +680,28 @@ class CharacterSheet {
     }
 
     calculateModifiers() {
-        const attributes = ['Strength', 'Dexterity', 'Constitution', 'Intelligence', 'Wisdom', 'Charisma'];
+        const attributes = [
+            { id: 'forca', key: 'strength' },
+            { id: 'destreza', key: 'dexterity' },
+            { id: 'constituicao', key: 'constitution' },
+            { id: 'inteligencia', key: 'intelligence' },
+            { id: 'sabedoria', key: 'wisdom' },
+            { id: 'carisma', key: 'charisma' }
+        ];
 
         attributes.forEach(attr => {
-            const scoreElement = document.getElementById(`${attr}score`);
-            const modElement = document.getElementById(`${attr}mod`);
+            const scoreElement = document.getElementById(`${attr.id}-value`);
+            const modElement = document.getElementById(`${attr.id}-modifier`);
 
             if (scoreElement && modElement) {
-                const score = parseInt(scoreElement.value) || 10;
+                const score = parseInt(scoreElement.textContent) || 10;
                 const modifier = Math.floor((score - 10) / 2);
                 const modString = modifier >= 0 ? `+${modifier}` : `${modifier}`;
-                modElement.value = modString;
+                modElement.textContent = modString;
 
                 // Atualizar no objeto character
-                if (this.character && this.character.attributes) {
-                    const attrKey = attr.toLowerCase().substring(0, 3);
-                    this.character.attributes[attrKey] = score;
+                if (this.character) {
+                    this.character[attr.key] = score;
                 }
             }
         });
@@ -637,28 +714,35 @@ class CharacterSheet {
     calculateProficiencyBonus() {
         const level = this.character?.level || 1;
         const profBonus = Math.ceil(level / 4) + 1;
-        const element = document.getElementById('proficiencybonus');
+        const element = document.getElementById('proficiency-bonus');
         if (element) {
-            element.value = `+${profBonus}`;
+            element.textContent = `+${profBonus}`;
         }
         return profBonus;
     }
 
     calculateSavingThrows() {
-        const attributes = ['Strength', 'Dexterity', 'Constitution', 'Intelligence', 'Wisdom', 'Charisma'];
+        const saves = [
+            { id: 'forca', attr: 'str' },
+            { id: 'destreza', attr: 'dex' },
+            { id: 'constituicao', attr: 'con' },
+            { id: 'inteligencia', attr: 'int' },
+            { id: 'sabedoria', attr: 'wis' },
+            { id: 'carisma', attr: 'cha' }
+        ];
         const profBonus = this.calculateProficiencyBonus();
 
-        attributes.forEach(attr => {
-            const modElement = document.getElementById(`${attr}mod`);
-            const saveElement = document.getElementById(`${attr}-save`);
-            const profElement = document.getElementById(`${attr}-save-prof`);
+        saves.forEach(save => {
+            const attrValue = this.getAttributeValue(save.attr);
+            const modifier = this.calculateModifier(attrValue);
+            const checkbox = document.getElementById(`save-${save.id}`);
+            const valueElement = document.getElementById(`save-${save.id}-value`);
 
-            if (modElement && saveElement) {
-                const modifier = parseInt(modElement.value) || 0;
-                const isProficient = profElement?.checked || false;
+            if (valueElement) {
+                const isProficient = checkbox?.checked || false;
                 const saveBonus = modifier + (isProficient ? profBonus : 0);
                 const saveString = saveBonus >= 0 ? `+${saveBonus}` : `${saveBonus}`;
-                saveElement.value = saveString;
+                valueElement.textContent = saveString;
             }
         });
     }
@@ -731,20 +815,19 @@ class CharacterSheet {
     }
 
     calculateCombatStats() {
-        // AC básica (10 + mod Dex)
-        const dexModElement = document.getElementById('Dexteritymod');
+        // Pegar modificador de Destreza do elemento correto
+        const dexValue = this.getAttributeValue('dex');
+        const dexMod = this.calculateModifier(dexValue);
         const acElement = document.getElementById('ac');
 
-        if (dexModElement && acElement) {
-            const dexMod = parseInt(dexModElement.value) || 0;
+        if (acElement) {
             const baseAC = 10 + dexMod;
             acElement.value = baseAC;
         }
 
         // Iniciativa (mod Dex)
         const initiativeElement = document.getElementById('initiative');
-        if (dexModElement && initiativeElement) {
-            const dexMod = parseInt(dexModElement.value) || 0;
+        if (initiativeElement) {
             const initiativeString = dexMod >= 0 ? `+${dexMod}` : `${dexMod}`;
             initiativeElement.value = initiativeString;
         }

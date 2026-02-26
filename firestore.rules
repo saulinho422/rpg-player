@@ -29,14 +29,21 @@ service cloud.firestore {
       allow update, delete: if request.auth != null && resource.data.created_by == request.auth.uid;
     }
 
+    // ===== CAMPAIGN PLAYERS =====
+    match /campaign_players/{docId} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null;
+      allow update, delete: if request.auth != null && resource.data.user_id == request.auth.uid;
+    }
+
     // ===== ACTIVITY LOG =====
-    match /activityLog/{activityId} {
+    match /activity_log/{activityId} {
       allow read: if request.auth != null && resource.data.user_id == request.auth.uid;
       allow create: if request.auth != null;
       allow update, delete: if false;
     }
 
-    // ===== GAME DATA (somente leitura para jogadores, autenticados podem escrever) =====
+    // ===== GAME DATA =====
     match /classes/{docId} {
       allow read: if request.auth != null;
       allow write: if request.auth != null;

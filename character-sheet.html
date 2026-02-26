@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -8,6 +9,7 @@
     <link rel="stylesheet" href="styles/character-sheet.css?v=3.0" />
     <link rel="stylesheet" href="styles/dice3d.css" />
 </head>
+
 <body class="bg-background min-h-screen">
 
     <!-- ══════════════════════════════════════
@@ -101,10 +103,13 @@
                             <!-- PV Atuais -->
                             <div class="stat-box hp-main-box" style="grid-column: span 1;">
                                 <div class="hp-total-row">
-                                    <span style="font-size:0.65rem;color:var(--cs-text-muted);text-transform:uppercase;letter-spacing:0.08em;">Máx</span>
-                                    <input type="number" name="maxhp" id="maxhp" class="hp-total-input" value="0" placeholder="0">
+                                    <span
+                                        style="font-size:0.65rem;color:var(--cs-text-muted);text-transform:uppercase;letter-spacing:0.08em;">Máx</span>
+                                    <input type="number" name="maxhp" id="maxhp" class="hp-total-input" value="0"
+                                        placeholder="0">
                                 </div>
-                                <input type="number" name="currenthp" id="currenthp" class="stat-box__value" value="0" style="font-size:clamp(2.4rem,8vw,3.6rem);">
+                                <input type="number" name="currenthp" id="currenthp" class="stat-box__value" value="0"
+                                    style="font-size:clamp(2.4rem,8vw,3.6rem);">
                                 <span class="stat-box__label">PV Atuais</span>
                             </div>
 
@@ -125,7 +130,8 @@
                                 <span class="stat-box__label">Classe<br>de Armadura</span>
                             </div>
                             <div class="stat-box">
-                                <input type="text" name="initiative" id="initiative" class="stat-box__value" placeholder="+0" readonly style="cursor:default;">
+                                <input type="text" name="initiative" id="initiative" class="stat-box__value"
+                                    placeholder="+0" readonly style="cursor:default;">
                                 <span class="stat-box__label">Iniciativa</span>
                             </div>
                             <div class="stat-box">
@@ -139,36 +145,84 @@
                     <section class="card p-6">
                         <h2>🎲 Dados de Vida</h2>
                         <div class="stat-box" style="padding:24px 14px;">
-                            <p style="font-size:0.65rem;color:var(--cs-text-muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px;">Total: 1d8 + MOD de CON</p>
+                            <p
+                                style="font-size:0.65rem;color:var(--cs-text-muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px;">
+                                Total: 1d8 + MOD de CON</p>
                             <input type="text" name="hitdice" id="hitdice" class="stat-box__value" value="1d8">
                             <span class="stat-box__label">Dados de Vida</span>
                         </div>
                     </section>
                 </div>
 
-                <!-- Coluna Direita — Ataques -->
+                <!-- Coluna Direita -->
                 <div class="space-y-6">
+                    <!-- Ataques -->
                     <section class="card p-6">
-                        <div class="flex justify-between items-center mb-4" style="border-bottom:1px solid var(--cs-gold-border);padding-bottom:10px;">
+                        <div class="flex justify-between items-center mb-4"
+                            style="border-bottom:1px solid var(--cs-gold-border);padding-bottom:10px;">
                             <h2 style="border:none;padding:0;margin:0;">⚔️ Ataques</h2>
                             <button id="addAttackBtn" class="cs-add-btn">+</button>
                         </div>
-
-                        <!-- Header -->
-                        <div class="grid gap-2 mb-2" style="grid-template-columns:1fr 60px 100px 32px;font-size:0.65rem;color:var(--cs-text-muted);text-transform:uppercase;letter-spacing:0.08em;padding:0 4px;">
+                        <div class="grid gap-2 mb-2"
+                            style="grid-template-columns:1fr 60px 100px 32px;font-size:0.65rem;color:var(--cs-text-muted);text-transform:uppercase;letter-spacing:0.08em;padding:0 4px;">
                             <div>Nome</div>
                             <div style="text-align:center;">Bônus</div>
                             <div style="text-align:center;">Dano / Tipo</div>
                             <div></div>
                         </div>
-
-                        <!-- Attacks list -->
                         <div id="attacksList" class="space-y-2">
                             <div class="text-center py-12" style="color:var(--cs-text-dim);font-style:italic;">
                                 <div style="font-size:2rem;margin-bottom:8px;">⚔️</div>
                                 Nenhum ataque cadastrado.<br>
                                 <span style="font-size:0.78rem;">Toque em + para adicionar</span>
                             </div>
+                        </div>
+                    </section>
+
+                    <!-- Características e Habilidades (movido de Recursos) -->
+                    <section class="card p-6">
+                        <div class="flex justify-between items-center mb-4"
+                            style="border-bottom:1px solid var(--cs-gold-border);padding-bottom:10px;">
+                            <h2 style="border:none;padding:0;margin:0;">✨ Características e Habilidades</h2>
+                            <div class="flex gap-2">
+                                <button id="toggleLockFeatures" class="btn-icon" title="Travar/Destravar">
+                                    <span class="lock-icon">🔒</span>
+                                </button>
+                                <button id="addFeatureBtn" class="btn-primary px-4 py-2"
+                                    style="border-radius:8px;font-size:0.78rem;">
+                                    + Habilidade
+                                </button>
+                            </div>
+                        </div>
+                        <div id="featuresList" class="space-y-2">
+                            <div class="text-center py-10" style="color:var(--cs-text-dim);font-style:italic;">
+                                <div style="font-size:2rem;margin-bottom:8px;">✨</div>
+                                Nenhuma habilidade adicionada ainda.
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Inventário (movido de Recursos) -->
+                    <section class="card p-6">
+                        <h2>🎒 Inventário</h2>
+                        <div class="space-y-4">
+                            <div class="flex justify-between items-center">
+                                <span class="text-sm" style="color:var(--cs-text-muted);">Capacidade de Carga:</span>
+                                <span class="font-mono text-sm" id="carrying-capacity-2">75 kg</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-sm" style="color:var(--cs-text-muted);">Carga Atual:</span>
+                                <span class="font-mono text-sm" id="current-load-2">0 kg</span>
+                            </div>
+                            <div class="w-full bg-gray-200" style="height:6px;border-radius:999px;overflow:hidden;">
+                                <div class="bg-primary"
+                                    style="height:100%;border-radius:999px;transition:width 0.4s ease;width:0%;"
+                                    id="load-bar-2"></div>
+                            </div>
+                            <button onclick="openInventoryModal()" class="btn-primary w-full px-4 py-2"
+                                style="border-radius:8px;font-size:0.88rem;">
+                                Gerenciar Inventário
+                            </button>
                         </div>
                     </section>
                 </div>
@@ -246,45 +300,47 @@
                     <!-- Testes de Resistência -->
                     <section class="card p-6">
                         <h2>🛡️ Testes de Resistência</h2>
-                        <div class="space-y-1">
+                        <p style="font-size:0.7rem;color:var(--cs-text-dim);margin-bottom:8px;font-style:italic;">
+                            Definidos pela classe do personagem</p>
+                        <div class="saves-grid">
                             <div class="save-row">
                                 <div class="flex items-center gap-3">
-                                    <input type="checkbox" id="save-forca" />
+                                    <input type="checkbox" id="save-forca" disabled />
                                     <label for="save-forca">Força</label>
                                 </div>
                                 <span class="save-val" id="save-forca-value">+0</span>
                             </div>
                             <div class="save-row">
                                 <div class="flex items-center gap-3">
-                                    <input type="checkbox" id="save-destreza" />
+                                    <input type="checkbox" id="save-destreza" disabled />
                                     <label for="save-destreza">Destreza</label>
                                 </div>
                                 <span class="save-val" id="save-destreza-value">+0</span>
                             </div>
                             <div class="save-row">
                                 <div class="flex items-center gap-3">
-                                    <input type="checkbox" id="save-constituicao" />
+                                    <input type="checkbox" id="save-constituicao" disabled />
                                     <label for="save-constituicao">Constituição</label>
                                 </div>
                                 <span class="save-val" id="save-constituicao-value">+0</span>
                             </div>
                             <div class="save-row">
                                 <div class="flex items-center gap-3">
-                                    <input type="checkbox" id="save-inteligencia" />
+                                    <input type="checkbox" id="save-inteligencia" disabled />
                                     <label for="save-inteligencia">Inteligência</label>
                                 </div>
                                 <span class="save-val" id="save-inteligencia-value">+0</span>
                             </div>
                             <div class="save-row">
                                 <div class="flex items-center gap-3">
-                                    <input type="checkbox" id="save-sabedoria" />
+                                    <input type="checkbox" id="save-sabedoria" disabled />
                                     <label for="save-sabedoria">Sabedoria</label>
                                 </div>
                                 <span class="save-val" id="save-sabedoria-value">+0</span>
                             </div>
                             <div class="save-row">
                                 <div class="flex items-center gap-3">
-                                    <input type="checkbox" id="save-carisma" />
+                                    <input type="checkbox" id="save-carisma" disabled />
                                     <label for="save-carisma">Carisma</label>
                                 </div>
                                 <span class="save-val" id="save-carisma-value">+0</span>
@@ -295,7 +351,7 @@
                     <!-- Perícias -->
                     <section class="card p-6">
                         <h2>🎯 Perícias</h2>
-                        <div class="space-y-1 max-h-64 overflow-y-auto" id="skills-list" style="padding-right:4px;">
+                        <div class="skills-grid-2col" id="skills-list">
                             <!-- Populated by JS -->
                         </div>
                     </section>
@@ -315,14 +371,55 @@
                 <div class="space-y-6">
                     <section class="card p-6">
                         <h2>📜 Proficiências e Idiomas</h2>
-                        <div class="space-y-4">
+                        <div class="space-y-5">
+                            <!-- Proficiências por categoria -->
                             <div>
-                                <label for="proficiencies" class="block text-sm mb-2" style="color:var(--cs-text-muted);">Proficiências</label>
-                                <textarea name="proficiencies" id="proficiencies" class="input-field w-full px-3 py-2 resize-none" rows="6" placeholder="Armaduras, Armas, Ferramentas..."></textarea>
+                                <div class="prof-category">
+                                    <span class="prof-cat-label">🛡️ Armaduras</span>
+                                    <button class="add-tag-btn"
+                                        onclick="openAddProficiencyModal('armaduras')">+</button>
+                                </div>
+                                <div class="tags-container" id="prof-armaduras">
+                                    <span class="empty-tags" id="empty-prof-armaduras">Nenhuma proficiência</span>
+                                </div>
                             </div>
                             <div>
-                                <label for="languages" class="block text-sm mb-2" style="color:var(--cs-text-muted);">Idiomas</label>
-                                <textarea name="languages" id="languages" class="input-field w-full px-3 py-2 resize-none" rows="3" placeholder="Comum, Élfico..."></textarea>
+                                <div class="prof-category">
+                                    <span class="prof-cat-label">⚔️ Armas</span>
+                                    <button class="add-tag-btn" onclick="openAddProficiencyModal('armas')">+</button>
+                                </div>
+                                <div class="tags-container" id="prof-armas">
+                                    <span class="empty-tags" id="empty-prof-armas">Nenhuma proficiência</span>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="prof-category">
+                                    <span class="prof-cat-label">🔧 Ferramentas</span>
+                                    <button class="add-tag-btn"
+                                        onclick="openAddProficiencyModal('ferramentas')">+</button>
+                                </div>
+                                <div class="tags-container" id="prof-ferramentas">
+                                    <span class="empty-tags" id="empty-prof-ferramentas">Nenhuma proficiência</span>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="prof-category">
+                                    <span class="prof-cat-label">📋 Outros</span>
+                                    <button class="add-tag-btn" onclick="openAddProficiencyModal('outros')">+</button>
+                                </div>
+                                <div class="tags-container" id="prof-outros">
+                                    <span class="empty-tags" id="empty-prof-outros">Nenhuma proficiência</span>
+                                </div>
+                            </div>
+
+                            <div style="border-top:1px solid var(--cs-gold-border);padding-top:16px;">
+                                <div class="prof-category">
+                                    <span class="prof-cat-label">🗣️ Idiomas</span>
+                                    <button class="add-tag-btn" onclick="openAddLanguageModal()">+</button>
+                                </div>
+                                <div class="tags-container" id="lang-tags">
+                                    <span class="empty-tags" id="empty-lang">Adicione um idioma</span>
+                                </div>
                             </div>
                         </div>
                     </section>
@@ -344,18 +441,22 @@
                         <h2>🎭 Informações do Personagem</h2>
                         <div class="space-y-4">
                             <div>
-                                <label for="character-name-2" class="block text-sm mb-1" style="color:var(--cs-text-muted);">Nome do Personagem</label>
-                                <input type="text" id="character-name-2" class="input-field w-full px-3 py-2" placeholder="Digite o nome do personagem" />
+                                <label for="character-name-2" class="block text-sm mb-1"
+                                    style="color:var(--cs-text-muted);">Nome do Personagem</label>
+                                <input type="text" id="character-name-2" class="input-field w-full px-3 py-2"
+                                    placeholder="Digite o nome do personagem" />
                             </div>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
-                                    <label for="character-class-2" class="block text-sm mb-1" style="color:var(--cs-text-muted);">Classe</label>
+                                    <label for="character-class-2" class="block text-sm mb-1"
+                                        style="color:var(--cs-text-muted);">Classe</label>
                                     <select id="character-class-2" class="input-field w-full px-3 py-2">
                                         <option value="">Selecione uma classe</option>
                                     </select>
                                 </div>
                                 <div>
-                                    <label for="character-race-2" class="block text-sm mb-1" style="color:var(--cs-text-muted);">Raça</label>
+                                    <label for="character-race-2" class="block text-sm mb-1"
+                                        style="color:var(--cs-text-muted);">Raça</label>
                                     <select id="character-race-2" class="input-field w-full px-3 py-2">
                                         <option value="">Selecione uma raça</option>
                                     </select>
@@ -363,13 +464,15 @@
                             </div>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
-                                    <label for="character-background-2" class="block text-sm mb-1" style="color:var(--cs-text-muted);">Antecedente</label>
+                                    <label for="character-background-2" class="block text-sm mb-1"
+                                        style="color:var(--cs-text-muted);">Antecedente</label>
                                     <select id="character-background-2" class="input-field w-full px-3 py-2">
                                         <option value="">Selecione um antecedente</option>
                                     </select>
                                 </div>
                                 <div>
-                                    <label for="character-alignment-2" class="block text-sm mb-1" style="color:var(--cs-text-muted);">Tendência</label>
+                                    <label for="character-alignment-2" class="block text-sm mb-1"
+                                        style="color:var(--cs-text-muted);">Tendência</label>
                                     <select id="character-alignment-2" class="input-field w-full px-3 py-2">
                                         <option value="">Selecione uma tendência</option>
                                     </select>
@@ -377,14 +480,17 @@
                             </div>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
-                                    <label for="character-subclass-2" class="block text-sm mb-1" style="color:var(--cs-text-muted);">Subclasse</label>
+                                    <label for="character-subclass-2" class="block text-sm mb-1"
+                                        style="color:var(--cs-text-muted);">Subclasse</label>
                                     <select id="character-subclass-2" class="input-field w-full px-3 py-2">
                                         <option value="">Selecione uma subclasse</option>
                                     </select>
                                 </div>
                                 <div>
-                                    <label for="character-level-2" class="block text-sm mb-1" style="color:var(--cs-text-muted);">Nível</label>
-                                    <input type="number" id="character-level-2" class="input-field w-full px-3 py-2" min="1" max="20" value="1" />
+                                    <label for="character-level-2" class="block text-sm mb-1"
+                                        style="color:var(--cs-text-muted);">Nível</label>
+                                    <input type="number" id="character-level-2" class="input-field w-full px-3 py-2"
+                                        min="1" max="20" value="1" />
                                 </div>
                             </div>
                         </div>
@@ -395,20 +501,29 @@
                         <h2>💬 Personalidade</h2>
                         <div class="space-y-3">
                             <div>
-                                <label for="personality-traits" class="block text-sm mb-1" style="color:var(--cs-text-muted);">Traços de Personalidade</label>
-                                <textarea name="personality-traits" id="personality-traits" class="input-field w-full px-3 py-2 resize-none" rows="2" placeholder="Como seu personagem age?"></textarea>
+                                <label for="personality-traits" class="block text-sm mb-1"
+                                    style="color:var(--cs-text-muted);">Traços de Personalidade</label>
+                                <textarea name="personality-traits" id="personality-traits"
+                                    class="input-field w-full px-3 py-2 resize-none" rows="2"
+                                    placeholder="Como seu personagem age?"></textarea>
                             </div>
                             <div>
-                                <label for="ideals" class="block text-sm mb-1" style="color:var(--cs-text-muted);">Ideais</label>
-                                <textarea name="ideals" id="ideals" class="input-field w-full px-3 py-2 resize-none" rows="2" placeholder="No que seu personagem acredita?"></textarea>
+                                <label for="ideals" class="block text-sm mb-1"
+                                    style="color:var(--cs-text-muted);">Ideais</label>
+                                <textarea name="ideals" id="ideals" class="input-field w-full px-3 py-2 resize-none"
+                                    rows="2" placeholder="No que seu personagem acredita?"></textarea>
                             </div>
                             <div>
-                                <label for="bonds" class="block text-sm mb-1" style="color:var(--cs-text-muted);">Vínculos</label>
-                                <textarea name="bonds" id="bonds" class="input-field w-full px-3 py-2 resize-none" rows="2" placeholder="O que é importante para seu personagem?"></textarea>
+                                <label for="bonds" class="block text-sm mb-1"
+                                    style="color:var(--cs-text-muted);">Vínculos</label>
+                                <textarea name="bonds" id="bonds" class="input-field w-full px-3 py-2 resize-none"
+                                    rows="2" placeholder="O que é importante para seu personagem?"></textarea>
                             </div>
                             <div>
-                                <label for="flaws" class="block text-sm mb-1" style="color:var(--cs-text-muted);">Defeitos</label>
-                                <textarea name="flaws" id="flaws" class="input-field w-full px-3 py-2 resize-none" rows="2" placeholder="Quais são as fraquezas do seu personagem?"></textarea>
+                                <label for="flaws" class="block text-sm mb-1"
+                                    style="color:var(--cs-text-muted);">Defeitos</label>
+                                <textarea name="flaws" id="flaws" class="input-field w-full px-3 py-2 resize-none"
+                                    rows="2" placeholder="Quais são as fraquezas do seu personagem?"></textarea>
                             </div>
                         </div>
                     </section>
@@ -420,68 +535,80 @@
                     <!-- Aparência -->
                     <section class="card p-6">
                         <h2>🪞 Aparência</h2>
-                        <div class="grid grid-cols-2 gap-4">
+
+                        <!-- Upload de Imagem -->
+                        <div class="char-avatar-section">
+                            <div class="char-avatar-preview" id="charAvatarPreview">
+                                <span class="avatar-placeholder">🎭</span>
+                                <img id="charAvatarImg" src="" alt="Avatar"
+                                    style="display:none;width:100%;height:100%;object-fit:cover;border-radius:12px;" />
+                            </div>
+                            <div class="char-avatar-actions">
+                                <label for="charAvatarInput" class="btn-primary px-4 py-2"
+                                    style="border-radius:8px;font-size:0.78rem;cursor:pointer;display:inline-block;text-align:center;">
+                                    📷 Escolher Imagem
+                                </label>
+                                <input type="file" id="charAvatarInput" accept="image/*" style="display:none;"
+                                    onchange="handleAvatarUpload(event)" />
+                                <button class="btn-icon" onclick="removeAvatar()" title="Remover imagem"
+                                    style="font-size:0.78rem;padding:6px 10px;">🗑️</button>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4" style="margin-top:16px;">
                             <div>
-                                <label for="age" class="block text-sm mb-1" style="color:var(--cs-text-muted);">Idade</label>
-                                <input type="text" name="age" id="age" class="input-field w-full px-3 py-2" placeholder="25" />
+                                <label for="age" class="block text-sm mb-1"
+                                    style="color:var(--cs-text-muted);">Idade</label>
+                                <input type="text" name="age" id="age" class="input-field w-full px-3 py-2"
+                                    placeholder="25" />
                             </div>
                             <div>
-                                <label for="height" class="block text-sm mb-1" style="color:var(--cs-text-muted);">Altura</label>
-                                <input type="text" name="height" id="height" class="input-field w-full px-3 py-2" placeholder="1,75m" />
+                                <label for="height" class="block text-sm mb-1"
+                                    style="color:var(--cs-text-muted);">Altura</label>
+                                <input type="text" name="height" id="height" class="input-field w-full px-3 py-2"
+                                    placeholder="1,75m" />
                             </div>
                             <div>
-                                <label for="weight" class="block text-sm mb-1" style="color:var(--cs-text-muted);">Peso</label>
-                                <input type="text" name="weight" id="weight" class="input-field w-full px-3 py-2" placeholder="70kg" />
+                                <label for="weight" class="block text-sm mb-1"
+                                    style="color:var(--cs-text-muted);">Peso</label>
+                                <input type="text" name="weight" id="weight" class="input-field w-full px-3 py-2"
+                                    placeholder="70kg" />
                             </div>
                             <div>
-                                <label for="eyes" class="block text-sm mb-1" style="color:var(--cs-text-muted);">Olhos</label>
-                                <input type="text" name="eyes" id="eyes" class="input-field w-full px-3 py-2" placeholder="Azuis" />
+                                <label for="eyes" class="block text-sm mb-1"
+                                    style="color:var(--cs-text-muted);">Olhos</label>
+                                <input type="text" name="eyes" id="eyes" class="input-field w-full px-3 py-2"
+                                    placeholder="Azuis" />
                             </div>
                             <div>
-                                <label for="skin" class="block text-sm mb-1" style="color:var(--cs-text-muted);">Pele</label>
-                                <input type="text" name="skin" id="skin" class="input-field w-full px-3 py-2" placeholder="Clara" />
+                                <label for="skin" class="block text-sm mb-1"
+                                    style="color:var(--cs-text-muted);">Pele</label>
+                                <input type="text" name="skin" id="skin" class="input-field w-full px-3 py-2"
+                                    placeholder="Clara" />
                             </div>
                             <div>
-                                <label for="hair" class="block text-sm mb-1" style="color:var(--cs-text-muted);">Cabelo</label>
-                                <input type="text" name="hair" id="hair" class="input-field w-full px-3 py-2" placeholder="Castanho" />
+                                <label for="hair" class="block text-sm mb-1"
+                                    style="color:var(--cs-text-muted);">Cabelo</label>
+                                <input type="text" name="hair" id="hair" class="input-field w-full px-3 py-2"
+                                    placeholder="Castanho" />
                             </div>
                         </div>
                         <div class="mt-4">
-                            <label for="appearance" class="block text-sm mb-1" style="color:var(--cs-text-muted);">Descrição da Aparência</label>
-                            <textarea name="appearance" id="appearance" class="input-field w-full px-3 py-2 resize-none" rows="4" placeholder="Descreva a aparência do seu personagem..."></textarea>
+                            <label for="appearance" class="block text-sm mb-1"
+                                style="color:var(--cs-text-muted);">Descrição da Aparência</label>
+                            <textarea name="appearance" id="appearance" class="input-field w-full px-3 py-2 resize-none"
+                                rows="4" placeholder="Descreva a aparência do seu personagem..."></textarea>
                         </div>
                     </section>
 
                     <!-- História -->
                     <section class="card p-6">
                         <h2>📖 História do Personagem</h2>
-                        <textarea name="backstory" id="backstory" class="input-field w-full px-3 py-2 resize-none" rows="8" placeholder="Conte a história do seu personagem..."></textarea>
+                        <textarea name="backstory" id="backstory" class="input-field w-full px-3 py-2 resize-none"
+                            rows="8" placeholder="Conte a história do seu personagem..."></textarea>
                     </section>
 
-                    <!-- Ataques e Conjuração -->
-                    <section class="card p-6">
-                        <h2>⚡ Ataques e Conjuração</h2>
-                        <div class="space-y-4">
-                            <div>
-                                <label for="attacks" class="block text-sm mb-2" style="color:var(--cs-text-muted);">Ataques</label>
-                                <textarea name="attacks" id="attacks" class="input-field w-full px-3 py-2 resize-none" rows="4" placeholder="Nome | Bônus de Ataque | Dano/Tipo"></textarea>
-                            </div>
-                            <div class="grid grid-cols-3 gap-4">
-                                <div>
-                                    <label for="spell-slots" class="block text-sm mb-1" style="color:var(--cs-text-muted);">Espaços de Magia</label>
-                                    <input type="text" name="spell-slots" id="spell-slots" class="input-field w-full px-3 py-2" placeholder="1º: 4" />
-                                </div>
-                                <div>
-                                    <label for="spell-save-dc" class="block text-sm mb-1" style="color:var(--cs-text-muted);">CD de Magia</label>
-                                    <input type="number" name="spell-save-dc" id="spell-save-dc" class="input-field w-full px-3 py-2" placeholder="13" />
-                                </div>
-                                <div>
-                                    <label for="spell-attack" class="block text-sm mb-1" style="color:var(--cs-text-muted);">Ataque Mágico</label>
-                                    <input type="text" name="spell-attack" id="spell-attack" class="input-field w-full px-3 py-2" placeholder="+5" />
-                                </div>
-                            </div>
-                        </div>
-                    </section>
+                    <!-- (Ataques e Conjuração removido - já está na aba Combate) -->
                 </div>
             </div>
         </div>
@@ -495,501 +622,789 @@
                 <!-- Coluna Esquerda -->
                 <div class="space-y-6">
 
-                    <!-- Características e Habilidades -->
-                    <section class="card p-6">
-                        <div class="flex justify-between items-center mb-4" style="border-bottom:1px solid var(--cs-gold-border);padding-bottom:10px;">
-                            <h2 style="border:none;padding:0;margin:0;">✨ Características e Habilidades</h2>
-                            <div class="flex gap-2">
-                                <button id="toggleLockFeatures" class="btn-icon" title="Travar/Destravar">
-                                    <span class="lock-icon">🔒</span>
-                                </button>
-                                <button id="addFeatureBtn" class="btn-primary px-4 py-2" style="border-radius:8px;font-size:0.78rem;">
-                                    + Habilidade
-                                </button>
-                            </div>
-                        </div>
-                        <div id="featuresList" class="space-y-2">
-                            <div class="text-center py-10" style="color:var(--cs-text-dim);font-style:italic;">
-                                <div style="font-size:2rem;margin-bottom:8px;">✨</div>
-                                Nenhuma habilidade adicionada ainda.
-                            </div>
-                        </div>
-                    </section>
+                    <!-- Coluna Direita -->
+                    <div class="space-y-6">
 
-                    <!-- Inventário -->
-                    <section class="card p-6">
-                        <h2>🎒 Inventário</h2>
-                        <div class="space-y-4">
-                            <div class="flex justify-between items-center">
-                                <span class="text-sm" style="color:var(--cs-text-muted);">Capacidade de Carga:</span>
-                                <span class="font-mono text-sm" id="carrying-capacity-2">75 kg</span>
-                            </div>
-                            <div class="flex justify-between items-center">
-                                <span class="text-sm" style="color:var(--cs-text-muted);">Carga Atual:</span>
-                                <span class="font-mono text-sm" id="current-load-2">0 kg</span>
-                            </div>
-                            <div class="w-full bg-gray-200" style="height:6px;border-radius:999px;overflow:hidden;">
-                                <div class="bg-primary" style="height:100%;border-radius:999px;transition:width 0.4s ease;width:0%;" id="load-bar-2"></div>
-                            </div>
-                            <button onclick="openInventoryModal()" class="btn-primary w-full px-4 py-2" style="border-radius:8px;font-size:0.88rem;">
-                                Gerenciar Inventário
-                            </button>
-                        </div>
-                    </section>
-                </div>
-
-                <!-- Coluna Direita -->
-                <div class="space-y-6">
-
-                    <!-- Tesouro -->
-                    <section class="card p-6">
-                        <h2>💰 Tesouro</h2>
-                        <div class="space-y-4">
-                            <div class="grid grid-cols-5 gap-3">
-                                <div>
-                                    <label for="cp-2" class="block text-xs mb-1 text-center" style="color:var(--cs-text-muted);">PC</label>
-                                    <input type="number" name="cp-2" id="cp-2" class="input-field w-full px-2 py-2 text-center" value="0" min="0" />
+                        <!-- Tesouro -->
+                        <section class="card p-6">
+                            <h2>💰 Tesouro</h2>
+                            <div class="space-y-4">
+                                <div class="grid grid-cols-5 gap-3">
+                                    <div>
+                                        <label for="cp-2" class="block text-xs mb-1 text-center"
+                                            style="color:var(--cs-text-muted);">PC</label>
+                                        <input type="number" name="cp-2" id="cp-2"
+                                            class="input-field w-full px-2 py-2 text-center" value="0" min="0" />
+                                    </div>
+                                    <div>
+                                        <label for="sp-2" class="block text-xs mb-1 text-center"
+                                            style="color:var(--cs-text-muted);">PP</label>
+                                        <input type="number" name="sp-2" id="sp-2"
+                                            class="input-field w-full px-2 py-2 text-center" value="0" min="0" />
+                                    </div>
+                                    <div>
+                                        <label for="ep-2" class="block text-xs mb-1 text-center"
+                                            style="color:var(--cs-text-muted);">PE</label>
+                                        <input type="number" name="ep-2" id="ep-2"
+                                            class="input-field w-full px-2 py-2 text-center" value="0" min="0" />
+                                    </div>
+                                    <div>
+                                        <label for="gp-2" class="block text-xs mb-1 text-center"
+                                            style="color:var(--cs-text-muted);">PO</label>
+                                        <input type="number" name="gp-2" id="gp-2"
+                                            class="input-field w-full px-2 py-2 text-center" value="0" min="0" />
+                                    </div>
+                                    <div>
+                                        <label for="pp-2" class="block text-xs mb-1 text-center"
+                                            style="color:var(--cs-text-muted);">PL</label>
+                                        <input type="number" name="pp-2" id="pp-2"
+                                            class="input-field w-full px-2 py-2 text-center" value="0" min="0" />
+                                    </div>
                                 </div>
                                 <div>
-                                    <label for="sp-2" class="block text-xs mb-1 text-center" style="color:var(--cs-text-muted);">PP</label>
-                                    <input type="number" name="sp-2" id="sp-2" class="input-field w-full px-2 py-2 text-center" value="0" min="0" />
-                                </div>
-                                <div>
-                                    <label for="ep-2" class="block text-xs mb-1 text-center" style="color:var(--cs-text-muted);">PE</label>
-                                    <input type="number" name="ep-2" id="ep-2" class="input-field w-full px-2 py-2 text-center" value="0" min="0" />
-                                </div>
-                                <div>
-                                    <label for="gp-2" class="block text-xs mb-1 text-center" style="color:var(--cs-text-muted);">PO</label>
-                                    <input type="number" name="gp-2" id="gp-2" class="input-field w-full px-2 py-2 text-center" value="0" min="0" />
-                                </div>
-                                <div>
-                                    <label for="pp-2" class="block text-xs mb-1 text-center" style="color:var(--cs-text-muted);">PL</label>
-                                    <input type="number" name="pp-2" id="pp-2" class="input-field w-full px-2 py-2 text-center" value="0" min="0" />
+                                    <label for="treasure-2" class="block text-sm mb-2"
+                                        style="color:var(--cs-text-muted);">Outros Tesouros</label>
+                                    <textarea name="treasure-2" id="treasure-2"
+                                        class="input-field w-full px-3 py-2 resize-none" rows="4"
+                                        placeholder="Gemas, joias, itens valiosos..."></textarea>
                                 </div>
                             </div>
-                            <div>
-                                <label for="treasure-2" class="block text-sm mb-2" style="color:var(--cs-text-muted);">Outros Tesouros</label>
-                                <textarea name="treasure-2" id="treasure-2" class="input-field w-full px-3 py-2 resize-none" rows="4" placeholder="Gemas, joias, itens valiosos..."></textarea>
-                            </div>
-                        </div>
-                    </section>
+                        </section>
 
-                    <!-- Aliados e Organizações -->
-                    <section class="card p-6">
-                        <h2>🤝 Aliados e Organizações</h2>
-                        <textarea name="allies-2" id="allies-2" class="input-field w-full px-3 py-2 resize-none" rows="6" placeholder="Liste aliados, contatos e organizações..."></textarea>
-                    </section>
+                        <!-- Aliados e Organizações -->
+                        <section class="card p-6">
+                            <h2>🤝 Aliados e Organizações</h2>
+                            <textarea name="allies-2" id="allies-2" class="input-field w-full px-3 py-2 resize-none"
+                                rows="6" placeholder="Liste aliados, contatos e organizações..."></textarea>
+                        </section>
 
-                    <!-- Características e Traços (texto livre) -->
-                    <section class="card p-6">
-                        <h2>📋 Características &amp; Traços</h2>
-                        <textarea name="features-traits" id="features-traits" class="input-field w-full px-3 py-2 resize-none" rows="6" placeholder="Características raciais, traços de antecedente..."></textarea>
-                    </section>
+                        <!-- Características e Traços (texto livre) -->
+                        <section class="card p-6">
+                            <h2>📋 Características &amp; Traços</h2>
+                            <textarea name="features-traits" id="features-traits"
+                                class="input-field w-full px-3 py-2 resize-none" rows="6"
+                                placeholder="Características raciais, traços de antecedente..."></textarea>
+                        </section>
+                    </div>
                 </div>
             </div>
-        </div>
 
-    </div><!-- /container -->
+        </div><!-- /container -->
 
-    <!-- ══════════════════════════════════════
+        <!-- ══════════════════════════════════════
          MOBILE BOTTOM NAVIGATION
     ══════════════════════════════════════ -->
-    <nav class="cs-bottom-nav" role="navigation" aria-label="Navegação das abas">
-        <button class="cs-bottom-nav__btn active" data-tab="combat" onclick="switchTab('combat')" aria-label="Combate">
-            <span class="cs-bottom-nav__icon">⚔️</span>
-            <span class="cs-bottom-nav__label">Combate</span>
-        </button>
-        <button class="cs-bottom-nav__btn" data-tab="attributes" onclick="switchTab('attributes')" aria-label="Atributos">
-            <span class="cs-bottom-nav__icon">📊</span>
-            <span class="cs-bottom-nav__label">Atributos</span>
-        </button>
-        <button class="cs-bottom-nav__btn" data-tab="identity" onclick="switchTab('identity')" aria-label="Identidade">
-            <span class="cs-bottom-nav__icon">🎭</span>
-            <span class="cs-bottom-nav__label">Identidade</span>
-        </button>
-        <button class="cs-bottom-nav__btn" data-tab="resources" onclick="switchTab('resources')" aria-label="Recursos">
-            <span class="cs-bottom-nav__icon">🎒</span>
-            <span class="cs-bottom-nav__label">Recursos</span>
-        </button>
-    </nav>
+        <nav class="cs-bottom-nav" role="navigation" aria-label="Navegação das abas">
+            <button class="cs-bottom-nav__btn active" data-tab="combat" onclick="switchTab('combat')"
+                aria-label="Combate">
+                <span class="cs-bottom-nav__icon">⚔️</span>
+                <span class="cs-bottom-nav__label">Combate</span>
+            </button>
+            <button class="cs-bottom-nav__btn" data-tab="attributes" onclick="switchTab('attributes')"
+                aria-label="Atributos">
+                <span class="cs-bottom-nav__icon">📊</span>
+                <span class="cs-bottom-nav__label">Atributos</span>
+            </button>
+            <button class="cs-bottom-nav__btn" data-tab="identity" onclick="switchTab('identity')"
+                aria-label="Identidade">
+                <span class="cs-bottom-nav__icon">🎭</span>
+                <span class="cs-bottom-nav__label">Identidade</span>
+            </button>
+            <button class="cs-bottom-nav__btn" data-tab="resources" onclick="switchTab('resources')"
+                aria-label="Recursos">
+                <span class="cs-bottom-nav__icon">🎒</span>
+                <span class="cs-bottom-nav__label">Recursos</span>
+            </button>
+        </nav>
 
-    <!-- ══════════════════════════════════════
+        <!-- ══════════════════════════════════════
          MODAL: ADICIONAR ATAQUE
     ══════════════════════════════════════ -->
-    <div id="attackModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4" style="display:none;">
-        <div style="max-width:440px;width:100%;padding:0;overflow:hidden;">
-            <div class="cs-modal__header">
-                <span class="cs-modal__title">⚔️ Adicionar Ataque</span>
-                <button id="closeAttackModal" class="cs-modal__close">&times;</button>
+        <div id="attackModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4" style="display:none;">
+            <div style="max-width:440px;width:100%;padding:0;overflow:hidden;">
+                <div class="cs-modal__header">
+                    <span class="cs-modal__title">⚔️ Adicionar Ataque</span>
+                    <button id="closeAttackModal" class="cs-modal__close">&times;</button>
+                </div>
+                <form id="attackForm" class="cs-modal__body">
+                    <div class="form-group">
+                        <label>Nome do Ataque</label>
+                        <input type="text" id="attackName" class="input-field w-full" placeholder="Ex: Espada Longa"
+                            required />
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="form-group">
+                            <label>Bônus de Ataque</label>
+                            <input type="text" id="attackBonus" class="input-field w-full text-center" placeholder="+5"
+                                required />
+                        </div>
+                        <div class="form-group">
+                            <label>Dano</label>
+                            <input type="text" id="attackDamage" class="input-field w-full text-center"
+                                placeholder="1d8+3" required />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Tipo de Dano</label>
+                        <select id="attackType" class="input-field w-full">
+                            <option value="Cortante">Cortante</option>
+                            <option value="Perfurante">Perfurante</option>
+                            <option value="Contundente">Contundente</option>
+                            <option value="Ácido">Ácido</option>
+                            <option value="Elétrico">Elétrico</option>
+                            <option value="Fogo">Fogo</option>
+                            <option value="Frio">Frio</option>
+                            <option value="Necrótico">Necrótico</option>
+                            <option value="Radiante">Radiante</option>
+                            <option value="Veneno">Veneno</option>
+                            <option value="Psíquico">Psíquico</option>
+                            <option value="Trovejante">Trovejante</option>
+                        </select>
+                    </div>
+                    <div class="cs-modal__footer" style="margin-top:8px;padding:0;">
+                        <button type="submit" class="btn-primary flex-1 py-3"
+                            style="border-radius:8px;">Adicionar</button>
+                        <button type="button" id="cancelAttackModal" class="btn-secondary flex-1 py-3"
+                            style="border-radius:8px;">Cancelar</button>
+                    </div>
+                </form>
             </div>
-            <form id="attackForm" class="cs-modal__body">
-                <div class="form-group">
-                    <label>Nome do Ataque</label>
-                    <input type="text" id="attackName" class="input-field w-full" placeholder="Ex: Espada Longa" required />
-                </div>
-                <div class="grid grid-cols-2 gap-4">
-                    <div class="form-group">
-                        <label>Bônus de Ataque</label>
-                        <input type="text" id="attackBonus" class="input-field w-full text-center" placeholder="+5" required />
-                    </div>
-                    <div class="form-group">
-                        <label>Dano</label>
-                        <input type="text" id="attackDamage" class="input-field w-full text-center" placeholder="1d8+3" required />
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label>Tipo de Dano</label>
-                    <select id="attackType" class="input-field w-full">
-                        <option value="Cortante">Cortante</option>
-                        <option value="Perfurante">Perfurante</option>
-                        <option value="Contundente">Contundente</option>
-                        <option value="Ácido">Ácido</option>
-                        <option value="Elétrico">Elétrico</option>
-                        <option value="Fogo">Fogo</option>
-                        <option value="Frio">Frio</option>
-                        <option value="Necrótico">Necrótico</option>
-                        <option value="Radiante">Radiante</option>
-                        <option value="Veneno">Veneno</option>
-                        <option value="Psíquico">Psíquico</option>
-                        <option value="Trovejante">Trovejante</option>
-                    </select>
-                </div>
-                <div class="cs-modal__footer" style="margin-top:8px;padding:0;">
-                    <button type="submit" class="btn-primary flex-1 py-3" style="border-radius:8px;">Adicionar</button>
-                    <button type="button" id="cancelAttackModal" class="btn-secondary flex-1 py-3" style="border-radius:8px;">Cancelar</button>
-                </div>
-            </form>
         </div>
-    </div>
 
-    <!-- ══════════════════════════════════════
+        <!-- ══════════════════════════════════════
          MODAL: INVENTÁRIO
     ══════════════════════════════════════ -->
-    <div id="inventory-modal" class="fixed inset-0 hidden z-50" style="background:rgba(0,0,0,0.8);backdrop-filter:blur(6px);">
-        <div class="flex items-center justify-center min-h-screen p-4">
-            <div style="background:rgba(18,18,28,0.97);border:1px solid var(--cs-gold-border-strong);border-radius:20px;max-width:800px;width:100%;max-height:92vh;overflow-y:auto;" class="modal-enter">
-                <div class="p-6">
-                    <div class="flex justify-between items-center mb-6">
-                        <h2 style="font-family:var(--font-heading);font-size:1.2rem;color:var(--cs-gold);">🎒 Gerenciar Inventário</h2>
-                        <button onclick="closeInventoryModal()" style="background:none;border:1px solid var(--cs-gold-border);color:var(--cs-text-muted);width:32px;height:32px;border-radius:50%;font-size:1.2rem;cursor:pointer;display:flex;align-items:center;justify-content:center;">&times;</button>
-                    </div>
+        <div id="inventory-modal" class="fixed inset-0 hidden z-50"
+            style="background:rgba(0,0,0,0.8);backdrop-filter:blur(6px);">
+            <div class="flex items-center justify-center min-h-screen p-4">
+                <div style="background:rgba(18,18,28,0.97);border:1px solid var(--cs-gold-border-strong);border-radius:20px;max-width:800px;width:100%;max-height:92vh;overflow-y:auto;"
+                    class="modal-enter">
+                    <div class="p-6">
+                        <div class="flex justify-between items-center mb-6">
+                            <h2 style="font-family:var(--font-heading);font-size:1.2rem;color:var(--cs-gold);">🎒
+                                Gerenciar Inventário</h2>
+                            <button onclick="closeInventoryModal()"
+                                style="background:none;border:1px solid var(--cs-gold-border);color:var(--cs-text-muted);width:32px;height:32px;border-radius:50%;font-size:1.2rem;cursor:pointer;display:flex;align-items:center;justify-content:center;">&times;</button>
+                        </div>
 
-                    <!-- Add Item -->
-                    <div class="mb-6 p-4" style="background:rgba(10,10,18,0.5);border-radius:12px;border:1px solid var(--cs-gold-border);">
-                        <h3 style="font-family:var(--font-heading);color:var(--cs-gold);font-size:0.95rem;margin-bottom:16px;">Adicionar Item</h3>
-                        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                            <div>
-                                <label class="block text-sm mb-1" style="color:var(--cs-text-muted);">Categoria</label>
-                                <select id="item-category" class="input-field w-full px-3 py-2">
-                                    <option value="">Selecione categoria</option>
-                                    <option value="armor">Armadura</option>
-                                    <option value="weapons">Armas</option>
-                                    <option value="kits">Kits</option>
-                                    <option value="custom">Personalizado</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block text-sm mb-1" style="color:var(--cs-text-muted);">Item</label>
-                                <select id="item-select" class="input-field w-full px-3 py-2" disabled>
-                                    <option value="">Selecione um item</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block text-sm mb-1" style="color:var(--cs-text-muted);">Quantidade</label>
-                                <input type="number" id="item-quantity" class="input-field w-full px-3 py-2" min="1" value="1" />
-                            </div>
-                            <div class="flex items-end">
-                                <button onclick="addInventoryItem()" class="btn-primary px-4 py-2 w-full" style="border-radius:8px;">Adicionar</button>
+                        <!-- Add Item -->
+                        <div class="mb-6 p-4"
+                            style="background:rgba(10,10,18,0.5);border-radius:12px;border:1px solid var(--cs-gold-border);">
+                            <h3
+                                style="font-family:var(--font-heading);color:var(--cs-gold);font-size:0.95rem;margin-bottom:16px;">
+                                Adicionar Item</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                                <div>
+                                    <label class="block text-sm mb-1"
+                                        style="color:var(--cs-text-muted);">Categoria</label>
+                                    <select id="item-category" class="input-field w-full px-3 py-2">
+                                        <option value="">Selecione categoria</option>
+                                        <option value="armor">Armadura</option>
+                                        <option value="weapons">Armas</option>
+                                        <option value="kits">Kits</option>
+                                        <option value="custom">Personalizado</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-sm mb-1" style="color:var(--cs-text-muted);">Item</label>
+                                    <select id="item-select" class="input-field w-full px-3 py-2" disabled>
+                                        <option value="">Selecione um item</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-sm mb-1"
+                                        style="color:var(--cs-text-muted);">Quantidade</label>
+                                    <input type="number" id="item-quantity" class="input-field w-full px-3 py-2" min="1"
+                                        value="1" />
+                                </div>
+                                <div class="flex items-end">
+                                    <button onclick="addInventoryItem()" class="btn-primary px-4 py-2 w-full"
+                                        style="border-radius:8px;">Adicionar</button>
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                    <!-- Items list -->
-                    <div>
-                        <h3 style="font-family:var(--font-heading);color:var(--cs-gold);font-size:0.95rem;margin-bottom:16px;">Itens no Inventário</h3>
-                        <div id="inventory-items" class="space-y-2">
-                            <p class="text-center py-8" style="color:var(--cs-text-dim);font-style:italic;">Nenhum item no inventário</p>
+                        <!-- Items list -->
+                        <div>
+                            <h3
+                                style="font-family:var(--font-heading);color:var(--cs-gold);font-size:0.95rem;margin-bottom:16px;">
+                                Itens no Inventário</h3>
+                            <div id="inventory-items" class="space-y-2">
+                                <p class="text-center py-8" style="color:var(--cs-text-dim);font-style:italic;">Nenhum
+                                    item no inventário</p>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <!-- ══════════════════════════════════════
+        <!-- ══════════════════════════════════════
          MODAL: CHARACTER CREATION WIZARD
     ══════════════════════════════════════ -->
-    <div id="characterCreationModal" class="creation-modal">
-        <div class="creation-modal-content">
-            <div class="creation-header">
-                <h2>🎭 Criar Novo Personagem</h2>
-                <button class="close-creation" title="Fechar">✕</button>
-            </div>
-            <div class="progress-bar">
-                <div class="progress-step active"><div class="step-number">1</div><span>Nome</span></div>
-                <div class="progress-step"><div class="step-number">2</div><span>Raça</span></div>
-                <div class="progress-step"><div class="step-number">3</div><span>Classe</span></div>
-                <div class="progress-step"><div class="step-number">4</div><span>Perícias</span></div>
-                <div class="progress-step"><div class="step-number">5</div><span>Atributos</span></div>
-                <div class="progress-step"><div class="step-number">6</div><span>Detalhes</span></div>
-                <div class="progress-step"><div class="step-number">7</div><span>Equip.</span></div>
-                <div class="progress-step"><div class="step-number">8</div><span>Finalizar</span></div>
-                <div class="progress-fill"></div>
-            </div>
-            <div id="creationContent" class="creation-body"></div>
-            <div class="creation-footer">
-                <button id="prevBtn" class="wizard-btn secondary-btn hidden">← Anterior</button>
-                <button id="nextBtn" class="wizard-btn primary-btn">Próximo →</button>
+        <div id="characterCreationModal" class="creation-modal">
+            <div class="creation-modal-content">
+                <div class="creation-header">
+                    <h2>🎭 Criar Novo Personagem</h2>
+                    <button class="close-creation" title="Fechar">✕</button>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-step active">
+                        <div class="step-number">1</div><span>Nome</span>
+                    </div>
+                    <div class="progress-step">
+                        <div class="step-number">2</div><span>Raça</span>
+                    </div>
+                    <div class="progress-step">
+                        <div class="step-number">3</div><span>Classe</span>
+                    </div>
+                    <div class="progress-step">
+                        <div class="step-number">4</div><span>Perícias</span>
+                    </div>
+                    <div class="progress-step">
+                        <div class="step-number">5</div><span>Atributos</span>
+                    </div>
+                    <div class="progress-step">
+                        <div class="step-number">6</div><span>Detalhes</span>
+                    </div>
+                    <div class="progress-step">
+                        <div class="step-number">7</div><span>Equip.</span>
+                    </div>
+                    <div class="progress-step">
+                        <div class="step-number">8</div><span>Finalizar</span>
+                    </div>
+                    <div class="progress-fill"></div>
+                </div>
+                <div id="creationContent" class="creation-body"></div>
+                <div class="creation-footer">
+                    <button id="prevBtn" class="wizard-btn secondary-btn hidden">← Anterior</button>
+                    <button id="nextBtn" class="wizard-btn primary-btn">Próximo →</button>
+                </div>
             </div>
         </div>
-    </div>
 
-    <!-- ══════════════════════════════════════
+        <!-- ══════════════════════════════════════
          MODAL: ADD/EDIT FEATURE
     ══════════════════════════════════════ -->
-    <div id="featureModal" class="feature-modal" style="display:none;">
-        <div class="feature-modal-content">
-            <div class="feature-modal-header">
-                <h2>Adicionar Habilidade</h2>
-                <button id="closeFeatureModal" class="close-feature-modal">&times;</button>
+        <div id="featureModal" class="feature-modal" style="display:none;">
+            <div class="feature-modal-content">
+                <div class="feature-modal-header">
+                    <h2>Adicionar Habilidade</h2>
+                    <button id="closeFeatureModal" class="close-feature-modal">&times;</button>
+                </div>
+                <form id="featureForm" class="feature-form">
+                    <div class="form-group">
+                        <label for="featureName">Nome da Habilidade</label>
+                        <input type="text" id="featureName" class="input-field w-full" placeholder="Ex: Visão no Escuro"
+                            required />
+                    </div>
+                    <div class="form-group">
+                        <label for="featureType">Tipo da Habilidade</label>
+                        <select id="featureType" class="input-field w-full" required>
+                            <option value="">Selecione o tipo</option>
+                            <option value="class">Habilidade de Classe</option>
+                            <option value="feat">Talento (Feat)</option>
+                            <option value="racial">Habilidade Racial</option>
+                            <option value="background">Habilidade de Background</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="featureSource">Detalhe do Tipo</label>
+                        <input type="text" id="featureSource" class="input-field w-full"
+                            placeholder="Ex: Elfo, Guerreiro, Nível 3" />
+                    </div>
+                    <div class="form-group">
+                        <label for="featureDescription">Descrição</label>
+                        <textarea id="featureDescription" class="input-field w-full" rows="5"
+                            placeholder="O que esta habilidade faz?"></textarea>
+                    </div>
+                    <div class="feature-modal-footer">
+                        <button type="button" id="cancelFeatureBtn" class="wizard-btn secondary-btn">Cancelar</button>
+                        <button type="submit" class="wizard-btn primary-btn">Adicionar Habilidade</button>
+                    </div>
+                </form>
             </div>
-            <form id="featureForm" class="feature-form">
-                <div class="form-group">
-                    <label for="featureName">Nome da Habilidade</label>
-                    <input type="text" id="featureName" class="input-field w-full" placeholder="Ex: Visão no Escuro" required />
-                </div>
-                <div class="form-group">
-                    <label for="featureType">Tipo da Habilidade</label>
-                    <select id="featureType" class="input-field w-full" required>
-                        <option value="">Selecione o tipo</option>
-                        <option value="class">Habilidade de Classe</option>
-                        <option value="feat">Talento (Feat)</option>
-                        <option value="racial">Habilidade Racial</option>
-                        <option value="background">Habilidade de Background</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="featureSource">Detalhe do Tipo</label>
-                    <input type="text" id="featureSource" class="input-field w-full" placeholder="Ex: Elfo, Guerreiro, Nível 3" />
-                </div>
-                <div class="form-group">
-                    <label for="featureDescription">Descrição</label>
-                    <textarea id="featureDescription" class="input-field w-full" rows="5" placeholder="O que esta habilidade faz?"></textarea>
-                </div>
-                <div class="feature-modal-footer">
-                    <button type="button" id="cancelFeatureBtn" class="wizard-btn secondary-btn">Cancelar</button>
-                    <button type="submit" class="wizard-btn primary-btn">Adicionar Habilidade</button>
-                </div>
-            </form>
         </div>
-    </div>
 
-    <!-- ══════════════════════════════════════
+        <!-- ══════════════════════════════════════
          MODAL: EDIT ATTRIBUTE
     ══════════════════════════════════════ -->
-    <div id="editAttrModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.82);z-index:9999;align-items:center;justify-content:center;backdrop-filter:blur(6px);">
-        <div style="background:rgba(18,18,28,0.97);border:1px solid var(--cs-gold-border-strong);border-radius:20px;width:min(360px,90vw);overflow:hidden;box-shadow:0 30px 80px rgba(0,0,0,0.7),var(--glow-gold-subtle);animation:cs-slideup 0.26s cubic-bezier(0.34,1.56,0.64,1) both;">
-            <div style="padding:18px 22px 14px;border-bottom:1px solid var(--cs-gold-border);display:flex;justify-content:space-between;align-items:center;background:linear-gradient(180deg,rgba(212,175,55,0.1),transparent);">
-                <span id="editAttrTitle" style="font-family:var(--font-heading);color:var(--cs-gold);font-size:0.95rem;letter-spacing:0.04em;">✏️ Editar Atributo</span>
-                <button onclick="closeEditAttrModal()" style="background:none;border:1px solid var(--cs-gold-border);color:var(--cs-text-muted);width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:1.1rem;display:flex;align-items:center;justify-content:center;" aria-label="Fechar">×</button>
-            </div>
-            <div style="padding:24px 22px;">
-                <label style="display:block;font-size:0.65rem;font-weight:bold;margin-bottom:10px;color:var(--cs-text-muted);text-transform:uppercase;letter-spacing:0.1em;">Valor (1–30)</label>
-                <input type="number" id="editAttrInput" min="1" max="30"
-                    style="width:100%;background:rgba(10,10,18,0.7);border:1px solid var(--cs-gold-border);border-radius:10px;padding:14px;color:var(--cs-text);font-family:var(--font-heading);font-size:1.6rem;text-align:center;outline:none;transition:border-color 0.2s,box-shadow 0.2s;" />
-                <div style="font-size:0.75rem;color:var(--cs-text-muted);margin-top:12px;text-align:center;">
-                    Modificador: <strong id="editAttrMod" style="color:var(--cs-gold);font-size:0.95rem;">+0</strong>
+        <div id="editAttrModal"
+            style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.82);z-index:9999;align-items:center;justify-content:center;backdrop-filter:blur(6px);">
+            <div
+                style="background:rgba(18,18,28,0.97);border:1px solid var(--cs-gold-border-strong);border-radius:20px;width:min(360px,90vw);overflow:hidden;box-shadow:0 30px 80px rgba(0,0,0,0.7),var(--glow-gold-subtle);animation:cs-slideup 0.26s cubic-bezier(0.34,1.56,0.64,1) both;">
+                <div
+                    style="padding:18px 22px 14px;border-bottom:1px solid var(--cs-gold-border);display:flex;justify-content:space-between;align-items:center;background:linear-gradient(180deg,rgba(212,175,55,0.1),transparent);">
+                    <span id="editAttrTitle"
+                        style="font-family:var(--font-heading);color:var(--cs-gold);font-size:0.95rem;letter-spacing:0.04em;">✏️
+                        Editar Atributo</span>
+                    <button onclick="closeEditAttrModal()"
+                        style="background:none;border:1px solid var(--cs-gold-border);color:var(--cs-text-muted);width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:1.1rem;display:flex;align-items:center;justify-content:center;"
+                        aria-label="Fechar">×</button>
+                </div>
+                <div style="padding:24px 22px;">
+                    <label
+                        style="display:block;font-size:0.65rem;font-weight:bold;margin-bottom:10px;color:var(--cs-text-muted);text-transform:uppercase;letter-spacing:0.1em;">Valor
+                        (1–30)</label>
+                    <input type="number" id="editAttrInput" min="1" max="30"
+                        style="width:100%;background:rgba(10,10,18,0.7);border:1px solid var(--cs-gold-border);border-radius:10px;padding:14px;color:var(--cs-text);font-family:var(--font-heading);font-size:1.6rem;text-align:center;outline:none;transition:border-color 0.2s,box-shadow 0.2s;" />
+                    <div style="font-size:0.75rem;color:var(--cs-text-muted);margin-top:12px;text-align:center;">
+                        Modificador: <strong id="editAttrMod"
+                            style="color:var(--cs-gold);font-size:0.95rem;">+0</strong>
+                    </div>
+                </div>
+                <div
+                    style="padding:14px 22px;border-top:1px solid var(--cs-gold-border);display:flex;justify-content:flex-end;gap:10px;background:rgba(0,0,0,0.2);">
+                    <button onclick="closeEditAttrModal()"
+                        style="padding:8px 18px;border:1px solid var(--cs-gold-border);border-radius:8px;background:transparent;color:var(--cs-text-muted);cursor:pointer;font-family:var(--font-heading);font-size:0.82rem;">Cancelar</button>
+                    <button onclick="confirmEditAttr()"
+                        style="padding:8px 22px;background:linear-gradient(135deg,var(--cs-gold),var(--cs-gold-dark));border:none;border-radius:8px;color:#0a0a0a;font-weight:700;cursor:pointer;font-family:var(--font-heading);font-size:0.82rem;">Salvar</button>
                 </div>
             </div>
-            <div style="padding:14px 22px;border-top:1px solid var(--cs-gold-border);display:flex;justify-content:flex-end;gap:10px;background:rgba(0,0,0,0.2);">
-                <button onclick="closeEditAttrModal()" style="padding:8px 18px;border:1px solid var(--cs-gold-border);border-radius:8px;background:transparent;color:var(--cs-text-muted);cursor:pointer;font-family:var(--font-heading);font-size:0.82rem;">Cancelar</button>
-                <button onclick="confirmEditAttr()" style="padding:8px 22px;background:linear-gradient(135deg,var(--cs-gold),var(--cs-gold-dark));border:none;border-radius:8px;color:#0a0a0a;font-weight:700;cursor:pointer;font-family:var(--font-heading);font-size:0.82rem;">Salvar</button>
+        </div>
+
+        <!-- ══════════════════════════════════════
+         MODAL: ADICIONAR PROFICIÊNCIA
+    ══════════════════════════════════════ -->
+        <div id="proficiencyModal" class="tag-modal" style="display:none;">
+            <div class="tag-modal-content">
+                <div class="tag-modal-header">
+                    <h2 id="profModalTitle">Adicionar Proficiência</h2>
+                    <button onclick="closeProficiencyModal()" class="close-feature-modal">&times;</button>
+                </div>
+                <div class="tag-modal-body">
+                    <div id="profModalCustom" style="display:none;margin-bottom:16px;">
+                        <input type="text" id="customProfInput" class="input-field w-full px-3 py-2"
+                            placeholder="Digite a proficiência personalizada..." />
+                        <button onclick="addCustomProficiency()" class="btn-primary w-full px-4 py-2"
+                            style="border-radius:8px;margin-top:8px;">Adicionar</button>
+                    </div>
+                    <div id="profModalList" class="tag-select-list">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
             </div>
         </div>
-    </div>
 
-    <!-- ══════════════════════════════════════
+        <!-- ══════════════════════════════════════
+         MODAL: ADICIONAR IDIOMA
+    ══════════════════════════════════════ -->
+        <div id="languageModal" class="tag-modal" style="display:none;">
+            <div class="tag-modal-content">
+                <div class="tag-modal-header">
+                    <h2>Adicionar Idioma</h2>
+                    <button onclick="closeLanguageModal()" class="close-feature-modal">&times;</button>
+                </div>
+                <div class="tag-modal-body">
+                    <div id="langModalList" class="tag-select-list">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ══════════════════════════════════════
          SCRIPTS
     ══════════════════════════════════════ -->
-    <script>
-        // ── Tab Switching ──
-        function switchTab(tabName) {
-            document.querySelectorAll('.tab-content').forEach(el => {
-                el.style.display = 'none';
-                el.classList.remove('active');
-            });
+        <script>
+            // ── Tab Switching ──
+            function switchTab(tabName) {
+                document.querySelectorAll('.tab-content').forEach(el => {
+                    el.style.display = 'none';
+                    el.classList.remove('active');
+                });
 
-            // Desktop tabs
-            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+                // Desktop tabs
+                document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
 
-            // Mobile bottom nav
-            document.querySelectorAll('.cs-bottom-nav__btn').forEach(btn => btn.classList.remove('active'));
+                // Mobile bottom nav
+                document.querySelectorAll('.cs-bottom-nav__btn').forEach(btn => btn.classList.remove('active'));
 
-            const tab = document.getElementById(`tab-${tabName}`);
-            if (tab) {
-                tab.style.display = 'block';
-                tab.classList.add('active');
-                // Retrigger animation
-                tab.style.animation = 'none';
-                tab.offsetHeight; // reflow
-                tab.style.animation = '';
+                const tab = document.getElementById(`tab-${tabName}`);
+                if (tab) {
+                    tab.style.display = 'block';
+                    tab.classList.add('active');
+                    // Retrigger animation
+                    tab.style.animation = 'none';
+                    tab.offsetHeight; // reflow
+                    tab.style.animation = '';
+                }
+
+                document.querySelectorAll(`[data-tab="${tabName}"]`).forEach(el => el.classList.add('active'));
             }
 
-            document.querySelectorAll(`[data-tab="${tabName}"]`).forEach(el => el.classList.add('active'));
-        }
-
-        // ── HP Bar Update ──
-        function updateHpBar() {
-            const current = parseInt(document.getElementById('currenthp')?.value) || 0;
-            const max = parseInt(document.getElementById('maxhp')?.value) || 1;
-            const ratio = Math.max(0, Math.min(1, current / max));
-            const bar = document.getElementById('hp-bar-visual');
-            if (!bar) return;
-            bar.style.width = (ratio * 100) + '%';
-            bar.className = 'hp-bar';
-            if (ratio <= 0.25) bar.classList.add('danger');
-            else if (ratio <= 0.5) bar.classList.add('warning');
-        }
-
-        document.getElementById('currenthp')?.addEventListener('input', updateHpBar);
-        document.getElementById('maxhp')?.addEventListener('input', updateHpBar);
-
-        // ── Edit Attribute Modal ──
-        let _currentEditAttr = null;
-
-        function editAttribute(attrName) {
-            const valueElement = document.getElementById(`${attrName}-value`);
-            if (!valueElement) return;
-            _currentEditAttr = attrName;
-            const currentValue = parseInt(valueElement.textContent) || 10;
-            const labels = {
-                forca:'FORÇA', destreza:'DESTREZA', constituicao:'CONSTITUIÇÃO',
-                inteligencia:'INTELIGÊNCIA', sabedoria:'SABEDORIA', carisma:'CARISMA'
-            };
-            document.getElementById('editAttrTitle').textContent = `✏️ ${labels[attrName] || attrName.toUpperCase()}`;
-            const inputEl = document.getElementById('editAttrInput');
-            inputEl.value = currentValue;
-            inputEl.style.borderColor = 'var(--cs-gold-border)';
-            inputEl.style.boxShadow = 'none';
-            const updateMod = v => {
-                const calc = Math.floor(((parseInt(v) || 10) - 10) / 2);
-                document.getElementById('editAttrMod').textContent = calc >= 0 ? `+${calc}` : `${calc}`;
-            };
-            updateMod(currentValue);
-            inputEl.oninput = () => updateMod(inputEl.value);
-            const modal = document.getElementById('editAttrModal');
-            modal.style.display = 'flex';
-            setTimeout(() => { inputEl.focus(); inputEl.select(); }, 60);
-        }
-
-        function closeEditAttrModal() {
-            document.getElementById('editAttrModal').style.display = 'none';
-            _currentEditAttr = null;
-        }
-
-        function confirmEditAttr() {
-            if (!_currentEditAttr) return;
-            const inputEl = document.getElementById('editAttrInput');
-            const parsedValue = parseInt(inputEl.value);
-            if (isNaN(parsedValue) || parsedValue < 1 || parsedValue > 30) {
-                inputEl.style.borderColor = 'var(--cs-danger)';
-                inputEl.style.boxShadow = '0 0 0 3px var(--cs-danger-muted)';
-                inputEl.focus();
-                return;
+            // ── HP Bar Update ──
+            function updateHpBar() {
+                const current = parseInt(document.getElementById('currenthp')?.value) || 0;
+                const max = parseInt(document.getElementById('maxhp')?.value) || 1;
+                const ratio = Math.max(0, Math.min(1, current / max));
+                const bar = document.getElementById('hp-bar-visual');
+                if (!bar) return;
+                bar.style.width = (ratio * 100) + '%';
+                bar.className = 'hp-bar';
+                if (ratio <= 0.25) bar.classList.add('danger');
+                else if (ratio <= 0.5) bar.classList.add('warning');
             }
-            const valueElement = document.getElementById(`${_currentEditAttr}-value`);
-            if (valueElement) {
-                valueElement.textContent = parsedValue;
-                const modifier = Math.floor((parsedValue - 10) / 2);
-                const modEl = document.getElementById(`${_currentEditAttr}-modifier`);
-                if (modEl) modEl.textContent = modifier >= 0 ? `+${modifier}` : `${modifier}`;
-                if (window.characterSheet) window.characterSheet.calculateAll();
-            }
-            closeEditAttrModal();
-        }
 
-        document.addEventListener('click', e => { if (e.target.id === 'editAttrModal') closeEditAttrModal(); });
-        document.addEventListener('keydown', e => {
-            if (e.key === 'Escape') closeEditAttrModal();
-            if (e.key === 'Enter' && _currentEditAttr) confirmEditAttr();
-        });
+            document.getElementById('currenthp')?.addEventListener('input', updateHpBar);
+            document.getElementById('maxhp')?.addEventListener('input', updateHpBar);
 
-        // ── Initialize ──
-        document.addEventListener('DOMContentLoaded', () => {
-            switchTab('combat');
-            updateHpBar();
-            initializeAttackModal();
-        });
+            // ── Edit Attribute Modal ──
+            let _currentEditAttr = null;
 
-        // ── Attack Modal System ──
-        function initializeAttackModal() {
-            const modal = document.getElementById('attackModal');
-            const addBtn = document.getElementById('addAttackBtn');
-            const closeBtn = document.getElementById('closeAttackModal');
-            const cancelBtn = document.getElementById('cancelAttackModal');
-            const form = document.getElementById('attackForm');
-            const attacksList = document.getElementById('attacksList');
-
-            if (!modal || !addBtn || !form || !attacksList) return;
-
-            let attacks = [];
-
-            const openModal  = () => { modal.style.display = 'flex'; };
-            const closeModal = () => { modal.style.display = 'none'; form.reset(); };
-
-            addBtn.addEventListener('click', openModal);
-            closeBtn?.addEventListener('click', closeModal);
-            cancelBtn?.addEventListener('click', closeModal);
-            modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
-
-            form.addEventListener('submit', e => {
-                e.preventDefault();
-                const attack = {
-                    id: Date.now(),
-                    name:   document.getElementById('attackName').value,
-                    bonus:  document.getElementById('attackBonus').value,
-                    damage: document.getElementById('attackDamage').value,
-                    type:   document.getElementById('attackType').value
+            function editAttribute(attrName) {
+                const valueElement = document.getElementById(`${attrName}-value`);
+                if (!valueElement) return;
+                _currentEditAttr = attrName;
+                const currentValue = parseInt(valueElement.textContent) || 10;
+                const labels = {
+                    forca: 'FORÇA', destreza: 'DESTREZA', constituicao: 'CONSTITUIÇÃO',
+                    inteligencia: 'INTELIGÊNCIA', sabedoria: 'SABEDORIA', carisma: 'CARISMA'
                 };
-                attacks.push(attack);
-                renderAttacks();
-                closeModal();
+                document.getElementById('editAttrTitle').textContent = `✏️ ${labels[attrName] || attrName.toUpperCase()}`;
+                const inputEl = document.getElementById('editAttrInput');
+                inputEl.value = currentValue;
+                inputEl.style.borderColor = 'var(--cs-gold-border)';
+                inputEl.style.boxShadow = 'none';
+                const updateMod = v => {
+                    const calc = Math.floor(((parseInt(v) || 10) - 10) / 2);
+                    document.getElementById('editAttrMod').textContent = calc >= 0 ? `+${calc}` : `${calc}`;
+                };
+                updateMod(currentValue);
+                inputEl.oninput = () => updateMod(inputEl.value);
+                const modal = document.getElementById('editAttrModal');
+                modal.style.display = 'flex';
+                setTimeout(() => { inputEl.focus(); inputEl.select(); }, 60);
+            }
+
+            function closeEditAttrModal() {
+                document.getElementById('editAttrModal').style.display = 'none';
+                _currentEditAttr = null;
+            }
+
+            function confirmEditAttr() {
+                if (!_currentEditAttr) return;
+                const inputEl = document.getElementById('editAttrInput');
+                const parsedValue = parseInt(inputEl.value);
+                if (isNaN(parsedValue) || parsedValue < 1 || parsedValue > 30) {
+                    inputEl.style.borderColor = 'var(--cs-danger)';
+                    inputEl.style.boxShadow = '0 0 0 3px var(--cs-danger-muted)';
+                    inputEl.focus();
+                    return;
+                }
+                const valueElement = document.getElementById(`${_currentEditAttr}-value`);
+                if (valueElement) {
+                    valueElement.textContent = parsedValue;
+                    const modifier = Math.floor((parsedValue - 10) / 2);
+                    const modEl = document.getElementById(`${_currentEditAttr}-modifier`);
+                    if (modEl) modEl.textContent = modifier >= 0 ? `+${modifier}` : `${modifier}`;
+                    if (window.characterSheet) window.characterSheet.calculateAll();
+                }
+                closeEditAttrModal();
+            }
+
+            document.addEventListener('click', e => { if (e.target.id === 'editAttrModal') closeEditAttrModal(); });
+            document.addEventListener('keydown', e => {
+                if (e.key === 'Escape') closeEditAttrModal();
+                if (e.key === 'Enter' && _currentEditAttr) confirmEditAttr();
             });
 
-            function renderAttacks() {
-                if (attacks.length === 0) {
-                    attacksList.innerHTML = `
+            // ── Initialize ──
+            document.addEventListener('DOMContentLoaded', () => {
+                switchTab('combat');
+                updateHpBar();
+                initializeAttackModal();
+            });
+
+            // ══════════════════════════════════════
+            // PROFICIENCY TAG SYSTEM
+            // ══════════════════════════════════════
+            const proficiencyData = {
+                armaduras: {
+                    title: '🛡️ Adicionar Proficiência em Armaduras',
+                    options: ['Armaduras Leves', 'Armaduras Médias', 'Armaduras Pesadas', 'Escudos']
+                },
+                armas: {
+                    title: '⚔️ Adicionar Proficiência em Armas',
+                    options: ['Armas Simples', 'Armas Marciais', 'Besta de Mão', 'Espada Curta', 'Espada Longa', 'Rapieira', 'Arco Curto', 'Arco Longo', 'Adaga']
+                },
+                ferramentas: {
+                    title: '🔧 Adicionar Proficiência em Ferramentas',
+                    options: ['Ferramentas de Ladrão', 'Kit de Herbalismo', 'Kit de Venenos', 'Ferramentas de Navegação', 'Ferramentas de Carpinteiro', 'Ferramentas de Ferreiro', 'Instrumentos Musicais']
+                },
+                outros: {
+                    title: '📋 Adicionar Outra Proficiência',
+                    options: []
+                }
+            };
+
+            let currentProfCategory = null;
+
+            function openAddProficiencyModal(category) {
+                currentProfCategory = category;
+                const data = proficiencyData[category];
+                if (!data) return;
+
+                document.getElementById('profModalTitle').textContent = data.title;
+
+                const customDiv = document.getElementById('profModalCustom');
+                const listDiv = document.getElementById('profModalList');
+                const customInput = document.getElementById('customProfInput');
+
+                // Always show custom input for 'outros', or when no preset options
+                customDiv.style.display = (category === 'outros' || data.options.length === 0) ? 'block' : 'none';
+                if (customInput) customInput.value = '';
+
+                // Get already-added tags
+                const container = document.getElementById(`prof-${category}`);
+                const existing = container ? Array.from(container.querySelectorAll('.prof-tag')).map(t => t.dataset.value) : [];
+
+                // Build option list
+                listDiv.innerHTML = data.options.map(opt => {
+                    const isAdded = existing.includes(opt);
+                    return `<div class="tag-select-item ${isAdded ? 'already-added' : ''}" onclick="addProficiencyTag('${category}', '${opt}')">${opt}</div>`;
+                }).join('');
+
+                if (category !== 'outros' && data.options.length > 0) {
+                    listDiv.innerHTML += `<div class="tag-select-item" onclick="document.getElementById('profModalCustom').style.display='block';document.getElementById('customProfInput').focus();" style="color:var(--cs-gold);font-style:italic;">+ Personalizado...</div>`;
+                }
+
+                document.getElementById('proficiencyModal').style.display = 'flex';
+            }
+
+            function closeProficiencyModal() {
+                document.getElementById('proficiencyModal').style.display = 'none';
+                currentProfCategory = null;
+            }
+
+            function addCustomProficiency() {
+                const input = document.getElementById('customProfInput');
+                const value = input?.value?.trim();
+                if (!value || !currentProfCategory) return;
+                addProficiencyTag(currentProfCategory, value);
+                input.value = '';
+            }
+
+            function addProficiencyTag(category, value) {
+                const container = document.getElementById(`prof-${category}`);
+                if (!container) return;
+
+                // Check if already exists
+                const existing = container.querySelectorAll('.prof-tag');
+                for (const tag of existing) {
+                    if (tag.dataset.value === value) return;
+                }
+
+                // Remove empty placeholder
+                const emptyMsg = document.getElementById(`empty-prof-${category}`);
+                if (emptyMsg) emptyMsg.style.display = 'none';
+
+                const tag = document.createElement('span');
+                tag.className = 'prof-tag';
+                tag.dataset.value = value;
+                tag.innerHTML = `${value} <span class="remove-tag" onclick="removeProficiencyTag(this, '${category}')">&times;</span>`;
+                container.appendChild(tag);
+
+                closeProficiencyModal();
+            }
+
+            function removeProficiencyTag(el, category) {
+                const tag = el.parentElement;
+                const container = tag.parentElement;
+                tag.remove();
+
+                // Show empty message if no tags left
+                const remaining = container.querySelectorAll('.prof-tag');
+                if (remaining.length === 0) {
+                    const emptyMsg = document.getElementById(`empty-prof-${category}`);
+                    if (emptyMsg) emptyMsg.style.display = '';
+                }
+            }
+
+            // ══════════════════════════════════════
+            // LANGUAGE TAG SYSTEM
+            // ══════════════════════════════════════
+            const allLanguages = [
+                'Comum', 'Anão', 'Élfico', 'Gigante', 'Gnômico', 'Goblin', 'Halfling', 'Orc',
+                'Abissal', 'Celestial', 'Dracônico', 'Subcomum', 'Infernal', 'Primordial', 'Silvestre', 'Subterrâneo'
+            ];
+
+            function openAddLanguageModal() {
+                const container = document.getElementById('lang-tags');
+                const existing = container ? Array.from(container.querySelectorAll('.lang-tag')).map(t => t.dataset.value) : [];
+
+                const listDiv = document.getElementById('langModalList');
+                listDiv.innerHTML = allLanguages.map(lang => {
+                    const isAdded = existing.includes(lang);
+                    return `<div class="tag-select-item ${isAdded ? 'already-added' : ''}" onclick="addLanguageTag('${lang}')">${lang}</div>`;
+                }).join('');
+
+                document.getElementById('languageModal').style.display = 'flex';
+            }
+
+            function closeLanguageModal() {
+                document.getElementById('languageModal').style.display = 'none';
+            }
+
+            function addLanguageTag(value) {
+                const container = document.getElementById('lang-tags');
+                if (!container) return;
+
+                // Check if already exists
+                const existing = container.querySelectorAll('.lang-tag');
+                for (const tag of existing) {
+                    if (tag.dataset.value === value) return;
+                }
+
+                // Remove empty placeholder
+                const emptyMsg = document.getElementById('empty-lang');
+                if (emptyMsg) emptyMsg.style.display = 'none';
+
+                const tag = document.createElement('span');
+                tag.className = 'lang-tag';
+                tag.dataset.value = value;
+                tag.innerHTML = `${value} <span class="remove-tag" onclick="removeLanguageTag(this)">&times;</span>`;
+                container.appendChild(tag);
+
+                closeLanguageModal();
+            }
+
+            function removeLanguageTag(el) {
+                const tag = el.parentElement;
+                const container = tag.parentElement;
+                tag.remove();
+
+                const remaining = container.querySelectorAll('.lang-tag');
+                if (remaining.length === 0) {
+                    const emptyMsg = document.getElementById('empty-lang');
+                    if (emptyMsg) emptyMsg.style.display = '';
+                }
+            }
+
+            // ══════════════════════════════════════
+            // AVATAR UPLOAD
+            // ══════════════════════════════════════
+            function handleAvatarUpload(event) {
+                const file = event.target.files[0];
+                if (!file) return;
+
+                if (!file.type.startsWith('image/')) {
+                    alert('Por favor, selecione um arquivo de imagem.');
+                    return;
+                }
+
+                if (file.size > 5 * 1024 * 1024) {
+                    alert('A imagem deve ter no máximo 5MB.');
+                    return;
+                }
+
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    const img = document.getElementById('charAvatarImg');
+                    const placeholder = document.querySelector('.avatar-placeholder');
+                    if (img) {
+                        img.src = e.target.result;
+                        img.style.display = 'block';
+                    }
+                    if (placeholder) placeholder.style.display = 'none';
+                };
+                reader.readAsDataURL(file);
+            }
+
+            function removeAvatar() {
+                const img = document.getElementById('charAvatarImg');
+                const placeholder = document.querySelector('.avatar-placeholder');
+                const input = document.getElementById('charAvatarInput');
+                if (img) {
+                    img.src = '';
+                    img.style.display = 'none';
+                }
+                if (placeholder) placeholder.style.display = '';
+                if (input) input.value = '';
+            }
+
+            // Close modals on backdrop click / escape
+            document.addEventListener('click', e => {
+                if (e.target.id === 'proficiencyModal') closeProficiencyModal();
+                if (e.target.id === 'languageModal') closeLanguageModal();
+            });
+            document.addEventListener('keydown', e => {
+                if (e.key === 'Escape') {
+                    if (document.getElementById('proficiencyModal')?.style.display === 'flex') closeProficiencyModal();
+                    if (document.getElementById('languageModal')?.style.display === 'flex') closeLanguageModal();
+                }
+            });
+
+            // ── Attack Modal System ──
+            function initializeAttackModal() {
+                const modal = document.getElementById('attackModal');
+                const addBtn = document.getElementById('addAttackBtn');
+                const closeBtn = document.getElementById('closeAttackModal');
+                const cancelBtn = document.getElementById('cancelAttackModal');
+                const form = document.getElementById('attackForm');
+                const attacksList = document.getElementById('attacksList');
+
+                if (!modal || !addBtn || !form || !attacksList) return;
+
+                let attacks = [];
+
+                const openModal = () => { modal.style.display = 'flex'; };
+                const closeModal = () => { modal.style.display = 'none'; form.reset(); };
+
+                addBtn.addEventListener('click', openModal);
+                closeBtn?.addEventListener('click', closeModal);
+                cancelBtn?.addEventListener('click', closeModal);
+                modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
+
+                form.addEventListener('submit', e => {
+                    e.preventDefault();
+                    const attack = {
+                        id: Date.now(),
+                        name: document.getElementById('attackName').value,
+                        bonus: document.getElementById('attackBonus').value,
+                        damage: document.getElementById('attackDamage').value,
+                        type: document.getElementById('attackType').value
+                    };
+                    attacks.push(attack);
+                    renderAttacks();
+                    closeModal();
+                });
+
+                function renderAttacks() {
+                    if (attacks.length === 0) {
+                        attacksList.innerHTML = `
                         <div class="text-center py-12" style="color:var(--cs-text-dim);font-style:italic;">
                             <div style="font-size:2rem;margin-bottom:8px;">⚔️</div>
                             Nenhum ataque cadastrado.<br>
                             <span style="font-size:0.78rem;">Toque em + para adicionar</span>
                         </div>`;
-                    return;
-                }
-                attacksList.innerHTML = attacks.map(a => `
+                        return;
+                    }
+                    attacksList.innerHTML = attacks.map(a => `
                     <div class="attack-row">
                         <div class="attack-row__name">${a.name}</div>
                         <div class="attack-row__bonus">${a.bonus}</div>
                         <div class="attack-row__damage">${a.damage} <span style="font-size:0.7rem;opacity:0.7;">${a.type}</span></div>
                         <button onclick="deleteAttack(${a.id})" class="attack-row__delete" title="Remover">✕</button>
                     </div>`).join('');
-            }
-
-            window.deleteAttack = id => {
-                if (confirm('Deseja remover este ataque?')) {
-                    attacks = attacks.filter(a => a.id !== id);
-                    renderAttacks();
                 }
-            };
-        }
-    </script>
 
-    <script type="module">
-        import { Dice3DRoller } from './js/dice3d.js?v=3.1';
-        window.Dice3DRoller = Dice3DRoller;
-    </script>
-    <script type="module" src="js/features-manager.js"></script>
-    <script type="module" src="js/character-sheet.js?v=3.1"></script>
+                window.deleteAttack = id => {
+                    if (confirm('Deseja remover este ataque?')) {
+                        attacks = attacks.filter(a => a.id !== id);
+                        renderAttacks();
+                    }
+                };
+            }
+        </script>
+
+        <script type="module">
+            import { Dice3DRoller } from './js/dice3d.js?v=3.1';
+            window.Dice3DRoller = Dice3DRoller;
+        </script>
+        <script type="module" src="js/features-manager.js"></script>
+        <script type="module" src="js/character-sheet.js?v=3.1"></script>
 
 </body>
+
 </html>
